@@ -1,0 +1,70 @@
+[
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-mdpi_ic_launcher_background.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-mdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-hdpi_ic_launcher_background.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-hdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xxxhdpi_ic_launcher_background.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xxhdpi_ic_launcher_background.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xhdpi_ic_launcher_background.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-mdpi_ic_launcher_foreground.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-hdpi_ic_launcher_foreground.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable_launch_background.xml.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable/launch_background.xml"
+    },
+    {
+        "merged": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/build/app/intermediates/res/merged/release/drawable-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "/Users/sipio/Documents/Businesses/Sipio/Apps/Mensa/mensa_italia/android/app/src/main/res/drawable-xhdpi/ic_launcher_foreground.png"
+    }
+]

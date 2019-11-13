@@ -1,0 +1,1 @@
+pt.tribeiro.flutter_plugin_pdf_viewer

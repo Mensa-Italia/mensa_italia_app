@@ -1,0 +1,4 @@
+it.sipio.mensa_italia
+drawable launch_background
+mipmap ic_launcher
+style LaunchTheme
