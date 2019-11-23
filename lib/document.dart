@@ -135,7 +135,7 @@ class _DocumentPageInfoState extends State<DocumentPageInfo> {
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   alignment: Alignment.center,
-                  child: AutoSizeText("Cerca documenti".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, color:Color(0xFF2f2e6a),fontWeight: FontWeight.bold),maxLines: 1,),
+                  child: AutoSizeText("Cerca documenti".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, color:Color(0xFF184295),fontWeight: FontWeight.bold),maxLines: 1,),
                 ),
 
 

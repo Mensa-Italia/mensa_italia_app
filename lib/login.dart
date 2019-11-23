@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/logo.png", width: size.width/3,),),),
                       Container(height: 20,),
-                      AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF2f2e6a)),),
+                      AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF184295)),),
                       Container(height: 40,),
                       Container(
                         padding: EdgeInsets.all(20),
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
                       Container(height: 50,),
-                      AutoSizeText("Questa è un'applicazione non ufficiale del Mensa Italia", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF2f2e6a)), textAlign: TextAlign.center,),
+                      AutoSizeText("Questa è un'applicazione non ufficiale del Mensa Italia", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
                     ],
                   ),
 
@@ -371,7 +371,7 @@ class _ErrorDialogState extends State<ErrorDialog> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
 
-                        AutoSizeText("ERRORE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25,color: Color(0xFF2f2e6a)),),
+                        AutoSizeText("ERRORE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25,color: Color(0xFF184295)),),
                         Container(height: 20,),
                         AutoSizeText("Credenziali non corrette, riprova"),
                         Container(height: 20,),
@@ -416,14 +416,14 @@ class MensaTextField extends TextField{
     fillColor: Colors.white,
     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
     labelStyle: TextStyle(
-        color: Color(0xFF2f2e6a),
+        color: Color(0xFF184295),
         fontWeight: FontWeight.bold
     ),
     border: new OutlineInputBorder(
       borderRadius: new BorderRadius.circular(25.0),
       borderSide: new BorderSide(
           width: 1.5,
-          color: Color(0xFF2f2e6a)
+          color: Color(0xFF184295)
       ),
     ),
     focusedBorder: new OutlineInputBorder(
@@ -431,7 +431,7 @@ class MensaTextField extends TextField{
       borderSide: new BorderSide(
 
           width: 2.0,
-          color: Color(0xFF2f2e6a)
+          color: Color(0xFF184295)
       ),
 
     ),
@@ -440,7 +440,7 @@ class MensaTextField extends TextField{
       borderSide: new BorderSide(
 
           width: 1.5,
-          color: Color(0xFF2f2e6a)
+          color: Color(0xFF184295)
       ),
 
     ),
@@ -478,7 +478,7 @@ class MensaButton extends FlatButton{
   // TODO: implement shape
   ShapeBorder get shape => new RoundedRectangleBorder(
       borderRadius: radius,
-      side: BorderSide(color: Color(0xFF2f2e6a)));
+      side: BorderSide(color: Color(0xFF184295)));
 
 
   @override
@@ -496,7 +496,7 @@ class MensaButton extends FlatButton{
 
   @override
   // TODO: implement color
-  Color get color => Color(0xFF2f2e6a);
+  Color get color => Color(0xFF184295);
 
   @override
   // TODO: implement textColor

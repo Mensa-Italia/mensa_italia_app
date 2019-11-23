@@ -94,7 +94,7 @@ class _MensaPageState extends State<MensaPage> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
                                         color: Colors.white,
-                                        border: Border.all(color: Color(0xFF2f2e6a)),
+                                        border: Border.all(color: Color(0xFF184295)),
                                         boxShadow: [
                                           BoxShadow(
                                               color: Colors.black,
@@ -176,7 +176,7 @@ class _MensaPageState extends State<MensaPage> {
 
                                                             padding: EdgeInsets.all(25),
 
-                                                            child: Image.asset("assets/images/logo_gold.png", height: 50,)
+                                                            child: Image.asset("assets/images/logo.png", height: 50,)
                                                         ),
                                                       ],
                                                     ),
@@ -299,7 +299,7 @@ class _MensaPageState extends State<MensaPage> {
                                                   Container(
                                                     padding: EdgeInsets.all(10),
                                                     decoration: BoxDecoration(
-                                                        color: Color(0xFF2f2e6a),
+                                                        color: Color(0xFF184295),
                                                         borderRadius: BorderRadius.all(Radius.circular(300))
                                                     ),
                                                     child:Icon(Icons.person, size: 40, color: Colors.white,),
@@ -328,7 +328,7 @@ class _MensaPageState extends State<MensaPage> {
                                                   Container(
                                                     padding: EdgeInsets.all(10),
                                                     decoration: BoxDecoration(
-                                                        color: Color(0xFF2f2e6a),
+                                                        color: Color(0xFF184295),
                                                         borderRadius: BorderRadius.all(Radius.circular(300))
                                                     ),
                                                     child:Icon(Icons.insert_drive_file, size: 40, color: Colors.white,),
@@ -352,7 +352,7 @@ class _MensaPageState extends State<MensaPage> {
                                           width: double.infinity,
                                           padding: EdgeInsets.all(10),
                                           decoration: BoxDecoration(
-                                              color: Color(0xFF2f2e6a)
+                                              color: Color(0xFF184295)
                                           ),
                                           child: AutoSizeText("Comunicazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
                                         ),
@@ -362,7 +362,7 @@ class _MensaPageState extends State<MensaPage> {
                                           width: double.infinity,
                                           padding: EdgeInsets.all(10),
                                           decoration: BoxDecoration(
-                                              color: Color(0xFF2f2e6a)
+                                              color: Color(0xFF184295)
                                           ),
                                           child: AutoSizeText("Documenti".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
                                         ),

@@ -39,9 +39,9 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
-        accentColor: Color(0xFF2f2e6a),
+        accentColor: Color(0xFF184295),
         appBarTheme: AppBarTheme(
-          color: Color(0xFF2f2e6a),
+          color: Color(0xFF184295),
 
         )
       ),
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/logo.png", width: size.width/2,),),),
                     Container(height: 20,),
-                    AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF2f2e6a)),),
+                    AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF184295)),),
                     Container(height: 40,),
                     isPreparing?CircularProgressIndicator():MensaButton(
                       onPressedNew: () {
