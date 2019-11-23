@@ -161,10 +161,10 @@ class _BackGroundHomeState extends State<BackGroundHome> {
     return WaveWidget(
       config: CustomConfig(
         gradients: [
-          [Color(0xEEadabff), Color(0xEEadabff)],
-          [Color(0xEE6c69f5), Color(0xEE6c69f5)],
-          [Color(0xEE504eb5), Color(0xEE504eb5)],
-          [Color(0xEE2f2e6a), Color(0xEE2f2e6a)]
+          [Color(0xEE6d9eff), Color(0xEE6d9eff)],
+          [Color(0xEE2666e5), Color(0xEE2666e5)],
+          [Color(0xEE1f54bc), Color(0xEE1f54bc)],
+          [Color(0xEE184295), Color(0xEE184295)]
         ],
         durations: [35000, 19440, 10800, 6000],
         heightPercentages: [0.70, 0.73, 0.75, 0.80],

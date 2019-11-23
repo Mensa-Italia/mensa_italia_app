@@ -187,7 +187,7 @@ class _RegSociState extends State<RegSoci> {
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: AutoSizeText("Nessun risultato disponibile".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),maxLines: 1,),
+                      child: AutoSizeText("Nessun risultato disponibile".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),maxLines: 1,textAlign: TextAlign.center,),
                     ),
 
 
