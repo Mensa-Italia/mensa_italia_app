@@ -18,9 +18,11 @@ import 'package:flutter/material.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
+import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'home.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'home_full.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -62,9 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                       Container(
                         height: 50,
                       ),
-                      Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/logo.png", width: size.width/3,),),),
-                      Container(height: 20,),
-                      AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF184295)),),
+                      Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/3,),),),
                       Container(height: 40,),
                       Container(
                         padding: EdgeInsets.all(20),
@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if(document!=null){
 
 
-                                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (d)=>MensaPage(document)), ModalRoute.withName('/'));
+                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.leftToRight, child:MensaFullPage(document)), ModalRoute.withName('/'));
 
                                 }else{
                                   showDialog(
@@ -122,7 +122,17 @@ class _LoginPageState extends State<LoginPage> {
 
 
                       Container(height: 50,),
-                      AutoSizeText("Questa è un'applicazione non ufficiale del Mensa Italia", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
+                      GestureDetector(
+                        onTap: _launchURL,
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            AutoSizeText("Thinked by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
+                            AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+
+                          ],
+                        )
+                      )
                     ],
                   ),
 
@@ -133,7 +143,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
+  _launchURL() async {
+    const url = 'https://sipio.it';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
 }
 
@@ -488,6 +505,7 @@ class MensaButton extends FlatButton{
     style: TextStyle(
       fontSize: 14.0,
     ),
+    textAlign: TextAlign.center,
   );
 
   @override

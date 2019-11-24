@@ -180,7 +180,7 @@ class _RegSociState extends State<RegSoci> {
                         )
                       ],
                     )
-                  ]:elements.isEmpty?[
+                  ]:elements[0].attributes["class"]=="alert-danger"?[
 
                     Container(height: 50,),
 

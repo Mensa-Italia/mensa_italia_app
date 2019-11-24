@@ -14,10 +14,11 @@ Matteo Sipione holds the authorial and commercial rights to this software.
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
-import 'home.dart';
+import 'home_full.dart';
 import 'login.dart';
 
 void main() => runApp(MyApp());
@@ -43,6 +44,22 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           color: Color(0xFF184295),
 
+
+        ),
+        textTheme: TextTheme(
+          title: TextStyle(fontFamily: "Gotham"),
+          body1: TextStyle(fontFamily: "Gotham"),
+          body2: TextStyle(fontFamily: "Gotham"),
+          subtitle: TextStyle(fontFamily: "Gotham"),
+          headline: TextStyle(fontFamily: "Gotham"),
+          display4: TextStyle(fontFamily: "Gotham"),
+          display3: TextStyle(fontFamily: "Gotham"),
+          display2: TextStyle(fontFamily: "Gotham"),
+          display1: TextStyle(fontFamily: "Gotham"),
+          subhead: TextStyle(fontFamily: "Gotham"),
+          overline: TextStyle(fontFamily: "Gotham"),
+          button: TextStyle(fontFamily: "Gotham"),
+          caption: TextStyle(fontFamily: "Gotham"),
         )
       ),
       debugShowMaterialGrid: false,
@@ -82,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
 
 
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (d)=>MensaPage(document)));
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:MensaFullPage(document)));
 
 
       }else{
@@ -125,13 +142,11 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       height: 100,
                     ),
-                    Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/logo.png", width: size.width/2,),),),
-                    Container(height: 20,),
-                    AutoSizeText("MENSA ITALIA", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Color(0xFF184295)),),
+                    Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/2,),),),
                     Container(height: 40,),
                     isPreparing?CircularProgressIndicator():MensaButton(
                       onPressedNew: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (d)=>LoginPage()));
+                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child:LoginPage()));
                       },
 
 

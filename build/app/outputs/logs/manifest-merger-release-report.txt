@@ -6,6 +6,7 @@ INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\ap
 INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml:1:1-34:12
 MERGED from [:shared_preferences] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\shared_preferences\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:2:1-7:12
 MERGED from [:flutter_plugin_pdf_viewer] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\flutter_plugin_pdf_viewer\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:2:1-7:12
+MERGED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:2:1-14:12
 MERGED from [:sqflite] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\sqflite\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:2:1-7:12
 MERGED from [:path_provider] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\path_provider\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:2:1-7:12
 INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml:1:1-34:12
@@ -31,6 +32,8 @@ ADDED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\s
 		ADDED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml:4:22-64
 application
 ADDED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml:10:5-33:19
+MERGED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:7:5-12:19
+MERGED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:7:5-12:19
 	android:label
 		ADDED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml:12:9-30
 	android:icon
@@ -75,6 +78,8 @@ MERGED from [:shared_preferences] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_i
 MERGED from [:shared_preferences] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\shared_preferences\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
 MERGED from [:flutter_plugin_pdf_viewer] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\flutter_plugin_pdf_viewer\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
 MERGED from [:flutter_plugin_pdf_viewer] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\flutter_plugin_pdf_viewer\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
+MERGED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
+MERGED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
 MERGED from [:sqflite] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\sqflite\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
 MERGED from [:sqflite] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\sqflite\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
 MERGED from [:path_provider] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\path_provider\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:5:5-44
@@ -89,3 +94,11 @@ INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\ap
 		INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml
 		ADDED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml
 		INJECTED from D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\android\app\src\main\AndroidManifest.xml
+activity#io.flutter.plugins.urllauncher.WebViewActivity
+ADDED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:8:9-11:74
+	android:exported
+		ADDED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:10:13-37
+	android:theme
+		ADDED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:11:13-71
+	android:name
+		ADDED from [:url_launcher] D:\Progetti\Applicazioni\Flutter\Sipio\mensa_italia_app\build\url_launcher\intermediates\merged_manifests\release\processReleaseManifest\merged\AndroidManifest.xml:9:13-74
