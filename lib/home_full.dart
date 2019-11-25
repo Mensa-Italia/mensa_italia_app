@@ -101,15 +101,15 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
 
-                                  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
 
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: <Widget>[
 
-                                      AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text, style: TextStyle(fontWeight: FontWeight.bold),),
+                                      AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold),),
 
-                                      AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text, style: TextStyle(),),
+                                      AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),),
 
                                     ],
                                   )
@@ -139,11 +139,15 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                           borderRadius: BorderRadius.all(Radius.circular(25)),
 
                                         ),
-                                        child:  Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                        Hero(tag: "logo", child: Material(color: Colors.transparent,child:Image.asset("assets/images/lettering_white.png", height: 120,))),
-                                          ],
+                                        child:  LayoutBuilder(
+                                            builder: (BuildContext context, BoxConstraints constraints) {
+                                              return Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
+                                                ],
+                                              );
+                                            }
                                         ),
 
                                       )
@@ -154,6 +158,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                               back: Container(
 
                                 margin: EdgeInsets.all(30),
+
                                 child: Card(
                                   elevation: 5,
                                   shape: RoundedRectangleBorder(
@@ -185,39 +190,58 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                                           margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
                                                           child: Column(
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            mainAxisSize: MainAxisSize.min,
                                                             crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: <Widget>[
 
-                                                              Column(
-                                                                children: <Widget>[
-                                                                  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[0].toUpperCase(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),),
-                                                                  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[1].toUpperCase(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20)),
+                                                              Expanded(
+                                                                child: Column(
 
-                                                                ],
+                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
+
+                                                                  ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
+                                                                    return    Expanded(
+                                                                      child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
+                                                                    );
+                                                                  }),
+                                                                ),
                                                               ),
 
 
 
-                                                              Column(
-                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: <Widget>[
-                                                                  AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,)),
-                                                                  Container(
-                                                                    width: constraints.maxWidth-(constraints.maxWidth*2/7),
-                                                                    child: Row(
-                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                      mainAxisSize: MainAxisSize.max,
-                                                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                                                      children: <Widget>[
-                                                                        AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20)),
-                                                                        AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),),
-                                                                      ],
-                                                                    ),
-                                                                  )
+                                                              Expanded(
+                                                                child: Column(
+                                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: <Widget>[
+                                                                    Expanded(
 
-                                                                ],
+                                                                      child:Container(
+
+                                                                          alignment: Alignment.bottomLeft,
+                                                                          child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
+                                                                      ),
+                                                                    ),
+                                                                    Expanded(
+                                                                      child:Container(
+                                                                        width: constraints.maxWidth-(constraints.maxWidth*2/7),
+
+                                                                        alignment: Alignment.bottomLeft,
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          mainAxisSize: MainAxisSize.max,
+                                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                                          children: <Widget>[
+                                                                            AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
+                                                                            AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    )
+
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ],
                                                           )

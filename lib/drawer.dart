@@ -121,7 +121,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
               child:  Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  AutoSizeText("Thinked by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
+                  AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
                   AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
 
                 ],

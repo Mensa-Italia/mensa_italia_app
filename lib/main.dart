@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
 
 
-        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:MensaFullPage(document)));
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)));
 
 
       }else{
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/2,),),),
                     Container(height: 40,),
-                    isPreparing?CircularProgressIndicator():MensaButton(
+                    isPreparing?LoadingDialog():MensaButton(
                       onPressedNew: () {
                         Navigator.push(context, PageTransition(type: PageTransitionType.fade, child:LoginPage()));
                       },

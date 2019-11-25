@@ -85,7 +85,28 @@ class _LoginPageState extends State<LoginPage> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     // return object of type Dialog
-                                    return LoadingDialog();
+                                    return Padding(
+                                        padding: EdgeInsets.only(left: 50.0, right: 50.0),
+                                    child://AlertDialog or any other Dialog you can use
+                                    Dialog(
+                                    elevation: 0.0,
+                                    backgroundColor: Colors.transparent,
+                                    child: Container(
+
+                                    decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(Radius.circular(25))
+                                    ),
+                                    child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: <Widget>[
+                                    Container(
+
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                                    child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[LoadingDialog()]))]))));
                                   },
                                 );
                                 Document document=await API().doLoginAndRetrieveMain(context, emailController.text, passwordController.text);
@@ -97,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if(document!=null){
 
 
-                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.leftToRight, child:MensaFullPage(document)), ModalRoute.withName('/'));
+                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
 
                                 }else{
                                   showDialog(
@@ -127,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                         child:  Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            AutoSizeText("Thinked by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
+                            AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
                             AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
 
                           ],
@@ -316,40 +337,7 @@ class _LoadingDialogState extends State<LoadingDialog> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
-    return Padding(
-        padding: EdgeInsets.only(left: 50.0, right: 50.0),
-        child://AlertDialog or any other Dialog you can use
-        Dialog(
-            elevation: 0.0,
-            backgroundColor: Colors.transparent,
-            child: Container(
-
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(25))
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-
-
-                        Transform.rotate(angle: _controller.value*50000, child: Image.asset("assets/images/logo.png", width: size.width/4,),)
-
-
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            )
-        ));
+    return Transform.rotate(angle: _controller.value*50000, child: Image.asset("assets/images/loading.png", width: size.width/4,),);
   }
 }
 
@@ -379,7 +367,6 @@ class _ErrorDialogState extends State<ErrorDialog> {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Container(
 
@@ -390,16 +377,16 @@ class _ErrorDialogState extends State<ErrorDialog> {
 
                         AutoSizeText("ERRORE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25,color: Color(0xFF184295)),),
                         Container(height: 20,),
-                        AutoSizeText("Credenziali non corrette, riprova"),
-                        Container(height: 20,),
+                        AutoSizeText("Credenziali non corrette, riprova", textAlign: TextAlign.center,),
                       ],
                     ),
                   ),
                   MensaButton(onPressedNew: (){
 
                     Navigator.pop(context);
-                  },text: "Va bene",)
+                  },text: "Va bene",),
 
+                  Container(height: 20,),
                 ],
               ),
             )
