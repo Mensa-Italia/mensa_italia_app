@@ -19,6 +19,7 @@ import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as prefix1;
 import 'package:mensa_italia/regsoci.dart';
+import 'package:mensa_italia/sig.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -259,8 +260,36 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                 ),
                               ),
                             ),
-                            Container(
-                              height: 20,
+
+                            GestureDetector(
+                              onTap: (){
+                               
+                                Navigator.push(context, PageTransition(child: SIGMensa(), type: PageTransitionType.rightToLeft));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(20),
+                                padding: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Theme.of(context).accentColor),
+                                    borderRadius: BorderRadius.circular(25)
+                                ),
+                                child:Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: AutoSizeText("Vivi al meglio la vita associativa, trova il SIG perfetto per te.", style: TextStyle(color: Theme.of(context).accentColor),),
+                                    ),
+                                    Container(
+                                      width: 40,
+                                    ),
+                                    Icon(
+                                        Icons.arrow_forward,
+                                        color: Theme.of(context).accentColor
+                                    )
+
+                                  ],
+                                ),
+                              ),
                             ),
 
 

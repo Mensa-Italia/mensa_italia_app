@@ -57,18 +57,10 @@ class _BlogMensaState extends State<BlogMensa> {
 
               }
             },
-            child: widget.document==null?Icon(Icons.account_circle):Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Container(
-                  width: IconTheme.of(context).size,
-                  height: IconTheme.of(context).size,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(200),
-                      image: DecorationImage(image: NetworkImage("https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"]), fit: BoxFit.cover)
-                  ),
-                )
+                AutoSizeText("AREA SOCI")
               ],
             ),
           ),
