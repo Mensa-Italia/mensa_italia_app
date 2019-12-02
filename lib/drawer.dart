@@ -112,7 +112,9 @@ class _MensaDrawerState extends State<MensaDrawer> {
 
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.clear();
-              Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:HomePage()));
+
+              Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:HomePage()), ModalRoute.withName('/'));
+
             }
           ),
           Container(height: 50,),

@@ -16,8 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
+import 'blog.dart';
 import 'home_full.dart';
 import 'login.dart';
 
@@ -39,28 +41,28 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
-        accentColor: Color(0xFF184295),
-        appBarTheme: AppBarTheme(
-          color: Color(0xFF184295),
+          primarySwatch: Colors.blue,
+          accentColor: Color(0xFF184295),
+          appBarTheme: AppBarTheme(
+            color: Color(0xFF184295),
 
 
-        ),
-        textTheme: TextTheme(
-          title: TextStyle(fontFamily: "Gotham"),
-          body1: TextStyle(fontFamily: "Gotham"),
-          body2: TextStyle(fontFamily: "Gotham"),
-          subtitle: TextStyle(fontFamily: "Gotham"),
-          headline: TextStyle(fontFamily: "Gotham"),
-          display4: TextStyle(fontFamily: "Gotham"),
-          display3: TextStyle(fontFamily: "Gotham"),
-          display2: TextStyle(fontFamily: "Gotham"),
-          display1: TextStyle(fontFamily: "Gotham"),
-          subhead: TextStyle(fontFamily: "Gotham"),
-          overline: TextStyle(fontFamily: "Gotham"),
-          button: TextStyle(fontFamily: "Gotham"),
-          caption: TextStyle(fontFamily: "Gotham"),
-        )
+          ),
+          textTheme: TextTheme(
+            title: TextStyle(fontFamily: "Gotham"),
+            body1: TextStyle(fontFamily: "Gotham"),
+            body2: TextStyle(fontFamily: "Gotham"),
+            subtitle: TextStyle(fontFamily: "Gotham"),
+            headline: TextStyle(fontFamily: "Gotham"),
+            display4: TextStyle(fontFamily: "Gotham"),
+            display3: TextStyle(fontFamily: "Gotham"),
+            display2: TextStyle(fontFamily: "Gotham"),
+            display1: TextStyle(fontFamily: "Gotham"),
+            subhead: TextStyle(fontFamily: "Gotham"),
+            overline: TextStyle(fontFamily: "Gotham"),
+            button: TextStyle(fontFamily: "Gotham"),
+            caption: TextStyle(fontFamily: "Gotham"),
+          )
       ),
       debugShowMaterialGrid: false,
       debugShowCheckedModeBanner: false,
@@ -90,29 +92,42 @@ class _HomePageState extends State<HomePage> {
 
   bool isPreparing=true;
   prepare() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+    Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
+
+    if(document!=null){
+
+
+
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:BlogMensa(document: document)));
+
+
+    }else{
+
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-      Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
-
-      if(document!=null){
-
-
-
-        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)));
-
-
+      if(prefs.getBool("isJumped")!=null&&prefs.getBool("isJumped")){
+        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:BlogMensa()));
       }else{
 
         setState(() {
           isPreparing=false;
         });
       }
+    }
 
   }
 
 
 
+  tryToLunchUrl(String url) async {
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
 
   Size size;
   @override
@@ -124,43 +139,82 @@ class _HomePageState extends State<HomePage> {
 
 
 
-      body: Container(
-        width: size.width,
+        body: Container(
+          width: size.width,
 
-        color: Colors.black.withOpacity(0.4),
-        height: size.height,
-        child: Stack(
-          children: [
-            BackGroundHome(),
+          color: Colors.black.withOpacity(0.4),
+          height: size.height,
+          child: Stack(
+              children: [
 
-            SingleChildScrollView(
 
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+
+                Stack(
+                  alignment: Alignment.bottomCenter,
                   children: <Widget>[
+
+
+                    BackGroundHome(),
                     Container(
-                      height: 100,
-                    ),
-                    Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/2,),),),
-                    Container(height: 40,),
-                    isPreparing?LoadingDialog():MensaButton(
-                      onPressedNew: () {
-                        Navigator.push(context, PageTransition(type: PageTransitionType.fade, child:LoginPage()));
-                      },
-
-
-                      text: "ACCEDI",
-                    ),
-                    Container(height: 40,)
-
+                      margin: EdgeInsets.only(bottom: 20),
+                      child:  AutoSizeText("FLOREAT MENSA!", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),),
+                    )
                   ],
                 ),
 
-            ),
-          ],
-        ),
-      ),
+                SingleChildScrollView(
+
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          height: 100,
+                        ),
+                        Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/2,),),),
+                        Container(height: 40,),
+                        isPreparing?LoadingDialog():MensaButton(
+                          onPressedNew: () {
+                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:LoginPage()));
+                          },
+
+
+                          text: "ACCEDI",
+                        ),
+                        Container(height: 30,),
+                        isPreparing?Container():AutoSizeText("Se non sei mensano salta l'accesso oppure scopri come diventarlo!.", textAlign: TextAlign.center,),
+                        Container(height: 50,),
+                        GestureDetector(
+                          onTap: (){
+                            tryToLunchUrl("https://www.mensaitalia.it/iscriviti/");
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            child:isPreparing?Container():AutoSizeText("DIVENTA MENSANO", textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                          ),
+                        )
+
+
+                      ]
+                  ),
+                ),
+                Positioned(
+
+                  right: 20,
+                  top: MediaQuery.of(context).padding.top+20,
+                  child:
+                  isPreparing?Container():GestureDetector(
+                    onTap: () async {
+                      Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.setBool("isJumped", true);
+                    },
+                    child: AutoSizeText("SALTA", style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 18),),
+                  ),
+                ),
+              ]
+          ),
+        )
     );
   }
 }
@@ -193,6 +247,7 @@ class _BackGroundHomeState extends State<BackGroundHome> {
         double.infinity,
         double.infinity,
       ),
+      duration: 1000,
     );
   }
 }

@@ -10,6 +10,8 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:fancy_dialog/FancyAnimation.dart';
+import 'package:fancy_dialog/fancy_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as prefix0;
@@ -38,9 +40,10 @@ class _RegSociState extends State<RegSoci> {
   prepare() async {
     document=await API().getData("https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome="+Uri.encodeFull(surnameController.text)+"&s_nome="+Uri.encodeFull(nameController.text)+"&s_citta=&s_provincia=&s_regione=&page=1");
     try{
-      maxPage=int.parse(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").elementAt(document.getElementsByTagName("ul").first.getElementsByTagName("li").length+1).getElementsByTagName("a").first.text);
+      maxPage=int.parse(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").elementAt(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").length-2).getElementsByTagName("a").first.text);
 
     }catch(e){
+      print(e);
       maxPage=0;
     }
     elements=document.getElementsByTagName("table").where((e)=>e.attributes["class"]=="table table-hover table-striped table-condensed").first.getElementsByTagName("tbody").first.getElementsByTagName("tr");
@@ -62,33 +65,38 @@ class _RegSociState extends State<RegSoci> {
   addMore() async {
     isLoading=true;
 
+    print(page);
+    print(maxPage);
     if(page<maxPage) {
-        page++;
+      page++;
 
 
 
 
-        document = await API().getData(
-            "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome="+Uri.encodeFull(surnameController.text)+"&s_nome="+Uri.encodeFull(nameController.text)+"&s_citta=&s_provincia=&s_regione=&page=" +
-                page.toString());
+      print( await API().getData(
+          "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome="+Uri.encodeFull(surnameController.text)+"&s_nome="+Uri.encodeFull(nameController.text)+"&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=" +
+              page.toString()));
+      document = await API().getData(
+          "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome="+Uri.encodeFull(surnameController.text)+"&s_nome="+Uri.encodeFull(nameController.text)+"&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=" +
+              page.toString());
 
-        elements.addAll( document
-            .getElementsByTagName("table")
-            .where((e) =>
-        e.attributes["class"] ==
-            "table table-hover table-striped table-condensed")
-            .first
-            .getElementsByTagName("tbody")
-            .first
-            .getElementsByTagName("tr"));
+      elements.addAll( document
+          .getElementsByTagName("table")
+          .where((e) =>
+      e.attributes["class"] ==
+          "table table-hover table-striped table-condensed")
+          .first
+          .getElementsByTagName("tbody")
+          .first
+          .getElementsByTagName("tr"));
 
 
-        setState(() {
+      setState(() {
 
-        });
-      isLoading=false;
-
+      });
     }
+    isLoading=false;
+
   }
 
   @override
@@ -106,158 +114,162 @@ class _RegSociState extends State<RegSoci> {
               FocusScope.of(context).requestFocus(new FocusNode());
             },
             child:NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollInfo) {
-            if (scrollInfo.metrics.pixels==scrollInfo.metrics.maxScrollExtent&&!isLoading) {
-              addMore();
-            }
-            return false;
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: document!=null?[
+              onNotification: (ScrollNotification scrollInfo) {
+                if (scrollInfo.metrics.pixels==scrollInfo.metrics.maxScrollExtent&&!isLoading) {
+                  addMore();
+                }
+                return false;
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: document!=null?[
 
-                Container(height: 20,),
-
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.center,
-                  child: AutoSizeText("Cerca soci".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, color:Color(0xFF184295),fontWeight: FontWeight.bold),maxLines: 1,),
-                ),
-
-
-                Container(height: 20,),
-
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      MensaTextField("Nome", textEditingController: nameController,),
-
-                      Container(height: 10,),
-                      MensaTextField("Cognome", textEditingController: surnameController,),
-
-                      Container(height: 10,),
-                      MensaButton(text: "Cerca",onPressedNew: (){
-
-                        if(elements!=null){
-                          elements.clear();
-                        }
-                        elements=null;
-                        setState(() {
-
-                        });
-                        prepare();
-                      },)
-
-
-                    ],
-                  ),
-                ),
-
-                Container(height: 40,),
-
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.center,
-                  child: AutoSizeText(document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-heading titolopanel").first.text.trim().toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),maxLines: 1,),
-                ),
-
-
-                Container(height: 10,),
-                Column(
-                  children: elements==null?[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          height: 20,
-                        ),
-                        CircularProgressIndicator(),
-                        Container(
-                          height: 20,
-                        )
-                      ],
-                    )
-                  ]:elements[0].attributes["class"]=="alert-danger"?[
-
-                    Container(height: 50,),
+                    Container(height: 20,),
 
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: AutoSizeText("Nessun risultato disponibile".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),maxLines: 1,textAlign: TextAlign.center,),
+                      child: AutoSizeText("Cerca soci".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, color:Color(0xFF184295),fontWeight: FontWeight.bold),maxLines: 1,),
                     ),
 
 
+                    Container(height: 20,),
 
-                  ]:List.generate(elements.length, (i){
-                    String image;
-                    String name;
-                    String card;
-                    String date;
-                    String place1;
-                    String place2;
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          MensaTextField("Nome", textEditingController: nameController,),
 
-                    var data=elements[i].getElementsByTagName("td");
+                          Container(height: 10,),
+                          MensaTextField("Cognome", textEditingController: surnameController,),
 
-                    for(int j=0;j<data.length;j++){
-                      if(j==0){
-                        try{
-                          image=data[j].getElementsByTagName("img").first.attributes["src"];
+                          Container(height: 10,),
+                          MensaButton(text: "Cerca",onPressedNew: (){
 
-                        }catch(e){
+                            if(elements!=null){
+                              elements.clear();
+                            }
+                            elements=null;
+                            setState(() {
 
-                          image="";
+                            });
+                            prepare();
+                          },)
+
+
+                        ],
+                      ),
+                    ),
+
+                    Container(height: 40,),
+
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.center,
+                      child: AutoSizeText(document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-heading titolopanel").first.text.trim().toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),maxLines: 1,),
+                    ),
+
+
+                    Container(height: 10,),
+                    Column(
+                      children: elements==null?[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              height: 20,
+                            ),
+                            CircularProgressIndicator(),
+                            Container(
+                              height: 20,
+                            )
+                          ],
+                        )
+                      ]:elements[0].attributes["class"]=="alert-danger"?[
+
+                        Container(height: 50,),
+
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.center,
+                          child: AutoSizeText("Nessun risultato disponibile".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),maxLines: 1,textAlign: TextAlign.center,),
+                        ),
+
+
+
+                      ]:List.generate(elements.length, (i){
+                        String image;
+                        String name;
+                        String card;
+                        String date;
+                        String place1;
+                        String place2;
+                        String link;
+
+                        var data=elements[i].getElementsByTagName("td");
+
+                        for(int j=0;j<data.length;j++){
+                          if(j==0){
+                            try{
+                              image=data[j].getElementsByTagName("img").first.attributes["src"];
+
+                            }catch(e){
+
+                              image="";
+                            }
+                          }
+                          if(j==1){
+                            card=data[j].text;
+                          }
+                          if(j==2){
+                            name=data[j].text;
+                          }
+                          if(j==3){
+                            date=data[j].text;
+                          }
+                          if(j==4){
+                            place1=data[j].text;
+                          }
+                          if(j==5){
+                            place2=data[j].text;
+                          }
+                          if(j==6){
+                            link=data[j].getElementsByTagName("a").first.attributes["href"];
+                          }
                         }
-                      }
-                      if(j==1){
-                        card=data[j].text;
-                      }
-                      if(j==2){
-                        name=data[j].text;
-                      }
-                      if(j==3){
-                        date=data[j].text;
-                      }
-                      if(j==4){
-                        place1=data[j].text;
-                      }
-                      if(j==5){
-                        place2=data[j].text;
-                      }
-                    }
 
-                    return UserBlock(image,name, card, date, place1, place2);
-                  }),
-                ),
-                Container(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    page<maxPage?CircularProgressIndicator():Container()
+                        return UserBlock(image,name, card, date, place1, place2, link);
+                      }),
+                    ),
+                    Container(height: 10,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        page<maxPage?CircularProgressIndicator():Container()
+                      ],
+                    ),
+                    Container(height: 10,)
+
+                  ]:[
+
+                    Container(height: 50,),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CircularProgressIndicator()
+                      ],
+                    ),
+
+                    Container(height: 50,),
+
                   ],
                 ),
-                Container(height: 10,)
-
-              ]:[
-
-                Container(height: 50,),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    CircularProgressIndicator()
-                  ],
-                ),
-
-                Container(height: 50,),
-
-              ],
-            ),
-          ),
-        ))
+              ),
+            ))
     );
   }
 }
@@ -272,8 +284,9 @@ class UserBlock extends StatefulWidget {
   String date;
   String place1;
   String place2;
+  String link;
 
-  UserBlock(this.image, this.name, this.card, this.date, this.place1, this.place2);
+  UserBlock(this.image, this.name, this.card, this.date, this.place1, this.place2, this.link);
 
 
   @override
@@ -283,51 +296,56 @@ class UserBlock extends StatefulWidget {
 class _UserBlockState extends State<UserBlock> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: EdgeInsets.all(20),
-      width: double.infinity,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-          color: Theme.of(context).accentColor,
-          boxShadow: [
-            BoxShadow(blurRadius: 3.0)
-          ]
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            height: 100,
-            width: 80,
-            decoration: BoxDecoration(
-                image: DecorationImage(image: NetworkImage(createLink(widget.image)),fit: BoxFit.cover),
-                borderRadius: BorderRadius.all(Radius.circular(10))
-            ),
-            child: Opacity(opacity: 0.0, child: Image.network(createLink(widget.image), height: 100,),),
-          ),
-          Container(width: 20,),
-          Expanded(
-            child: Container(
+    return GestureDetector(
+      onTap: (){
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.all(20),
+        width: double.infinity,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+            color: Theme.of(context).accentColor,
+            boxShadow: [
+              BoxShadow(blurRadius: 3.0)
+            ]
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
               height: 100,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-
-                  AutoSizeText((widget.name??"").toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),maxLines: 1,),
-
-                  AutoSizeText(widget.card, minFontSize: 0, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),maxLines: 1,),
-                  AutoSizeText(widget.date, minFontSize: 0,style: TextStyle( color: Colors.white),maxLines: 1,),
-                  AutoSizeText(widget.place1+", "+widget.place2, minFontSize: 0,style: TextStyle( color: Colors.white),maxLines: 1,),
-                ],
+              width: 80,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: NetworkImage(createLink(widget.image)),fit: BoxFit.cover),
+                  borderRadius: BorderRadius.all(Radius.circular(10))
               ),
+              child: Opacity(opacity: 0.0, child: Image.network(createLink(widget.image), height: 100,),),
             ),
-          )
+            Container(width: 20,),
+            Expanded(
+              child: Container(
+                height: 100,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
 
-        ],
+                    AutoSizeText((widget.name??"").toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),maxLines: 1,),
+
+                    AutoSizeText(widget.card, minFontSize: 0, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),maxLines: 1,),
+                    AutoSizeText(widget.date, minFontSize: 0,style: TextStyle( color: Colors.white),maxLines: 1,),
+                    AutoSizeText(widget.place1+", "+widget.place2, minFontSize: 0,style: TextStyle( color: Colors.white),maxLines: 1,),
+                  ],
+                ),
+              ),
+            )
+
+          ],
+        ),
       ),
+
     );
   }
 

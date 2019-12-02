@@ -22,6 +22,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'blog.dart';
 import 'home_full.dart';
 
 class LoginPage extends StatefulWidget {
@@ -118,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if(document!=null){
 
 
-                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
+                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:BlogMensa(document: document,)), ModalRoute.withName('/'));
 
                                 }else{
                                   showDialog(
@@ -211,6 +212,19 @@ class API{
     ),);
 
     return html.parse(response.data);
+  }
+
+
+  Future<String> getBlogEvent() async {
+
+    response = await dio.get("https://www.mensaitalia.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full", options: Options(
+        followRedirects: true,
+
+        validateStatus: (status) { return status < 500; }
+    ),);
+
+    return response.data.toString();
+
   }
 
 
