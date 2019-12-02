@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if(document!=null){
 
 
-                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:BlogMensa(document: document,)), ModalRoute.withName('/'));
+                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
 
                                 }else{
                                   showDialog(

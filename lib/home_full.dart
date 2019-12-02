@@ -23,6 +23,8 @@ import 'package:mensa_italia/sig.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'blog.dart';
 import 'document.dart';
 import 'drawer.dart';
 import 'login.dart';
@@ -277,7 +279,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
                                     Expanded(
-                                      child: AutoSizeText("Vivi al meglio la vita associativa, trova il SIG perfetto per te.", style: TextStyle(color: Theme.of(context).accentColor),),
+                                      child: AutoSizeText("Vivi al meglio la vita associativa, trova il SIG perfetto per te", style: TextStyle(color: Theme.of(context).accentColor),),
                                     ),
                                     Container(
                                       width: 40,
@@ -291,6 +293,49 @@ class _MensaFullPageState extends State<MensaFullPage> {
                                 ),
                               ),
                             ),
+
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF184295)
+                              ),
+                              child: AutoSizeText("Eventi".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                            ),
+
+                            BlogBlock(),
+
+                            GestureDetector(
+                              onTap: (){
+
+                                Navigator.push(context, PageTransition(child: BlogMensa(title:"Eventi"), type: PageTransitionType.rightToLeft));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(20),
+                                padding: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Theme.of(context).accentColor),
+                                    borderRadius: BorderRadius.circular(25)
+                                ),
+                                child:Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: AutoSizeText("Vedi tutti gli eventi", style: TextStyle(color: Theme.of(context).accentColor),),
+                                    ),
+                                    Container(
+                                      width: 40,
+                                    ),
+                                    Icon(
+                                        Icons.arrow_forward,
+                                        color: Theme.of(context).accentColor
+                                    )
+
+                                  ],
+                                ),
+                              ),
+                            ),
+
 
 
                             Container(
@@ -313,7 +358,133 @@ class _MensaFullPageState extends State<MensaFullPage> {
                             ),
                             elaborateTable("documenti"),
 
-                            Container(height: 100,),
+
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF184295)
+                              ),
+                              child: AutoSizeText("Informazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                            ),
+
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: <Widget>[
+                                  GestureDetector(
+                                    onTap: () async {
+                                      tryToLunchUrl('https://www.mensaitalia.it/cose-il-mensa/');
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                              width: 60,
+                                              height: 60,
+                                              margin: EdgeInsets.only(bottom: 10),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: BorderRadius.circular(200)
+                                              ),
+                                              child: Icon(Icons.whatshot, color: Colors.white,)
+                                          ),
+
+                                          AutoSizeText("Cosa siamo".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      tryToLunchUrl('https://www.mensaitalia.it/storia/');
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                              width: 60,
+                                              height: 60,
+                                              margin: EdgeInsets.only(bottom: 10),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: BorderRadius.circular(200)
+                                              ),
+                                              child: Icon(Icons.change_history, color: Colors.white,)
+                                          ),
+
+                                          AutoSizeText("storia".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      tryToLunchUrl('https://www.mensaitalia.it/statuto/');
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                              width: 60,
+                                              height: 60,
+                                              margin: EdgeInsets.only(bottom: 10),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: BorderRadius.circular(200)
+                                              ),
+                                              child: Icon(Icons.wb_incandescent, color: Colors.white,)
+                                          ),
+
+                                          AutoSizeText("statuto".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      tryToLunchUrl('https://www.mensaitalia.it/domande-frequenti/');
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                              width: 60,
+                                              height: 60,
+                                              margin: EdgeInsets.only(bottom: 10),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: BorderRadius.circular(200)
+                                              ),
+                                              child: Icon(Icons.question_answer, color: Colors.white,)
+                                          ),
+
+                                          AutoSizeText("domande".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ),
+
+                                ],
+                              ),
+                            ),
+
 
                           ],
                         ),
@@ -327,6 +498,12 @@ class _MensaFullPageState extends State<MensaFullPage> {
   }
 
 
+  tryToLunchUrl(String url) async {
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
 
   Widget elaborateTable(String point){
 

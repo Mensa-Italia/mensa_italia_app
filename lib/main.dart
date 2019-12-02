@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
 
 
 
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:BlogMensa(document: document)));
+      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:MensaFullPage(document)));
 
 
     }else{
@@ -184,15 +184,7 @@ class _HomePageState extends State<HomePage> {
                         Container(height: 30,),
                         isPreparing?Container():AutoSizeText("Se non sei mensano salta l'accesso oppure scopri come diventarlo!.", textAlign: TextAlign.center,),
                         Container(height: 50,),
-                        GestureDetector(
-                          onTap: (){
-                            tryToLunchUrl("https://www.mensaitalia.it/iscriviti/");
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            child:isPreparing?Container():AutoSizeText("DIVENTA MENSANO", textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                          ),
-                        )
+
 
 
                       ]
@@ -200,17 +192,38 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Positioned(
 
-                  right: 20,
-                  top: MediaQuery.of(context).padding.top+20,
-                  child:
-                  isPreparing?Container():GestureDetector(
-                    onTap: () async {
-                      Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      prefs.setBool("isJumped", true);
-                    },
-                    child: AutoSizeText("SALTA", style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 18),),
-                  ),
+                    right: 20,
+                    left: 20,
+                    top: MediaQuery.of(context).padding.top+20,
+                    child:
+                    isPreparing?Container():Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: (){
+                              tryToLunchUrl("https://www.mensaitalia.it/iscriviti/");
+                            },
+                            child: Container(
+                              child:AutoSizeText("DIVENTA MENSANO", textAlign: TextAlign.start, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), ),
+                            ),
+                          ),
+                        ),
+        Expanded(
+          child: GestureDetector(
+                              onTap: () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setBool("isJumped", true);
+                                Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
+                              },
+                              child: AutoSizeText("SALTA", textAlign: TextAlign.end, style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 14),),
+                            )
+        )
+
+
+                      ],
+                    )
                 ),
               ]
           ),
