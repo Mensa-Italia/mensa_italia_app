@@ -415,8 +415,16 @@ class MensaTextField extends TextField{
   String text;
   bool obscure;
   TextEditingController textEditingController;
-  MensaTextField(this.text, {this.obscure=false, this.textEditingController});
+  Function(String) onChag;
+  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag});
 
+
+  @override
+  // TODO: implement onChanged
+  get onChanged => (s){
+    onChag(s);
+    super.onChanged(s);
+  };
 
   @override
   // TODO: implement controller
@@ -430,6 +438,7 @@ class MensaTextField extends TextField{
   // TODO: implement decoration
   InputDecoration get decoration => InputDecoration(
     labelText: text,
+
 
     fillColor: Colors.white,
     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),

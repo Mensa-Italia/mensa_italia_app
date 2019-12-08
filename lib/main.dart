@@ -14,6 +14,7 @@ Matteo Sipione holds the authorial and commercial rights to this software.
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,23 +27,60 @@ import 'login.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+
+  MyApp(){
+    OneSignal.shared.init(
+        "f2b93a2b-0d67-4e9e-b5c8-991c96a33ddc",
+        iOSSettings: {
+          OSiOSSettings.autoPrompt: false,
+          OSiOSSettings.inAppLaunchUrl: false,
+          OSiOSSettings.inAppAlerts: false,
+        },
+
+
+    );
+    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+    sendFirst();
+
+  }
+
+  sendFirst() async {
+
+    var a = await SharedPreferences.getInstance();
+
+
+    if(a.getBool("FIRSTNOTIFY")==null||!a.getBool("FIRSTNOTIFY")){
+
+      OneSignal.shared.postNotification(OSCreateNotification(
+          playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
+          content: "Benvenuto nell'app del MENSA!"
+      ));
+      a.setBool("FIRSTNOTIFY", true);
+    }
+
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mensa Italia',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
           primarySwatch: Colors.blue,
           accentColor: Color(0xFF184295),
+          bottomAppBarColor: Colors.transparent,
+          bottomAppBarTheme: BottomAppBarTheme(
+              color: Colors.transparent
+          ),
+          dialogTheme: DialogTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+
+            ),
+
+          ),
           appBarTheme: AppBarTheme(
             color: Color(0xFF184295),
 
@@ -65,6 +103,7 @@ class MyApp extends StatelessWidget {
           )
       ),
       debugShowMaterialGrid: false,
+
       debugShowCheckedModeBanner: false,
       showSemanticsDebugger: false,
       home: HomePage(),
@@ -210,8 +249,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-        Expanded(
-          child: GestureDetector(
+                        Expanded(
+                            child: GestureDetector(
                               onTap: () async {
                                 SharedPreferences prefs = await SharedPreferences.getInstance();
                                 await prefs.setBool("isJumped", true);
@@ -219,7 +258,7 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: AutoSizeText("SALTA", textAlign: TextAlign.end, style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 14),),
                             )
-        )
+                        )
 
 
                       ],

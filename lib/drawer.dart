@@ -89,7 +89,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
                   builder: (d)=>DialogDocumentPick(widget.document.getElementsByTagName("li").where((e)=>e.attributes["class"]=="dropdown").where((e)=>e.getElementsByTagName("a").first.text=="Documenti").first.getElementsByTagName("ul").first.getElementsByTagName("li"))
               );
             },
-          ),
+          ),/*
           ListTile(
             leading: Icon(Icons.store, color: Theme.of(context).accentColor,),
             title: Text('Negozio'),
@@ -99,7 +99,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
               Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:StoreMensa()));
 
             },
-          ),
+          ),*/
           ListTile(
             leading: Icon(Icons.close, color: Colors.redAccent,),
             title: Text('Disconnetti profilo'),
