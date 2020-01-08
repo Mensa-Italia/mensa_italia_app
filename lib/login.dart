@@ -214,6 +214,20 @@ class API{
     return html.parse(response.data);
   }
 
+  Future<String> getRawData(String link) async{
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+    var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
+    dio.interceptors.add(CookieManager(cookieJar));
+    response = await dio.get(link, options: Options(
+        followRedirects: true,
+        validateStatus: (status) { return status < 500; }
+    ),);
+
+    return response.data;
+  }
+
 
   Future<String> getBlogEvent() async {
 

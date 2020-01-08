@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,25 @@ class SIGMensa extends StatefulWidget {
 }
 
 class _SIGMensaState extends State<SIGMensa> {
+
+
+  List<dynamic> list;
+
+  init() async {
+    list=jsonDecode((await API().getRawData("https://raw.githubusercontent.com/Mensa-Italia/mensa_italia_app/master/sig.json")));
+    setState(() {
+
+    });
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    init();
+  }
+  
+  
   @override
   Widget build(BuildContext context) {
 
@@ -28,9 +49,17 @@ class _SIGMensaState extends State<SIGMensa> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+          children: list==null?[
 
-            SigItem("https://www.facebook.com/groups/1739607052753863/","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_acquariofilia.jpg"),
+            Container(
+              margin: EdgeInsets.only(top: 20),
+              width: 100,
+              height: 100,
+              child: LoadingDialog(),
+            )
+
+
+           /* SigItem("https://www.facebook.com/groups/1739607052753863/","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_acquariofilia.jpg"),
             SigItem("https://www.facebook.com/groups/2927299450673592","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_armi_e_tiro.jpg"),
             SigItem("https://www.facebook.com/groups/sigbusiness/","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_business.jpg"),
             SigItem("https://www.facebook.com/groups/sigchimica/","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_chimica.jpg"),
@@ -50,8 +79,10 @@ class _SIGMensaState extends State<SIGMensa> {
             SigItem("https://www.facebook.com/groups/420332905062409/?ref=br_rs","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_skeptical.jpg"),
             SigItem("https://www.facebook.com/groups/259962521209761","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_stile_bellezza_arte.jpg"),
             SigItem("https://www.facebook.com/groups/sigtecnologia","https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_tecnologia.jpg"),
-
-          ],
+*/
+          ]:list.isNotEmpty?List.generate(list.length, (i){
+            return SigItem(list[i]["link"],list[i]["image"]);
+          }):[],
         ),
       ),
 

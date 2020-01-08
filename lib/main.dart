@@ -14,6 +14,7 @@ Matteo Sipione holds the authorial and commercial rights to this software.
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,23 +24,30 @@ import 'package:wave/wave.dart';
 import 'blog.dart';
 import 'home_full.dart';
 import 'login.dart';
+import 'dart:io';
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
 
-void main() => runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
 
 
   MyApp(){
+
+
     OneSignal.shared.init(
-        "f2b93a2b-0d67-4e9e-b5c8-991c96a33ddc",
-        iOSSettings: {
-          OSiOSSettings.autoPrompt: false,
-          OSiOSSettings.inAppLaunchUrl: false,
-          OSiOSSettings.inAppAlerts: false,
-        },
+      "f2b93a2b-0d67-4e9e-b5c8-991c96a33ddc",
+      iOSSettings: {
+        OSiOSSettings.autoPrompt: false,
+        OSiOSSettings.inAppLaunchUrl: false,
+        OSiOSSettings.inAppAlerts: false,
+      },
 
 
     );
+
     OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
     sendFirst();
 
@@ -132,6 +140,12 @@ class _HomePageState extends State<HomePage> {
   bool isPreparing=true;
   prepare() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+    if((await InAppUpdate.checkForUpdate()).updateAvailable){
+      await InAppUpdate.performImmediateUpdate();
+      exit(0);
+    }
 
 
     Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
