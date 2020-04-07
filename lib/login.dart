@@ -20,6 +20,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'blog.dart';
@@ -33,146 +34,74 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
+  final RoundedLoadingButtonController _btnController = new RoundedLoadingButtonController();
 
 
   Size size;
+  bool enabled=true;
+
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
 
 
-    return Scaffold(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+
+        MensaTextField("Email", textEditingController: emailController,enablede: enabled,),
+        Container(height: 10,),
+        MensaTextField("Password", obscure: true, textEditingController: passwordController, enablede: enabled,),
+        Container(height: 20,),
+
+        RoundedLoadingButton(
+          height: 40,
+          child: AutoSizeText('ACCEDI', style: TextStyle(color: Colors.white)),
+          controller: _btnController,
+          color: Theme.of(context).accentColor,
+          onPressed: () async {
+
+            enabled=false;
+            setState(() {
+
+            });
+            _btnController.start();
+            Document document=await API().doLoginAndRetrieveMain(context, emailController.text, passwordController.text);
 
 
 
-      body:  new GestureDetector(
-          onTap: () {
+            if(document!=null){
+              enabled=true;
+              setState(() {
 
-            FocusScope.of(context).requestFocus(new FocusNode());
+              });
+
+              Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
+
+            }else{
+              enabled=true;
+              setState(() {
+
+              });
+              _btnController.reset();
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  // return object of type Dialog
+                  return ErrorDialog();
+                },
+              );
+
+            }
           },
-          child:Container(
-            width: size.width,
+        ),
 
-            height: size.height,
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        height: 50,
-                      ),
-                      Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/3,),),),
-                      Container(height: 40,),
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-
-                            MensaTextField("Email", textEditingController: emailController,),
-                            Container(height: 10,),
-                            MensaTextField("Password", obscure: true, textEditingController: passwordController,),
-
-                            Container(height: 30,),
-                            MensaButton(
-                              onPressedNew: () async {
-
-
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    // return object of type Dialog
-                                    return Padding(
-                                        padding: EdgeInsets.only(left: 50.0, right: 50.0),
-                                    child://AlertDialog or any other Dialog you can use
-                                    Dialog(
-                                    elevation: 0.0,
-                                    backgroundColor: Colors.transparent,
-                                    child: Container(
-
-                                    decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(25))
-                                    ),
-                                    child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: <Widget>[
-                                    Container(
-
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-                                    child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[LoadingDialog()]))]))));
-                                  },
-                                );
-                                Document document=await API().doLoginAndRetrieveMain(context, emailController.text, passwordController.text);
-
-                                Navigator.pop(context);
-
-
-
-                                if(document!=null){
-
-
-                                  Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
-
-                                }else{
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      // return object of type Dialog
-                                      return ErrorDialog();
-                                    },
-                                  );
-                                }
-
-
-
-
-                              },
-
-                              text: "ACCEDI",
-                            ),
-                          ],
-                        ),
-                      ),
-
-
-                      Container(height: 50,),
-                      GestureDetector(
-                        onTap: _launchURL,
-                        child:  Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
-                            AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-
-                          ],
-                        )
-                      )
-                    ],
-                  ),
-
-                ),
-              ],
-            ),
-          )),
+      ],
     );
   }
 
-  _launchURL() async {
-    const url = 'https://sipio.it';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 
 }
 
@@ -430,8 +359,13 @@ class MensaTextField extends TextField{
   bool obscure;
   TextEditingController textEditingController;
   Function(String) onChag;
-  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag});
+  bool enablede;
 
+  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true});
+
+  @override
+  // TODO: implement enabled
+  bool get enabled => enablede;
 
   @override
   // TODO: implement onChanged
@@ -451,39 +385,27 @@ class MensaTextField extends TextField{
   @override
   // TODO: implement decoration
   InputDecoration get decoration => InputDecoration(
-    labelText: text,
-
-
-    fillColor: Colors.white,
+    hintText: text,
+    filled: true,
+    fillColor: Color(0xFFd9d9d9),
     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+    focusColor: Color(0xFFd9d9d9),
+    hoverColor: Color(0xFFd9d9d9),
     labelStyle: TextStyle(
-        color: Color(0xFF184295),
+        color: Color(0xFF3d3d3d),
         fontWeight: FontWeight.bold
     ),
-    border: new OutlineInputBorder(
-      borderRadius: new BorderRadius.circular(25.0),
-      borderSide: new BorderSide(
-          width: 1.5,
-          color: Color(0xFF184295)
-      ),
+    border: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.transparent),
+        borderRadius: BorderRadius.circular(200)
     ),
-    focusedBorder: new OutlineInputBorder(
-      borderRadius: new BorderRadius.circular(25.0),
-      borderSide: new BorderSide(
-
-          width: 2.0,
-          color: Color(0xFF184295)
-      ),
-
+    focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.transparent),
+        borderRadius: BorderRadius.circular(200)
     ),
-    enabledBorder: new OutlineInputBorder(
-      borderRadius: new BorderRadius.circular(25.0),
-      borderSide: new BorderSide(
-
-          width: 1.5,
-          color: Color(0xFF184295)
-      ),
-
+    enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.transparent),
+        borderRadius: BorderRadius.circular(200)
     ),
     //fillColor: Colors.green
   );

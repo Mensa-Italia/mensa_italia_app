@@ -274,10 +274,10 @@ class _DialogCallState extends State<DialogCall> {
     }
 
 
-    Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.contacts]);
+    Map<Permission, PermissionStatus> permissions = await [Permission.contacts].request();
 
 
-    if(permissions[PermissionGroup.contacts].value==PermissionStatus.granted.value) {
+    if(permissions[Permission.contacts].isDenied) {
       var xa = await ContactsService.getContacts(query: widget.name);
       existsytem = xa.isNotEmpty;
     }
@@ -347,10 +347,10 @@ class _DialogCallState extends State<DialogCall> {
                 splashColor: Colors.white,
                 onTap: () async {
 
-                  Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.contacts]);
+                  Map<Permission, PermissionStatus> permissions = await [Permission.contacts].request();
 
 
-                  if(permissions[PermissionGroup.contacts].value==PermissionStatus.granted.value) {
+                  if(permissions[Permission.contacts].isGranted) {
                     Contact newContact = new Contact(
                         givenName: widget.name.substring(0, widget.name.indexOf(' ',0)),
                         familyName: widget.name.substring(widget.name.indexOf(' ',0), widget.name.length),

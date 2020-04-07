@@ -11,6 +11,8 @@ Matteo Sipione holds the authorial and commercial rights to this software.
 */
 
 
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
@@ -25,6 +27,9 @@ import 'blog.dart';
 import 'home_full.dart';
 import 'login.dart';
 import 'dart:io';
+import 'dart:math' as math;
+
+
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -125,7 +130,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
 
 
@@ -134,6 +139,14 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     prepare();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Timer(Duration(milliseconds: 500),(){
+      _visible=true;
+      setState(() {
+
+      });
+    }));
   }
 
 
@@ -142,10 +155,15 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
 
-    if((await InAppUpdate.checkForUpdate()).updateAvailable){
-      await InAppUpdate.performImmediateUpdate();
-      exit(0);
+    try{
+      if((await InAppUpdate.checkForUpdate()).updateAvailable){
+        await InAppUpdate.performImmediateUpdate();
+        exit(0);
+      }
+    }catch(E){
+
     }
+
 
 
     Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
@@ -183,102 +201,107 @@ class _HomePageState extends State<HomePage> {
   }
 
   Size size;
+
+
+  static Matrix4 _pmat(num pv) {
+    return new Matrix4(
+      1.0, 0.0, 0.0, 0.0, //
+      0.0, 1.0, 0.0, 0.0, //
+      0.0, 0.0, 1.0, pv * 0.001, //
+      0.0, 0.0, 0.0, 1.0,
+    );
+  }
+
+  Matrix4 perspective = _pmat(1.0);
+
+  bool _visible=false;
+
+
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
 
 
-    return Scaffold(
+    return GestureDetector(
+        onTap: () {
 
-
-
-        body: Container(
-          width: size.width,
-
-          color: Colors.black.withOpacity(0.4),
-          height: size.height,
-          child: Stack(
-              children: [
-
-
-
-                Stack(
-                  alignment: Alignment.bottomCenter,
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
+        child:Scaffold(
+          backgroundColor: Theme.of(context).accentColor,
+          body:Container(
+            width: size.width,
+            height: size.height,
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                    minHeight: size.height
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
+                    AnimatedOpacity(
+                      opacity: _visible?1.0:0.0,
+                      duration: Duration(milliseconds: 500),
+                      child: Container(
+                        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top+50, bottom: 50),
+                        child: Image.asset('assets/images/mensa_under.png', width: size.width/2),
+                      ),
 
+                    ),
 
-                    BackGroundHome(),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 20),
-                      child:  AutoSizeText("FLOREAT MENSA!", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),),
+                    AnimatedOpacity(
+                      opacity: _visible?1.0:0.0,
+                      duration: Duration(milliseconds: 200),
+                      child: Card(
+                      margin: EdgeInsets.only(bottom: 0),
+                      elevation: 5.0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      child: Container(
+                        width: size.width*3/4,
+                        padding: EdgeInsets.all(20),
+                        child:   LoginPage(),
+                        ),
+                      ),
+                    ),
+
+                    AnimatedOpacity(
+                      opacity: _visible?1.0:0.0,
+                      duration: Duration(milliseconds: 500),
+
+                      child:GestureDetector(
+                        onTap: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool("isJumped", true);
+                          Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 100),
+                          child: AutoSizeText("SALTA ACCESSO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                        ),
+                      ),
+
+                    ),
+                    GestureDetector(
+                        onTap: (){
+                          tryToLunchUrl("https://www.sipio.it");
+                        },
+                        child:  Container(
+                          margin: EdgeInsets.all(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white.withOpacity(0.5)), textAlign: TextAlign.center,),
+                              AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+
+                            ],
+                          ),
+                        )
                     )
                   ],
                 ),
-
-                SingleChildScrollView(
-
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          height: 100,
-                        ),
-                        Hero(tag: "logo", child: Material(color: Colors.transparent,child: Image.asset("assets/images/lettering_blue.png", width: size.width/2,),),),
-                        Container(height: 40,),
-                        isPreparing?LoadingDialog():MensaButton(
-                          onPressedNew: () {
-                            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:LoginPage()));
-                          },
-
-
-                          text: "ACCEDI",
-                        ),
-                        Container(height: 30,),
-                        isPreparing?Container():AutoSizeText("Se non sei mensano salta l'accesso oppure scopri come diventarlo!.", textAlign: TextAlign.center,),
-                        Container(height: 50,),
-
-
-
-                      ]
-                  ),
-                ),
-                Positioned(
-
-                    right: 20,
-                    left: 20,
-                    top: MediaQuery.of(context).padding.top+20,
-                    child:
-                    isPreparing?Container():Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: (){
-                              tryToLunchUrl("https://www.mensaitalia.it/iscriviti/");
-                            },
-                            child: Container(
-                              child:AutoSizeText("DIVENTA MENSANO", textAlign: TextAlign.start, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.setBool("isJumped", true);
-                                Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
-                              },
-                              child: AutoSizeText("SALTA", textAlign: TextAlign.end, style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 14),),
-                            )
-                        )
-
-
-                      ],
-                    )
-                ),
-              ]
+              ),
+            ),
           ),
         )
     );

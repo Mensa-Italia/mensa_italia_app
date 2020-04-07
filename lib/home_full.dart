@@ -24,6 +24,7 @@ import 'package:mensa_italia/sig.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'blog.dart';
 import 'document.dart';
@@ -285,29 +286,82 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
                                     Navigator.push(context, PageTransition(child: SIGMensa(), type: PageTransitionType.rightToLeft));
                                   },
-                                  child: Container(
-                                    margin: EdgeInsets.all(20),
-                                    padding: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).accentColor),
-                                        borderRadius: BorderRadius.circular(25)
-                                    ),
-                                    child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: AutoSizeText("Vivi al meglio la vita associativa, trova il SIG perfetto per te", style: TextStyle(color: Theme.of(context).accentColor),),
-                                        ),
-                                        Container(
-                                          width: 40,
-                                        ),
-                                        Icon(
-                                            Icons.arrow_forward,
-                                            color: Theme.of(context).accentColor
-                                        )
 
-                                      ],
-                                    ),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Shimmer.fromColors(
+                                          child: Container(
+                                            margin: EdgeInsets.all(20),
+                                            padding: EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(25),
+                                              color:Colors.black
+                                            ),
+                                            child:Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Expanded(
+                                                    child: Container(
+                                                      padding: EdgeInsets.all(5),
+                                                      child: AutoSizeText.rich(TextSpan(
+                                                          children: [
+                                                            TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
+                                                            TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                            TextSpan(text: "perfetto per te"),
+                                                          ]
+                                                      ), style: TextStyle(color: Colors.white),),
+                                                    )
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.only(left: 20,),
+                                                  child: Icon(
+                                                      Icons.arrow_forward,
+                                                      color: Colors.white
+                                                  ),
+                                                ),
+
+
+                                              ],
+                                            ),
+                                          ),
+
+                                          baseColor: Theme.of(context).accentColor,
+                                          highlightColor: Colors.red
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(20),
+                                        padding: EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(25)
+                                        ),
+                                        child:Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Expanded(
+                                                child: Container(
+                                                  padding: EdgeInsets.all(5),
+                                                  child: AutoSizeText.rich(TextSpan(
+                                                      children: [
+                                                        TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
+                                                        TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                        TextSpan(text: "perfetto per te"),
+                                                      ]
+                                                  ), style: TextStyle(color: Colors.white),),
+                                                )
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(left: 20,),
+                                              child: Icon(
+                                                  Icons.arrow_forward,
+                                                  color: Colors.white
+                                              ),
+                                            ),
+
+
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
 

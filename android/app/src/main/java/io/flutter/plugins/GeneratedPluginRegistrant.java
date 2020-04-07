@@ -3,6 +3,7 @@ package io.flutter.plugins;
 import io.flutter.plugin.common.PluginRegistry;
 import flutter.plugins.contactsservice.contactsservice.ContactsServicePlugin;
 import pt.tribeiro.flutter_plugin_pdf_viewer.FlutterPluginPdfViewerPlugin;
+import de.ffuf.in_app_update.InAppUpdatePlugin;
 import com.onesignal.flutter.OneSignalPlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
 import com.baseflow.permissionhandler.PermissionHandlerPlugin;
@@ -20,6 +21,7 @@ public final class GeneratedPluginRegistrant {
     }
     ContactsServicePlugin.registerWith(registry.registrarFor("flutter.plugins.contactsservice.contactsservice.ContactsServicePlugin"));
     FlutterPluginPdfViewerPlugin.registerWith(registry.registrarFor("pt.tribeiro.flutter_plugin_pdf_viewer.FlutterPluginPdfViewerPlugin"));
+    InAppUpdatePlugin.registerWith(registry.registrarFor("de.ffuf.in_app_update.InAppUpdatePlugin"));
     OneSignalPlugin.registerWith(registry.registrarFor("com.onesignal.flutter.OneSignalPlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
     PermissionHandlerPlugin.registerWith(registry.registrarFor("com.baseflow.permissionhandler.PermissionHandlerPlugin"));

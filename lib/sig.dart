@@ -21,7 +21,7 @@ class _SIGMensaState extends State<SIGMensa> {
   List<dynamic> list;
 
   init() async {
-    list=jsonDecode((await API().getRawData("https://raw.githubusercontent.com/Mensa-Italia/mensa_italia_app/master/sig.json")));
+    list=jsonDecode((await API().getRawData("https://raw.githubusercontent.com/Mensa-Italia/SIGs/master/sigs.json")));
     setState(() {
 
     });
