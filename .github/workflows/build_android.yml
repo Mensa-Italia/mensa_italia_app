@@ -10,11 +10,11 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-      env:
-        KEY_JKS: ${{ secrets.KEY_JKS }}
-        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > key.jks && flutter pub get && flutter test && flutter build apk
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          run: echo $KEY_JKS > key.jks && flutter pub get && flutter test && flutter build apk
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
