@@ -140,13 +140,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
     super.initState();
     prepare();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => Timer(Duration(milliseconds: 500),(){
-      _visible=true;
-      setState(() {
-
-      });
-    }));
   }
 
 
@@ -185,6 +178,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
         setState(() {
           isPreparing=false;
+          _visible=true;
         });
       }
     }
@@ -250,7 +244,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
                     ),
 
-                    AnimatedOpacity(
+                    isPreparing?CircularProgressIndicator(
+                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                    ):AnimatedOpacity(
                       opacity: _visible?1.0:0.0,
                       duration: Duration(milliseconds: 200),
                       child: Card(

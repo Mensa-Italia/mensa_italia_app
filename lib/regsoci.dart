@@ -128,7 +128,7 @@ class _RegSociState extends State<RegSoci> {
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: AutoSizeText("Cerca soci".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 25, color:Color(0xFF184295),fontWeight: FontWeight.bold),maxLines: 1,),
+                      child: AutoSizeText("Cerca soci".toUpperCase(), minFontSize: 0, style: TextStyle(fontSize: 20, color:Color(0xFF184295),fontWeight: FontWeight.bold),maxLines: 1,),
                     ),
 
 
@@ -299,7 +299,7 @@ class _UserBlockState extends State<UserBlock> {
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Card(
         elevation: 5.0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: Theme.of(context).accentColor,
         child: GestureDetector(
           onTap: (){

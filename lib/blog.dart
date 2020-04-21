@@ -39,22 +39,85 @@ class _BlogBlockState extends State<BlogBlock> {
   bool isPreparing=true;
   @override
   Widget build(BuildContext context) {
-    return    isPreparing?Container(
-      margin: EdgeInsets.only(top: 50),
-      child: LoadingDialog(),
-    ):Column(
-      children:List.generate(1, (i){
-        if(rssFeed.items.elementAt(i).media.contents.first.url!=""){
-          return EventItem(rssFeed.items.elementAt(i).link,rssFeed.items.elementAt(i).media.contents.first.url);
-        }else{
-          return Container();
-        }
+    return CardClipperElements(
+        Column(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Color(0xFF184295)
+              ),
+              child: AutoSizeText("Eventi".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+            ),
+            isPreparing?Container(
+              margin: EdgeInsets.only(top: 50),
+              child: LoadingDialog(),
+            ):Column(
+              children:List.generate(1, (i){
+                if(rssFeed.items.elementAt(i).media.contents.first.url!=""){
+                  return EventItem(rssFeed.items.elementAt(i).link,rssFeed.items.elementAt(i).media.contents.first.url);
+                }else{
+                  return Container();
+                }
 
-      }),
+              }),
+            ),
+
+            GestureDetector(
+              onTap: (){
+
+                Navigator.push(context, PageTransition(child: BlogMensa(title:"Eventi"), type: PageTransitionType.rightToLeft));
+              },
+              child: Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                ),
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: AutoSizeText("Vedi tutti gli eventi", style: TextStyle(color: Theme.of(context).accentColor),),
+                    ),
+                    Container(
+                      width: 40,
+                    ),
+                    Icon(
+                        Icons.arrow_forward,
+                        color: Theme.of(context).accentColor
+                    )
+
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
     );
   }
 }
 
+class CardClipperElements extends StatelessWidget {
+
+  Widget child;
+
+  CardClipperElements(this.child);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+
+      elevation: 3.0,
+      margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: child,
+      ),
+    );
+  }
+}
 
 
 
@@ -294,7 +357,7 @@ class _EventItemState extends State<EventItem> {
       child: Card(
         margin: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        elevation: 5.0,
+        elevation: 0.0,
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(

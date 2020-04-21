@@ -32,7 +32,99 @@ import 'drawer.dart';
 import 'login.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
+
+import 'package:flutter/material.dart' as AM;
+
 import 'main.dart';
+
+class TransitionAppBar extends StatelessWidget {
+
+  TransitionAppBar({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPersistentHeader(
+      pinned: true,
+      floating: false,
+
+      delegate: _TransitionAppBarDelegate(),
+    );
+  }
+}
+
+class _TransitionAppBarDelegate extends SliverPersistentHeaderDelegate {
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    double tempVal = 34 * maxExtent / 100;
+    final progress =  shrinkOffset > tempVal ? 1.0 : shrinkOffset / tempVal;
+    final Rprogress=1-progress;
+    return SizedBox.expand(
+        child: Container(
+          color: Theme.of(context).accentColor.withOpacity(progress),
+          alignment: Alignment.topLeft,
+          child:  Card(
+            elevation: 5.0*Rprogress,
+            color: Theme.of(context).accentColor,
+            margin: EdgeInsets.only(left: 20.0*Rprogress, right: 20.0*Rprogress, top: MediaQuery.of(context).padding.top+20*Rprogress, bottom: 5*Rprogress),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50*Rprogress)
+            ),
+            child: Container(
+              height: 80,
+              padding: EdgeInsets.only(left: 5*Rprogress, right: 5*Rprogress,),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                            margin: EdgeInsets.only(left: 10*Rprogress),
+                            child: IconButton(
+                              icon: Icon(Icons.menu, color: Theme.of(context).primaryTextTheme.title.color,),
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                            )
+                        ),
+                        AutoSizeText("MENSA ITALIA", style: Theme.of(context).primaryTextTheme.title, minFontSize: 0,)
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 10*Rprogress),
+                    child:  IconButton(
+                      icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.title.color,),
+                      onPressed: () {
+                        Navigator.push(context, PageTransition(child: PhoneBook(), type: PageTransitionType.rightToLeft));
+                      },
+                    ),
+                  )
+
+                ],
+              ),
+            ),
+          ),
+        )
+    );
+  }
+
+  @override
+  double get maxExtent => 120;
+
+  @override
+  double get minExtent => 90;
+
+  @override
+  bool shouldRebuild(_TransitionAppBarDelegate oldDelegate) {
+    return false;
+  }
+}
+
+
+
 
 
 class MensaFullPage extends StatefulWidget {
@@ -82,493 +174,451 @@ class _MensaFullPageState extends State<MensaFullPage> {
         drawer: MensaDrawer(widget.document),
 
 
-        appBar: AppBar(
-          title: AutoSizeText("MENSA ITALIA".toUpperCase()),
-          actions: <Widget>[
-            GestureDetector(
-              onTap: (){
-
-                Navigator.push(context, PageTransition(child: PhoneBook(), type: PageTransitionType.rightToLeft));
-
-              },
-              child: Icon(Icons.phone),
-            ),
-            Container(
-              width: 20,
-            )
-          ],
-        ),
         body:  new GestureDetector(
-            onTap: () {
+          onTap: () {
 
-              FocusScope.of(context).requestFocus(new FocusNode());
-            },
-            child:Stack(
-              children: <Widget>[
-                SingleChildScrollView(
+            FocusScope.of(context).requestFocus(new FocusNode());
+          },
+          child: CustomScrollView(
 
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
+            slivers: <Widget>[
+              TransitionAppBar(),
+              SliverList(
+                delegate: SliverChildListDelegate( <Widget>[
+
+                  Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
+
+
+                  FlipCard(
+                    direction: FlipDirection.HORIZONTAL, // default
+                    front:Container(
+
+                      margin: EdgeInsets.only(left: 30, right: 30,),
+                      child: Card(
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        child: AspectRatio(
+                            aspectRatio: 86/54,
+                            child:Container(
+
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).accentColor,
+                                borderRadius: BorderRadius.all(Radius.circular(25)),
+
+                              ),
+                              child:  LayoutBuilder(
+                                  builder: (BuildContext context, BoxConstraints constraints) {
+                                    return Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
+                                      ],
+                                    );
+                                  }
+                              ),
+
+                            )
+                        ),
+                      ),
+                    ),
+
+                    back: Container(
+
+                      margin: EdgeInsets.only(left: 30, right: 30),
+
+                      child: Card(
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        child: AspectRatio(
+                            aspectRatio: 86/54,
+
+                            child: Container(
+
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
+                                borderRadius: BorderRadius.all(Radius.circular(25)),
+                              ),
+                              child:  LayoutBuilder(
+                                  builder: (BuildContext context, BoxConstraints constraints) {
+                                    return Container(
+                                      height: constraints.maxHeight,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: <Widget>[
+                                          Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
+                                          Expanded(
+                                            child:Container(
+                                                margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: <Widget>[
+
+                                                    Expanded(
+                                                      child: Column(
+
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
+
+                                                        ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
+                                                          return    Expanded(
+                                                            child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
+                                                          );
+                                                        }),
+                                                      ),
+                                                    ),
+
+
+
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: <Widget>[
+                                                          Expanded(
+
+                                                            child:Container(
+
+                                                                alignment: Alignment.bottomLeft,
+                                                                child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child:Container(
+                                                              width: constraints.maxWidth-(constraints.maxWidth*2/7),
+
+                                                              alignment: Alignment.bottomLeft,
+                                                              child: Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                mainAxisSize: MainAxisSize.max,
+                                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                                children: <Widget>[
+                                                                  AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
+                                                                  AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )
+
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                              ),
+
+                            )
+                        ),
+                      ),
+                    ),
+                  ),
+
+
+
+                  CardClipperElements(Container(
+
+                    padding: EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+
+                        AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+
+                            AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold),),
+
+                            AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),),
+
+                          ],
+                        )
+                      ],
+                    ),
+                  )
+                  ),
+
+                  Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
+
+
+                  GestureDetector(
+                    onTap: (){
+
+                      Navigator.push(context, PageTransition(child: SIGMensa(), type: PageTransitionType.rightToLeft));
+                    },
+
+                    child: Stack(
+                      children: <Widget>[
+                        Shimmer.fromColors(
+                            child: Container(
+                              margin: EdgeInsets.all(20),
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color:Colors.black
+                              ),
+                              child:Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                      child: Container(
+                                        padding: EdgeInsets.all(5),
+                                        child: AutoSizeText.rich(TextSpan(
+                                            children: [
+                                              TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
+                                              TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                              TextSpan(text: "perfetto per te"),
+                                            ]
+                                        ), style: TextStyle(color: Colors.white),),
+                                      )
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 20,),
+                                    child: Icon(
+                                        Icons.arrow_forward,
+                                        color: Colors.white
+                                    ),
+                                  ),
+
+
+                                ],
+                              ),
+                            ),
+
+                            baseColor: Theme.of(context).accentColor,
+                            highlightColor: Colors.red
+                        ),
+                        Container(
+                          margin: EdgeInsets.all(20),
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25)
+                          ),
+                          child:Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: AutoSizeText.rich(TextSpan(
+                                        children: [
+                                          TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
+                                          TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                          TextSpan(text: "perfetto per te"),
+                                        ]
+                                    ), style: TextStyle(color: Colors.white),),
+                                  )
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(left: 20,),
+                                child: Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white
+                                ),
+                              ),
+
+
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
+
+
+                  BlogBlock(),
+
+
+                  CardClipperElements(
+                      Column(
                         children: <Widget>[
                           Container(
-                            width: size.width,
-                            child: Column(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Color(0xFF184295)
+                            ),
+                            child: AutoSizeText("Comunicazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                          ),
+                          elaborateTable("comunicazioni")
+                        ],
+                      )
+                  ),
+
+                  CardClipperElements(
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Color(0xFF184295)
+                            ),
+                            child: AutoSizeText("Documenti".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                          ),
+                          elaborateTable("documenti"),
+                        ],
+                      )
+                  ),
+
+                  CardClipperElements(
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Color(0xFF184295)
+                            ),
+                            child: AutoSizeText("Informazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                          ),
+
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
                               children: <Widget>[
-                                Container(
-
-                                  padding: EdgeInsets.all(15),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-
-                                      AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: <Widget>[
-
-                                          AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold),),
-
-                                          AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),),
-
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-
-
-
-
-                                FlipCard(
-                                  direction: FlipDirection.HORIZONTAL, // default
-                                  front:Container(
-
-                                    margin: EdgeInsets.all(30),
-                                    child: Card(
-                                      elevation: 5,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(25.0),
-                                      ),
-                                      child: AspectRatio(
-                                          aspectRatio: 86/54,
-                                          child:Container(
-
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
-                                              borderRadius: BorderRadius.all(Radius.circular(25)),
-
-                                            ),
-                                            child:  LayoutBuilder(
-                                                builder: (BuildContext context, BoxConstraints constraints) {
-                                                  return Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: <Widget>[
-                                                      Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
-                                                    ],
-                                                  );
-                                                }
-                                            ),
-
-                                          )
-                                      ),
-                                    ),
-                                  ),
-
-                                  back: Container(
-
-                                    margin: EdgeInsets.all(30),
-
-                                    child: Card(
-                                      elevation: 5,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(25.0),
-                                      ),
-                                      child: AspectRatio(
-                                          aspectRatio: 86/54,
-
-                                          child: Container(
-
-                                            padding: EdgeInsets.all(20),
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey,
-                                              image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
-                                              borderRadius: BorderRadius.all(Radius.circular(25)),
-                                            ),
-                                            child:  LayoutBuilder(
-                                                builder: (BuildContext context, BoxConstraints constraints) {
-                                                  return Container(
-                                                    height: constraints.maxHeight,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisSize: MainAxisSize.max,
-                                                      children: <Widget>[
-                                                        Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
-                                                        Expanded(
-                                                          child:Container(
-                                                              margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
-                                                              child: Column(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: <Widget>[
-
-                                                                  Expanded(
-                                                                    child: Column(
-
-                                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
-
-                                                                      ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
-                                                                        return    Expanded(
-                                                                          child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
-                                                                        );
-                                                                      }),
-                                                                    ),
-                                                                  ),
-
-
-
-                                                                  Expanded(
-                                                                    child: Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children: <Widget>[
-                                                                        Expanded(
-
-                                                                          child:Container(
-
-                                                                              alignment: Alignment.bottomLeft,
-                                                                              child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
-                                                                          ),
-                                                                        ),
-                                                                        Expanded(
-                                                                          child:Container(
-                                                                            width: constraints.maxWidth-(constraints.maxWidth*2/7),
-
-                                                                            alignment: Alignment.bottomLeft,
-                                                                            child: Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                              mainAxisSize: MainAxisSize.max,
-                                                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                                                              children: <Widget>[
-                                                                                AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
-                                                                                AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        )
-
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )
-
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
-                                            ),
-
-                                          )
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
                                 GestureDetector(
-                                  onTap: (){
-
-                                    Navigator.push(context, PageTransition(child: SIGMensa(), type: PageTransitionType.rightToLeft));
-                                  },
-
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Shimmer.fromColors(
-                                          child: Container(
-                                            margin: EdgeInsets.all(20),
-                                            padding: EdgeInsets.all(20),
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(25),
-                                              color:Colors.black
-                                            ),
-                                            child:Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: <Widget>[
-                                                Expanded(
-                                                    child: Container(
-                                                      padding: EdgeInsets.all(5),
-                                                      child: AutoSizeText.rich(TextSpan(
-                                                          children: [
-                                                            TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
-                                                            TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                                            TextSpan(text: "perfetto per te"),
-                                                          ]
-                                                      ), style: TextStyle(color: Colors.white),),
-                                                    )
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(left: 20,),
-                                                  child: Icon(
-                                                      Icons.arrow_forward,
-                                                      color: Colors.white
-                                                  ),
-                                                ),
-
-
-                                              ],
-                                            ),
-                                          ),
-
-                                          baseColor: Theme.of(context).accentColor,
-                                          highlightColor: Colors.red
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.all(20),
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(25)
-                                        ),
-                                        child:Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Expanded(
-                                                child: Container(
-                                                  padding: EdgeInsets.all(5),
-                                                  child: AutoSizeText.rich(TextSpan(
-                                                      children: [
-                                                        TextSpan(text: "Vivi al meglio la vita associativa, trova il"),
-                                                        TextSpan(text: " SIG ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                                        TextSpan(text: "perfetto per te"),
-                                                      ]
-                                                  ), style: TextStyle(color: Colors.white),),
-                                                )
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.only(left: 20,),
-                                              child: Icon(
-                                                  Icons.arrow_forward,
-                                                  color: Colors.white
-                                              ),
-                                            ),
-
-
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF184295)
-                                  ),
-                                  child: AutoSizeText("Eventi".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                                ),
-
-                                BlogBlock(),
-
-                                GestureDetector(
-                                  onTap: (){
-
-                                    Navigator.push(context, PageTransition(child: BlogMensa(title:"Eventi"), type: PageTransitionType.rightToLeft));
+                                  onTap: () async {
+                                    tryToLunchUrl('https://www.mensaitalia.it/cose-il-mensa/');
                                   },
                                   child: Container(
                                     margin: EdgeInsets.all(20),
-                                    padding: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).accentColor),
-                                        borderRadius: BorderRadius.circular(25)
-                                    ),
-                                    child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Expanded(
-                                          child: AutoSizeText("Vedi tutti gli eventi", style: TextStyle(color: Theme.of(context).accentColor),),
-                                        ),
                                         Container(
-                                          width: 40,
+                                            width: 60,
+                                            height: 60,
+                                            margin: EdgeInsets.only(bottom: 10),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context).accentColor,
+                                                borderRadius: BorderRadius.circular(200)
+                                            ),
+                                            child: Icon(Icons.whatshot, color: Colors.white,)
                                         ),
-                                        Icon(
-                                            Icons.arrow_forward,
-                                            color: Theme.of(context).accentColor
-                                        )
 
+                                        AutoSizeText("Cosa siamo".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
                                       ],
                                     ),
                                   ),
+
                                 ),
-
-
-
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF184295)
-                                  ),
-                                  child: AutoSizeText("Comunicazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                                ),
-                                elaborateTable("comunicazioni"),
-
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF184295)
-                                  ),
-                                  child: AutoSizeText("Documenti".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                                ),
-                                elaborateTable("documenti"),
-
-
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF184295)
-                                  ),
-                                  child: AutoSizeText("Informazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                                ),
-
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () async {
-                                          tryToLunchUrl('https://www.mensaitalia.it/cose-il-mensa/');
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                  width: 60,
-                                                  height: 60,
-                                                  margin: EdgeInsets.only(bottom: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context).accentColor,
-                                                      borderRadius: BorderRadius.circular(200)
-                                                  ),
-                                                  child: Icon(Icons.whatshot, color: Colors.white,)
-                                              ),
-
-                                              AutoSizeText("Cosa siamo".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                            ],
-                                          ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    tryToLunchUrl('https://www.mensaitalia.it/storia/');
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.all(20),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Container(
+                                            width: 60,
+                                            height: 60,
+                                            margin: EdgeInsets.only(bottom: 10),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context).accentColor,
+                                                borderRadius: BorderRadius.circular(200)
+                                            ),
+                                            child: Icon(Icons.change_history, color: Colors.white,)
                                         ),
 
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          tryToLunchUrl('https://www.mensaitalia.it/storia/');
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                  width: 60,
-                                                  height: 60,
-                                                  margin: EdgeInsets.only(bottom: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context).accentColor,
-                                                      borderRadius: BorderRadius.circular(200)
-                                                  ),
-                                                  child: Icon(Icons.change_history, color: Colors.white,)
-                                              ),
-
-                                              AutoSizeText("storia".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                            ],
-                                          ),
-                                        ),
-
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          tryToLunchUrl('https://www.mensaitalia.it/statuto/');
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                  width: 60,
-                                                  height: 60,
-                                                  margin: EdgeInsets.only(bottom: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context).accentColor,
-                                                      borderRadius: BorderRadius.circular(200)
-                                                  ),
-                                                  child: Icon(Icons.wb_incandescent, color: Colors.white,)
-                                              ),
-
-                                              AutoSizeText("statuto".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                            ],
-                                          ),
-                                        ),
-
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          tryToLunchUrl('https://www.mensaitalia.it/domande-frequenti/');
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                  width: 60,
-                                                  height: 60,
-                                                  margin: EdgeInsets.only(bottom: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context).accentColor,
-                                                      borderRadius: BorderRadius.circular(200)
-                                                  ),
-                                                  child: Icon(Icons.question_answer, color: Colors.white,)
-                                              ),
-
-                                              AutoSizeText("domande".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                            ],
-                                          ),
-                                        ),
-
-                                      ),
-
-                                    ],
+                                        AutoSizeText("storia".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                      ],
+                                    ),
                                   ),
-                                ),
 
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    tryToLunchUrl('https://www.mensaitalia.it/statuto/');
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.all(20),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Container(
+                                            width: 60,
+                                            height: 60,
+                                            margin: EdgeInsets.only(bottom: 10),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context).accentColor,
+                                                borderRadius: BorderRadius.circular(200)
+                                            ),
+                                            child: Icon(Icons.wb_incandescent, color: Colors.white,)
+                                        ),
+
+                                        AutoSizeText("statuto".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                      ],
+                                    ),
+                                  ),
+
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    tryToLunchUrl('https://www.mensaitalia.it/domande-frequenti/');
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.all(20),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Container(
+                                            width: 60,
+                                            height: 60,
+                                            margin: EdgeInsets.only(bottom: 10),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context).accentColor,
+                                                borderRadius: BorderRadius.circular(200)
+                                            ),
+                                            child: Icon(Icons.question_answer, color: Colors.white,)
+                                        ),
+
+                                        AutoSizeText("domande".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                                      ],
+                                    ),
+                                  ),
+
+                                ),
 
                               ],
                             ),
-                          )
+                          ),
+                        ],
+                      )
+                  ),
 
-                        ]
-                    )
+
+
+                ],
                 ),
-
-
-
-              ],
-            )
+              )
+            ],
+          ),
         )
     );
   }
@@ -607,7 +657,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
 
           row.add(Flexible(
-            child: AutoSizeText(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.start,),
+            child: AM.Text(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.start,maxLines: 2, overflow: TextOverflow.ellipsis,),
           ));
         }
       }

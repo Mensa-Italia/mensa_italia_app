@@ -113,15 +113,15 @@ class _SigItemState extends State<SigItem> {
       },
       child: Card(
         margin: EdgeInsets.all(10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 5.0,
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25)
+              borderRadius: BorderRadius.circular(15)
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(15),
             child: CachedNetworkImage(
               imageUrl:widget.image,
               width: MediaQuery.of(context).size.width,
