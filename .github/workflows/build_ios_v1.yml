@@ -14,3 +14,4 @@ jobs:
     - run: flutter pub get
     # Build :D
     - run: flutter build ios
+
