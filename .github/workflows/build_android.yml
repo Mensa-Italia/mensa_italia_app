@@ -13,7 +13,8 @@ jobs:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        run: echo $KEY_JKS | base64 --decode > "/home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks" && flutter pub get && flutter build apk --release
+        run: echo "$env:KEY_JKS" | base64 --decode > "/home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks"
+      - run: flutter pub get && flutter build apk --release
       - uses: actions/upload-artifact@v1
         with:
           name: release-apk
