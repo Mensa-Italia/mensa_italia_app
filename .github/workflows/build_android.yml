@@ -11,8 +11,8 @@ jobs:
       - name: android
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
-          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: echo $KEY_JKS > /home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks && flutter pub get && flutter build appbundle --release
       - uses: actions/upload-artifact@v1
         with:
@@ -29,6 +29,6 @@ jobs:
       - name: macos
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
-          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: echo $KEY_JKS > /home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks && flutter pub get && flutter build ios --release
