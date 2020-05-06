@@ -1,20 +1,22 @@
 on: push
 jobs:
-  Android:
+  android:
     runs-on: ubuntu-latest
     steps:
-      - name: setup-flutter
-        uses: takuyaohashi/setup-flutter@v1
+      - uses: actions/checkout@v1
+      - uses: takuyaohashi/setup-flutter@v1
+      - name: android
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          run: echo $KEY_JKS > key.jks && flutter pub get && flutter build apk --release
+          run: echo $KEY_JKS > key.jks && flutter pub get && flutter build ios --release
   macos:
     runs-on: macos-latest
     steps:
-      - name: setup-flutter
-        uses: takuyaohashi/setup-flutter@v1
+      - uses: actions/checkout@v1
+      - uses: takuyaohashi/setup-flutter@v1
+      - name: macos
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
