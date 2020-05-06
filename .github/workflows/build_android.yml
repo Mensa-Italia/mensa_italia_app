@@ -1,6 +1,7 @@
 on: push
 jobs:
-  Android App Bundle:
+  Android_App_Bundle:
+    name: Android App Bundle
     runs-on: ubuntu-latest
     steps:
       - name: Prepearing Checkout
