@@ -1,0 +1,111 @@
+####################################################################################################
+
+#  BUILD APP BUNDLE
+
+####################################################################################################
+
+
+on: push
+
+
+jobs:
+
+  Android_App_Bundle:
+    name: Android App Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepering Project
+        uses: actions/checkout@v1
+
+      - name: Prepering Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Prepering Flutter
+        uses: subosito/flutter-action@v1.3.1
+
+      - name: Adding signing key for Play Store
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+        run: echo "$KEY_JKS" | base64 --decode > "/home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks"
+
+      - name: Building App Bundle
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        run: flutter pub get && flutter build appbundle --release
+
+      - name: Make Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: release-app-bundle
+          path: build/app/outputs/bundle/release/app.aab
+
+      - name: Make Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/bundle/release/app.aab"
+          allowUpdates: true
+          artifactContentType: "aab"
+          name: "release"
+          tag: "release"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Upload Release To Play Store
+#      - uses: r0adkll/upload-google-play@v1
+#        with:
+#          serviceAccountJson: ${{ SERVICE_ACCOUNT_JSON }}
+#          packageName: it.mensa.app
+#          releaseFile: build/app/outputs/bundle/release/app.aab
+#          track: beta
+#          whatsNewDirectory: /home/runner/work/mensa_italia_app/mensa_italia_app/whatsnew
+
+
+####################################################################################################
+
+#  BUILD APK
+
+####################################################################################################
+
+  Android_App_Apk:
+    name: Android App Apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepering Project
+        uses: actions/checkout@v1
+
+      - name: Prepering Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Prepering Flutter
+        uses: subosito/flutter-action@v1.3.1
+
+      - name: Adding signing key for Play Store
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+        run: echo "$KEY_JKS" | base64 --decode > "/home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks"
+
+      - name: Building App Apk
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        run: flutter pub get && flutter build apk --release
+
+      - name: Make Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: release-app-apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Make Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/apk/release/app-release.apk"
+          allowUpdates: true
+          artifactContentType: "apk"
+          name: "release"
+          tag: "release"
+          token: ${{ secrets.GITHUB_TOKEN }}
