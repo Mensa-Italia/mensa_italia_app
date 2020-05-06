@@ -10,6 +10,9 @@ jobs:
     name: Android App Bundle
     runs-on: ubuntu-latest
     steps:
+      - name: Prepering Project
+        uses: actions/checkout@v1
+
       - name: Prepering Java
         uses: actions/setup-java@v1
         with:
