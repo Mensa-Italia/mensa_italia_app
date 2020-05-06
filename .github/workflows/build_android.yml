@@ -26,7 +26,16 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/bundle/release/app.aab
-      - name: Release App Bundle
-        uses: yakuhzi/action-release@v1.2.0
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          file: build/app/outputs/bundle/release/app.aab
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - New Login Screen
+          draft: false
+          prerelease: false
