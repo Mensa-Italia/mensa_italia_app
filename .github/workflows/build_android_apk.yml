@@ -38,12 +38,13 @@ jobs:
           name: release-app-apk
           path: build/app/outputs/apk/release/app-release.apk
 
-      - uses: ncipollo/release-action@v1
+      - name: Make Release
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/release/app-release.apk"
           allowUpdates: true
           artifactContentType: "apk"
-          name: "release-android-apk"
-          tag: "release-android-apk"
+          name: "release"
+          tag: "release"
           token: ${{ secrets.GITHUB_TOKEN }}
 

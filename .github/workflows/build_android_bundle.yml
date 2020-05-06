@@ -38,13 +38,14 @@ jobs:
           name: release-app-bundle
           path: build/app/outputs/bundle/release/app.aab
 
-      - uses: ncipollo/release-action@v1
+      - name: Make Release
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/bundle/release/app.aab"
           allowUpdates: true
           artifactContentType: "aab"
-          name: "release-android-bundle"
-          tag: "release-android-bundle"
+          name: "release"
+          tag: "release"
           token: ${{ secrets.GITHUB_TOKEN }}
 
 #      - name: Upload Release To Play Store
