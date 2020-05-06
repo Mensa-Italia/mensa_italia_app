@@ -1,38 +1,51 @@
-name: Android
-
-# This workflow is triggered on pushes to the repository.
-
-on:
-  push:
-    branches:
-      - master
-
-    # on: push    # Default will running for every branch.
-
+#The name of your workflow.
+name:  Test, build and deploy
+# Trigger the workflow on push or pull request
+on: [push,pull_request]
+#A workflow run is made up of one or more jobs. Jobs run in parallel by default.
 jobs:
-  build:
-    # This job will run on ubuntu virtual machine
-    runs-on: ubuntu-latest
+  build_deploy:
+    #if conditional to prevent a job from running
+    if: github.event_name != 'pull_request'
+    runs-on: macos-latest
+    #Identifies any jobs that must complete successfully before this job will run.
+    needs: [drive_ios,drive_android,test]
+    name: Build  apk  and web
     steps:
-
-      # Setup Java environment in order to build the Android app.
       - uses: actions/checkout@v1
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '1.12.14'
+          channel: 'dev'
+      # This action sets up a java environment
+      # https://github.com/actions/setup-java
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
-
-      # Setup the flutter environment.
-      - uses: subosito/flutter-action@v1
+      #enable linux,macos,windows   and  web
+      - run: flutter  config --enable-web
+      - run: flutter  config --enable-linux-desktop
+      - run: flutter  config --enable-macos-desktop
+      - run: flutter  config --enable-windows-desktop
+      - run: flutter pub get
+      # build macOS desktop version
+      - run: flutter build macos --release
+      # build Android version
+      - run: flutter build apk --debug --split-per-abi
+      # This action will create a github release and optionally upload an artifact to it.
+      # https://github.com/ncipollo/release-action
+      - name: Create a Release APK
+        uses: ncipollo/release-action@v1
         with:
-          channel: 'dev'
-        env:
-          KEY_JKS: ${{ secrets.KEY_JKS }}
-          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          run: echo $KEY_JKS > key.jks && flutter pub get && flutter test && flutter build apk --release
-
-      # Upload generated apk to the artifacts.
-      - uses: actions/upload-artifact@v1
+          artifacts: "build/app/outputs/apk/debug/*.apk,build/macos/Build/Products/Release/*.app"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      # build Flutter web version
+      - run: flutter build web
+      # Handle the deploy process of your project to GitHub Pages.
+      # https://github.com/JamesIves/github-pages-deploy-action
+      - uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          name: release-apk
-          path: build/app/outputs/apk/release/app-release.apk
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          BASE_BRANCH: master
+          BRANCH: gh-pages
+          FOLDER: build/web
