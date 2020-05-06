@@ -38,6 +38,19 @@ jobs:
           name: release-app-bundle
           path: build/app/outputs/bundle/release/app.aab
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: release
+          release_name: Android App Bundle [${{ github.ref }}]
+          body: |
+            Changes in this Release
+            - New Login Screen
+          draft: false
+          prerelease: false
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -45,7 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: https://github.com/Mensa-Italia/mensa_italia_app/releases/tag/release
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/app/outputs/bundle/release/app.aab
           asset_name: app-release.aab
           asset_content_type: application/aab
