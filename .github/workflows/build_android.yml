@@ -41,12 +41,15 @@ jobs:
           name: release-app-bundle
           path: build/app/outputs/bundle/release/app.aab
 
-      - uses: meeDamian/github-release@2.0
+      - uses: ncipollo/release-action@v1
         with:
+          artifact: "build/app/outputs/bundle/release/app.aab"
+          bodyFile: "body.md"
+          allowUpdates: true
+          artifactContentType: "aab"
+          name: "release"
+          tag: "release"
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: release
-          name: Android App Bundle
-          files: build/app/outputs/bundle/release/app.aab
 
 #      - name: Create Release
 #        id: create_release
