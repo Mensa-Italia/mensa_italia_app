@@ -60,7 +60,7 @@ android {
         release {
             storeFile file("../key.jks")
             storePassword = System.getenv("ALIAS_PASSWORD")
-            keyAlias = "key"
+            keyAlias = key
             keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
