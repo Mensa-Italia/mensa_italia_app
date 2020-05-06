@@ -10,7 +10,7 @@ jobs:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          run: echo $KEY_JKS > key.jks && flutter pub get && flutter build ios --release
+        run: echo $KEY_JKS > key.jks && flutter pub get && flutter build ios --release
   macos:
     runs-on: macos-latest
     steps:
@@ -21,4 +21,4 @@ jobs:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          run: echo $KEY_JKS > key.jks && flutter pub get && flutter build ios --release
+        run: echo $KEY_JKS > key.jks && flutter pub get && flutter build ios --release
