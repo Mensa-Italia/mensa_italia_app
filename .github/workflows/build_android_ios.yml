@@ -6,9 +6,9 @@ on: push
 
 jobs:
 
-  Android_App_Bundle:
-    name: Android App Bundle
-    runs-on: ubuntu-latest
+  IOS_App_:
+    name: IOS App
+    runs-on: macos-latest
     steps:
       - name: Prepering Project
         uses: actions/checkout@v1
@@ -26,32 +26,24 @@ jobs:
           KEY_JKS: ${{ secrets.KEY_JKS }}
         run: echo "$KEY_JKS" | base64 --decode > "/home/runner/work/mensa_italia_app/mensa_italia_app/android/key.jks"
 
-      - name: Building App Bundle
+      - name: Building App IOS
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        run: flutter pub get && flutter build appbundle --release
+        run: flutter pub get && flutter build ios --release
 
       - name: Make Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: release-app-bundle
-          path: build/app/outputs/bundle/release/app.aab
+          name: release-app-ios
+          path: build/app/outputs/ios/release/app-release.ipa
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/bundle/release/app.aab"
+          artifacts: "build/app/outputs/ios/release/app-release.ipa"
           allowUpdates: true
-          artifactContentType: "aab"
-          name: "release"
-          tag: "release"
+          artifactContentType: "ipa"
+          name: "release-android-ios"
+          tag: "release-android-ios"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: Upload Release To Play Store
-#      - uses: r0adkll/upload-google-play@v1
-#        with:
-#          serviceAccountJson: ${{ SERVICE_ACCOUNT_JSON }}
-#          packageName: it.mensa.app
-#          releaseFile: build/app/outputs/bundle/release/app.aab
-#          track: beta
-#          whatsNewDirectory: /home/runner/work/mensa_italia_app/mensa_italia_app/whatsnew
