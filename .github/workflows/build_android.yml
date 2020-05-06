@@ -1,10 +1,7 @@
 
 
 
-on:
-  push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+on: push
 
 
 jobs:
@@ -44,7 +41,6 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifact: "build/app/outputs/bundle/release/app.aab"
-          bodyFile: "body.md"
           allowUpdates: true
           artifactContentType: "aab"
           name: "release"
