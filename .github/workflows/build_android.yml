@@ -24,18 +24,12 @@ jobs:
       # Setup the flutter environment.
       - uses: subosito/flutter-action@v1
         with:
-          channel: 'stable' # 'dev', 'alpha', default to: 'beta'
+          channel: 'dev'
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          # flutter-version: '1.12.x' # you can also specify exact version of flutter
-
-      # Get flutter dependencies.
-      - run: flutter pub get
-
-      # Build apk.
-      - run: flutter build apk
+          run: echo $KEY_JKS > key.jks && flutter pub get && flutter test && flutter build apk --release
 
       # Upload generated apk to the artifacts.
       - uses: actions/upload-artifact@v1
