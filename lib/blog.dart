@@ -100,17 +100,20 @@ class _BlogBlockState extends State<BlogBlock> {
 class CardClipperElements extends StatelessWidget {
 
   Widget child;
+  Color color;
 
-  CardClipperElements(this.child);
+  CardClipperElements(this.child,{this.color});
 
 
   @override
   Widget build(BuildContext context) {
     return Card(
 
-      elevation: 3.0,
-      margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      elevation: 15.0,
+      margin: EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
+
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: color??Colors.white,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: child,

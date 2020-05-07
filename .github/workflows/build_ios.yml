@@ -12,7 +12,7 @@ jobs:
   ####################################################################################################
 
   Android_App_IOS:
-    name: IOS App ipa
+    name: IOS App Ipa
     runs-on: macos-latest
     steps:
       - name: Prepering Project
@@ -32,28 +32,28 @@ jobs:
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: flutter pub get && flutter build ios --no-codesign --release
 
-      - name: Make Release
-        uses: yukiarrr/ios-build-action@v0.5.0
-        with:
-          project-path: ios/Runner.xcodeproj
-          p12-base64: ${{ secrets.P12_BASE64 }}
-          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
-          code-signing-identity: "iOS Distribution"
-          team-id: ${{ secrets.TEAM_ID }}
-          workspace-path: ios/Runner.xcworkspace
+#      - name: Make Release
+#        uses: yukiarrr/ios-build-action@v0.5.0
+#        with:
+#          project-path: ios/Runner.xcodeproj
+#          p12-base64: ${{ secrets.P12_BASE64 }}
+#          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
+#          code-signing-identity: "iOS Distribution"
+#          team-id: ${{ secrets.TEAM_ID }}
+#          workspace-path: ios/Runner.xcworkspace
 
-      - name: Make Artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: release-app-ipa
-          path: output.ipa
+#      - name: Make Artifact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: release-app-ipa
+#          path: output.ipa
 
-      - name: Make Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "output.ipa"
-          allowUpdates: true
-          artifactContentType: "ipa"
-          name: "release"
-          tag: "release"
-          token: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Make Release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          artifacts: "output.ipa"
+#          allowUpdates: true
+#          artifactContentType: "ipa"
+#          name: "release"
+#          tag: "release"
+#          token: ${{ secrets.GITHUB_TOKEN }}

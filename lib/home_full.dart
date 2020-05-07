@@ -21,11 +21,13 @@ import 'package:html/dom.dart' as prefix1;
 import 'package:mensa_italia/phone_book.dart';
 import 'package:mensa_italia/regsoci.dart';
 import 'package:mensa_italia/sig.dart';
+import 'package:mensa_italia/youtube.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'blog.dart';
 import 'document.dart';
 import 'drawer.dart';
@@ -161,6 +163,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
   }
 
 
+
   Size size;
   @override
   Widget build(BuildContext context) {
@@ -186,7 +189,14 @@ class _MensaFullPageState extends State<MensaFullPage> {
               SliverList(
                 delegate: SliverChildListDelegate( <Widget>[
 
-                  Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
+                  Container(
+                    height: 25,
+                  ),
+
+
+                  Container(
+                    height: 25,
+                  ),
 
 
                   FlipCard(
@@ -357,8 +367,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
                   Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
 
+                  YoutubeMensaPlayer(),
 
-                  GestureDetector(
+                  CardClipperElements(GestureDetector(
                     onTap: (){
 
                       Navigator.push(context, PageTransition(child: SIGMensa(), type: PageTransitionType.rightToLeft));
@@ -368,7 +379,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
                       children: <Widget>[
                         Shimmer.fromColors(
                             child: Container(
-                              margin: EdgeInsets.all(20),
                               padding: EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
@@ -406,7 +416,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
                             highlightColor: Colors.red
                         ),
                         Container(
-                          margin: EdgeInsets.all(20),
                           padding: EdgeInsets.all(20),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25)
@@ -440,7 +449,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                         )
                       ],
                     ),
-                  ),
+                  )),
 
                   Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 40,),
 

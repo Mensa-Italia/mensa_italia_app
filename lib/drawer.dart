@@ -48,96 +48,117 @@ class _MensaDrawerState extends State<MensaDrawer> {
         children: <Widget>[
           Container(height: MediaQuery.of(context).padding.top+10,),
           CardClipperElements(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  AspectRatio(
-                    child: Image.network(
-                      "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"],
-                      fit: BoxFit.cover,
+              Container(
+                color: Theme.of(context).accentColor,
+                height: MediaQuery.of(context).size.width/2,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      height: MediaQuery.of(context).size.width/2,
+                      child: AspectRatio(
+                        child: Image.network(
+                          "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"],
+                          fit: BoxFit.cover,
+                        ),
+                        aspectRatio: 1,
+                      ),
                     ),
-                    aspectRatio: 10/9,
-                  ),
-                  Container(
+                    Expanded(
+                      child: Container(
 
 
-                    padding: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
 
-                    color: Theme.of(context).accentColor,
-                    child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                  ),
-                ],
-              )
+                        color: Theme.of(context).accentColor,
+                        child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            color: Theme.of(context).accentColor,
+
           ),
 
 
 
           CardClipperElements(
-              ListTile(
-                leading: Icon(Icons.sim_card, color: Theme.of(context).accentColor,),
-                title: Text('Carta PDF'),
-                onTap: () {
+              Column(
+                children: <Widget>[
+                  ListTile(
+                    leading: Icon(Icons.sim_card, color: Theme.of(context).accentColor,),
+                    title: Text('Carta PDF'),
+                    onTap: () {
 
-                  String link=(createLink(widget.document.getElementsByTagName("a").where((e)=>e.attributes["class"]=="btn btn-success btn-sm btn-block").where((e)=>e.text=="Tessera").first.attributes["href"]));
+                      String link=(createLink(widget.document.getElementsByTagName("a").where((e)=>e.attributes["class"]=="btn btn-success btn-sm btn-block").where((e)=>e.text=="Tessera").first.attributes["href"]));
 
-                  Navigator.pop(context);
-                  Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:ShowDocumentPage(link)));
-                },
+                      Navigator.pop(context);
+                      Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:ShowDocumentPage(link)));
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.supervised_user_circle, color: Theme.of(context).accentColor,),
+                    title: Text('Registro soci'),
+                    onTap: () {
+
+                      Navigator.pop(context);
+                      Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:RegSoci()));
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.insert_drive_file, color: Theme.of(context).accentColor,),
+                    title: Text('Documenti'),
+                    onTap: () {
+
+                      Navigator.pop(context);
+                      showDialog(
+                          context: context,
+                          builder: (d)=>DialogDocumentPick(widget.document.getElementsByTagName("li").where((e)=>e.attributes["class"]=="dropdown").where((e)=>e.getElementsByTagName("a").first.text=="Documenti").first.getElementsByTagName("ul").first.getElementsByTagName("li"))
+                      );
+                    },
+                  ),
+                  ListTile(
+                      leading: Icon(Icons.close, color: Colors.redAccent,),
+                      title: Text('Disconnetti profilo'),
+                      onTap: () async {
+
+                        Directory appDocDir = await getApplicationDocumentsDirectory();
+                        String appDocPath = appDocDir.path;
+                        var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
+                        cookieJar.deleteAll();
+
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        prefs.clear();
+
+                        Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:HomePage()), ModalRoute.withName('/'));
+
+                      }
+                  ),
+                  Divider(
+                    indent: 20,
+                    endIndent: 20,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  Container(
+                    child: GestureDetector(
+                        onTap: _launchURL,
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
+                            AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+
+                          ],
+                        )
+                    ),
+                    margin: EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.all(5),
+                  )
+                ],
               )
+
           ),
-    CardClipperElements(ListTile(
-            leading: Icon(Icons.supervised_user_circle, color: Theme.of(context).accentColor,),
-            title: Text('Registro soci'),
-            onTap: () {
-
-              Navigator.pop(context);
-              Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:RegSoci()));
-            },
-          )),
-    CardClipperElements(ListTile(
-            leading: Icon(Icons.insert_drive_file, color: Theme.of(context).accentColor,),
-            title: Text('Documenti'),
-            onTap: () {
-
-              Navigator.pop(context);
-              showDialog(
-                  context: context,
-                  builder: (d)=>DialogDocumentPick(widget.document.getElementsByTagName("li").where((e)=>e.attributes["class"]=="dropdown").where((e)=>e.getElementsByTagName("a").first.text=="Documenti").first.getElementsByTagName("ul").first.getElementsByTagName("li"))
-              );
-            },
-          )),
-    CardClipperElements(ListTile(
-              leading: Icon(Icons.close, color: Colors.redAccent,),
-              title: Text('Disconnetti profilo'),
-              onTap: () async {
-
-                Directory appDocDir = await getApplicationDocumentsDirectory();
-                String appDocPath = appDocDir.path;
-                var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
-                cookieJar.deleteAll();
-
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-
-                Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:HomePage()), ModalRoute.withName('/'));
-
-              }
-          )),
           Container(height: 50,),
-          CardClipperElements(Container(
-            child: GestureDetector(
-                onTap: _launchURL,
-                child:  Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295)), textAlign: TextAlign.center,),
-                    AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFF184295), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-
-                  ],
-                )
-            ),
-            padding: EdgeInsets.all(5),
-          ))
         ],
       ),
     );
