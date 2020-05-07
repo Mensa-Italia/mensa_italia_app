@@ -33,4 +33,19 @@ jobs:
         run: flutter pub get && flutter build ios --no-codesign --release
 
 
+      - name: Make Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: release-app-ios
+          path: build/app/outputs/ios/release/app-release.ipa
+
+      - name: Make Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/ios/release/app-release.ipa"
+          allowUpdates: true
+          artifactContentType: "aab"
+          name: "release"
+          tag: "release"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
