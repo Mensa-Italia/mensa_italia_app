@@ -32,20 +32,11 @@ jobs:
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: flutter pub get && flutter build ios --no-codesign --release
 
-
-      - name: Make Artifact
+      - name: Show Artifact
         uses: actions/upload-artifact@v1
-        with:
-          name: release-app-ios
-          path: build/app/outputs/ios/release/app-release.ipa
+        run: tree build/app/outputs/
 
-      - name: Make Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/ios/release/app-release.ipa"
-          allowUpdates: true
-          artifactContentType: "aab"
-          name: "release"
-          tag: "release"
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Show 2 Artifact
+        uses: actions/upload-artifact@v1
+        run: echo tree build/app/outputs/
 
