@@ -32,9 +32,14 @@ jobs:
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: flutter pub get && flutter build ios --no-codesign --release
 
-      - name: Make Artifact
-        uses: actions/upload-artifact@v1
+      - uses: yukiarrr/ios-build-action@v0.5.0
         with:
-          name: release-app-ios
-          path: build/app/outputs/
+          project-path: ios/Runner.xcodeproj
+          p12-base64: ${{ secrets.P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
+          code-signing-identity: "iOS Distribution"
+          team-id: ${{ secrets.TEAM_ID }}
+          workspace-path: ios/Runner.xcworkspace
+
+
 
