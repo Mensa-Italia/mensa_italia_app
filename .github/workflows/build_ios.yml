@@ -30,7 +30,7 @@ jobs:
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        run: flutter pub get && flutter build ios --release
+        run: flutter pub get && flutter build ios --no-codesign --release
 
 
 
