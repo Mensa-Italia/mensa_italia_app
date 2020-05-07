@@ -33,10 +33,8 @@ jobs:
         run: flutter pub get && flutter build ios --no-codesign --release
 
       - name: Show Artifact
-        uses: actions/upload-artifact@v1
         run: tree build/app/outputs/
 
       - name: Show 2 Artifact
-        uses: actions/upload-artifact@v1
         run: echo tree build/app/outputs/
 
