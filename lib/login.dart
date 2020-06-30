@@ -151,7 +151,8 @@ class API{
     dio.interceptors.add(CookieManager(cookieJar));
     response = await dio.get(link, options: Options(
         followRedirects: true,
-        validateStatus: (status) { return status < 500; }
+        validateStatus: (status) { return status < 500; },
+
     ),);
 
     return response.data;

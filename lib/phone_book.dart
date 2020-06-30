@@ -122,7 +122,7 @@ class _PhoneBookState extends State<PhoneBook> {
                   direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
                   center: Container(
                     padding: EdgeInsets.all(40),
-                    child: AutoSizeText(("STO SCARICANDO LA RUBRICA MENSANA, CI VORRà un po'\n\n"+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                    child: AutoSizeText(("STO SCARICANDO LA RUBRICA MENSANA, CI VORRà un po'\n\n (Non chiudere questa pagina)\n\n"+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                   )
                 ):ListView(
                   children: List.generate(PhoneDB().primalContact.length, (i){

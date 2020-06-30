@@ -1,4 +1,4 @@
-package it.sipio.mensa_italia
+package it.mensa.app
 
 import android.os.Bundle
 

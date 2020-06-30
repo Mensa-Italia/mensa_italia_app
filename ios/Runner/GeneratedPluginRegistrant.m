@@ -10,10 +10,16 @@
 @import contacts_service;
 #endif
 
-#if __has_include(<flutter_plugin_pdf_viewer/FlutterPluginPdfViewerPlugin.h>)
-#import <flutter_plugin_pdf_viewer/FlutterPluginPdfViewerPlugin.h>
+#if __has_include(<flutter_full_pdf_viewer/FlutterFullPdfViewerPlugin.h>)
+#import <flutter_full_pdf_viewer/FlutterFullPdfViewerPlugin.h>
 #else
-@import flutter_plugin_pdf_viewer;
+@import flutter_full_pdf_viewer;
+#endif
+
+#if __has_include(<flutter_inappwebview/InAppWebViewFlutterPlugin.h>)
+#import <flutter_inappwebview/InAppWebViewFlutterPlugin.h>
+#else
+@import flutter_inappwebview;
 #endif
 
 #if __has_include(<in_app_update/InAppUpdatePlugin.h>)
@@ -40,6 +46,12 @@
 @import permission_handler;
 #endif
 
+#if __has_include(<screen/ScreenPlugin.h>)
+#import <screen/ScreenPlugin.h>
+#else
+@import screen;
+#endif
+
 #if __has_include(<shared_preferences/FLTSharedPreferencesPlugin.h>)
 #import <shared_preferences/FLTSharedPreferencesPlugin.h>
 #else
@@ -58,24 +70,40 @@
 @import url_launcher;
 #endif
 
-#if __has_include(<webview_media/FLTWebViewFlutterPlugin.h>)
-#import <webview_media/FLTWebViewFlutterPlugin.h>
+#if __has_include(<video_player/FLTVideoPlayerPlugin.h>)
+#import <video_player/FLTVideoPlayerPlugin.h>
 #else
-@import webview_media;
+@import video_player;
+#endif
+
+#if __has_include(<wakelock/WakelockPlugin.h>)
+#import <wakelock/WakelockPlugin.h>
+#else
+@import wakelock;
+#endif
+
+#if __has_include(<webview_flutter/FLTWebViewFlutterPlugin.h>)
+#import <webview_flutter/FLTWebViewFlutterPlugin.h>
+#else
+@import webview_flutter;
 #endif
 
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
   [ContactsServicePlugin registerWithRegistrar:[registry registrarForPlugin:@"ContactsServicePlugin"]];
-  [FlutterPluginPdfViewerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterPluginPdfViewerPlugin"]];
+  [FlutterFullPdfViewerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterFullPdfViewerPlugin"]];
+  [InAppWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppWebViewFlutterPlugin"]];
   [InAppUpdatePlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppUpdatePlugin"]];
   [OneSignalPlugin registerWithRegistrar:[registry registrarForPlugin:@"OneSignalPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
   [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
+  [ScreenPlugin registerWithRegistrar:[registry registrarForPlugin:@"ScreenPlugin"]];
   [FLTSharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTSharedPreferencesPlugin"]];
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];
   [FLTURLLauncherPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTURLLauncherPlugin"]];
+  [FLTVideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTVideoPlayerPlugin"]];
+  [WakelockPlugin registerWithRegistrar:[registry registrarForPlugin:@"WakelockPlugin"]];
   [FLTWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTWebViewFlutterPlugin"]];
 }
 
