@@ -736,9 +736,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
             i++;
           }else{
             row.add( Container(
-                margin: EdgeInsets.only(left: 10),
-                child: i==e.getElementsByTagName("td").length-1?AutoSizeText(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.end,maxLines: 1, minFontSize: 0,):AM.Text(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.start,maxLines: 2, overflow: TextOverflow.ellipsis,),
-              ),
+              margin: EdgeInsets.only(left: 10),
+              child: i==e.getElementsByTagName("td").length-1?AutoSizeText(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.end,maxLines: 1, minFontSize: 0,):AM.Text(e.getElementsByTagName("td")[i].text.trim(), textAlign: TextAlign.start,maxLines: 2, overflow: TextOverflow.ellipsis,),
+            ),
             );
 
           }
@@ -997,7 +997,13 @@ class _ShowDocumentPageState extends State<ShowDocumentPage> {
         child: Center(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
-                : PDFViewerScaffold(path: pathPDF)),
+                : PDFViewerScaffold(
+                appBar: AppBar(
+                  title: AutoSizeText("Documento".toUpperCase()),
+                ),
+                path: pathPDF
+            )
+        ),
       ),
     );
   }
