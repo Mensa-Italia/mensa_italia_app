@@ -42,12 +42,12 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: release-app-bundle
-          path: build/app/outputs/bundle/release/app.aab
+          path: build/app/outputs/bundle/release/app-release.aab
 
       - name: Make Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/bundle/release/app.aab"
+          artifacts: "build/app/outputs/bundle/release/app-release.aab"
           allowUpdates: true
           artifactContentType: "aab"
           name: "release"
