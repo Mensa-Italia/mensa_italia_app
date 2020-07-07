@@ -20,23 +20,26 @@ class _SIGMensaState extends State<SIGMensa> {
 
 
   List<dynamic> list;
+  List<dynamic> filtered;
 
   init() async {
     list=jsonDecode((await API().getRawData("https://raw.githubusercontent.com/Mensa-Italia/SIGs/master/sigs.json?id="+(new Random(15)).nextInt(15000).toString())));
+    list.sort((el1, el2)=>el1["name"].toString().toLowerCase().compareTo(el2["name"].toString().toLowerCase()));
+    filtered=list;
     print(list);
     setState(() {
 
     });
   }
-  
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     init();
   }
-  
-  
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -48,22 +51,32 @@ class _SIGMensaState extends State<SIGMensa> {
         title: AutoSizeText("Special Interest Groups".toUpperCase()),
 
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: list==null?[
+      body: ListView(
+        children: list==null?[
 
-            Container(
-              margin: EdgeInsets.only(top: 20),
-              width: 100,
-              height: 100,
-              child: LoadingDialog(),
-            )
+          Container(
+            margin: EdgeInsets.only(top: 20),
+            width: 100,
+            height: 100,
+            child: LoadingDialog(),
+          )
 
-          ]:list.isNotEmpty?List.generate(list.length, (i){
-            return SigItem(list[i]["link"],list[i]["image"]);
-          }):[],
-        ),
+        ]:list.isNotEmpty?([
+
+          Container(
+            padding: EdgeInsets.all(20),
+            child:MensaTextField("Cerca SIG",onChag: (text){
+
+              filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
+              setState(() {
+
+              });
+            },),
+          )
+
+        ]..addAll(List.generate(filtered.length, (i){
+          return SigItem(filtered[i]["link"],filtered[i]["image"]);
+        }))):[],
       ),
 
     );
@@ -101,12 +114,13 @@ class _SigItemState extends State<SigItem> {
               borderRadius: BorderRadius.circular(15)
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: CachedNetworkImage(
-              imageUrl:widget.image,
-              width: MediaQuery.of(context).size.width,
-              errorWidget: (d,s,t)=>CachedNetworkImage(imageUrl: "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog_error.jpg",),
-            ),
+              borderRadius: BorderRadius.circular(15),
+              child: CachedNetworkImage(
+                imageUrl:widget.image,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+                errorWidget: (d,s,t)=>CachedNetworkImage(imageUrl: "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog_error.jpg", fit: BoxFit.cover,),
+              )
           ),
         ),
       ),

@@ -4,7 +4,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:mensa_italia/regsoci.dart';
-import 'package:mensa_italia/store.dart';
+import 'package:mensa_italia/renew.dart';
+import 'package:mensa_italia/transitate.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +23,8 @@ import 'package:cookie_jar/cookie_jar.dart';
 
 class MensaDrawer extends StatefulWidget {
   dom.Document document;
-  MensaDrawer(this.document);
+  Function reload;
+  MensaDrawer(this.document, this.reload);
   @override
   _MensaDrawerState createState() => _MensaDrawerState();
 }
@@ -87,22 +89,32 @@ class _MensaDrawerState extends State<MensaDrawer> {
                 children: <Widget>[
                   ListTile(
                     leading: Icon(Icons.sim_card, color: Theme.of(context).accentColor,),
-                    title: Text('Carta PDF'),
+                    title: Text('Tessera PDF'),
                     onTap: () {
 
                       String link=(createLink(widget.document.getElementsByTagName("a").where((e)=>e.attributes["class"]=="btn btn-success btn-sm btn-block").where((e)=>e.text=="Tessera").first.attributes["href"]));
 
                       Navigator.pop(context);
-                      Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:ShowDocumentPage(link)));
+                      NavigateTo(context).page(ShowDocumentPage(link));
                     },
                   ),
+                  widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?ListTile(
+                    leading: Icon(Icons.trending_up, color: Theme.of(context).accentColor,),
+                    title: Text('Rinnova Tessera'),
+                    onTap: () async {
+
+                      Navigator.pop(context);
+                      await NavigateTo(context).page(RenewCardPage());
+                      widget.reload();
+                    },
+                  ):Container(),
                   ListTile(
                     leading: Icon(Icons.supervised_user_circle, color: Theme.of(context).accentColor,),
                     title: Text('Registro soci'),
                     onTap: () {
 
                       Navigator.pop(context);
-                      Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:RegSoci()));
+                      NavigateTo(context).page(RegSoci());
                     },
                   ),
                   ListTile(
@@ -130,7 +142,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.clear();
 
-                        Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:HomePage()), ModalRoute.withName('/'));
+                        NavigateTo(context).pageClear(HomePage());
 
                       }
                   ),

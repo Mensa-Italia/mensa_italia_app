@@ -17,6 +17,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:mensa_italia/transitate.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,14 +64,16 @@ class MyApp extends StatelessWidget {
     var a = await SharedPreferences.getInstance();
 
 
-    if(a.getBool("FIRSTNOTIFY")==null||!a.getBool("FIRSTNOTIFY")){
+    if(a.getBool("firstnoty")==null||!a.getBool("firstnoty")){
 
       OneSignal.shared.postNotification(OSCreateNotification(
           playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
           content: "Benvenuto nell'app del MENSA!"
       ));
-      a.setBool("FIRSTNOTIFY", true);
+      a.setBool("firstnoty", true);
     }
+
+
 
   }
 
@@ -162,18 +165,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
     Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
 
     if(document!=null){
-
-
-
-      Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:MensaFullPage(document)));
-
-
+      NavigateTo(context).page(MensaFullPage(document),replace:true);
     }else{
-
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if(prefs.getBool("isJumped")!=null&&prefs.getBool("isJumped")){
-        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeft, child:BlogMensa()));
+
+        NavigateTo(context).page(BlogMensa(),replace:true);
       }else{
 
         setState(() {
@@ -269,7 +266,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                         onTap: () async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           await prefs.setBool("isJumped", true);
-                          Navigator.pushReplacement(context, PageTransition(child: BlogMensa(), type: PageTransitionType.rightToLeft));
+                          NavigateTo(context).page(BlogMensa(), replace:true);
                         },
                         child: Container(
                           margin: EdgeInsets.only(top: 100),

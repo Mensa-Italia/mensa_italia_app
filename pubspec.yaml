@@ -43,6 +43,7 @@ dependencies:
   flutter_html: ^1.0.0
   barcode_flutter: ^1.1.2
 
+  flutter_masked_text: ^0.8.0
   webfeed: ^0.4.2
   shared_preferences: ^0.5.7+3
   flutter_full_pdf_viewer: ^1.0.6

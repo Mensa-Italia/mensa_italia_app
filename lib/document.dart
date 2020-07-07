@@ -14,6 +14,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as prefix0;
+import 'package:mensa_italia/transitate.dart';
 import 'package:page_transition/page_transition.dart';
 import 'home_full.dart';
 import 'login.dart';
@@ -294,7 +295,7 @@ class _DocumentBlockState extends State<DocumentBlock> {
   Widget build(BuildContext context) {
     return GestureDetector(onTap: (){
 
-      Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child:ShowDocumentPage(createLink(widget.link))));
+      NavigateTo(context).page(ShowDocumentPage(createLink(widget.link)));
     },child:Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: EdgeInsets.all(20),

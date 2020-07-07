@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:mensa_italia/login.dart';
+import 'package:mensa_italia/transitate.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,7 +68,7 @@ class _BlogBlockState extends State<BlogBlock> {
           GestureDetector(
             onTap: (){
 
-              Navigator.push(context, PageTransition(child: BlogMensa(title:"Eventi"), type: PageTransitionType.rightToLeft));
+              NavigateTo(context).page(BlogMensa(title:"Eventi"));
             },
             child: Container(
               padding: EdgeInsets.all(20),
@@ -110,7 +111,7 @@ class CardClipperElements extends StatelessWidget {
     return Card(
 
       elevation: 15.0,
-      margin: EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 25),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 20),
 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       color: color??Colors.white,
@@ -171,7 +172,9 @@ class _BlogMensaState extends State<BlogMensa> {
 
                     SharedPreferences prefs = await SharedPreferences.getInstance();
                     await prefs.setBool("isJumped", false);
-                    Navigator.pushReplacement(context, PageTransition(child: HomePage(), type: PageTransitionType.rightToLeft));
+
+
+                    NavigateTo(context).page(HomePage(),replace: true);
                   },
                   child: AutoSizeText("ACCEDI")
               )

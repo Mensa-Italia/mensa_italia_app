@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
+import 'package:mensa_italia/transitate.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -78,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
 
               });
 
-              Navigator.pushAndRemoveUntil(context, PageTransition(type: PageTransitionType.fade, child:MensaFullPage(document)), ModalRoute.withName('/'));
+              NavigateTo(context).pageClear(MensaFullPage(document));
 
             }else{
               enabled=true;
@@ -114,13 +115,18 @@ class API{
   Dio dio = new Dio();
 
 
-
-  Future<File> getFile(String url) async {
-
+  Future<CookieManager> getCookieJar() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
     var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
-    dio.interceptors.add(CookieManager(cookieJar));
+    return CookieManager(cookieJar);
+  }
+
+
+  Future<File> getFile(String url) async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+    dio.interceptors.add(await getCookieJar());
     response = await dio.download(url, appDocPath+"/pdf.pdf");
     return File(appDocPath+"/pdf.pdf");
 
@@ -131,10 +137,7 @@ class API{
 
   Future<Document> getData(String link) async{
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
-    dio.interceptors.add(CookieManager(cookieJar));
+    dio.interceptors.add(await getCookieJar());
     response = await dio.get(link, options: Options(
         followRedirects: true,
         validateStatus: (status) { return status < 500; }
@@ -143,20 +146,28 @@ class API{
     return html.parse(response.data);
   }
 
-  Future<String> getRawData(String link) async{
+  Future<String> getRawData(String link,{ Map<String, String> data}) async{
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
-    dio.interceptors.add(CookieManager(cookieJar));
-    response = await dio.get(link, options: Options(
+    dio.interceptors.add(await getCookieJar());
+
+    if(data==null){
+      response = await dio.get(link, options: Options(
         followRedirects: true,
         validateStatus: (status) { return status < 500; },
 
-    ),);
+      ),);
+    }else{
+      response = await dio.post(link, options: Options(
+        followRedirects: true,
+        validateStatus: (status) { return status < 500; },
+      ), data: FormData.fromMap(data));
+    }
+
 
     return response.data;
   }
+
+
 
 
   Future<String> getBlogEvent() async {
@@ -176,10 +187,7 @@ class API{
 
 
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
-    dio.interceptors.add(CookieManager(cookieJar));
+    dio.interceptors.add(await getCookieJar());
 
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/login?codass=170734", options: Options(
         followRedirects: true,
@@ -359,19 +367,24 @@ class MensaTextField extends TextField{
   String text;
   bool obscure;
   TextEditingController textEditingController;
+  TextInputType textInputType;
   Function(String) onChag;
   bool enablede;
 
-  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true});
+  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true, this.textInputType});
 
   @override
   // TODO: implement enabled
   bool get enabled => enablede;
 
   @override
+  // TODO: implement keyboardType
+  TextInputType get keyboardType => this.textInputType;
+
+  @override
   // TODO: implement onChanged
   get onChanged => (s){
-    onChag(s);
+    onChag(controller.text);
     super.onChanged(s);
   };
 
@@ -420,15 +433,24 @@ class MensaButton extends FlatButton{
   Function onPressedNew;
   String text;
   BorderRadius radius;
-  MensaButton({this.onPressedNew,this.text, this.radius}){
+  bool enableded;
+  MensaButton({this.onPressedNew,this.text, this.radius, this.enableded=true}){
     radius=radius??BorderRadius.circular(200.0);
+
   }
 
 
+  @override
+  // TODO: implement enabled
+  bool get enabled => this.enableded;
 
   @override
   // TODO: implement onPressed
-  get onPressed => onPressedNew;
+  get onPressed => (){
+    if(enableded){
+      onPressedNew();
+    }
+  };
 
   @override
   // TODO: implement materialTapTargetSize
