@@ -9,7 +9,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia/blog.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt;
 
 
@@ -20,11 +19,11 @@ class YoutubeMensaPlayer extends StatefulWidget {
 
 class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
 
-  YoutubePlayerController _controller;
 
 
   bool isLive=false;
   String videoUrl;
+  String image;
 
   tryThis() async {
     yt.YoutubeExplode exploder = yt.YoutubeExplode();
@@ -40,22 +39,7 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
     }
 
     videoUrl=video.url;
-    _controller=YoutubePlayerController(
-      initialVideoId: YoutubePlayer.convertUrlToId(video.url),
-
-
-      flags: YoutubePlayerFlags(
-          autoPlay: true,
-          mute: mute,
-          enableCaption: false,
-
-          forceHD: false,
-          controlsVisibleAtStart: false,
-          loop: true,
-          hideControls: true,
-          isLive: isLive
-      ),
-    );
+    image=video.thumbnails.highResUrl;
     setState(() {
 
     });
@@ -76,37 +60,23 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [
-            BoxShadow(blurRadius: 10.0, spreadRadius: 1.0, offset: Offset(0,1))
-          ]
       ),
       child: Column(
         children: <Widget>[
           Row(
             children: <Widget>[
-              _controller!=null? GestureDetector(onTap: (){
+              videoUrl!=null? GestureDetector(onTap: (){
                 tryToLunchUrl(videoUrl);
               },
                 child: Container(
                   height: 100,
                   width: 100/9*16,
-                  child: AbsorbPointer(
-                      child:YoutubePlayer(
-                        controller: _controller,
-                        showVideoProgressIndicator: false,
 
-
-                        progressIndicatorColor: Theme.of(context).accentColor,
-                        liveUIColor: Theme.of(context).accentColor,
-                        bottomActions: <Widget>[
-                        ],
-                        topActions: <Widget>[
-
-
-                        ],
-                        onReady: () {
-                        },
-                      )
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(image)
+                    )
                   ),
                 ),):Container(
                 height: 100,
@@ -141,7 +111,7 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                             children: <Widget>[
 
                               Expanded(
-                                child:  AutoSizeText(isLive?"ULTIMA LIVE":"ULTIMO VIDEO".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,minFontSize: 0,),
+                                child:  AutoSizeText("Youtube".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,minFontSize: 0,),
 
                               ) ,
 

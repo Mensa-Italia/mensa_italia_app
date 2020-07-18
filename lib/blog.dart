@@ -110,7 +110,7 @@ class CardClipperElements extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
 
-      elevation: 15.0,
+      elevation: 5.0,
       margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 20),
 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

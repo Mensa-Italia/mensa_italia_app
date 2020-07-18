@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:mensa_italia/transitate.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+//import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
 
   MyApp(){
 
-
+/*
     OneSignal.shared.init(
       "f2b93a2b-0d67-4e9e-b5c8-991c96a33ddc",
       iOSSettings: {
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
 
     );
 
-    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);*/
     sendFirst();
 
   }
@@ -66,10 +66,10 @@ class MyApp extends StatelessWidget {
 
     if(a.getBool("firstnoty")==null||!a.getBool("firstnoty")){
 
-      OneSignal.shared.postNotification(OSCreateNotification(
+     /* OneSignal.shared.postNotification(OSCreateNotification(
           playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
           content: "Benvenuto nell'app del MENSA!"
-      ));
+      ));*/
       a.setBool("firstnoty", true);
     }
 

@@ -27,7 +27,8 @@ import 'package:mensa_italia/phone_book.dart';
 import 'package:mensa_italia/renew.dart';
 import 'package:mensa_italia/sig.dart';
 import 'package:mensa_italia/transitate.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:mensa_italia/youtube.dart';
+//import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -215,7 +216,8 @@ class _MensaFullPageState extends State<MensaFullPage> {
         DateTime temp=(DateTime(toSend.year, toSend.month, toSend.day, 18,0).toUtc().subtract(Duration(days: i)));
 
         try{
-          Map ax=await OneSignal.shared.postNotification(OSCreateNotification(
+
+        /*  Map ax=await OneSignal.shared.postNotification(OSCreateNotification(
               playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
               content: "La tua tessera scadrà tra "+(i-1).toString()+" giorni. Rinnovala ora!",
               delayedOption: OSCreateNotificationDelayOption.timezone,
@@ -225,7 +227,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
           print(ax["id"]+" "+DateTime.now().toUtc().add(Duration(seconds: 5*i)).toIso8601String());
           await a.setStringList("renewNotify", a.getStringList("renewNotify")..addAll([
             ax["id"]
-          ]));
+          ]));*/
         }catch(Exc){
 
         }
@@ -283,7 +285,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
-    renew();
+    //renew();
 
 
     return GestureDetector(
@@ -649,6 +651,13 @@ class _MensaFullPageState extends State<MensaFullPage> {
                     )
 
                 ),
+
+
+                CardClipperElements(
+                    YoutubeMensaPlayer()
+                ),
+
+
                 Container(height: 10,),
                 Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 5,),
                 Container(height: 20,),

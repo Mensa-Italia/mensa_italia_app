@@ -28,12 +28,6 @@
 @import in_app_update;
 #endif
 
-#if __has_include(<onesignal_flutter/OneSignalPlugin.h>)
-#import <onesignal_flutter/OneSignalPlugin.h>
-#else
-@import onesignal_flutter;
-#endif
-
 #if __has_include(<path_provider/FLTPathProviderPlugin.h>)
 #import <path_provider/FLTPathProviderPlugin.h>
 #else
@@ -95,7 +89,6 @@
   [FlutterFullPdfViewerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterFullPdfViewerPlugin"]];
   [InAppWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppWebViewFlutterPlugin"]];
   [InAppUpdatePlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppUpdatePlugin"]];
-  [OneSignalPlugin registerWithRegistrar:[registry registrarForPlugin:@"OneSignalPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
   [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
   [ScreenPlugin registerWithRegistrar:[registry registrarForPlugin:@"ScreenPlugin"]];

@@ -5,7 +5,6 @@ import flutter.plugins.contactsservice.contactsservice.ContactsServicePlugin;
 import com.alveliu.flutterfullpdfviewer.FlutterFullPdfViewerPlugin;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import de.ffuf.in_app_update.InAppUpdatePlugin;
-import com.onesignal.flutter.OneSignalPlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
 import com.baseflow.permissionhandler.PermissionHandlerPlugin;
 import flutter.plugins.screen.screen.ScreenPlugin;
@@ -28,7 +27,6 @@ public final class GeneratedPluginRegistrant {
     FlutterFullPdfViewerPlugin.registerWith(registry.registrarFor("com.alveliu.flutterfullpdfviewer.FlutterFullPdfViewerPlugin"));
     InAppWebViewFlutterPlugin.registerWith(registry.registrarFor("com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin"));
     InAppUpdatePlugin.registerWith(registry.registrarFor("de.ffuf.in_app_update.InAppUpdatePlugin"));
-    OneSignalPlugin.registerWith(registry.registrarFor("com.onesignal.flutter.OneSignalPlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
     PermissionHandlerPlugin.registerWith(registry.registrarFor("com.baseflow.permissionhandler.PermissionHandlerPlugin"));
     ScreenPlugin.registerWith(registry.registrarFor("flutter.plugins.screen.screen.ScreenPlugin"));
