@@ -57,8 +57,8 @@ jobs:
           artifacts: "build/app/outputs/bundle/release/app-release.aab"
           allowUpdates: true
           artifactContentType: "aab"
-          name: ${{ steps.buildnumber.outputs.build_number }}
-          tag: ${{ steps.buildnumber.outputs.build_number }}
+          name: "release App Bundle - ${{ steps.buildnumber.outputs.build_number }}"
+          tag: "release App Bundle - ${{ steps.buildnumber.outputs.build_number }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete Artifcat
@@ -113,14 +113,22 @@ jobs:
           name: release-app-apk
           path: build/app/outputs/apk/release/app-release.apk
 
+
+      - name: Generate build number
+        uses: einaregilsson/build-number@v2
+        with:
+          token: ${{secrets.github_token}}
+      - name: Print new build number
+        run: echo "Build number is $BUILD_NUMBER"
+
       - name: Make Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/release/app-release.apk"
           allowUpdates: true
           artifactContentType: "apk"
-          name: "release"
-          tag: "release"
+            name: "release Apk - ${{ steps.buildnumber.outputs.build_number }}"
+            tag: "release Apk - ${{ steps.buildnumber.outputs.build_number }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete Artifcat
