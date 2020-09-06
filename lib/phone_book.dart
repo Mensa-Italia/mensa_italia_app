@@ -1,12 +1,5 @@
-
-
-
-
-
-import 'dart:async';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +8,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
-
 import 'login.dart';
 
 class PhoneBook extends StatefulWidget {
@@ -188,7 +180,7 @@ class _ContactPhoneState extends State<ContactPhone> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
 
@@ -569,9 +561,10 @@ class PhoneDB{
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }

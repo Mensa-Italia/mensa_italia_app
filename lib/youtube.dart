@@ -1,13 +1,5 @@
-
-
-
-
-
-
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_italia/blog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt;
 
@@ -47,7 +39,6 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     tryThis();

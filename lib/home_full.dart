@@ -10,15 +10,13 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'dart:async';
-
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as AM;
 import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as prefix1;
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
@@ -28,10 +26,9 @@ import 'package:mensa_italia/renew.dart';
 import 'package:mensa_italia/sig.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:mensa_italia/youtube.dart';
-//import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simple_html_css/simple_html_css.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'blog.dart';
 import 'document.dart';
 import 'drawer.dart';
@@ -281,6 +278,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
 
 
+
   Size size;
   @override
   Widget build(BuildContext context) {
@@ -493,7 +491,13 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
                                       widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
                                       AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),):
-                                      AutoSizeText("RINNOVO IN CORSO", style: TextStyle(),),
+                                      (DateTime.parse(
+                                          widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                                      ).difference(DateTime.now())).inDays<30?
+                                      AutoSizeText("RINNOVO IN CORSO", style: TextStyle(),):
+                                      AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),)
 
                                     ],
                                   )
@@ -948,9 +952,10 @@ class _MensaFullPageState extends State<MensaFullPage> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }
@@ -1024,7 +1029,7 @@ class _BlockDialogDocState extends State<BlockDialogDoc> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
 
@@ -1122,8 +1127,8 @@ class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
         child: Column(
           children: <Widget>[
 
-            Html(
-              data: document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"",
+            HTML.toRichText(context,
+              document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"",
             )
 
 

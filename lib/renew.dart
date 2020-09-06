@@ -1,7 +1,3 @@
-
-
-
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart' as dio;
 import 'package:flip_card/flip_card.dart';
@@ -13,6 +9,7 @@ import 'package:html/dom.dart';
 import 'package:mensa_italia/login.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class RenewCardPage extends StatefulWidget {
@@ -348,6 +345,7 @@ class _RenewCardPageState extends State<RenewCardPage> {
                     Navigator.pop(context);
                   }
 
+
                 },
                     enableded:moneyToPay!=""&&confirmPrivacy
                 )
@@ -361,6 +359,12 @@ class _RenewCardPageState extends State<RenewCardPage> {
   }
 
   bool confirmPrivacy=false;
+  tryToLunchUrl(String url) async {
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
 
 }
 

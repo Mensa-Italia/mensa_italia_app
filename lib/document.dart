@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as prefix0;
 import 'package:mensa_italia/transitate.dart';
-import 'package:page_transition/page_transition.dart';
 import 'home_full.dart';
 import 'login.dart';
 
@@ -346,9 +345,10 @@ class _DocumentBlockState extends State<DocumentBlock> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }

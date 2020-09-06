@@ -19,12 +19,9 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
 import 'package:mensa_italia/transitate.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'blog.dart';
 import 'home_full.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,6 +66,9 @@ class _LoginPageState extends State<LoginPage> {
 
             });
             _btnController.start();
+
+
+
             Document document=await API().doLoginAndRetrieveMain(context, emailController.text, passwordController.text);
 
 
@@ -111,8 +111,11 @@ class _LoginPageState extends State<LoginPage> {
 class API{
 
 
-  Response response;
-  Dio dio = new Dio();
+  Dio dio;
+
+  API(){
+      dio = new Dio();
+  }
 
 
   Future<CookieManager> getCookieJar() async {
@@ -124,6 +127,7 @@ class API{
 
 
   Future<File> getFile(String url) async {
+    Response response;
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
     dio.interceptors.add(await getCookieJar());
@@ -136,31 +140,29 @@ class API{
 
 
   Future<Document> getData(String link) async{
-
+    Response response;
     dio.interceptors.add(await getCookieJar());
-    response = await dio.get(link, options: Options(
-        followRedirects: true,
-        validateStatus: (status) { return status < 500; }
-    ),);
+    response = await dio.get(link,  options: Options(
+      headers: getHeader(),
+      followRedirects: true,
+    ));
 
     return html.parse(response.data);
   }
 
   Future<String> getRawData(String link,{ Map<String, String> data}) async{
-
+    Response response;
     dio.interceptors.add(await getCookieJar());
-
     if(data==null){
-      response = await dio.get(link, options: Options(
+      response = await dio.get(link,  options: Options(
+        headers: getHeader(),
         followRedirects: true,
-        validateStatus: (status) { return status < 500; },
-
-      ),);
+      ));
     }else{
-      response = await dio.post(link, options: Options(
+      response = await dio.post(link,  data: FormData.fromMap(data),  options: Options(
+        headers: getHeader(),
         followRedirects: true,
-        validateStatus: (status) { return status < 500; },
-      ), data: FormData.fromMap(data));
+      ));
     }
 
 
@@ -168,32 +170,35 @@ class API{
   }
 
 
+  Map<String, dynamic> getHeader(){
+
+    return null;
+  }
+
 
 
   Future<String> getBlogEvent() async {
+    Response response;
 
-    response = await dio.get("https://www.mensaitalia.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full", options: Options(
-        followRedirects: true,
+    response = await dio.get("https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",  options: Options(
+      headers: getHeader(),
+      followRedirects: true,
+    ));
 
-        validateStatus: (status) { return status < 500; }
-    ),);
-
-    return response.data.toString();
+    return response.data;
 
   }
 
 
   Future<Document> doLoginAndRetrieveMain(BuildContext context,String email, String password) async{
-
+    Response response;
 
 
     dio.interceptors.add(await getCookieJar());
-
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/login?codass=170734", options: Options(
-        followRedirects: true,
-
-        validateStatus: (status) { return status < 500; }
-    ),);
+        headers: getHeader(),
+      followRedirects: true,
+    ));
 
 
 
@@ -210,8 +215,8 @@ class API{
 
     if(!response.isRedirect&&document.getElementsByTagName("input").where((e)=>e.attributes["name"]=="_token").isNotEmpty){
 
-      Token=(document.getElementsByTagName("input").where((e)=>e.attributes["name"]=="_token").first.attributes["value"]);
 
+      Token=(document.getElementsByTagName("input").where((e)=>e.attributes["name"]=="_token").first.attributes["value"]);
 
 
       FormData formData=FormData.fromMap({
@@ -219,11 +224,10 @@ class API{
         "password":password,
         "_token":Token
       });
-      response = await dio.post("https://www.cloud32.it/Associazioni/utenti/login", data: formData,options: Options(
-          followRedirects: true,
-
-          validateStatus: (status) { return status < 500; }
-      ),);
+      response = await dio.post("https://www.cloud32.it/Associazioni/utenti/login", data: formData, options: Options(
+        headers: getHeader(),
+        followRedirects: true,
+      ));
 
 
 
@@ -231,10 +235,9 @@ class API{
     }
 
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/home", options: Options(
-        followRedirects: true,
-
-        validateStatus: (status) { return status < 500; }
-    ),);
+      headers: getHeader(),
+      followRedirects: true,
+    ));
 
 
     print(response);
@@ -319,10 +322,7 @@ class ErrorDialog extends StatefulWidget {
 class _ErrorDialogState extends State<ErrorDialog> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(left: 50.0, right: 50.0),
-        child://AlertDialog or any other Dialog you can use
-        Dialog(
+    return  Dialog(
             elevation: 0.0,
             backgroundColor: Colors.transparent,
             child: Container(
@@ -356,7 +356,7 @@ class _ErrorDialogState extends State<ErrorDialog> {
                 ],
               ),
             )
-        ));
+        );
   }
 }
 

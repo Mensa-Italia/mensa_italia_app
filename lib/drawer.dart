@@ -1,16 +1,13 @@
 import 'dart:io';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:mensa_italia/regsoci.dart';
 import 'package:mensa_italia/renew.dart';
 import 'package:mensa_italia/transitate.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'blog.dart';
 import 'home_full.dart';
 import 'main.dart';
@@ -34,9 +31,10 @@ class _MensaDrawerState extends State<MensaDrawer> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }

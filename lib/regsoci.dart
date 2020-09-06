@@ -10,14 +10,11 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fancy_dialog/FancyAnimation.dart';
-import 'package:fancy_dialog/fancy_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as dom;
 import 'login.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 
 class RegSoci extends StatefulWidget {
   @override
@@ -356,9 +353,10 @@ class _UserBlockState extends State<UserBlock> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }
@@ -478,9 +476,10 @@ class _DialogBlockState extends State<DialogBlock> {
   String createLink(String link) {
 
     if (link.split("://").contains("https")) {
-      return link;
+      return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
+
 
     }
   }

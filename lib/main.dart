@@ -9,17 +9,11 @@ Created by Matteo Sipion on the date of 15/10/2019.
 
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
-
-
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:mensa_italia/transitate.dart';
-//import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wave/config.dart';
@@ -28,7 +22,6 @@ import 'blog.dart';
 import 'home_full.dart';
 import 'login.dart';
 import 'dart:io';
-import 'dart:math' as math;
 
 
 void main(){
@@ -39,43 +32,6 @@ void main(){
 
 class MyApp extends StatelessWidget {
 
-
-  MyApp(){
-
-/*
-    OneSignal.shared.init(
-      "f2b93a2b-0d67-4e9e-b5c8-991c96a33ddc",
-      iOSSettings: {
-        OSiOSSettings.autoPrompt: false,
-        OSiOSSettings.inAppLaunchUrl: false,
-        OSiOSSettings.inAppAlerts: false,
-      },
-
-
-    );
-
-    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);*/
-    sendFirst();
-
-  }
-
-  sendFirst() async {
-
-    var a = await SharedPreferences.getInstance();
-
-
-    if(a.getBool("firstnoty")==null||!a.getBool("firstnoty")){
-
-     /* OneSignal.shared.postNotification(OSCreateNotification(
-          playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
-          content: "Benvenuto nell'app del MENSA!"
-      ));*/
-      a.setBool("firstnoty", true);
-    }
-
-
-
-  }
 
 
 
@@ -150,15 +106,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   prepare() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+      try{
+        if((await InAppUpdate.checkForUpdate()).updateAvailable){
+          await InAppUpdate.performImmediateUpdate();
+          exit(0);
+        }
+      }catch(E){
 
-    try{
-      if((await InAppUpdate.checkForUpdate()).updateAvailable){
-        await InAppUpdate.performImmediateUpdate();
-        exit(0);
       }
-    }catch(E){
 
-    }
 
 
 
