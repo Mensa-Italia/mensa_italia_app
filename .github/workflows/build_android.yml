@@ -58,7 +58,7 @@ jobs:
           allowUpdates: true
           artifactContentType: "aab"
           name: "release App Bundle - ${{ steps.buildnumber.outputs.build_number }}"
-          tag: "release App Bundle - ${{ steps.buildnumber.outputs.build_number }}"
+          tag: "release"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete Artifcat
@@ -128,7 +128,7 @@ jobs:
           allowUpdates: true
           artifactContentType: "apk"
           name: "release Apk - ${{ steps.buildnumber.outputs.build_number }}"
-          tag: "release Apk - ${{ steps.buildnumber.outputs.build_number }}"
+          tag: "release"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete Artifcat
