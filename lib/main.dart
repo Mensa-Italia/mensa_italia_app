@@ -11,6 +11,7 @@ Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:mensa_italia/transitate.dart';
@@ -24,9 +25,13 @@ import 'login.dart';
 import 'dart:io';
 
 
-void main(){
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  await SharedPreferences.getInstance();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((value) => runApp(MyApp()));
 
 }
 
