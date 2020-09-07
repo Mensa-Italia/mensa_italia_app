@@ -125,10 +125,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
     }else{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if(prefs.getBool("isJumped")!=null&&prefs.getBool("isJumped")){
-
         NavigateTo(context).page(BlogMensa(),replace:true);
       }else{
-
         setState(() {
           isPreparing=false;
           _visible=true;
@@ -141,14 +139,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
 
   tryToLunchUrl(String url) async {
-
     if (await canLaunch(url)) {
       await launch(url);
     }
   }
 
   Size size;
-
 
   static Matrix4 _pmat(num pv) {
     return new Matrix4(
