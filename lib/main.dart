@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   }
 
 
-  String errorString;
+  String errorString="";
 
   bool isPreparing=true;
   prepare() async {
