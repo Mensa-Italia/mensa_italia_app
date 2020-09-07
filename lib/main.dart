@@ -107,6 +107,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   }
 
 
+  String errorString;
+
   bool isPreparing=true;
   prepare() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -117,27 +119,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
           exit(0);
         }
       }catch(E){
-
-      }
-
-
-
-
-    Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
-
-    if(document!=null){
-      NavigateTo(context).page(MensaFullPage(document),replace:true);
-    }else{
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      if(prefs.getBool("isJumped")!=null&&prefs.getBool("isJumped")){
-        NavigateTo(context).page(BlogMensa(),replace:true);
-      }else{
+        errorString="The error is "+E.toString();
         setState(() {
-          isPreparing=false;
-          _visible=true;
+
         });
       }
+
+
+
+    try{
+      Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
+
+      if(document!=null){
+        NavigateTo(context).page(MensaFullPage(document),replace:true);
+      }else{
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if(prefs.getBool("isJumped")!=null&&prefs.getBool("isJumped")){
+          NavigateTo(context).page(BlogMensa(),replace:true);
+        }else{
+          setState(() {
+            isPreparing=false;
+            _visible=true;
+          });
+        }
+      }
+    }catch(E){
+      errorString="The error is "+E.toString();
+      setState(() {
+
+      });
     }
+
+
 
   }
 
@@ -198,6 +211,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
                     ),
 
+
                     isPreparing?CircularProgressIndicator(
                       valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
                     ):AnimatedOpacity(
@@ -214,6 +228,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                         ),
                       ),
                     ),
+
+                    AutoSizeText(errorString, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white.withOpacity(0.5)), textAlign: TextAlign.center,),
+
 
                     AnimatedOpacity(
                       opacity: _visible?1.0:0.0,
@@ -232,6 +249,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       ),
 
                     ),
+
+
                     GestureDetector(
                         onTap: (){
                           tryToLunchUrl("https://www.sipio.it");
