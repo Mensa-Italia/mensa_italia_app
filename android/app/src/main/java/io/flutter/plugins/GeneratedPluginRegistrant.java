@@ -2,10 +2,10 @@ package io.flutter.plugins;
 
 import io.flutter.plugin.common.PluginRegistry;
 import flutter.plugins.contactsservice.contactsservice.ContactsServicePlugin;
-import com.alveliu.flutterfullpdfviewer.FlutterFullPdfViewerPlugin;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import de.ffuf.in_app_update.InAppUpdatePlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
+import com.example.pdfviewerplugin.PdfViewerPlugin;
 import com.baseflow.permissionhandler.PermissionHandlerPlugin;
 import flutter.plugins.screen.screen.ScreenPlugin;
 import io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin;
@@ -24,10 +24,10 @@ public final class GeneratedPluginRegistrant {
       return;
     }
     ContactsServicePlugin.registerWith(registry.registrarFor("flutter.plugins.contactsservice.contactsservice.ContactsServicePlugin"));
-    FlutterFullPdfViewerPlugin.registerWith(registry.registrarFor("com.alveliu.flutterfullpdfviewer.FlutterFullPdfViewerPlugin"));
     InAppWebViewFlutterPlugin.registerWith(registry.registrarFor("com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin"));
     InAppUpdatePlugin.registerWith(registry.registrarFor("de.ffuf.in_app_update.InAppUpdatePlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
+    PdfViewerPlugin.registerWith(registry.registrarFor("com.example.pdfviewerplugin.PdfViewerPlugin"));
     PermissionHandlerPlugin.registerWith(registry.registrarFor("com.baseflow.permissionhandler.PermissionHandlerPlugin"));
     ScreenPlugin.registerWith(registry.registrarFor("flutter.plugins.screen.screen.ScreenPlugin"));
     SharedPreferencesPlugin.registerWith(registry.registrarFor("io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin"));

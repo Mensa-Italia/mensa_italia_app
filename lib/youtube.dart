@@ -32,9 +32,11 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
 
     videoUrl=video.url;
     image=video.thumbnails.highResUrl;
-    setState(() {
+    if(mounted){
+      setState(() {
 
-    });
+      });
+    }
   }
 
   @override

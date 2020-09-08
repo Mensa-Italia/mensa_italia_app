@@ -16,7 +16,6 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as AM;
-import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:html/dom.dart' as prefix1;
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +25,7 @@ import 'package:mensa_italia/renew.dart';
 import 'package:mensa_italia/sig.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:mensa_italia/youtube.dart';
+import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -214,7 +214,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
         try{
 
-        /*  Map ax=await OneSignal.shared.postNotification(OSCreateNotification(
+          /*  Map ax=await OneSignal.shared.postNotification(OSCreateNotification(
               playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
               content: "La tua tessera scadrà tra "+(i-1).toString()+" giorni. Rinnovala ora!",
               delayedOption: OSCreateNotificationDelayOption.timezone,
@@ -1118,22 +1118,24 @@ class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       appBar: AppBar(
         title: AutoSizeText("COMUNICAZIONE"),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
+      body: ListView(
+        padding: EdgeInsets.all(20),
+        children: [
+          AutoSizeText.rich(HTML.toTextSpan(context,
+              document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"<div></div>",
+              defaultTextStyle: TextStyle(
+                fontSize: 12,
+                decoration: TextDecoration.none,
+              ),
+          ))
 
-            HTML.toRichText(context,
-              document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"",
-            )
-
-
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -1178,30 +1180,24 @@ class _ShowDocumentPageState extends State<ShowDocumentPage> {
 
 
   Size size;
-  PDFViewerScaffold pdfviw;
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
-    return _isLoading
-        ?Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: AutoSizeText("Documento".toUpperCase()),
       ),
       body: Container(
         height: size.height,
         width: size.width,
-        child: Center(
+        child: _isLoading
+            ?Center(
             child:  Center(child: CircularProgressIndicator())
 
+        ):PdfViewer(
+          filePath: pathPDF,
         ),
       ),
-    ): pdfviw??=PDFViewerScaffold(
-
-      appBar: AppBar(
-        title: AutoSizeText("Documento".toUpperCase()),
-      ),
-      path: pathPDF,
-
     );
   }
 }
