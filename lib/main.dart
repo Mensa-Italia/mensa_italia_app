@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   }
 
 
-  String errorString="";
+
 
   bool isPreparing=true;
   prepare() async {
@@ -119,15 +119,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
           exit(0);
         }
       }catch(E){
-        errorString="The error is "+E.toString();
-        setState(() {
 
-        });
       }
 
 
 
-    try{
       Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
 
       if(document!=null){
@@ -143,12 +139,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
           });
         }
       }
-    }catch(E){
-      errorString="The error is "+E.toString();
-      setState(() {
 
-      });
-    }
 
 
 
@@ -228,9 +219,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                         ),
                       ),
                     ),
-
-                    AutoSizeText(errorString, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white.withOpacity(0.5)), textAlign: TextAlign.center,),
-
 
                     AnimatedOpacity(
                       opacity: _visible?1.0:0.0,
