@@ -144,7 +144,7 @@ class API{
     dio.interceptors.add(await getCookieJar());
     response = await dio.get(link,  options: Options(
       headers: getHeader(),
-      followRedirects: false,
+      followRedirects: Platform.isAndroid,
       validateStatus: (status) {
         return status < 500;
       },
@@ -159,7 +159,7 @@ class API{
     if(data==null){
       response = await dio.get(link,  options: Options(
         headers: getHeader(),
-        followRedirects: false,
+        followRedirects: Platform.isAndroid,
         validateStatus: (status) {
           return status < 500;
         },
@@ -167,7 +167,7 @@ class API{
     }else{
       response = await dio.post(link,  data: FormData.fromMap(data),  options: Options(
         headers: getHeader(),
-        followRedirects: false,
+        followRedirects: Platform.isAndroid,
         validateStatus: (status) {
           return status < 500;
         },
@@ -191,7 +191,7 @@ class API{
 
     response = await dio.get("https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",  options: Options(
       headers: getHeader(),
-      followRedirects: false,
+      followRedirects: Platform.isAndroid,
       validateStatus: (status) {
         return status < 500;
       },
@@ -209,7 +209,7 @@ class API{
     dio.interceptors.add(await getCookieJar());
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/login?codass=170734", options: Options(
         headers: getHeader(),
-      followRedirects: false,
+      followRedirects: Platform.isAndroid,
       validateStatus: (status) {
         return status < 500;
       },
@@ -241,7 +241,7 @@ class API{
       });
       response = await dio.post("https://www.cloud32.it/Associazioni/utenti/login", data: formData, options: Options(
         headers: getHeader(),
-        followRedirects: false,
+        followRedirects: Platform.isAndroid,
         validateStatus: (status) {
           return status < 500;
         },
@@ -254,7 +254,7 @@ class API{
 
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/home", options: Options(
       headers: getHeader(),
-      followRedirects: false,
+      followRedirects: Platform.isAndroid,
       validateStatus: (status) {
         return status < 500;
       },
