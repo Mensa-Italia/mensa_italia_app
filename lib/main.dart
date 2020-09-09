@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:mensa_italia/phone_book.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -112,6 +113,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   bool isPreparing=true;
   prepare() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
 
       try{
         if((await InAppUpdate.checkForUpdate()).updateAvailable){

@@ -19,6 +19,7 @@ class _SIGMensaState extends State<SIGMensa> {
 
   List<dynamic> list;
   List<dynamic> filtered;
+  MensaTextField mensaTextField;
 
   init() async {
     list=jsonDecode((await API().getRawData("https://raw.githubusercontent.com/Mensa-Italia/SIGs/master/sigs.json?id="+(new Random(15)).nextInt(15000).toString())));
@@ -63,7 +64,7 @@ class _SIGMensaState extends State<SIGMensa> {
 
           Container(
             padding: EdgeInsets.all(20),
-            child:MensaTextField("Cerca SIG",onChag: (text){
+            child:mensaTextField??=MensaTextField("Cerca SIG",onChag: (text){
 
               filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
               setState(() {

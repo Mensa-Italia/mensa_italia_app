@@ -77,5 +77,6 @@ flutter {
 }
 
 dependencies {
+    implementation('com.github.barteksc:android-pdf-viewer:2.8.2'){ force = true }
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

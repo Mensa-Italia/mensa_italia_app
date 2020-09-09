@@ -392,10 +392,13 @@ class MensaTextField extends TextField{
   Function(String) onChag;
   bool enablede;
 
-  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true, this.textInputType});
+  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true, this.textInputType}){
+   if(textEditingController==null){
+     textEditingController=TextEditingController();
+   }
+  }
 
   @override
-  // TODO: implement enabled
   bool get enabled => enablede;
 
   @override
@@ -403,15 +406,16 @@ class MensaTextField extends TextField{
   TextInputType get keyboardType => this.textInputType;
 
   @override
-  // TODO: implement onChanged
   get onChanged => (s){
     onChag(controller.text);
     super.onChanged(s);
   };
 
+
+
   @override
   // TODO: implement controller
-  TextEditingController get controller => textEditingController??super.controller;
+  TextEditingController get controller => textEditingController;
 
   @override
   // TODO: implement obscureText

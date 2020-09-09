@@ -5,6 +5,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
@@ -26,34 +27,41 @@ class _PhoneBookState extends State<PhoneBook> {
 
   double loading=0;
 
+
+
   init() async {
+
+    PhoneDB().pointOfOperation((i,j){
+      loading=i/j;
+      if(mounted)
+      setState(() {
+
+      });
+    });
 
     if(await PhoneDB().load()){
 
     }else{
-      await PhoneDB().download((i,j){
-        loading=i/j;
-
-        setState(() {
-
-        });
-      }, (){
+      await PhoneDB().download(redo: (){
+        if(mounted)
         setState(() {
 
         });
       });
       await PhoneDB().load();
-
+      if(mounted)
       setState(() {
 
       });
     }
 
+    if(mounted)
     setState(() {
 
     });
   }
 
+  MensaTextField mensaTextField;
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +79,15 @@ class _PhoneBookState extends State<PhoneBook> {
                 onTap: () async {
 
                   loading=0;
-                  await PhoneDB().download((i,j){
-                    loading=i/j;
-                    setState(() {
-
-                    });
-                  }, (){
+                  await PhoneDB().download(redo: (){
+                    if(mounted)
                     setState(() {
 
                     });
                   });
                   await PhoneDB().load();
 
+                  if(mounted)
                   setState(() {
 
                   });
@@ -114,7 +119,7 @@ class _PhoneBookState extends State<PhoneBook> {
                   direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
                   center: Container(
                     padding: EdgeInsets.all(40),
-                    child: AutoSizeText(("STO SCARICANDO LA RUBRICA MENSANA, CI VORRà un po'\n\n (Non chiudere questa pagina)\n\n"+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                    child: AutoSizeText(("STO SCARICANDO LA RUBRICA MENSANA "+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                   )
                 ):ListView(
                   children: List.generate(PhoneDB().primalContact.length, (i){
@@ -141,9 +146,10 @@ class _PhoneBookState extends State<PhoneBook> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(200)
                     ),
-                    child: MensaTextField("Cerca (Cognome Nome)",onChag: (text){
+                    child: mensaTextField??=MensaTextField("Cerca (Cognome Nome)",onChag: (text){
 
                       PhoneDB().load(text: text);
+                      if(mounted)
                       setState(() {
 
                       });
@@ -274,6 +280,7 @@ class _DialogCallState extends State<DialogCall> {
       existsytem = xa.isNotEmpty;
     }
 
+    if(mounted)
     setState(() {
 
     });
@@ -285,6 +292,12 @@ class _DialogCallState extends State<DialogCall> {
     // TODO: implement initState
     super.initState();
     init();
+  }
+
+  @override
+  void dispose() {
+    PhoneDB().pointOfOperation(null);
+    super.dispose();
   }
 
 
@@ -421,6 +434,11 @@ class PhoneDB{
       await _init();
     }
 
+    SharedPreferences sp=await SharedPreferences.getInstance();
+    if(sp.getInt("downloadedPoint")!=-1){
+      return false;
+    }
+
     var tal;
     if(text==null){
 
@@ -441,25 +459,39 @@ class PhoneDB{
 
   int maxPage;
   int page=1;
+  Function(int,int) everyPage;
+
+  pointOfOperation(Function(int,int) everyPage){
+    this.everyPage=everyPage;
+  }
 
 
+  download({Function redo}) async{
 
-  download(Function(int,int) everyPage, Function redo) async{
-    if(db==null){
-      await _init();
+    SharedPreferences sp=await SharedPreferences.getInstance();
+
+    page=sp.getInt("downloadedPoint");
+    page=page==null?1:page;
+    if(page>1){
+
+
+    }else{
+      if(db==null){
+        await _init();
+      }
+      primalContact.clear();
+      primalContact=null;
+      db.delete("Contacts");
+      if(redo!=null){
+        redo();
+      }
+      page=1;
     }
-
-    primalContact.clear();
-    primalContact=null;
-    db.delete("Contacts");
-    redo();
-
     dom.Document document = await API().getData("https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=&s_nome=&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page="+page.toString());
 
     maxPage=int.parse(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").elementAt(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").length-2).getElementsByTagName("a").first.text);
 
-    for(page=1;page<=maxPage;page++){
-
+    for(;page<=maxPage;page++){
       dom.Document document = await API().getData("https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=&s_nome=&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page="+page.toString());
 
       try{
@@ -477,6 +509,8 @@ class PhoneDB{
           var data=i.getElementsByTagName("td");
 
           for(int j=0;j<data.length;j++){
+
+            print(j);
             if(j==0){
               try{
                 image=data[j].getElementsByTagName("img").first.attributes["src"];
@@ -509,16 +543,24 @@ class PhoneDB{
             print(e);
           }
 
-          everyPage(page, maxPage);
+          if(everyPage!=null){
+            everyPage(page, maxPage);
+          }
 
         });
       }catch(e){
 
       }
 
+      sp.setInt("downloadedPoint", page);
+
     }
 
+    sp.setInt("downloadedPoint", -1);
+
     primalContact=[];
+
+
 
   }
 

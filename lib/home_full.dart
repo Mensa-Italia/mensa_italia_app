@@ -19,6 +19,7 @@ import 'package:flutter/material.dart' as AM;
 import 'package:html/dom.dart' as prefix1;
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
+import 'package:in_app_review/in_app_review.dart';
 import 'package:mensa_italia/locals.dart';
 import 'package:mensa_italia/phone_book.dart';
 import 'package:mensa_italia/renew.dart';
@@ -253,7 +254,24 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
     });
 
+
+
     scrollController.addListener(() { toDoWhileOnMove();});
+
+    startReview();
+  }
+
+  startReview() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int point=prefs.getInt("downloadedPoint");
+    if(point==null||point>1){
+      PhoneDB().download();
+    }
+    InAppReview inAppReview = InAppReview.instance;
+
+    if (await inAppReview.isAvailable()) {
+      inAppReview.requestReview();
+    }
   }
 
 

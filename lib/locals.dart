@@ -38,7 +38,7 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
     init();
   }
 
-
+  MensaTextField mensaTextField;
   @override
   Widget build(BuildContext context) {
 
@@ -64,8 +64,9 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
 
           Container(
             padding: EdgeInsets.all(20),
-            child:MensaTextField("Cerca Gruppo",onChag: (text){
+            child:mensaTextField??=MensaTextField("Cerca Gruppo",onChag: (text){
 
+              print(text);
               filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
               setState(() {
 
