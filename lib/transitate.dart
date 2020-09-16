@@ -21,7 +21,7 @@ class NavigateTo{
 
   dynamic pageClear(Widget page){
 
-    Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => page), ModalRoute.withName('/'));
+    Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => page), (Route<dynamic> route) => false);
   }
 
 }

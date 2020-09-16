@@ -304,6 +304,562 @@ class _MensaFullPageState extends State<MensaFullPage> {
     //renew();
 
 
+    ListView BaseBlock=ListView(
+      children: <Widget>[
+
+        Container(
+          height: 25,
+        ),
+
+
+
+
+        FlipCard(
+          direction: FlipDirection.HORIZONTAL, // default
+          front:Container(
+
+            margin: EdgeInsets.only(left: 30, right: 30,),
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              child: AspectRatio(
+                  aspectRatio: 86/54,
+                  child:Container(
+
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).accentColor,
+                      borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
+
+                    ),
+                    child:  LayoutBuilder(
+                        builder: (BuildContext context, BoxConstraints constraints) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
+                            ],
+                          );
+                        }
+                    ),
+
+                  )
+              ),
+            ),
+          ),
+
+          back: Container(
+
+            margin: EdgeInsets.only(left: 30, right: 30),
+
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(size.width/50),
+              ),
+              child: AspectRatio(
+                  aspectRatio: 86/54,
+
+                  child: Container(
+
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
+                      borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
+                    ),
+                    child:  LayoutBuilder(
+                        builder: (BuildContext context, BoxConstraints constraints) {
+                          return Container(
+                            height: constraints.maxHeight,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
+                                Expanded(
+                                  child:Container(
+                                      margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+
+                                          Expanded(
+                                            child: Column(
+
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
+
+                                              ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
+                                                return    Expanded(
+                                                  child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
+                                                );
+                                              }),
+                                            ),
+                                          ),
+
+
+
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Expanded(
+
+                                                  child:Container(
+
+                                                      alignment: Alignment.bottomLeft,
+                                                      child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child:Container(
+                                                    width: constraints.maxWidth-(constraints.maxWidth*2/7),
+
+                                                    alignment: Alignment.bottomLeft,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisSize: MainAxisSize.max,
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      children: <Widget>[
+                                                        AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
+                                                        AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      )
+
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                    ),
+
+                  )
+              ),
+            ),
+          ),
+        ),
+
+
+        Container(
+          height: 25,
+        ),
+
+        CardClipperElements(
+
+            Container(
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+
+                    Container(
+                      padding: EdgeInsets.all(15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+
+                         Expanded(
+                           child:  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                         ),
+
+                          Container(width: 5,),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+
+                                AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold), minFontSize: 0, textAlign: TextAlign.right,),
+
+                                widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
+                                AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
+                                (DateTime.parse(
+                                    widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                                ).difference(DateTime.now())).inDays<30?
+                                AutoSizeText("RINNOVO IN CORSO", style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
+                                AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right, maxLines: 1,)
+
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    (DateTime.parse(
+                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                            widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                            widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                    ).difference(DateTime.now())).inDays<30&&widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?GestureDetector(
+                      onTap: () async {
+
+                        await NavigateTo(context).page(RenewCardPage());
+                        reload();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+                        decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.15)
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: AutoSizeText("La tua tesserà scadrà tra "+(DateTime.parse(
+                                  widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                                      widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                                      widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                              ).difference(DateTime.now())).inDays.toString()+" giorni.", style: TextStyle(fontWeight: FontWeight.bold),),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 10, right: 10),
+                              child: Icon(Icons.arrow_forward),
+                            )
+                          ],
+                        ),
+                      ),
+                    ):Container(),
+
+
+                  ],
+                )
+            )
+        ),
+
+        Container(height: 10,),
+        Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 5,),
+        Container(height: 20,),
+        CardClipperElements(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Color(0xFF184295)
+                  ),
+                  child: AutoSizeText("GRUPPO UFFICIALE".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                ),
+                GestureDetector(
+                  onTap: (){
+                    tryToLunchUrl("https://www.facebook.com/groups/MensaItalia/");
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                    ),
+                    child: ClipRRect(
+                      child: CachedNetworkImage(
+                        imageUrl:"https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog.jpg",
+                        width: MediaQuery.of(context).size.width,
+                        errorWidget: (d,s,t)=>CachedNetworkImage(imageUrl: "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog_error.jpg",),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
+        ),
+
+        CardClipperElements(
+            Container(
+
+              color: Color(0xFF184295),
+              child:  Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Color(0xFF184295)
+                    ),
+                    child: AutoSizeText("LA TUA VITA ASSOCIATIVA".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                  ),
+                  GestureDetector(
+                    onTap: (){
+
+                      NavigateTo(context).page(LOCALSMensa());
+                    },
+
+                    child: Container(
+                        margin: EdgeInsets.only(bottom: 1),
+                        alignment: Alignment.center,
+                        color: Colors.white,
+                        padding: EdgeInsets.only(left: 10, top: 20, bottom: 20),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: AutoSizeText.rich(TextSpan(
+                                    children: [
+                                      TextSpan(text: "GRUPPI LOCALI", style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ]
+                                ), style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.start)
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 10, right: 10),
+                              child: Icon(Icons.arrow_forward),
+                            )
+                          ],
+                        )
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (){
+
+                      NavigateTo(context).page(SIGMensa());
+                    },
+
+                    child: Container(
+                      alignment: Alignment.center,
+                      color: Colors.white,
+                      padding: EdgeInsets.only(left: 10, top: 20, bottom: 20),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: AutoSizeText.rich(TextSpan(
+                                  children: [
+                                    TextSpan(text: "SIGs ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: "(Special Interest Groups)"),
+                                  ]
+                              ), style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.start)
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: Icon(Icons.arrow_forward),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+
+        ),
+
+
+        CardClipperElements(
+            YoutubeMensaPlayer()
+        ),
+
+
+        Container(height: 10,),
+        Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 5,),
+        Container(height: 20,),
+
+        BlogBlock(),
+
+
+        CardClipperElements(
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Color(0xFF184295)
+                  ),
+                  child: AutoSizeText("Comunicazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                ),
+                elaborateTable("comunicazioni")
+              ],
+            )
+        ),
+
+        CardClipperElements(
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Color(0xFF184295)
+                  ),
+                  child: AutoSizeText("Documenti".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                ),
+                elaborateTable("documenti"),
+              ],
+            )
+        ),
+
+        CardClipperElements(
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Color(0xFF184295)
+                  ),
+                  child: AutoSizeText("Informazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
+                ),
+
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () async {
+                          tryToLunchUrl('https://www.mensaitalia.it/cose-il-mensa/');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                  width: 60,
+                                  height: 60,
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: BorderRadius.circular(200)
+                                  ),
+                                  child: Icon(Icons.whatshot, color: Colors.white,)
+                              ),
+
+                              AutoSizeText("Cosa siamo".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                            ],
+                          ),
+                        ),
+
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          tryToLunchUrl('https://www.mensaitalia.it/storia/');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                  width: 60,
+                                  height: 60,
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: BorderRadius.circular(200)
+                                  ),
+                                  child: Icon(Icons.change_history, color: Colors.white,)
+                              ),
+
+                              AutoSizeText("storia".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                            ],
+                          ),
+                        ),
+
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          tryToLunchUrl('https://www.mensaitalia.it/statuto/');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                  width: 60,
+                                  height: 60,
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: BorderRadius.circular(200)
+                                  ),
+                                  child: Icon(Icons.wb_incandescent, color: Colors.white,)
+                              ),
+
+                              AutoSizeText("statuto".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                            ],
+                          ),
+                        ),
+
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          tryToLunchUrl('https://www.mensaitalia.it/domande-frequenti/');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                  width: 60,
+                                  height: 60,
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      borderRadius: BorderRadius.circular(200)
+                                  ),
+                                  child: Icon(Icons.question_answer, color: Colors.white,)
+                              ),
+
+                              AutoSizeText("domande".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
+                            ],
+                          ),
+                        ),
+
+                      ),
+
+                    ],
+                  ),
+                ),
+              ],
+            )
+        ),
+
+
+        Container(
+          height: 100,
+        ),
+        Container(
+          child: GestureDetector(
+              onTap: (){
+                tryToLunchUrl('https://sipio.it');
+              },
+              child:  Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black.withOpacity(0.3)), textAlign: TextAlign.center,),
+                  AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black.withOpacity(0.3), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+
+                ],
+              )
+          ),
+          margin: EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.all(5),
+        ),
+
+        Container(
+          height: 100,
+        ),
+
+      ],
+    );
+
+
     return GestureDetector(
         onTap: () {
 
@@ -312,12 +868,12 @@ class _MensaFullPageState extends State<MensaFullPage> {
         child: Scaffold(
 
 
-            drawer: MensaDrawer(widget.document, reload),
+            drawer: size.width>=600?null:MensaDrawer(widget.document, reload),
 
 
             appBar: AppBar(
               title: AutoSizeText("MENSA"),
-              actions: <Widget>[
+              actions: size.width>=600?null:[
                 IconButton(
                   icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.title.color,),
                   onPressed: () {
@@ -330,555 +886,20 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
 
 
-            body:  ListView(
-              children: <Widget>[
 
+            body: size.width>=600?Row(
+              children: [
                 Container(
-                  height: 25,
-                ),
-
-
-
-
-                FlipCard(
-                  direction: FlipDirection.HORIZONTAL, // default
-                  front:Container(
-
-                    margin: EdgeInsets.only(left: 30, right: 30,),
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                      child: AspectRatio(
-                          aspectRatio: 86/54,
-                          child:Container(
-
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).accentColor,
-                              borderRadius: BorderRadius.all(Radius.circular(25)),
-
-                            ),
-                            child:  LayoutBuilder(
-                                builder: (BuildContext context, BoxConstraints constraints) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
-                                    ],
-                                  );
-                                }
-                            ),
-
-                          )
-                      ),
-                    ),
-                  ),
-
-                  back: Container(
-
-                    margin: EdgeInsets.only(left: 30, right: 30),
-
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                      child: AspectRatio(
-                          aspectRatio: 86/54,
-
-                          child: Container(
-
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
-                              borderRadius: BorderRadius.all(Radius.circular(25)),
-                            ),
-                            child:  LayoutBuilder(
-                                builder: (BuildContext context, BoxConstraints constraints) {
-                                  return Container(
-                                    height: constraints.maxHeight,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
-                                        Expanded(
-                                          child:Container(
-                                              margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: <Widget>[
-
-                                                  Expanded(
-                                                    child: Column(
-
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
-
-                                                      ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
-                                                        return    Expanded(
-                                                          child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
-                                                        );
-                                                      }),
-                                                    ),
-                                                  ),
-
-
-
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: <Widget>[
-                                                        Expanded(
-
-                                                          child:Container(
-
-                                                              alignment: Alignment.bottomLeft,
-                                                              child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
-                                                          ),
-                                                        ),
-                                                        Expanded(
-                                                          child:Container(
-                                                            width: constraints.maxWidth-(constraints.maxWidth*2/7),
-
-                                                            alignment: Alignment.bottomLeft,
-                                                            child: Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              mainAxisSize: MainAxisSize.max,
-                                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                                              children: <Widget>[
-                                                                AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
-                                                                AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        )
-
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                }
-                            ),
-
-                          )
-                      ),
-                    ),
-                  ),
-                ),
-
-
-                Container(
-                  height: 25,
-                ),
-
-                CardClipperElements(
-
-                    Container(
-
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-
-                            Container(
-                              padding: EdgeInsets.all(15),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-
-                                  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-
-                                      AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold),),
-
-                                      widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
-                                      AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),):
-                                      (DateTime.parse(
-                                          widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
-                                      ).difference(DateTime.now())).inDays<30?
-                                      AutoSizeText("RINNOVO IN CORSO", style: TextStyle(),):
-                                      AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(),)
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            (DateTime.parse(
-                                widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                    widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                    widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
-                            ).difference(DateTime.now())).inDays<30&&widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?GestureDetector(
-                              onTap: () async {
-
-                                await NavigateTo(context).page(RenewCardPage());
-                                reload();
-                              },
-                              child: Container(
-                                padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-                                decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.15)
-                                ),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: AutoSizeText("La tua tesserà scadrà tra "+(DateTime.parse(
-                                          widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
-                                      ).difference(DateTime.now())).inDays.toString()+" giorni.", style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 10, right: 10),
-                                      child: Icon(Icons.arrow_forward),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ):Container(),
-
-
-                          ],
-                        )
-                    )
-                ),
-
-                Container(height: 10,),
-                Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 5,),
-                Container(height: 20,),
-                CardClipperElements(
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF184295)
-                          ),
-                          child: AutoSizeText("GRUPPO UFFICIALE".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            tryToLunchUrl("https://www.facebook.com/groups/MensaItalia/");
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                            ),
-                            child: ClipRRect(
-                              child: CachedNetworkImage(
-                                imageUrl:"https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog.jpg",
-                                width: MediaQuery.of(context).size.width,
-                                errorWidget: (d,s,t)=>CachedNetworkImage(imageUrl: "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog_error.jpg",),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                ),
-
-                CardClipperElements(
-                    Container(
-
-                      color: Color(0xFF184295),
-                      child:  Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: Color(0xFF184295)
-                            ),
-                            child: AutoSizeText("LA TUA VITA ASSOCIATIVA".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                          ),
-                          GestureDetector(
-                            onTap: (){
-
-                              NavigateTo(context).page(LOCALSMensa());
-                            },
-
-                            child: Container(
-                                margin: EdgeInsets.only(bottom: 1),
-                                alignment: Alignment.center,
-                                color: Colors.white,
-                                padding: EdgeInsets.only(left: 10, top: 20, bottom: 20),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                        child: AutoSizeText.rich(TextSpan(
-                                            children: [
-                                              TextSpan(text: "GRUPPI LOCALI", style: TextStyle(fontWeight: FontWeight.bold)),
-                                            ]
-                                        ), style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.start)
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 10, right: 10),
-                                      child: Icon(Icons.arrow_forward),
-                                    )
-                                  ],
-                                )
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: (){
-
-                              NavigateTo(context).page(SIGMensa());
-                            },
-
-                            child: Container(
-                              alignment: Alignment.center,
-                              color: Colors.white,
-                              padding: EdgeInsets.only(left: 10, top: 20, bottom: 20),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                      child: AutoSizeText.rich(TextSpan(
-                                          children: [
-                                            TextSpan(text: "SIGs ", style: TextStyle(fontWeight: FontWeight.bold)),
-                                            TextSpan(text: "(Special Interest Groups)"),
-                                          ]
-                                      ), style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.start)
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.only(left: 10, right: 10),
-                                    child: Icon(Icons.arrow_forward),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-
-                ),
-
-
-                CardClipperElements(
-                    YoutubeMensaPlayer()
-                ),
-
-
-                Container(height: 10,),
-                Divider(endIndent: 80, indent: 80, color: Theme.of(context).accentColor,height: 5,),
-                Container(height: 20,),
-
-                BlogBlock(),
-
-
-                CardClipperElements(
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF184295)
-                          ),
-                          child: AutoSizeText("Comunicazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                        ),
-                        elaborateTable("comunicazioni")
-                      ],
-                    )
-                ),
-
-                CardClipperElements(
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF184295)
-                          ),
-                          child: AutoSizeText("Documenti".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                        ),
-                        elaborateTable("documenti"),
-                      ],
-                    )
-                ),
-
-                CardClipperElements(
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF184295)
-                          ),
-                          child: AutoSizeText("Informazioni".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,),
-                        ),
-
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () async {
-                                  tryToLunchUrl('https://www.mensaitalia.it/cose-il-mensa/');
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                          width: 60,
-                                          height: 60,
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
-                                              borderRadius: BorderRadius.circular(200)
-                                          ),
-                                          child: Icon(Icons.whatshot, color: Colors.white,)
-                                      ),
-
-                                      AutoSizeText("Cosa siamo".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                    ],
-                                  ),
-                                ),
-
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  tryToLunchUrl('https://www.mensaitalia.it/storia/');
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                          width: 60,
-                                          height: 60,
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
-                                              borderRadius: BorderRadius.circular(200)
-                                          ),
-                                          child: Icon(Icons.change_history, color: Colors.white,)
-                                      ),
-
-                                      AutoSizeText("storia".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                    ],
-                                  ),
-                                ),
-
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  tryToLunchUrl('https://www.mensaitalia.it/statuto/');
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                          width: 60,
-                                          height: 60,
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
-                                              borderRadius: BorderRadius.circular(200)
-                                          ),
-                                          child: Icon(Icons.wb_incandescent, color: Colors.white,)
-                                      ),
-
-                                      AutoSizeText("statuto".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                    ],
-                                  ),
-                                ),
-
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  tryToLunchUrl('https://www.mensaitalia.it/domande-frequenti/');
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                          width: 60,
-                                          height: 60,
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
-                                              borderRadius: BorderRadius.circular(200)
-                                          ),
-                                          child: Icon(Icons.question_answer, color: Colors.white,)
-                                      ),
-
-                                      AutoSizeText("domande".toUpperCase(), style: TextStyle(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold, fontSize: 10),textAlign: TextAlign.center,),
-                                    ],
-                                  ),
-                                ),
-
-                              ),
-
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                ),
-
-
-                Container(
-                  height: 100,
+                  width: size.width/2,
+                  child: MensaDrawer(widget.document, reload)
                 ),
                 Container(
-                  child: GestureDetector(
-                      onTap: (){
-                        tryToLunchUrl('https://sipio.it');
-                      },
-                      child:  Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          AutoSizeText("Thought by ", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black.withOpacity(0.3)), textAlign: TextAlign.center,),
-                          AutoSizeText("Matteo Sipione", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black.withOpacity(0.3), fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-
-                        ],
-                      )
-                  ),
-                  margin: EdgeInsets.only(bottom: 10),
-                  padding: EdgeInsets.all(5),
-                ),
-
-                Container(
-                  height: 100,
-                ),
+                  width: size.width/2,
+                  child: BaseBlock
+                )
 
               ],
-            )
+            ):BaseBlock
         )
 
     );

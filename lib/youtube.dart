@@ -50,105 +50,112 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white,
-      ),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              videoUrl!=null? GestureDetector(onTap: (){
-                tryToLunchUrl(videoUrl);
-              },
-                child: Container(
-                  height: 100,
-                  width: 100/9*16,
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints){
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              children: <Widget>[
 
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(image)
-                    )
+                      color: Color(0xFF184295)
                   ),
-                ),):Container(
-                height: 100,
-                width: 100/9*16,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+
+                      Expanded(
+                        child: AutoSizeText("Youtube".toUpperCase(),
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                          textAlign: TextAlign.center,
+                          minFontSize: 0,
+                          maxLines: 1,),
+
+                      ),
+
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Column(
                   children: <Widget>[
-                    CircularProgressIndicator(
-                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),)
+                    videoUrl != null ? GestureDetector(onTap: () {
+                      tryToLunchUrl(videoUrl);
+                    },
+                      child: Container(
+                        height: constraints.maxWidth*9/16,
+                        width: constraints.maxWidth,
+
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(image)
+                            )
+                        ),
+                      ),) : Container(
+                      height: constraints.maxWidth*9/16,
+                      width: constraints.maxWidth,
+                      decoration: BoxDecoration(
+                          color: Theme
+                              .of(context)
+                              .accentColor
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          CircularProgressIndicator(
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                                Colors.white),)
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        tryToLunchUrl(
+                            "https://www.youtube.com/channel/UC9YB8yAsDGX6kjMZIZQQMPA");
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment
+                              .spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              child: AutoSizeText("Vedi tutti i video",
+                                style: TextStyle(color: Theme
+                                    .of(context)
+                                    .accentColor),
+                                minFontSize: 0,
+                                maxLines: 2,),
+                            ),
+                            Icon(
+                                Icons.arrow_forward,
+                                color: Theme
+                                    .of(context)
+                                    .accentColor
+                            )
+
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              Expanded(
-                  child: Container(
-                    height: 100,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF184295)
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-
-                              Expanded(
-                                child:  AutoSizeText("Youtube".toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),textAlign: TextAlign.center,minFontSize: 0,),
-
-                              ) ,
-
-                            ],
-                          ),
-                        ),
-
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: (){
-
-                              tryToLunchUrl("https://www.youtube.com/channel/UC9YB8yAsDGX6kjMZIZQQMPA");
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              decoration: BoxDecoration(
-                              ),
-                              child:Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: AutoSizeText("Vedi tutti i video", style: TextStyle(color: Theme.of(context).accentColor), minFontSize: 0,),
-                                  ),
-                                  Icon(
-                                      Icons.arrow_forward,
-                                      color: Theme.of(context).accentColor
-                                  )
-
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-              )
-            ],
-          ),
 
 
-        ],
-      ),
-    );
+              ],
+            ),
+          );
+        });
   }
 
 

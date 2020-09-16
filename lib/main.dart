@@ -10,11 +10,11 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:mensa_italia/phone_book.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,6 +24,7 @@ import 'blog.dart';
 import 'home_full.dart';
 import 'login.dart';
 import 'dart:io';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 Future<void> main() async {
@@ -45,6 +46,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mensa Italia',
+
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'), // English
+        const Locale('it', 'IT'), // Italian
+        const Locale('fr', 'FR'), // French
+        const Locale('th', 'TH'), // Thai
+      ],
       theme: ThemeData(
           primarySwatch: Colors.blue,
           accentColor: Color(0xFF184295),
@@ -200,7 +213,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       duration: Duration(milliseconds: 500),
                       child: Container(
                         margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top+50, bottom: 50),
-                        child: Image.asset('assets/images/mensa_under.png', width: size.width/2),
+                        child: Image.asset('assets/images/mensa_under.png', width: size.width/2>300?300:size.width/2,),
                       ),
 
                     ),
@@ -216,7 +229,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       elevation: 5.0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                       child: Container(
-                        width: size.width*3/4,
+                        width: size.width*3/4>300?300:size.width*3/4,
                         padding: EdgeInsets.all(20),
                         child:   LoginPage(),
                         ),
