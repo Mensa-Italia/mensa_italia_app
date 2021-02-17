@@ -65,8 +65,6 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
           Container(
             padding: EdgeInsets.all(20),
             child:mensaTextField??=MensaTextField("Cerca Gruppo",onChag: (text){
-
-              print(text);
               filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
               setState(() {
 
@@ -75,7 +73,7 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
           )
 
         ]..addAll(List.generate(filtered.length, (i){
-          return SigItem(filtered[i]["link"],filtered[i]["image"]);
+          return SigItem(filtered[i]["link"],filtered[i]["name"],filtered[i]["image"]);
         }))):[],
       ),
 

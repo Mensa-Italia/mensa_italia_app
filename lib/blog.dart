@@ -29,9 +29,11 @@ class _BlogBlockState extends State<BlogBlock> {
   Future init() async {
     rssFeed = new RssFeed.parse(await API().getBlogEvent());
     isPreparing=false;
-    setState(() {
+    if(mounted){
+      setState(() {
 
-    });
+      });
+    }
   }
   bool isPreparing=true;
   @override

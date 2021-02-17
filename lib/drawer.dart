@@ -63,7 +63,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
                           height: constraints.maxWidth/2,
                           child: AspectRatio(
                             child: Image.network(
-                              "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"],
+                              "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"].replaceAll('\\', "/"),
                               fit: BoxFit.cover,
                             ),
                             aspectRatio: 1,
@@ -119,7 +119,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
                             NavigateTo(context).page(ShowDocumentPage(link));
                           },
                         ),
-                        widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?ListTile(
+                        /*widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?ListTile(
                           leading: Icon(Icons.trending_up, color: Theme.of(context).accentColor,),
                           title: Text('Rinnova Tessera'),
                           onTap: () async {
@@ -128,7 +128,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
                             await NavigateTo(context).page(RenewCardPage());
                             widget.reload();
                           },
-                        ):Container(),
+                        ):Container(),*/
                         ListTile(
                           leading: Icon(Icons.supervised_user_circle, color: Theme.of(context).accentColor,),
                           title: Text('Registro soci'),

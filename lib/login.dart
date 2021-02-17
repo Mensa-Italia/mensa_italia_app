@@ -261,12 +261,6 @@ class API{
     ));
 
 
-    print(response);
-
-
-
-
-
     document = html.parse(response.data);
 
     if(document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").isNotEmpty){

@@ -166,7 +166,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
       "Accept": "application/json",
     });
     final response = await request.send();
-    print(response);
     if (response.statusCode != 200)
       return Future.error("error: status code ${response.statusCode}");
     return await response.stream.bytesToString();
@@ -215,17 +214,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
         try{
 
-          /*  Map ax=await OneSignal.shared.postNotification(OSCreateNotification(
-              playerIds: [(await OneSignal.shared.getPermissionSubscriptionState()).subscriptionStatus.userId],
-              content: "La tua tessera scadrà tra "+(i-1).toString()+" giorni. Rinnovala ora!",
-              delayedOption: OSCreateNotificationDelayOption.timezone,
-              sendAfter: temp
-          ));
-
-          print(ax["id"]+" "+DateTime.now().toUtc().add(Duration(seconds: 5*i)).toIso8601String());
-          await a.setStringList("renewNotify", a.getStringList("renewNotify")..addAll([
-            ax["id"]
-          ]));*/
         }catch(Exc){
 
         }
@@ -250,7 +238,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((duration){
 
-      precacheImage(new NetworkImage( "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"]), context);
+      precacheImage(new NetworkImage(
+          "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"].replaceAll('\\', "/")
+      ), context);
 
     });
 
@@ -396,7 +386,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
                                               ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
                                                 return    Expanded(
-                                                  child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0,),
+                                                  child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines:1),
                                                 );
                                               }),
                                             ),
@@ -473,9 +463,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
 
-                         Expanded(
-                           child:  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                         ),
+                          Expanded(
+                            child:  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                          ),
 
                           Container(width: 5,),
                           Expanded(
@@ -501,11 +491,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                         ],
                       ),
                     ),
-                    (DateTime.parse(
-                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                            widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                            widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
-                    ).difference(DateTime.now())).inDays<30&&widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?GestureDetector(
+                    /*GestureDetector(
                       onTap: () async {
 
                         await NavigateTo(context).page(RenewCardPage());
@@ -532,7 +518,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                           ],
                         ),
                       ),
-                    ):Container(),
+                    )*/
 
 
                   ],
@@ -654,9 +640,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
         ),
 
 
-        CardClipperElements(
+       /* CardClipperElements(
             YoutubeMensaPlayer()
-        ),
+        ),*/
 
 
         Container(height: 10,),
@@ -890,12 +876,12 @@ class _MensaFullPageState extends State<MensaFullPage> {
             body: size.width>=600?Row(
               children: [
                 Container(
-                  width: size.width/2,
-                  child: MensaDrawer(widget.document, reload)
+                    width: size.width/2,
+                    child: MensaDrawer(widget.document, reload)
                 ),
                 Container(
-                  width: size.width/2,
-                  child: BaseBlock
+                    width: size.width/2,
+                    child: BaseBlock
                 )
 
               ],
@@ -1167,11 +1153,11 @@ class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
         padding: EdgeInsets.all(20),
         children: [
           AutoSizeText.rich(HTML.toTextSpan(context,
-              document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"<div></div>",
-              defaultTextStyle: TextStyle(
-                fontSize: 12,
-                decoration: TextDecoration.none,
-              ),
+            document!=null?document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel-body").first.outerHtml:"<div></div>",
+            defaultTextStyle: TextStyle(
+              fontSize: 12,
+              decoration: TextDecoration.none,
+            ),
           ))
 
         ],
@@ -1233,8 +1219,8 @@ class _ShowDocumentPageState extends State<ShowDocumentPage> {
             ?Center(
             child:  Center(child: CircularProgressIndicator())
 
-        ):PdfViewer(
-          filePath: pathPDF,
+        ):PdfView(
+          path: pathPDF,
         ),
       ),
     );

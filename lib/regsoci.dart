@@ -42,7 +42,6 @@ class _RegSociState extends State<RegSoci> {
       maxPage=int.parse(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").elementAt(document.getElementsByTagName("ul").where((e)=>e.attributes["class"]=="pagination").first.getElementsByTagName("li").length-2).getElementsByTagName("a").first.text);
 
     }catch(e){
-      print(e);
       maxPage=0;
     }
     elements=document.getElementsByTagName("table").where((e)=>e.attributes["class"]=="table table-hover table-striped table-condensed").first.getElementsByTagName("tbody").first.getElementsByTagName("tr");
@@ -63,8 +62,6 @@ class _RegSociState extends State<RegSoci> {
   bool isLoading=false;
   addMore() async {
     isLoading=true;
-
-    print(maxPage);
     if(page<maxPage) {
       page++;
 

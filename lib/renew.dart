@@ -63,7 +63,6 @@ class _RenewCardPageState extends State<RenewCardPage> {
 
           ]:[
 
-
             DropdownButton<String>(
               iconSize: 30,
               itemHeight: 100,
@@ -113,7 +112,6 @@ class _RenewCardPageState extends State<RenewCardPage> {
                   "codListino":str,
                 })).toString().trim();
                 mensaTextField=null;
-                print(data);
                 moneyToPay=data.split("|")[0];
                 try{
                   if(data.split("|")[1]=="1"){
@@ -228,10 +226,7 @@ class _RenewCardPageState extends State<RenewCardPage> {
 
                     double mn=double.parse(text.toString().replaceAll(",", ".").toString());
                     moneyToAdd=mn.abs().toStringAsFixed(2);
-                    print(text);
-                    print(moneyToAdd);
                   }catch(exc){
-                    print(exc);
                     moneyToAdd="0.0";
                   }
 
@@ -433,7 +428,6 @@ class _StartPayModeState extends State<StartPayMode> {
 
 
         onLoadStart: (inawc, str) async {
-          print(str);
           try{
             if(str=="https://www.cloud32.it/Associazioni/utenti/home") {
               if (((await inawc.getHtml()).contains(

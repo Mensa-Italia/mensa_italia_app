@@ -509,8 +509,6 @@ class PhoneDB{
           var data=i.getElementsByTagName("td");
 
           for(int j=0;j<data.length;j++){
-
-            print(j);
             if(j==0){
               try{
                 image=data[j].getElementsByTagName("img").first.attributes["src"];
@@ -539,8 +537,6 @@ class PhoneDB{
                 [image,name,link,place1,place2]
             );
           }catch(e){
-
-            print(e);
           }
 
           if(everyPage!=null){
