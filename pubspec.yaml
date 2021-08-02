@@ -30,41 +30,41 @@ dependencies:
 
 
   auto_size_text: ^2.1.0
-  wave: ^0.1.0
-  dio: ^3.0.10
+  wave: ^0.2.0
+  dio: ^4.0.0
   youtube_explode_dart: ^1.7.5
-  dio_cookie_manager: ^1.0.0
-  path_provider: ^1.6.27
-  url_launcher: ^5.7.10
-  page_transition: ^1.1.7+6
-  cached_network_image: ^2.5.0
-  in_app_update: ^1.1.15
-  liquid_progress_indicator: ^0.3.2
-  sqflite: ^1.3.2+3
-  permission_handler: ^5.1.0+2
-  contacts_service: ^0.4.6
-  flutter_html: ^1.2.0
-  simple_html_css: ^2.0.2
+  dio_cookie_manager: ^2.0.0
+  path_provider: ^2.0.2
+  url_launcher: ^6.0.9
+  page_transition: ^2.0.2
+  cached_network_image: ^3.1.0
+  in_app_update: ^2.0.0
+  liquid_progress_indicator: ^0.4.0
+  sqflite: ^2.0.0+3
+  permission_handler: ^8.1.4+2
+  contacts_service: ^0.6.1
+  flutter_html: ^2.1.1
+  simple_html_css: ^3.0.1
   barcode_flutter: ^1.1.2
   flutter_masked_text: ^0.8.0
-  dart_rss: ^1.1.1+1
-  shared_preferences: ^0.5.12+4
+  dart_rss: ^2.0.1
+  shared_preferences: ^2.0.6
 
-  memoize: ^2.0.0
+  memoize: ^3.0.0
   pdf_viewer_plugin: ^1.1.1
-  flip_card: ^0.4.4
-  http: 0.12.2
-  html: 0.14.0+3
+  flip_card: ^0.5.0
+  http: ^0.13.3
+  html: ^0.15.0
   fancy_dialog: ^1.0.4
-  rounded_loading_button: ^1.0.18
-  flutter_inappwebview: ^4.0.0+4
-  shimmer: ^1.1.2
-  flutter_svg: 0.19.0
-  in_app_review: ^1.0.4
+  rounded_loading_button: ^2.0.5
+  flutter_inappwebview: ^5.3.2
+  shimmer: ^2.0.0
+  flutter_svg: ^0.22.0
+  in_app_review: ^2.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: 1.0.0
+  cupertino_icons: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -72,8 +72,8 @@ dev_dependencies:
 
 
 dependency_overrides:
-  rxdart: 0.23.1
-  xml: ^4.5.1
+  rxdart: 0.27.1
+  xml: ^5.1.2
 
 
 # For information on the generic Dart part of this file, see the

@@ -62,39 +62,36 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           accentColor: Color(0xFF184295),
           bottomAppBarColor: Colors.transparent,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.white,
           bottomAppBarTheme: BottomAppBarTheme(
               color: Colors.transparent
           ),
           dialogTheme: DialogTheme(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25),
-
             ),
-
           ),
           appBarTheme: AppBarTheme(
             color: Color(0xFF184295),
-
-
           ),
           textTheme: TextTheme(
-            title: TextStyle(fontFamily: "Gotham"),
-            body1: TextStyle(fontFamily: "Gotham"),
-            body2: TextStyle(fontFamily: "Gotham"),
-            subtitle: TextStyle(fontFamily: "Gotham"),
-            headline: TextStyle(fontFamily: "Gotham"),
-            display4: TextStyle(fontFamily: "Gotham"),
-            display3: TextStyle(fontFamily: "Gotham"),
-            display2: TextStyle(fontFamily: "Gotham"),
-            display1: TextStyle(fontFamily: "Gotham"),
-            subhead: TextStyle(fontFamily: "Gotham"),
-            overline: TextStyle(fontFamily: "Gotham"),
-            button: TextStyle(fontFamily: "Gotham"),
-            caption: TextStyle(fontFamily: "Gotham"),
+            title: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            body1: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            body2: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            subtitle: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            headline: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            display4: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            display3: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            display2: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            display1: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            subhead: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            overline: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            button: TextStyle(fontFamily: "Gotham", color: Colors.black),
+            caption: TextStyle(fontFamily: "Gotham", color: Colors.black),
           )
       ),
       debugShowMaterialGrid: false,
-
       debugShowCheckedModeBanner: false,
       showSemanticsDebugger: false,
       home: HomePage(),
@@ -114,10 +111,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     prepare();
-
   }
 
 
@@ -130,7 +125,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
 
       try{
-        if((await InAppUpdate.checkForUpdate()).updateAvailable){
+        if((await InAppUpdate.checkForUpdate()).updateAvailability==UpdateAvailability.updateAvailable){
           await InAppUpdate.performImmediateUpdate();
           exit(0);
         }

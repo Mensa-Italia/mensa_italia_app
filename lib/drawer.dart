@@ -157,7 +157,7 @@ class _MensaDrawerState extends State<MensaDrawer> {
 
                               Directory appDocDir = await getApplicationDocumentsDirectory();
                               String appDocPath = appDocDir.path;
-                              var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
+                              var cookieJar=PersistCookieJar(storage: FileStorage(appDocPath+"/.cookies/"));
                               cookieJar.deleteAll();
 
                               SharedPreferences prefs = await SharedPreferences.getInstance();

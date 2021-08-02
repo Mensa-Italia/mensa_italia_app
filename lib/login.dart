@@ -121,7 +121,7 @@ class API{
   Future<CookieManager> getCookieJar() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
-    var cookieJar=PersistCookieJar(dir:appDocPath+"/.cookies/");
+    var cookieJar=PersistCookieJar(storage: FileStorage(appDocPath+"/.cookies/"));
     return CookieManager(cookieJar);
   }
 

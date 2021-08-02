@@ -130,7 +130,7 @@ class _TransitionAppBarDelegate extends SliverPersistentHeaderDelegate {
 class MensaFullPage extends StatefulWidget {
 
 
-  Document document;
+  final Document document;
 
   MensaFullPage(this.document);
 
@@ -139,6 +139,11 @@ class MensaFullPage extends StatefulWidget {
 }
 
 class _MensaFullPageState extends State<MensaFullPage> {
+
+
+
+
+  Document document;
 
   bool isNumeric(String s) {
     if(s == null) {
@@ -152,8 +157,8 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
   reload() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Document document=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
-    widget.document=document;
+    Document docu=await API().doLoginAndRetrieveMain(context, prefs.getString("email"), prefs.getString("password"));
+    document=docu;
     setState(() {
 
     });
@@ -177,7 +182,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
     //a.setString("NextRenew", null);
 
-    if(widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isEmpty){
+    if(document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isEmpty){
       if(a.getStringList("renewNotify")!=null){
         for(int i=0;i<a.getStringList("renewNotify").length;i++){
           deleteWithBodyExample(a.getStringList("renewNotify").elementAt(i));
@@ -186,12 +191,12 @@ class _MensaFullPageState extends State<MensaFullPage> {
       }
     }
 
-    if(a.getString("NextRenew")==null&&widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty){
+    if(a.getString("NextRenew")==null&&document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty){
 
       DateTime toSend=DateTime.parse(
-          widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-              widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+          document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+              document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+              document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
       );
 
 
@@ -236,12 +241,11 @@ class _MensaFullPageState extends State<MensaFullPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    document=widget.document;
     WidgetsBinding.instance.addPostFrameCallback((duration){
-
       precacheImage(new NetworkImage(
-          "https://www.cloud32.it"+widget.document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"].replaceAll('\\', "/")
+          "https://www.cloud32.it"+document.getElementsByTagName("img").where((e)=>e.attributes["alt"]=="Foto").first.attributes["src"].replaceAll('\\', "/")
       ), context);
-
     });
 
 
@@ -291,19 +295,11 @@ class _MensaFullPageState extends State<MensaFullPage> {
   @override
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
-    //renew();
-
-
-    ListView BaseBlock=ListView(
+    ListView baseBlock=ListView(
       children: <Widget>[
-
         Container(
           height: 25,
         ),
-
-
-
-
         FlipCard(
           direction: FlipDirection.HORIZONTAL, // default
           front:Container(
@@ -368,72 +364,72 @@ class _MensaFullPageState extends State<MensaFullPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
-                                Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
-                                Expanded(
-                                  child:Container(
-                                      margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
+                            Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
+                            Expanded(
+                              child:Container(
+                                  margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
 
-                                          Expanded(
-                                            child: Column(
+                                  Expanded(
+                                  child: Column(
 
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children:widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children:document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
 
-                                              ]:List.generate(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
-                                                return    Expanded(
-                                                  child: AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines:1),
-                                                );
-                                              }),
-                                            ),
-                                          ),
-
-
-
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Expanded(
-
-                                                  child:Container(
-
-                                                      alignment: Alignment.bottomLeft,
-                                                      child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child:Container(
-                                                    width: constraints.maxWidth-(constraints.maxWidth*2/7),
-
-                                                    alignment: Alignment.bottomLeft,
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      mainAxisSize: MainAxisSize.max,
-                                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                                      children: <Widget>[
-                                                        AutoSizeText(widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
-                                                        AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-
-                                  ),
-                                )
-                              ],
+                                      ]:List.generate(document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
+                                return    Expanded(
+                                  child: AutoSizeText(document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines:1),
+                                );
+                              }),
                             ),
+                          ),
+
+
+
+                          Expanded(
+                          child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                          Expanded(
+
+                          child:Container(
+
+                          alignment: Alignment.bottomLeft,
+                          child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
+                          ),
+                          ),
+                          Expanded(
+                          child:Container(
+                          width: constraints.maxWidth-(constraints.maxWidth*2/7),
+
+                          alignment: Alignment.bottomLeft,
+                          child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                          AutoSizeText(document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
+                          AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
+                          ],
+                          ),
+                          ),
+                          )
+
+                          ],
+                          ),
+                          ),
+                          ],
+                          )
+
+                          ),
+                          )
+                          ],
+                          ),
                           );
                         }
                     ),
@@ -443,12 +439,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
             ),
           ),
         ),
-
-
         Container(
           height: 25,
         ),
-
         CardClipperElements(
 
             Container(
@@ -464,7 +457,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                         children: <Widget>[
 
                           Expanded(
-                            child:  AutoSizeText(widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                            child:  AutoSizeText(document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                           ),
 
                           Container(width: 5,),
@@ -473,17 +466,17 @@ class _MensaFullPageState extends State<MensaFullPage> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
 
-                                AutoSizeText("Tessera n: "+widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold), minFontSize: 0, textAlign: TextAlign.right,),
+                                AutoSizeText("Tessera n: "+document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold), minFontSize: 0, textAlign: TextAlign.right,),
 
-                                widget.document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
-                                AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
+                                document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
+                                AutoSizeText("Scadenza: "+document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
                                 (DateTime.parse(
-                                    widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                        widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                                    document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                                        document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                                        document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
                                 ).difference(DateTime.now())).inDays<30?
                                 AutoSizeText("RINNOVO IN CORSO", style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
-                                AutoSizeText("Scadenza: "+widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right, maxLines: 1,)
+                                AutoSizeText("Scadenza: "+document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right, maxLines: 1,)
 
                               ],
                             ),
@@ -506,9 +499,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
                           children: <Widget>[
                             Expanded(
                               child: AutoSizeText("La tua tesserà scadrà tra "+(DateTime.parse(
-                                  widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                      widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                      widget.document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
+                                  document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
+                                      document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
+                                      document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
                               ).difference(DateTime.now())).inDays.toString()+" giorni.", style: TextStyle(fontWeight: FontWeight.bold),),
                             ),
                             Container(
@@ -640,7 +633,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
         ),
 
 
-       /* CardClipperElements(
+        /* CardClipperElements(
             YoutubeMensaPlayer()
         ),*/
 
@@ -844,21 +837,15 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
       ],
     );
-
-
     return GestureDetector(
         onTap: () {
 
           FocusScope.of(context).requestFocus(new FocusNode());
         },
         child: Scaffold(
-
-
-            drawer: size.width>=600?null:MensaDrawer(widget.document, reload),
-
-
+            drawer: size.width>=600?null:MensaDrawer(document, reload),
             appBar: AppBar(
-              title: AutoSizeText("MENSA"),
+              title: AutoSizeText("MENSA ITALIA"),
               actions: size.width>=600?null:[
                 IconButton(
                   icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.title.color,),
@@ -869,25 +856,19 @@ class _MensaFullPageState extends State<MensaFullPage> {
                 ),
               ],
             ),
-
-
-
-
             body: size.width>=600?Row(
               children: [
                 Container(
                     width: size.width/2,
-                    child: MensaDrawer(widget.document, reload)
+                    child: MensaDrawer(document, reload)
                 ),
                 Container(
                     width: size.width/2,
-                    child: BaseBlock
+                    child: baseBlock
                 )
-
               ],
-            ):BaseBlock
+            ):baseBlock
         )
-
     );
   }
 
@@ -902,7 +883,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
   Widget elaborateTable(String point){
 
 
-    var el=widget.document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel panel-primary "+point).first;
+    var el=document.getElementsByTagName("div").where((e)=>e.attributes["class"]=="panel panel-primary "+point).first;
     List<prefix1.Element> element=el.getElementsByTagName("table").first.getElementsByTagName("tr");
 
     List<Widget> lista=[];
@@ -989,18 +970,13 @@ class _MensaFullPageState extends State<MensaFullPage> {
 }
 
 
-class DialogDocumentPick extends StatefulWidget {
+class DialogDocumentPick extends StatelessWidget {
 
-  List<prefix1.Element> elements;
+  final List<prefix1.Element> elements;
 
   DialogDocumentPick(this.elements);
 
 
-  @override
-  _DialogDocumentPickState createState() => _DialogDocumentPickState();
-}
-
-class _DialogDocumentPickState extends State<DialogDocumentPick> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -1018,46 +994,38 @@ class _DialogDocumentPickState extends State<DialogDocumentPick> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: List.generate(widget.elements.length, (i){
+                children: List.generate(elements.length, (i){
 
-                  return BlockDialogDoc(widget.elements[i].getElementsByTagName("a").first,i==0,i==widget.elements.length-1);
+                  return BlockDialogDoc(elements[i].getElementsByTagName("a").first,i==0,i==elements.length-1);
                 }),
               ),
             )
         ));
   }
 }
-class BlockDialogDoc extends StatefulWidget {
-  prefix1.Element element;
-  bool isTop;
-  bool isEnd;
+
+
+class BlockDialogDoc extends StatelessWidget {
+  final prefix1.Element element;
+  final bool isTop;
+  final bool isEnd;
 
   BlockDialogDoc(this.element,this.isTop, this.isEnd);
   @override
-  _BlockDialogDocState createState() => _BlockDialogDocState();
-}
-
-class _BlockDialogDocState extends State<BlockDialogDoc> {
-  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: widget.isTop?EdgeInsets.only(bottom: 5):widget.isEnd?EdgeInsets.only(top: 5):EdgeInsets.symmetric(vertical: 5),
+      margin: isTop?EdgeInsets.only(bottom: 5):isEnd?EdgeInsets.only(top: 5):EdgeInsets.symmetric(vertical: 5),
       child: MensaButton(onPressedNew: (){
-
-        NavigateTo(context).page(DocumentPageInfo(createLink(widget.element.attributes["href"])));
-      },text: widget.element.text,radius: widget.isTop?BorderRadius.only(topLeft: Radius.circular(25),topRight: Radius.circular(25)):widget.isEnd?BorderRadius.only(bottomLeft: Radius.circular(25),bottomRight: Radius.circular(25)):BorderRadius.circular(0.0),),
+        NavigateTo(context).page(DocumentPageInfo(createLink(element.attributes["href"])));
+      },text: element.text,radius: isTop?BorderRadius.only(topLeft: Radius.circular(25),topRight: Radius.circular(25)):isEnd?BorderRadius.only(bottomLeft: Radius.circular(25),bottomRight: Radius.circular(25)):BorderRadius.circular(0.0),),
     );
   }
 
-
-
   String createLink(String link) {
-
     if (link.split("://").contains("https")) {
       return (""+link);
     }else{
       return "https://www.cloud32.it"+link;
-
     }
   }
 }
@@ -1068,43 +1036,29 @@ class _BlockDialogDocState extends State<BlockDialogDoc> {
 
 
 
-class BuildRowBlock extends StatefulWidget {
+class BuildRowBlock extends StatelessWidget {
 
-  List<Widget> row;
-  String link;
-
-  bool isCommunication=false;
-
-
-  BuildRowBlock(this.row, this.link, this.isCommunication){
-    isCommunication=isCommunication??false;
-  }
+  final List<Widget> row;
+  final String link;
+  final bool isCommunication;
 
 
-  @override
-  _BuildRowBlockState createState() => _BuildRowBlockState();
-}
+  BuildRowBlock(this.row, this.link, [this.isCommunication=false]);
 
-class _BuildRowBlockState extends State<BuildRowBlock> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        if(widget.isCommunication){
-
-          NavigateTo(context).page(ShowCommunicationPage(widget.link));
-
-        }else{
-
-          NavigateTo(context).page(ShowDocumentPage(widget.link));
-
-
+        if(isCommunication){
+          NavigateTo(context).page(ShowCommunicationPage(link));
+       }else{
+          NavigateTo(context).page(ShowDocumentPage(link));
         }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         child: Row(
-          children: widget.row,
+          children: row,
         ),
       ),
     );
@@ -1113,7 +1067,7 @@ class _BuildRowBlockState extends State<BuildRowBlock> {
 
 
 class ShowCommunicationPage extends StatefulWidget {
-  String link;
+  final String link;
 
   ShowCommunicationPage(this.link);
 
@@ -1122,17 +1076,13 @@ class ShowCommunicationPage extends StatefulWidget {
 }
 
 class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
-
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     prepare();
   }
 
   Document document;
-
   prepare() async {
     document=await API().getData(widget.link);
     setState(() {
@@ -1159,7 +1109,6 @@ class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
               decoration: TextDecoration.none,
             ),
           ))
-
         ],
       ),
     );
@@ -1171,7 +1120,7 @@ class _ShowCommunicationPageState extends State<ShowCommunicationPage> {
 
 class ShowDocumentPage extends StatefulWidget {
 
-  String link;
+  final String link;
   ShowDocumentPage(this.link);
 
   @override
@@ -1185,7 +1134,6 @@ class _ShowDocumentPageState extends State<ShowDocumentPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     prepare();
   }
