@@ -10,11 +10,11 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom.dart' as dom;
 import 'login.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class RegSoci extends StatefulWidget {
   @override
@@ -206,7 +206,7 @@ class _RegSociState extends State<RegSoci> {
                         for(int j=0;j<data.length;j++){
                           if(j==0){
                             try{
-                              image=data[j].getElementsByTagName("img").first.attributes["src"];
+                              image=data[j].getElementsByTagName("img").first.attributes["src"].replaceAll("\\", "/");
 
                             }catch(e){
 
@@ -270,13 +270,13 @@ class _RegSociState extends State<RegSoci> {
 
 
 class UserBlock extends StatefulWidget {
-  String image;
-  String name;
-  String card;
-  String date;
-  String place1;
-  String place2;
-  String link;
+  final String image;
+  final String name;
+  final String card;
+  final String date;
+  final String place1;
+  final String place2;
+  final String link;
 
   UserBlock(this.image, this.name, this.card, this.date, this.place1, this.place2, this.link);
 
@@ -361,13 +361,13 @@ class _UserBlockState extends State<UserBlock> {
 
 class DialogBlock extends StatefulWidget {
 
-  String image;
-  String name;
-  String card;
-  String date;
-  String place1;
-  String place2;
-  String link;
+  final String image;
+  final String name;
+  final String card;
+  final String date;
+  final String place1;
+  final String place2;
+  final String link;
 
   DialogBlock(this.image, this.name, this.card, this.date, this.place1, this.place2, this.link);
   @override
@@ -421,7 +421,7 @@ class _DialogBlockState extends State<DialogBlock> {
                   height: MediaQuery.of(context).size.width*2/3,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      image: DecorationImage(image: CachedNetworkImageProvider(createLink(widget.image)??"https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg",), fit: BoxFit.cover)
+                      image: DecorationImage(image: ExtendedNetworkImageProvider(createLink(widget.image)??"https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg",), fit: BoxFit.cover)
                   ),
 
 
@@ -441,6 +441,10 @@ class _DialogBlockState extends State<DialogBlock> {
                         secondData=elements.elementAt(i).getElementsByClassName("col-sm-6 col-sm-offset-1").first.children.first.text;
                       }else{
                         secondData=elements.elementAt(i).getElementsByClassName("col-sm-6 col-sm-offset-1").first.text;
+                      }
+
+                      if(secondData.toLowerCase().contains('protected'.toLowerCase())){
+                        return Container();
                       }
 
 

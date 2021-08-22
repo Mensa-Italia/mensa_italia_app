@@ -49,9 +49,10 @@ class _LoginPageState extends State<LoginPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
 
-        MensaTextField("Email", textEditingController: emailController,enablede: enabled,),
+        MensaTextField("Email", textEditingController: emailController,enablede: enabled,
+          textInputType: TextInputType.emailAddress,),
         Container(height: 10,),
-        MensaTextField("Password", obscure: true, textEditingController: passwordController, enablede: enabled,),
+        MensaTextField("Password", obscure: true, textEditingController: passwordController, enablede: enabled,   textInputType: TextInputType.visiblePassword,),
         Container(height: 20,),
 
         RoundedLoadingButton(
@@ -379,18 +380,14 @@ class _ErrorDialogState extends State<ErrorDialog> {
 
 class MensaTextField extends TextField{
 
-  String text;
-  bool obscure;
-  TextEditingController textEditingController;
-  TextInputType textInputType;
-  Function(String) onChag;
-  bool enablede;
+  final String text;
+  final bool obscure;
+  final TextEditingController textEditingController;
+  final TextInputType textInputType;
+  final Function(String) onChag;
+  final bool enablede;
 
-  MensaTextField(this.text, {this.obscure=false, this.textEditingController, this.onChag, this.enablede=true, this.textInputType}){
-   if(textEditingController==null){
-     textEditingController=TextEditingController();
-   }
-  }
+  MensaTextField(this.text, {this.obscure=false, TextEditingController textEditingController, this.onChag, this.enablede=true, this.textInputType}) : this.textEditingController=textEditingController??TextEditingController();
 
   @override
   bool get enabled => enablede;
@@ -401,8 +398,12 @@ class MensaTextField extends TextField{
 
   @override
   get onChanged => (s){
-    onChag(controller.text);
-    super.onChanged(s);
+    if(onChag!=null){
+      onChag(controller.text);
+    }
+    if(super.onChanged!=null){
+      super.onChanged(s);
+    }
   };
 
 
@@ -423,6 +424,7 @@ class MensaTextField extends TextField{
     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
     focusColor: Color(0xFFd9d9d9),
     hoverColor: Color(0xFFd9d9d9),
+    hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
     labelStyle: TextStyle(
         color: Color(0xFF3d3d3d),
         fontWeight: FontWeight.bold
@@ -443,19 +445,13 @@ class MensaTextField extends TextField{
   );
 }
 
-class MensaButton extends FlatButton{
+class MensaButton extends MaterialButton{
 
-
-
-
-  Function onPressedNew;
-  String text;
-  BorderRadius radius;
-  bool enableded;
-  MensaButton({this.onPressedNew,this.text, this.radius, this.enableded=true}){
-    radius=radius??BorderRadius.circular(200.0);
-
-  }
+  final Function onPressedNew;
+  final String text;
+  final BorderRadius radius;
+  final bool enableded;
+  MensaButton({this.onPressedNew,this.text, this.radius, this.enableded=true});
 
 
   @override
@@ -481,7 +477,7 @@ class MensaButton extends FlatButton{
   @override
   // TODO: implement shape
   ShapeBorder get shape => new RoundedRectangleBorder(
-      borderRadius: radius,
+      borderRadius: radius??BorderRadius.circular(200.0),
       side: BorderSide(color: Color(0xFF184295)));
 
 

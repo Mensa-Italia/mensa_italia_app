@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:mensa_italia/login.dart';
 import 'package:mensa_italia/sig.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -33,7 +34,6 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     init();
   }
@@ -51,33 +51,47 @@ class _LOCALSMensaState extends State<LOCALSMensa> {
 
       ),
       body: ListView(
-        children: list==null?[
-
-          Container(
-            margin: EdgeInsets.only(top: 20),
-            width: 100,
-            height: 100,
-            child: LoadingDialog(),
-          )
-
-        ]:list.isNotEmpty?([
+        children: [
 
           Container(
             padding: EdgeInsets.all(20),
             child:mensaTextField??=MensaTextField("Cerca Gruppo",onChag: (text){
-              filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
               setState(() {
-
+                filtered=list.where((element) => element["name"].toString().toLowerCase().contains(text.toLowerCase())).toList();
               });
             },),
-          )
-
-        ]..addAll(List.generate(filtered.length, (i){
-          return SigItem(filtered[i]["link"],filtered[i]["name"],filtered[i]["image"]);
-        }))):[],
+          ),
+          ...getChildren()
+        ],
       ),
 
     );
+  }
+
+  List<Widget> getChildren(){
+    if(list==null){
+      return List.generate(3, (index) => Shimmer.fromColors(
+        baseColor: Colors.white,
+        highlightColor: Theme.of(context).accentColor.withOpacity(0.5),
+        child: Container(
+          margin: EdgeInsets.all(10),
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.width*758/1875+50,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Color(0xFF303030)
+          ),
+        ),
+      ));
+    }
+    if(list.isNotEmpty){
+      return [
+        ...List.generate(filtered.length, (i){
+          return SigItem(filtered[i]["link"],filtered[i]["name"],filtered[i]["image"]);
+        })
+      ];
+    }
+    return [];
   }
 }
 

@@ -1,24 +1,11 @@
 name: mensa_italia
 description: The Official Mensa Italia App
+publish_to: 'none'
 
-# The following line prevents the package from being accidentally published to
-# pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.1.2+12
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -26,18 +13,15 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-
-
-
   auto_size_text: ^2.1.0
   wave: ^0.2.0
   dio: ^4.0.0
-  youtube_explode_dart: ^1.7.5
+  youtube_explode_dart: ^1.10.4
   dio_cookie_manager: ^2.0.0
   path_provider: ^2.0.2
   url_launcher: ^6.0.9
   page_transition: ^2.0.2
-  cached_network_image: ^3.1.0
+  extended_image: 4.1.0
   in_app_update: ^2.0.0
   liquid_progress_indicator: ^0.4.0
   sqflite: ^2.0.0+3
@@ -49,7 +33,6 @@ dependencies:
   flutter_masked_text: ^0.8.0
   dart_rss: ^2.0.1
   shared_preferences: ^2.0.6
-
   memoize: ^3.0.0
   pdf_viewer_plugin: ^1.1.1
   flip_card: ^0.5.0
@@ -61,10 +44,8 @@ dependencies:
   shimmer: ^2.0.0
   flutter_svg: ^0.22.0
   in_app_review: ^2.0.2
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.3
+  carbon_icons: ^0.0.1+2
 
 dev_dependencies:
   flutter_test:
@@ -73,18 +54,11 @@ dev_dependencies:
 
 dependency_overrides:
   rxdart: 0.27.1
-  xml: ^5.1.2
+  xml: 5.2.0
+  meta: 1.7.0
+  json_annotation: 4.1.0
 
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
 

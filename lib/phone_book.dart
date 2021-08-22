@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -119,7 +119,7 @@ class _PhoneBookState extends State<PhoneBook> {
                   direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
                   center: Container(
                     padding: EdgeInsets.all(40),
-                    child: AutoSizeText(("STO SCARICANDO LA RUBRICA MENSANA "+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                    child: AutoSizeText(("Sto scaricando la rubrica mensana "+(loading*100).toStringAsFixed(2).toString()+"%").toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                   )
                 ):ListView(
                   children: List.generate(PhoneDB().primalContact.length, (i){
@@ -169,10 +169,10 @@ class _PhoneBookState extends State<PhoneBook> {
 
 
 class ContactPhone extends StatefulWidget {
-  String image;
-  String name;
-  String city;
-  String link;
+  final String image;
+  final String name;
+  final String city;
+  final String link;
 
   ContactPhone(this.name, this.image, this.city, this.link);
 
@@ -218,7 +218,7 @@ class _ContactPhoneState extends State<ContactPhone> {
                       boxShadow: [
                         BoxShadow(blurRadius: 1.0, offset: Offset(0, 1.0))
                       ],
-                      image: DecorationImage(image: CachedNetworkImageProvider(createLink(widget.image),), fit: BoxFit.cover)
+                      image: DecorationImage(image: ExtendedNetworkImageProvider(createLink(widget.image),), fit: BoxFit.cover)
                   ),
                 ),
                 Column(
@@ -247,9 +247,9 @@ class _ContactPhoneState extends State<ContactPhone> {
 class DialogCall extends StatefulWidget {
 
 
-  String name;
-  String image;
-  String link;
+  final String name;
+  final String image;
+  final String link;
 
   DialogCall(this.name, this.image, this.link);
 
@@ -320,7 +320,7 @@ class _DialogCallState extends State<DialogCall> {
             height: MediaQuery.of(context).size.width*2/3,
             width: double.infinity,
             decoration: BoxDecoration(
-                image: DecorationImage(image: CachedNetworkImageProvider(widget.image??"https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg",), fit: BoxFit.cover)
+                image: DecorationImage(image: ExtendedNetworkImageProvider(widget.image??"https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg",), fit: BoxFit.cover)
             ),
 
 
@@ -511,7 +511,7 @@ class PhoneDB{
           for(int j=0;j<data.length;j++){
             if(j==0){
               try{
-                image=data[j].getElementsByTagName("img").first.attributes["src"];
+                image=data[j].getElementsByTagName("img").first.attributes["src"].replaceAll("\\", "/");
 
               }catch(e){
 
@@ -622,7 +622,6 @@ class PrimalContacts{
 
   @override
   String toString() {
-    // TODO: implement toString
     return "id: "+(id??"null").toString()+" name: "+(name??"null")+" link: "+(link??"null")+ "phone: "+(phone??"null")+" image: "+(image??"null\n");
   }
 }

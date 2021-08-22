@@ -106,11 +106,14 @@ class _RenewCardPageState extends State<RenewCardPage> {
           );
         }),
         onChanged: (str) async {
+          print(str);
           selected=str;
           String data=(await API().getRawData("https://www.cloud32.it/Associazioni/GetListinoIscri.php", data: {
             "codass":"170734",
             "codListino":str,
           })).toString().trim();
+
+
           mensaTextField=null;
           moneyToPay=data.split("|")[0];
           try{

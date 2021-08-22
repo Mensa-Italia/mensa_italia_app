@@ -10,8 +10,9 @@ Created by Matteo Sipion on the date of 15/10/2019.
 Matteo Sipione holds the authorial and commercial rights to this software.
 */
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ import 'package:http/http.dart' as http;
 import 'package:in_app_review/in_app_review.dart';
 import 'package:mensa_italia/locals.dart';
 import 'package:mensa_italia/phone_book.dart';
-import 'package:mensa_italia/renew.dart';
 import 'package:mensa_italia/sig.dart';
 import 'package:mensa_italia/transitate.dart';
 import 'package:mensa_italia/youtube.dart';
@@ -30,6 +30,7 @@ import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_html_css/simple_html_css.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'blog.dart';
 import 'document.dart';
 import 'drawer.dart';
@@ -125,6 +126,187 @@ class _TransitionAppBarDelegate extends SliverPersistentHeaderDelegate {
 
 
 
+class MensaMembershipCard extends StatefulWidget {
+
+
+  final Document document;
+
+  MensaMembershipCard(this.document);
+  @override
+  _MensaMembershipCardState createState() => _MensaMembershipCardState();
+}
+
+class _MensaMembershipCardState extends State<MensaMembershipCard> {
+
+  List<String> nomeProfilo;
+  String ntessera;
+  @override
+  void initState() {
+    nomeProfilo=widget.document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ");
+    ntessera=widget.document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim();
+    super.initState();
+  }
+
+  Size size;
+  @override
+  Widget build(BuildContext context) {
+    size=MediaQuery.of(context).size;
+    return FlipCard(
+      direction: FlipDirection.HORIZONTAL,
+      back:Container(
+        margin: EdgeInsets.only(left: 30, right: 30,),
+        child: Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.0),
+          ),
+          child: AspectRatio(
+              aspectRatio: 86/54,
+              child:Container(
+
+                decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
+
+                ),
+                child:  LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
+                        ],
+                      );
+                    }
+                ),
+
+              )
+          ),
+        ),
+      ),
+
+      front: Container(
+
+        margin: EdgeInsets.only(left: 30, right: 30),
+
+        child: Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(size.width/50),
+          ),
+          child: AspectRatio(
+              aspectRatio: 86/54,
+
+              child: Container(
+
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
+                  borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
+                ),
+                child:  LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      return Container(
+                        height: constraints.maxHeight,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
+                            Expanded(
+                              child:Container(
+                                  margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+
+                                      Expanded(
+                                        child: Builder(
+                                          builder: (_){
+                                            if(nomeProfilo.isEmpty){
+                                              Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children:[]
+                                              );
+                                            }
+                                            return Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: List.generate(nomeProfilo.length, (i){
+                                                return Expanded(
+                                                  child: AutoSizeText(nomeProfilo[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines:1),
+                                                );
+                                              }),
+                                            );
+                                          },
+                                        ),
+                                      ),
+
+
+
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child:Container(
+                                                  alignment: Alignment.bottomLeft,
+                                                  child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child:Container(
+                                                width: constraints.maxWidth-(constraints.maxWidth*2/7),
+
+                                                alignment: Alignment.bottomLeft,
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    AutoSizeText(ntessera, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
+                                                    AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                ),
+
+              )
+          ),
+        ),
+      ),
+    );
+  }
+
+
+}
+
+
+bool isNumeric(String s) {
+  if(s == null) {
+    return false;
+  }
+  return double.parse(s, (e) => null) != null;
+}
 
 
 class MensaFullPage extends StatefulWidget {
@@ -144,14 +326,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
 
   Document document;
-
-  bool isNumeric(String s) {
-    if(s == null) {
-      return false;
-    }
-    return double.parse(s, (e) => null) != null;
-  }
-
 
   ScrollController scrollController=ScrollController();
 
@@ -296,149 +470,12 @@ class _MensaFullPageState extends State<MensaFullPage> {
   Widget build(BuildContext context) {
     size=MediaQuery.of(context).size;
     ListView baseBlock=ListView(
+      cacheExtent: size.height*3,
       children: <Widget>[
         Container(
           height: 25,
         ),
-        FlipCard(
-          direction: FlipDirection.HORIZONTAL, // default
-          front:Container(
-
-            margin: EdgeInsets.only(left: 30, right: 30,),
-            child: Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: AspectRatio(
-                  aspectRatio: 86/54,
-                  child:Container(
-
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).accentColor,
-                      borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
-
-                    ),
-                    child:  LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Image.asset("assets/images/lettering_white.png", height: constraints.maxHeight*2/3,)
-                            ],
-                          );
-                        }
-                    ),
-
-                  )
-              ),
-            ),
-          ),
-
-          back: Container(
-
-            margin: EdgeInsets.only(left: 30, right: 30),
-
-            child: Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(size.width/50),
-              ),
-              child: AspectRatio(
-                  aspectRatio: 86/54,
-
-                  child: Container(
-
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      image: DecorationImage(image: AssetImage("assets/images/backcard.jpg"), fit: BoxFit.cover,),
-                      borderRadius: BorderRadius.all(Radius.circular(size.width/50)),
-                    ),
-                    child:  LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) {
-                          return Container(
-                            height: constraints.maxHeight,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                            Image.asset("assets/images/lettering_horizzontal_white.png", width: constraints.maxWidth*2/3,),
-                            Expanded(
-                              child:Container(
-                                  margin: EdgeInsets.only(left: constraints.maxWidth*2/7),
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-
-                                  Expanded(
-                                  child: Column(
-
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children:document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").isEmpty?[
-
-                                      ]:List.generate(document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ").length, (i){
-                                return    Expanded(
-                                  child: AutoSizeText(document.getElementsByTagName("span").where((e)=>e.attributes["class"]=="itemless nomeprofilo").first.text.split(" ")[i].toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines:1),
-                                );
-                              }),
-                            ),
-                          ),
-
-
-
-                          Expanded(
-                          child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                          Expanded(
-
-                          child:Container(
-
-                          alignment: Alignment.bottomLeft,
-                          child:AutoSizeText("Tessera", style: TextStyle(fontWeight: FontWeight.bold,), minFontSize: 0)
-                          ),
-                          ),
-                          Expanded(
-                          child:Container(
-                          width: constraints.maxWidth-(constraints.maxWidth*2/7),
-
-                          alignment: Alignment.bottomLeft,
-                          child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                          AutoSizeText(document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.toUpperCase().trim(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
-                          AutoSizeText("MENSA.IT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), minFontSize: 0,),
-                          ],
-                          ),
-                          ),
-                          )
-
-                          ],
-                          ),
-                          ),
-                          ],
-                          )
-
-                          ),
-                          )
-                          ],
-                          ),
-                          );
-                        }
-                    ),
-
-                  )
-              ),
-            ),
-          ),
-        ),
+        MensaMembershipCard(widget.document),
         Container(
           height: 25,
         ),
@@ -468,14 +505,6 @@ class _MensaFullPageState extends State<MensaFullPage> {
 
                                 AutoSizeText("Tessera n: "+document.getElementsByTagName("label").where((e)=>isNumeric(e.text)).first.text.trim(), style: TextStyle(fontWeight: FontWeight.bold), minFontSize: 0, textAlign: TextAlign.right,),
 
-                                document.getElementsByClassName("btn btn-success btn-sm btn-block").where((element) => element.text=="Rinnova").isNotEmpty?
-                                AutoSizeText("Scadenza: "+document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
-                                (DateTime.parse(
-                                    document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[2]+"-"+
-                                        document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[1]+"-"+
-                                        document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim().split("/")[0]
-                                ).difference(DateTime.now())).inDays<30?
-                                AutoSizeText("RINNOVO IN CORSO", style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right,):
                                 AutoSizeText("Scadenza: "+document.getElementsByTagName("label").where((e)=>!isNumeric(e.text)).first.text.trim(), style: TextStyle(), minFontSize: 0, textAlign: TextAlign.right, maxLines: 1,)
 
                               ],
@@ -543,10 +572,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
                     decoration: BoxDecoration(
                     ),
                     child: ClipRRect(
-                      child: CachedNetworkImage(
-                        imageUrl:"https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog.jpg",
+                      child: ExtendedImage.network(
+                        "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog.jpg",
                         width: MediaQuery.of(context).size.width,
-                        errorWidget: (d,s,t)=>CachedNetworkImage(imageUrl: "https://www.mensaitalia.it/wp-content/uploads/2019/12/sig_miog_error.jpg",),
                       ),
                     ),
                   ),
@@ -592,7 +620,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                             ),
                             Container(
                               padding: EdgeInsets.only(left: 10, right: 10),
-                              child: Icon(Icons.arrow_forward),
+                              child: Icon(Icons.arrow_forward, color: Theme.of(context).accentColor,),
                             )
                           ],
                         )
@@ -620,7 +648,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
                           ),
                           Container(
                             padding: EdgeInsets.only(left: 10, right: 10),
-                            child: Icon(Icons.arrow_forward),
+                            child: Icon(Icons.arrow_forward, color: Theme.of(context).accentColor,),
                           )
                         ],
                       ),
@@ -633,9 +661,9 @@ class _MensaFullPageState extends State<MensaFullPage> {
         ),
 
 
-        /* CardClipperElements(
+         CardClipperElements(
             YoutubeMensaPlayer()
-        ),*/
+        ),
 
 
         Container(height: 10,),
@@ -904,7 +932,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
             decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.fitHeight,
-                    image: CachedNetworkImageProvider(createLink(e.getElementsByTagName("td")[i].getElementsByTagName("img").first.attributes["src"]))
+                    image: ExtendedNetworkImageProvider(createLink(e.getElementsByTagName("td")[i].getElementsByTagName("img").first.attributes["src"]))
                 )
             ),
           )
@@ -1051,7 +1079,7 @@ class BuildRowBlock extends StatelessWidget {
       onTap: (){
         if(isCommunication){
           NavigateTo(context).page(ShowCommunicationPage(link));
-       }else{
+        }else{
           NavigateTo(context).page(ShowDocumentPage(link));
         }
       },

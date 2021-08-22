@@ -63,6 +63,8 @@ class MyApp extends StatelessWidget {
           accentColor: Color(0xFF184295),
           bottomAppBarColor: Colors.transparent,
           brightness: Brightness.dark,
+          dialogBackgroundColor: Colors.white,
+          backgroundColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
           bottomAppBarTheme: BottomAppBarTheme(
               color: Colors.transparent
@@ -223,6 +225,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       margin: EdgeInsets.only(bottom: 0),
                       elevation: 5.0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      color: Colors.white,
                       child: Container(
                         width: size.width*3/4>300?300:size.width*3/4,
                         padding: EdgeInsets.all(20),

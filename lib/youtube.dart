@@ -1,5 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:carbon_icons/carbon_icons.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt;
 
@@ -31,7 +33,7 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
     }
 
     videoUrl=video.url;
-    image=video.thumbnails.highResUrl;
+    image=video.thumbnails.standardResUrl;
     if(mounted){
       setState(() {
 
@@ -70,8 +72,11 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
 
+
+                      Icon(CarbonIcons.logo_youtube, color: Colors.transparent,),
+
                       Expanded(
-                        child: AutoSizeText("Youtube".toUpperCase(),
+                        child: AutoSizeText("Ultimo video".toUpperCase(),
                           style: TextStyle(color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 20),
@@ -79,6 +84,11 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                           minFontSize: 0,
                           maxLines: 1,),
 
+                      ),
+
+                      Transform.rotate(
+                        angle: 0.2,
+                          child: Icon(CarbonIcons.logo_youtube, color: Color(0xFFFF5959),)
                       ),
 
                     ],
@@ -92,7 +102,6 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                       child: Container(
                         height: constraints.maxWidth*9/16,
                         width: constraints.maxWidth,
-
                         decoration: BoxDecoration(
                             image: DecorationImage(
                                 fit: BoxFit.cover,
@@ -103,23 +112,21 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                       height: constraints.maxWidth*9/16,
                       width: constraints.maxWidth,
                       decoration: BoxDecoration(
-                          color: Theme
-                              .of(context)
-                              .accentColor
+                          color: Theme.of(context).accentColor
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          CircularProgressIndicator(
-                            valueColor: new AlwaysStoppedAnimation<Color>(
-                                Colors.white),)
-                        ],
+                      child: Shimmer.fromColors(
+                        highlightColor: Colors.white.withOpacity(0.5),
+                        baseColor: Theme.of(context).accentColor,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Color(0xFF303030)
+                          ),
+                        ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        tryToLunchUrl(
-                            "https://www.youtube.com/channel/UC9YB8yAsDGX6kjMZIZQQMPA");
+                        tryToLunchUrl("https://www.youtube.com/channel/UC9YB8yAsDGX6kjMZIZQQMPA");
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -131,17 +138,13 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                           children: <Widget>[
                             Expanded(
                               child: AutoSizeText("Vedi tutti i video",
-                                style: TextStyle(color: Theme
-                                    .of(context)
-                                    .accentColor),
+                                style: TextStyle(color: Theme.of(context).accentColor),
                                 minFontSize: 0,
                                 maxLines: 2,),
                             ),
                             Icon(
                                 Icons.arrow_forward,
-                                color: Theme
-                                    .of(context)
-                                    .accentColor
+                                color: Theme.of(context).accentColor
                             )
 
                           ],
@@ -150,8 +153,6 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
                     ),
                   ],
                 ),
-
-
               ],
             ),
           );
@@ -161,10 +162,12 @@ class _YoutubeMensaPlayerState extends State<YoutubeMensaPlayer> {
 
 
   tryToLunchUrl(String url) async {
-
-    if (await canLaunch(url)) {
+    try{
       await launch(url);
+    }catch(e){
+
     }
+
   }
 }
 
