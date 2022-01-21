@@ -444,7 +444,8 @@ class _DialogBlockState extends State<DialogBlock> {
                       }
 
                       if(secondData.toLowerCase().contains('protected'.toLowerCase())){
-                        return Container();
+                        String protectedEmail = elements.elementAt(i).getElementsByClassName("__cf_email__").first.attributes["data-cfemail"];
+                        secondData = decodeEmail(protectedEmail);
                       }
 
 
@@ -486,14 +487,19 @@ class _DialogBlockState extends State<DialogBlock> {
   }
 }
 
+int getHexPair(str, pos) {
+  str = str.substring(pos, pos + 2);
+  return int.parse(str, radix: 16);
+}
 
+String decodeEmail(token) {
+  String mail = "";
+  int xor = getHexPair(token, 0);
 
+  for (int i = 2; i < token.length; i += 2) {
+    int l = getHexPair(token, i) ^ xor;
+    mail += String.fromCharCode(l);
+  }
 
-
-
-
-
-
-
-
-
+  return mail;
+}

@@ -82,20 +82,20 @@ class _TransitionAppBarDelegate extends SliverPersistentHeaderDelegate {
                         Container(
                             margin: EdgeInsets.only(left: 10*Rprogress),
                             child: IconButton(
-                              icon: Icon(Icons.menu, color: Theme.of(context).primaryTextTheme.title.color,),
+                              icon: Icon(Icons.menu, color: Theme.of(context).primaryTextTheme.headline1.color,),
                               onPressed: () {
                                 Scaffold.of(context).openDrawer();
                               },
                             )
                         ),
-                        AutoSizeText("MENSA ITALIA", style: Theme.of(context).primaryTextTheme.title, minFontSize: 0,)
+                        AutoSizeText("MENSA ITALIA", style: Theme.of(context).primaryTextTheme.headline1, minFontSize: 0,)
                       ],
                     ),
                   ),
                   Container(
                     margin: EdgeInsets.only(right: 10*Rprogress),
                     child:  IconButton(
-                      icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.title.color,),
+                      icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.headline1.color,),
                       onPressed: () {
 
 
@@ -876,7 +876,7 @@ class _MensaFullPageState extends State<MensaFullPage> {
               title: AutoSizeText("MENSA ITALIA"),
               actions: size.width>=600?null:[
                 IconButton(
-                  icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.title.color,),
+                  icon: Icon(Icons.phone, color: Theme.of(context).primaryTextTheme.headline1.color,),
                   onPressed: () {
 
                     NavigateTo(context).page(PhoneBook());
