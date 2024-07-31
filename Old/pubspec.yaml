@@ -1,0 +1,72 @@
+name: mensa_italia
+description: The Official Mensa Italia App
+publish_to: 'none'
+
+version: 1.2.0+13
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  auto_size_text: ^2.1.0
+  wave: ^0.2.0
+  dio: ^4.0.0
+  youtube_explode_dart: ^1.10.4
+  dio_cookie_manager: ^2.0.0
+  path_provider: ^2.0.2
+  url_launcher: ^6.0.9
+  page_transition: ^2.0.2
+  extended_image: 4.1.0
+  in_app_update: ^2.0.0
+  liquid_progress_indicator: ^0.4.0
+  sqflite: ^2.0.0+3
+  permission_handler: ^8.1.4+2
+  contacts_service: ^0.6.1
+  flutter_html: ^2.1.1
+  simple_html_css: ^3.0.1
+  barcode_flutter: ^1.1.2
+  flutter_masked_text: ^0.8.0
+  dart_rss: ^2.0.1
+  shared_preferences: ^2.0.6
+  memoize: ^3.0.0
+  pdf_viewer_plugin: ^1.1.1
+  flip_card: ^0.5.0
+  http: ^0.13.3
+  html: ^0.15.0
+  fancy_dialog: ^1.0.4
+  rounded_loading_button: ^2.0.5
+  flutter_inappwebview: ^5.3.2
+  shimmer: ^2.0.0
+  flutter_svg: ^0.22.0
+  in_app_review: ^2.0.2
+  cupertino_icons: ^1.0.3
+  carbon_icons: ^0.0.1+2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+dependency_overrides:
+  rxdart: 0.27.1
+  xml: 5.2.0
+  meta: 1.7.0
+  json_annotation: 4.1.0
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Gotham
+      fonts:
+        - asset: fonts/Gotham-Book.otf
+
