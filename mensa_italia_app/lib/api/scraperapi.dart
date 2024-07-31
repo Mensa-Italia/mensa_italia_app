@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:html/dom.dart';
+import 'package:mensa_italia_app/model/testelab.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:html/parser.dart' as html;
@@ -15,6 +16,11 @@ class ScraperApi {
     dio.httpClientAdapter = NativeAdapter();
   }
 
+  init() async {
+    dio.httpClientAdapter = NativeAdapter();
+    dio.interceptors.add(await getCookieJar());
+  }
+
   static final ScraperApi _instance = ScraperApi._privateConstructor();
 
   factory ScraperApi() {
@@ -24,22 +30,19 @@ class ScraperApi {
   Future<CookieManager> getCookieJar() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
-    var cookieJar =
-        PersistCookieJar(storage: FileStorage("$appDocPath/.cookies/"));
+    var cookieJar = PersistCookieJar(storage: FileStorage("$appDocPath/.cookies/"));
     return CookieManager(cookieJar);
   }
 
   Future<File> getFile(String url) async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
-    dio.interceptors.add(await getCookieJar());
     await dio.download(url, "$appDocPath/pdf.pdf");
     return File("$appDocPath/pdf.pdf");
   }
 
   Future<Document> getData(String link) async {
     Response response;
-    dio.interceptors.add(await getCookieJar());
     response = await dio.get(link,
         options: Options(
           headers: getHeader(),
@@ -54,7 +57,6 @@ class ScraperApi {
 
   Future<String> getRawData(String link, {Map<String, String>? data}) async {
     Response response;
-    dio.interceptors.add(await getCookieJar());
     if (data == null) {
       response = await dio.get(link,
           options: Options(
@@ -86,8 +88,7 @@ class ScraperApi {
   Future<String> getBlogEvent() async {
     Response response;
 
-    response = await dio.get(
-        "https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",
+    response = await dio.get("https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",
         options: Options(
           headers: getHeader(),
           followRedirects: Platform.isAndroid,
@@ -99,13 +100,9 @@ class ScraperApi {
     return response.data;
   }
 
-  Future<Document?> doLoginAndRetrieveMain(
-      String email, String password) async {
+  Future<Document?> doLoginAndRetrieveMain(String email, String password) async {
     Response response;
-
-    dio.interceptors.add(await getCookieJar());
-    response = await dio.get(
-        "https://www.cloud32.it/Associazioni/utenti/login?codass=170734",
+    response = await dio.get("https://www.cloud32.it/Associazioni/utenti/login?codass=170734",
         options: Options(
           headers: getHeader(),
           followRedirects: Platform.isAndroid,
@@ -119,30 +116,19 @@ class ScraperApi {
 
     document = html.parse(response.data);
 
-    if (!response.isRedirect &&
-        document
-            .getElementsByTagName("input")
-            .where((e) => e.attributes["name"] == "_token")
-            .isNotEmpty) {
-      token = (document
-              .getElementsByTagName("input")
-              .where((e) => e.attributes["name"] == "_token")
-              .first
-              .attributes["value"]) ??
-          "";
+    if (!response.isRedirect && document.getElementsByTagName("input").where((e) => e.attributes["name"] == "_token").isNotEmpty) {
+      token = (document.getElementsByTagName("input").where((e) => e.attributes["name"] == "_token").first.attributes["value"]) ?? "";
 
-      FormData formData = FormData.fromMap(
-          {"email": email, "password": password, "_token": token});
-      response =
-          await dio.post("https://www.cloud32.it/Associazioni/utenti/login",
-              data: formData,
-              options: Options(
-                headers: getHeader(),
-                followRedirects: Platform.isAndroid,
-                validateStatus: (status) {
-                  return (status ?? 0) < 500;
-                },
-              ));
+      FormData formData = FormData.fromMap({"email": email, "password": password, "_token": token});
+      response = await dio.post("https://www.cloud32.it/Associazioni/utenti/login",
+          data: formData,
+          options: Options(
+            headers: getHeader(),
+            followRedirects: Platform.isAndroid,
+            validateStatus: (status) {
+              return (status ?? 0) < 500;
+            },
+          ));
     }
 
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/home",
@@ -156,10 +142,7 @@ class ScraperApi {
 
     document = html.parse(response.data);
 
-    if (document
-        .getElementsByTagName("img")
-        .where((e) => e.attributes["alt"] == "Foto")
-        .isNotEmpty) {
+    if (document.getElementsByTagName("img").where((e) => e.attributes["alt"] == "Foto").isNotEmpty) {
       savePasswordEmail(email, password);
       return document;
     } else {
@@ -175,8 +158,7 @@ class ScraperApi {
 
   Future<bool> isPasswordEmailStored() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString("email") != null &&
-        prefs.getString("password") != null;
+    return prefs.getString("email") != null && prefs.getString("password") != null;
   }
 
   Future<String> getStoredEmail() async {
@@ -192,5 +174,40 @@ class ScraperApi {
   Future logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+  }
+
+  //https://www.cloud32.it/Associazioni/utenti/testelab
+  Future<List<TestelabModel>> getTestelab({required int page, String? search}) async {
+    try {
+      Response response;
+      response = await dio.get(
+        "https://www.cloud32.it/Associazioni/utenti/testelab?s_id=&s_soggetto=${Uri.encodeQueryComponent(search ?? "")}&s_provincia=&s_regione=&Ricerca=Ricerca&testord=SocioDescr&testordDir=asc&page=$page",
+        options: Options(
+          headers: getHeader(),
+          followRedirects: Platform.isAndroid,
+          validateStatus: (status) {
+            return (status ?? 0) < 500;
+          },
+        ),
+      );
+
+      Document document = html.parse(response.data);
+      List<TestelabModel> testelab = [];
+      document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
+        List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+        testelab.add(TestelabModel(
+          id: data[0],
+          fullname: data[1],
+          typeOfTest: data[2],
+          modality: data[3],
+          status: data[5],
+          state: data[6],
+        ));
+      });
+
+      return testelab;
+    } catch (_) {
+      return [];
+    }
   }
 }

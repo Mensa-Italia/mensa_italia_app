@@ -10,6 +10,9 @@ import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_
 import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart';
 import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dart';
+import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view.dart';
+import 'package:mensa_italia_app/ui/views/renew_membership_webview/renew_membership_webview_view.dart';
+import 'package:mensa_italia_app/ui/views/addon_test_assistant/addon_test_assistant_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -20,6 +23,9 @@ import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dar
     MaterialRoute(page: HomeView),
     MaterialRoute(page: ExternalAddonWebviewView),
     MaterialRoute(page: AddonContactsView),
+    MaterialRoute(page: RenewMembershipView),
+    MaterialRoute(page: RenewMembershipWebviewView),
+    MaterialRoute(page: AddonTestAssistantView),
 // @stacked-route
   ],
   dependencies: [

@@ -44,7 +44,11 @@ class LoginViewModel extends MasterModel {
       Api().login(email: email, password: password).then((res) {
         setBusy(false);
         if (res) {
-          navigationService.replaceWith(Routes.homeView);
+          if (user.isMembershipActive) {
+            navigationService.replaceWith(Routes.homeView);
+          } else {
+            navigationService.replaceWith(Routes.renewMembershipView);
+          }
         } else {
           dialogService.showCustomDialog(
             variant: DialogType.infoAlert,

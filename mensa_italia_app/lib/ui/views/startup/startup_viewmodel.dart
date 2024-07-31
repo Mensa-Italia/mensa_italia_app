@@ -5,18 +5,24 @@ import 'package:mensa_italia_app/app/app.router.dart';
 
 class StartupViewModel extends MasterModel {
   Future runStartupLogic() async {
+    await ScraperApi().init();
     ScraperApi().isPasswordEmailStored().then((existsStored) async {
       if (existsStored) {
         final email = await ScraperApi().getStoredEmail();
         final password = await ScraperApi().getStoredPassword();
         Api().login(email: email, password: password).then((isLogged) {
           if (isLogged) {
-            navigationService.replaceWith(Routes.homeView);
+            if (!user.isMembershipActive) {
+              navigationService.replaceWith(Routes.homeView);
+            } else {
+              navigationService.replaceWith(Routes.renewMembershipView);
+            }
           } else {
             navigationService.replaceWith(Routes.loginView);
           }
         });
       } else {
+        await Future.delayed(const Duration(seconds: 5));
         navigationService.replaceWith(Routes.loginView);
       }
     });

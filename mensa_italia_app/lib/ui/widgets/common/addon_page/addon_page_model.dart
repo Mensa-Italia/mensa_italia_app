@@ -15,10 +15,15 @@ class AddonPageModel extends MasterModel {
   }
 
   openAddon() {
-    navigationService.navigateToExternalAddonWebviewView(addonID: "oakk7cnnzpi5wlo");
+    navigationService.navigateToExternalAddonWebviewView(
+        addonID: "oakk7cnnzpi5wlo");
   }
 
   openContacts() {
     navigationService.navigateToAddonContactsView();
+  }
+
+  openTestMakers() {
+    navigationService.navigateToAddonTestAssistantView();
   }
 }

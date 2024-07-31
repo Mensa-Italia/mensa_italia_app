@@ -1,11 +1,9 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/addon.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
-import 'package:mensa_italia_app/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_page_model.dart';
@@ -37,10 +35,16 @@ class AddonPage extends StackedView<AddonPageModel> {
               ),
             ),
             _InternalAddonButton(
-              name: "Phonebook",
+              name: "Contacts",
               description: "You Mensa Italia contacts, you can find any contact you need!",
               icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
               onTap: viewModel.openContacts,
+            ),
+            _InternalAddonButton(
+              name: "TestMakers",
+              description: "You see this because you're one of the test makers!",
+              icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
+              onTap: viewModel.openTestMakers,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),

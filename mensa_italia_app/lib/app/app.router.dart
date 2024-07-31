@@ -5,18 +5,24 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i8;
+import 'package:flutter/material.dart' as _i11;
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dart'
     as _i7;
+import 'package:mensa_italia_app/ui/views/addon_test_assistant/addon_test_assistant_view.dart'
+    as _i10;
 import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart'
     as _i6;
 import 'package:mensa_italia_app/ui/views/home/home_view.dart' as _i5;
 import 'package:mensa_italia_app/ui/views/login/login_view.dart' as _i2;
+import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view.dart'
+    as _i8;
+import 'package:mensa_italia_app/ui/views/renew_membership_webview/renew_membership_webview_view.dart'
+    as _i9;
 import 'package:mensa_italia_app/ui/views/sigs_list/sigs_list_view.dart' as _i4;
 import 'package:mensa_italia_app/ui/views/startup/startup_view.dart' as _i3;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i9;
+import 'package:stacked_services/stacked_services.dart' as _i12;
 
 class Routes {
   static const loginView = '/login-view';
@@ -31,6 +37,12 @@ class Routes {
 
   static const addonContactsView = '/addon-contacts-view';
 
+  static const renewMembershipView = '/renew-membership-view';
+
+  static const renewMembershipWebviewView = '/renew-membership-webview-view';
+
+  static const addonTestAssistantView = '/addon-test-assistant-view';
+
   static const all = <String>{
     loginView,
     startupView,
@@ -38,6 +50,9 @@ class Routes {
     homeView,
     externalAddonWebviewView,
     addonContactsView,
+    renewMembershipView,
+    renewMembershipWebviewView,
+    addonTestAssistantView,
   };
 }
 
@@ -67,29 +82,41 @@ class StackedRouter extends _i1.RouterBase {
       Routes.addonContactsView,
       page: _i7.AddonContactsView,
     ),
+    _i1.RouteDef(
+      Routes.renewMembershipView,
+      page: _i8.RenewMembershipView,
+    ),
+    _i1.RouteDef(
+      Routes.renewMembershipWebviewView,
+      page: _i9.RenewMembershipWebviewView,
+    ),
+    _i1.RouteDef(
+      Routes.addonTestAssistantView,
+      page: _i10.AddonTestAssistantView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.LoginView: (data) {
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i2.LoginView(),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.StartupView(),
         settings: data,
       );
     },
     _i4.SigsListView: (data) {
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.SigsListView(),
         settings: data,
       );
     },
     _i5.HomeView: (data) {
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i5.HomeView(),
         settings: data,
       );
@@ -97,15 +124,36 @@ class StackedRouter extends _i1.RouterBase {
     _i6.ExternalAddonWebviewView: (data) {
       final args =
           data.getArgs<ExternalAddonWebviewViewArguments>(nullOk: false);
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i6.ExternalAddonWebviewView(key: args.key, addonID: args.addonID),
         settings: data,
       );
     },
     _i7.AddonContactsView: (data) {
-      return _i8.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i7.AddonContactsView(),
+        settings: data,
+      );
+    },
+    _i8.RenewMembershipView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i8.RenewMembershipView(),
+        settings: data,
+      );
+    },
+    _i9.RenewMembershipWebviewView: (data) {
+      final args =
+          data.getArgs<RenewMembershipWebviewViewArguments>(nullOk: false);
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) =>
+            _i9.RenewMembershipWebviewView(key: args.key, url: args.url),
+        settings: data,
+      );
+    },
+    _i10.AddonTestAssistantView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i10.AddonTestAssistantView(),
         settings: data,
       );
     },
@@ -124,7 +172,7 @@ class ExternalAddonWebviewViewArguments {
     required this.addonID,
   });
 
-  final _i8.Key? key;
+  final _i11.Key? key;
 
   final String addonID;
 
@@ -145,7 +193,34 @@ class ExternalAddonWebviewViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i9.NavigationService {
+class RenewMembershipWebviewViewArguments {
+  const RenewMembershipWebviewViewArguments({
+    this.key,
+    required this.url,
+  });
+
+  final _i11.Key? key;
+
+  final String url;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "url": "$url"}';
+  }
+
+  @override
+  bool operator ==(covariant RenewMembershipWebviewViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.url == url;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ url.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i12.NavigationService {
   Future<dynamic> navigateToLoginView([
     int? routerId,
     bool preventDuplicates = true,
@@ -203,7 +278,7 @@ extension NavigatorStateExtension on _i9.NavigationService {
   }
 
   Future<dynamic> navigateToExternalAddonWebviewView({
-    _i8.Key? key,
+    _i11.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -228,6 +303,51 @@ extension NavigatorStateExtension on _i9.NavigationService {
         transition,
   ]) async {
     return navigateTo<dynamic>(Routes.addonContactsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToRenewMembershipView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.renewMembershipView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToRenewMembershipWebviewView({
+    _i11.Key? key,
+    required String url,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.renewMembershipWebviewView,
+        arguments: RenewMembershipWebviewViewArguments(key: key, url: url),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToAddonTestAssistantView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.addonTestAssistantView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -291,7 +411,7 @@ extension NavigatorStateExtension on _i9.NavigationService {
   }
 
   Future<dynamic> replaceWithExternalAddonWebviewView({
-    _i8.Key? key,
+    _i11.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -316,6 +436,51 @@ extension NavigatorStateExtension on _i9.NavigationService {
         transition,
   ]) async {
     return replaceWith<dynamic>(Routes.addonContactsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithRenewMembershipView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.renewMembershipView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithRenewMembershipWebviewView({
+    _i11.Key? key,
+    required String url,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.renewMembershipWebviewView,
+        arguments: RenewMembershipWebviewViewArguments(key: key, url: url),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithAddonTestAssistantView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.addonTestAssistantView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

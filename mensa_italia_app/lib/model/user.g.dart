@@ -16,8 +16,12 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       expireMembership: DateTime.parse(json['expire_membership'] as String),
       powers:
           (json['powers'] as List<dynamic>).map((e) => e as String).toList(),
+      favouriteAddons: (json['favourite_addons'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
       addons:
           (json['addons'] as List<dynamic>).map((e) => e as String).toList(),
+      isMembershipActive: json['is_membership_active'] as bool,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -29,5 +33,7 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'email': instance.email,
       'expire_membership': instance.expireMembership.toIso8601String(),
       'powers': instance.powers,
+      'favourite_addons': instance.favouriteAddons,
       'addons': instance.addons,
+      'is_membership_active': instance.isMembershipActive,
     };

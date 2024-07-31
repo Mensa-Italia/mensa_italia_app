@@ -12,24 +12,41 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
   Widget builder(BuildContext context, AddonContactsViewModel viewModel, Widget? child) {
     return Scaffold(
       body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: viewModel.scrollController,
+        anchor: 0.06,
         slivers: [
           CupertinoSliverNavigationBar(
-            largeTitle: const Text(
-              'Contacts',
-              style: TextStyle(fontWeight: FontWeight.w900),
+            largeTitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Contacts',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
+                Container(
+                  height: 40,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 15, top: 3),
+                    child: CupertinoSearchTextField(
+                      onChanged: viewModel.search,
+                      controller: viewModel.searchController,
+                      prefixIcon: const Icon(CupertinoIcons.search),
+                      onSubmitted: viewModel.search,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            stretch: true,
+            previousPageTitle: "Addons",
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+            border: null,
             middle: const Text(
               'Contacts',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            trailing: const Material(
-              color: Colors.transparent,
-              child: Text('1250 soci', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-            ),
-            previousPageTitle: "Addons",
             alwaysShowMiddle: false,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-            border: null,
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
           SliverList.separated(
