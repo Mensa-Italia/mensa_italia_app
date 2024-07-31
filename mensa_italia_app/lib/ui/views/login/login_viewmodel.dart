@@ -44,7 +44,7 @@ class LoginViewModel extends MasterModel {
       Api().login(email: email, password: password).then((res) {
         setBusy(false);
         if (res) {
-          if (user.isMembershipActive) {
+          if (!user.isMembershipActive) {
             navigationService.replaceWith(Routes.homeView);
           } else {
             navigationService.replaceWith(Routes.renewMembershipView);
