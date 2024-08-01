@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:html/dom.dart';
+import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/model/testelab.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -209,5 +210,122 @@ class ScraperApi {
     } catch (_) {
       return [];
     }
+  }
+
+  //https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=&s_nome=&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca
+  Future<List<RegSociModel>> getRegSoci({required int page, String? search}) async {
+    try {
+      String nameToSearch = "";
+      String surnameToSearch = "";
+      if ((search ?? "").contains(" ")) {
+        List<String> splitted = search!.replaceFirst(" ", "~~~").split("~~~");
+        nameToSearch = splitted.last;
+        surnameToSearch = splitted.first;
+      } else {
+        nameToSearch = search ?? "";
+        surnameToSearch = "";
+      }
+      List<RegSociModel> testelab = [];
+      List<String> idsToNotRepeat = [];
+
+      Response response;
+      response = await dio.get(
+        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=${surnameToSearch}&s_nome=${nameToSearch}&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
+        options: Options(
+          headers: getHeader(),
+          followRedirects: Platform.isAndroid,
+          validateStatus: (status) {
+            return (status ?? 0) < 500;
+          },
+        ),
+      );
+
+      Document document = html.parse(response.data);
+      try {
+        document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
+          List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+          if (!idsToNotRepeat.contains(data[1])) {
+            testelab.add(RegSociModel(
+              id: data[1],
+              name: data[2],
+              city: data[4],
+              state: data[5],
+              image: "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+              linkToFullProfile: "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+            ));
+            idsToNotRepeat.add(data[1]);
+          }
+        });
+      } catch (_) {}
+
+      response = await dio.get(
+        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=${nameToSearch}&s_nome=${surnameToSearch}&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
+        options: Options(
+          headers: getHeader(),
+          followRedirects: Platform.isAndroid,
+          validateStatus: (status) {
+            return (status ?? 0) < 500;
+          },
+        ),
+      );
+      document = html.parse(response.data);
+      try {
+        document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
+          List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+          if (!idsToNotRepeat.contains(data[1])) {
+            testelab.add(RegSociModel(
+              id: data[1],
+              name: data[2],
+              city: data[4],
+              state: data[5],
+              image: "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+              linkToFullProfile: "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+            ));
+            idsToNotRepeat.add(data[1]);
+          }
+        });
+      } catch (_) {}
+      testelab.sort((a, b) => a.name.compareTo(b.name));
+
+      return testelab;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<Map<String, String>> getRegSocioDeepData(String url) async {
+    Response response;
+    response = await dio.get(
+      url,
+      options: Options(
+        headers: getHeader(),
+        followRedirects: Platform.isAndroid,
+        validateStatus: (status) {
+          return (status ?? 0) < 500;
+        },
+      ),
+    );
+
+    Document document = html.parse(response.data);
+
+    Map<String, String> data = Map.fromEntries(document.getElementsByClassName("form-group").map((e) {
+      try {
+        var key = e.getElementsByTagName("div").first.text.trim();
+        var value = "";
+        try {
+          value = e.getElementsByTagName("label").last.text.trim();
+        } catch (_) {
+          value = e.getElementsByTagName("a").last.attributes["href"] ?? "";
+        }
+        var mapEntry = MapEntry(key, value);
+        return mapEntry;
+      } catch (e) {
+        return MapEntry("", "");
+      }
+    }).toList());
+
+    print(data);
+
+    return data;
   }
 }

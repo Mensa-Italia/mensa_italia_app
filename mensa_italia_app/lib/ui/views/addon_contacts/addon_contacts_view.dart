@@ -1,6 +1,7 @@
 import 'package:faker/faker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_contacts_viewmodel.dart';
@@ -9,7 +10,8 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
   const AddonContactsView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, AddonContactsViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddonContactsViewModel viewModel, Widget? child) {
     return Scaffold(
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -40,7 +42,8 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
             ),
             stretch: true,
             previousPageTitle: "Addons",
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+            backgroundColor:
+                Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
             border: null,
             middle: const Text(
               'Contacts',
@@ -52,36 +55,43 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
           SliverList.separated(
             itemCount: viewModel.contacts.length,
             itemBuilder: (context, index) {
-              bool firstCharIsDifferent = index == 0 || viewModel.contacts[index][0] != viewModel.contacts[index - 1][0];
+              bool firstCharIsDifferent = index == 0 ||
+                  viewModel.contacts[index].name[0] !=
+                      viewModel.contacts[index - 1].name[0];
               if (firstCharIsDifferent) {
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20)
+                          .copyWith(top: 20),
                       child: Row(
                         children: [
                           Text(
-                            viewModel.contacts[index][0],
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey),
+                            viewModel.contacts[index].name[0],
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
                     const Divider(height: 0, endIndent: 20, indent: 20),
                     _ContactsTile(
-                      fullName: viewModel.contacts[index],
-                      avatar: "https://picsum.photos/200/300?random=$index",
+                      contact: viewModel.contacts[index],
+                      onTap: viewModel.tapOnContact(index),
                     ),
                   ],
                 );
               } else {
                 return _ContactsTile(
-                  fullName: viewModel.contacts[index],
-                  avatar: "https://picsum.photos/200/300?random=$index",
+                  contact: viewModel.contacts[index],
+                  onTap: viewModel.tapOnContact(index),
                 );
               }
             },
-            separatorBuilder: (context, index) => const Divider(height: 0, endIndent: 20, indent: 20),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 0, endIndent: 20, indent: 20),
           ),
           const SliverSafeArea(
             sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10)),
@@ -92,17 +102,18 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
   }
 
   @override
-  AddonContactsViewModel viewModelBuilder(BuildContext context) => AddonContactsViewModel();
+  AddonContactsViewModel viewModelBuilder(BuildContext context) =>
+      AddonContactsViewModel();
 }
 
 class _ContactsTile extends ViewModelWidget<AddonContactsViewModel> {
-  final String fullName;
-  final String avatar;
+  final RegSociModel contact;
+  final Function() onTap;
 
   const _ContactsTile({
     Key? key,
-    required this.fullName,
-    required this.avatar,
+    required this.contact,
+    required this.onTap,
   }) : super(key: key);
 
   @override
@@ -115,19 +126,43 @@ class _ContactsTile extends ViewModelWidget<AddonContactsViewModel> {
       minVerticalPadding: 0,
       title: Text.rich(
         TextSpan(
-          text: fullName.split(' ').first,
+          text: capitalization(contact.name.split(' ').first).trim(),
           style: const TextStyle(fontWeight: FontWeight.w700),
           children: [
             const TextSpan(text: ' '),
             TextSpan(
-              text: fullName.replaceFirst(" ", "~~~").split('~~~').last,
+              text: capitalization(
+                      contact.name.replaceFirst(" ", "~~~").split('~~~').last)
+                  .trim(),
               style: const TextStyle(fontWeight: FontWeight.w400),
             ),
           ],
         ),
         style: const TextStyle(fontSize: 16),
       ),
-      onTap: () {},
+      onTap: onTap,
     );
+  }
+
+  String capitalization(String text) {
+    var textList = text.split(" ");
+    if (textList.length == 1) {
+      if (textList[0].length > 1) {
+        textList[0] = textList[0][0].toUpperCase() +
+            textList[0].substring(1).toLowerCase();
+      } else {
+        textList[0] = textList[0].toUpperCase();
+      }
+    } else {
+      for (var i = 0; i < textList.length; i++) {
+        if (textList[i].length > 1) {
+          textList[i] = textList[i][0].toUpperCase() +
+              textList[i].substring(1).toLowerCase();
+        } else {
+          textList[i] = textList[i].toUpperCase();
+        }
+      }
+    }
+    return textList.join(" ");
   }
 }

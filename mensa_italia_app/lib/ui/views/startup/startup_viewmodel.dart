@@ -12,7 +12,7 @@ class StartupViewModel extends MasterModel {
         final password = await ScraperApi().getStoredPassword();
         Api().login(email: email, password: password).then((isLogged) {
           if (isLogged) {
-            if (!user.isMembershipActive) {
+            if (user.isMembershipActive) {
               navigationService.replaceWith(Routes.homeView);
             } else {
               navigationService.replaceWith(Routes.renewMembershipView);
