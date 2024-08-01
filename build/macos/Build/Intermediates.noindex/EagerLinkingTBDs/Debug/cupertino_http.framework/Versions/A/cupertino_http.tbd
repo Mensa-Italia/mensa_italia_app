@@ -1,0 +1,89 @@
+{
+  "main_library": {
+    "exported_symbols": [
+      {
+        "data": {
+          "global": [
+            "_Dart_NewUnhandledExceptionError_DL",
+            "_Dart_DeleteFinalizableHandle_DL",
+            "_Dart_NewPersistentHandle_DL",
+            "_Dart_IsApiError_DL",
+            "_Dart_IsFatalError_DL",
+            "_Dart_PostInteger_DL",
+            "_Dart_NewNativePort_DL",
+            "_Dart_EnterScope_DL",
+            "_Dart_HandleFromWeakPersistent_DL",
+            "_Dart_NewFinalizableHandle_DL",
+            "_Dart_UpdateExternalSize_DL",
+            "_Dart_ErrorGetException_DL",
+            "_Dart_IsUnhandledExceptionError_DL",
+            "_Dart_UpdateFinalizableExternalSize_DL",
+            "_Dart_ExitScope_DL",
+            "_cupertino_httpVersionString",
+            "_Dart_SendPortGetId_DL",
+            "_Dart_HandleFromPersistent_DL",
+            "_Dart_NewApiError_DL",
+            "_Dart_PostCObject_DL",
+            "_Dart_ErrorHasException_DL",
+            "_Dart_CloseNativePort_DL",
+            "_Dart_SetPersistentHandle_DL",
+            "_Dart_NewSendPort_DL",
+            "_Dart_GetError_DL",
+            "_Dart_PropagateError_DL",
+            "_Dart_DeletePersistentHandle_DL",
+            "_Dart_NewWeakPersistentHandle_DL",
+            "_cupertino_httpVersionNumber",
+            "_Dart_ErrorGetStackTrace_DL",
+            "_Dart_Post_DL",
+            "_Dart_IsError_DL",
+            "_Dart_DeleteWeakPersistentHandle_DL",
+            "_Dart_IsCompilationError_DL",
+            "_Dart_NewCompilationError_DL"
+          ],
+          "objc_class": [
+            "PodsDummy_cupertino_http",
+            "CUPHTTPForwardedWebSocketClosed",
+            "CUPHTTPForwardedFinishedDownloading",
+            "CUPHTTPTaskConfiguration",
+            "CUPHTTPClientDelegate",
+            "CUPHTTPForwardedWebSocketOpened",
+            "CUPHTTPStreamToNSInputStreamAdapter",
+            "CUPHTTPForwardedRedirect",
+            "CUPHTTPForwardedData",
+            "CUPHTTPForwardedDelegate",
+            "CUPHTTPForwardedComplete",
+            "CUPHTTPForwardedResponse"
+          ]
+        },
+        "text": {
+          "global": [
+            "_FindFunctionPointer",
+            "_CUPHTTPSendMessage",
+            "_CUPHTTPReceiveMessage",
+            "_NSObjectToCObject",
+            "_Dart_InitializeApiDL"
+          ]
+        }
+      }
+    ],
+    "flags": [
+      {
+        "attributes": [
+          "not_app_extension_safe"
+        ]
+      }
+    ],
+    "install_names": [
+      {
+        "name": "@rpath/cupertino_http.framework/Versions/A/cupertino_http"
+      }
+    ],
+    "target_info": [
+      {
+        "min_deployment": "11",
+        "target": "arm64-macos"
+      }
+    ]
+  },
+  "tapi_tbd_version": 5
+}

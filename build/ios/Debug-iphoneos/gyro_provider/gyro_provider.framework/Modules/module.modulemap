@@ -1,0 +1,11 @@
+framework module gyro_provider {
+  umbrella header "gyro_provider-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module gyro_provider.Swift {
+  header "gyro_provider-Swift.h"
+  requires objc
+}
