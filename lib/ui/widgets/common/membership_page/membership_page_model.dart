@@ -31,11 +31,29 @@ class MembershipPageModel extends MasterModel {
       rebuildUi();
     });
 
-    SharedPreferences.getInstance().then((prefs) {
+    SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
+      favsAddons.clear();
+      if (!allowTestMakerAddon()) {
+        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
+      }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
         addons.clear();
+
+        List<String> toRemove = [];
+        for (var favsAddon in favsAddons) {
+          if (favsAddon.startsWith("EXTERNAL:")) {
+            if (!value.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+              toRemove.add(favsAddon);
+            }
+          }
+        }
+        for (var favsAddon in toRemove) {
+          favsAddons.remove(favsAddon);
+        }
+        prefs.setStringList("addons_fav", favsAddons);
+
         for (final addon in value) {
           if (favsAddons.contains("EXTERNAL:${addon.id}")) {
             addons.add(addon);

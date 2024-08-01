@@ -14,7 +14,6 @@ class UserModel with _$UserModel {
     required String email,
     required DateTime expireMembership,
     required List<String> powers,
-    required List<String> favouriteAddons,
     required List<String> addons,
     required bool isMembershipActive,
   }) = _UserModel;

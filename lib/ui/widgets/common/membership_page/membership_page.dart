@@ -355,7 +355,10 @@ class _addons extends ViewModelWidget<MembershipPageModel> {
               );
             }).toList()))
           .reversed
-          .toList(),
+          .toList()
+        ..sort((a, b) {
+          return a.name.compareTo(b.name);
+        }),
     );
   }
 }

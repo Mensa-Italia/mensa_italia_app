@@ -7,18 +7,43 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddonPageModel extends MasterModel {
+  final List<AddonModel> _storedAddons = [];
   final List<AddonModel> addons = [];
   final List<String> favsAddons = [];
+
+  String searchText = "";
+
+  bool isSearching(String check) {
+    return check.toLowerCase().contains(searchText.toLowerCase()) || searchText.isEmpty;
+  }
 
   TextEditingController searchController = TextEditingController();
 
   ScrollController scrollController = ScrollController();
 
   AddonPageModel() {
-    SharedPreferences.getInstance().then((prefs) {
+    SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
+      if (!allowTestMakerAddon()) {
+        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
+      }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
+        _storedAddons.clear();
+        _storedAddons.addAll(value);
+
+        List<String> toRemove = [];
+        for (var favsAddon in favsAddons) {
+          if (favsAddon.startsWith("EXTERNAL:")) {
+            if (!_storedAddons.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+              toRemove.add(favsAddon);
+            }
+          }
+        }
+        for (var favsAddon in toRemove) {
+          favsAddons.remove(favsAddon);
+        }
+        prefs.setStringList("addons_fav", favsAddons);
         addons.clear();
         addons.addAll(value);
         rebuildUi();
@@ -38,7 +63,12 @@ class AddonPageModel extends MasterModel {
     navigationService.navigateToAddonTestAssistantView();
   }
 
-  void search(String value) {}
+  void search(String value) {
+    searchText = value;
+    addons.clear();
+    addons.addAll(_storedAddons.where((element) => isSearching(element.name.toLowerCase())));
+    rebuildUi();
+  }
 
   openDocuments() {
     navigationService.navigateToAddonAreaDocumentsView();

@@ -27,7 +27,6 @@ mixin _$UserModel {
   String get email => throw _privateConstructorUsedError;
   DateTime get expireMembership => throw _privateConstructorUsedError;
   List<String> get powers => throw _privateConstructorUsedError;
-  List<String> get favouriteAddons => throw _privateConstructorUsedError;
   List<String> get addons => throw _privateConstructorUsedError;
   bool get isMembershipActive => throw _privateConstructorUsedError;
 
@@ -50,7 +49,6 @@ abstract class $UserModelCopyWith<$Res> {
       String email,
       DateTime expireMembership,
       List<String> powers,
-      List<String> favouriteAddons,
       List<String> addons,
       bool isMembershipActive});
 }
@@ -75,7 +73,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? expireMembership = null,
     Object? powers = null,
-    Object? favouriteAddons = null,
     Object? addons = null,
     Object? isMembershipActive = null,
   }) {
@@ -108,10 +105,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.powers
           : powers // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      favouriteAddons: null == favouriteAddons
-          ? _value.favouriteAddons
-          : favouriteAddons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       addons: null == addons
           ? _value.addons
           : addons // ignore: cast_nullable_to_non_nullable
@@ -140,7 +133,6 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String email,
       DateTime expireMembership,
       List<String> powers,
-      List<String> favouriteAddons,
       List<String> addons,
       bool isMembershipActive});
 }
@@ -163,7 +155,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? expireMembership = null,
     Object? powers = null,
-    Object? favouriteAddons = null,
     Object? addons = null,
     Object? isMembershipActive = null,
   }) {
@@ -196,10 +187,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value._powers
           : powers // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      favouriteAddons: null == favouriteAddons
-          ? _value._favouriteAddons
-          : favouriteAddons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       addons: null == addons
           ? _value._addons
           : addons // ignore: cast_nullable_to_non_nullable
@@ -223,11 +210,9 @@ class _$UserModelImpl implements _UserModel {
       required this.email,
       required this.expireMembership,
       required final List<String> powers,
-      required final List<String> favouriteAddons,
       required final List<String> addons,
       required this.isMembershipActive})
       : _powers = powers,
-        _favouriteAddons = favouriteAddons,
         _addons = addons;
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -253,14 +238,6 @@ class _$UserModelImpl implements _UserModel {
     return EqualUnmodifiableListView(_powers);
   }
 
-  final List<String> _favouriteAddons;
-  @override
-  List<String> get favouriteAddons {
-    if (_favouriteAddons is EqualUnmodifiableListView) return _favouriteAddons;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_favouriteAddons);
-  }
-
   final List<String> _addons;
   @override
   List<String> get addons {
@@ -274,7 +251,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, username: $username, name: $name, avatar: $avatar, email: $email, expireMembership: $expireMembership, powers: $powers, favouriteAddons: $favouriteAddons, addons: $addons, isMembershipActive: $isMembershipActive)';
+    return 'UserModel(id: $id, username: $username, name: $name, avatar: $avatar, email: $email, expireMembership: $expireMembership, powers: $powers, addons: $addons, isMembershipActive: $isMembershipActive)';
   }
 
   @override
@@ -291,8 +268,6 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.expireMembership, expireMembership) ||
                 other.expireMembership == expireMembership) &&
             const DeepCollectionEquality().equals(other._powers, _powers) &&
-            const DeepCollectionEquality()
-                .equals(other._favouriteAddons, _favouriteAddons) &&
             const DeepCollectionEquality().equals(other._addons, _addons) &&
             (identical(other.isMembershipActive, isMembershipActive) ||
                 other.isMembershipActive == isMembershipActive));
@@ -309,7 +284,6 @@ class _$UserModelImpl implements _UserModel {
       email,
       expireMembership,
       const DeepCollectionEquality().hash(_powers),
-      const DeepCollectionEquality().hash(_favouriteAddons),
       const DeepCollectionEquality().hash(_addons),
       isMembershipActive);
 
@@ -336,7 +310,6 @@ abstract class _UserModel implements UserModel {
       required final String email,
       required final DateTime expireMembership,
       required final List<String> powers,
-      required final List<String> favouriteAddons,
       required final List<String> addons,
       required final bool isMembershipActive}) = _$UserModelImpl;
 
@@ -357,8 +330,6 @@ abstract class _UserModel implements UserModel {
   DateTime get expireMembership;
   @override
   List<String> get powers;
-  @override
-  List<String> get favouriteAddons;
   @override
   List<String> get addons;
   @override

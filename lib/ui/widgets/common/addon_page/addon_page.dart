@@ -52,42 +52,47 @@ class AddonPage extends StackedView<AddonPageModel> {
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-              child: const Text(
-                "Officials",
-                style: TextStyle(
-                  fontSize: 18,
+            if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+                child: const Text(
+                  "Officials",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            ),
-            _InternalAddonButton(
-              name: "Contacts",
-              description: "You Mensa Italia contacts, you can find any contact you need!",
-              icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
-              onTap: viewModel.openContacts,
-            ),
-            _InternalAddonButton(
-              name: "TestMakers",
-              description: "You see this because you're one of the test makers!",
-              icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
-              onTap: viewModel.openTestMakers,
-            ),
-            _InternalAddonButton(
-              name: "Documents",
-              description: "Official documents of Mensa Italia",
-              icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
-              onTap: viewModel.openDocuments,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
-              child: const Text(
-                "Verified",
-                style: TextStyle(
-                  fontSize: 18,
+            if (viewModel.isSearching("contacts"))
+              _InternalAddonButton(
+                name: "Contacts",
+                description: "You Mensa Italia contacts, you can find any contact you need!",
+                icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
+                onTap: viewModel.openContacts,
+              ),
+            if (viewModel.isSearching("documents"))
+              _InternalAddonButton(
+                name: "Documents",
+                description: "Official documents of Mensa Italia",
+                icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
+                onTap: viewModel.openDocuments,
+              ),
+            if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
+              _InternalAddonButton(
+                name: "TestMakers",
+                description: "You see this because you're one of the test makers!",
+                icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
+                onTap: viewModel.openTestMakers,
+              ),
+            if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
+                child: const Text(
+                  "Verified",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            ),
             ...viewModel.addons.map((addon) {
               return _ExternalAddonButton(addon: addon);
             }).toList(),

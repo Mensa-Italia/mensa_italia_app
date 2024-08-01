@@ -14,4 +14,24 @@ class MasterModel extends ReactiveViewModel {
   UserModel get user {
     return Api().getUser()!;
   }
+
+  hasPower(String power) {
+    return user.powers.contains(power);
+  }
+
+  allowTestMakerAddon() {
+    return hasPower("testmakers");
+  }
+
+  allowControlSigs() {
+    return hasPower("sigs");
+  }
+
+  allowControlEvents() {
+    return hasPower("events");
+  }
+
+  allowControlAddons() {
+    return hasPower("addons");
+  }
 }

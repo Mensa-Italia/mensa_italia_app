@@ -26,11 +26,15 @@ class Api {
     formData.fields.add(MapEntry("email", email));
     formData.fields.add(MapEntry("password", password));
 
-    return await dio.post("/api/cs/auth-with-area", data: formData).then((value) async {
+    return await dio
+        .post("/api/cs/auth-with-area", data: formData)
+        .then((value) async {
       final token = value.data["token"];
       final model = RecordModel.fromJson(value.data["record"]);
       pb.authStore.save(token, model);
-      return await ScraperApi().doLoginAndRetrieveMain(email, password).then((value) {
+      return await ScraperApi()
+          .doLoginAndRetrieveMain(email, password)
+          .then((value) {
         return true;
       }).catchError((e) {
         return false;
@@ -41,13 +45,19 @@ class Api {
   }
 
   Future getAddonAccessData(String addonId) {
-    return dio.get("/api/cs/sign-payload/$addonId", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+    return dio
+        .get("/api/cs/sign-payload/$addonId",
+            options: Options(headers: {"Authorization": pb.authStore.token}))
+        .then((value) {
       return value.data;
     });
   }
 
   Future<List<AddonModel>> getAddons() async {
-    return await pb.collection('addons').getFullList(sort: 'name').then((value) {
+    return await pb
+        .collection('addons')
+        .getFullList(sort: 'name')
+        .then((value) {
       return value.map((e) {
         Map<String, dynamic> data = e.toJson();
         data["icon"] = pb.files.getUrl(e, e.getStringValue("icon")).toString();
@@ -60,7 +70,8 @@ class Api {
     return await pb.collection('sigs').getFullList(sort: 'name').then((value) {
       return value.map((e) {
         Map<String, dynamic> data = e.toJson();
-        data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
+        data["image"] =
+            pb.files.getUrl(e, e.getStringValue("image")).toString();
         return SigModel.fromJson(data);
       }).toList();
     });
@@ -69,7 +80,10 @@ class Api {
   UserModel? getUser() {
     try {
       Map<String, dynamic> data = (pb.authStore.model as RecordModel).toJson();
-      data["avatar"] = pb.files.getUrl(pb.authStore.model, pb.authStore.model.getStringValue("avatar")).toString();
+      data["avatar"] = pb.files
+          .getUrl(
+              pb.authStore.model, pb.authStore.model.getStringValue("avatar"))
+          .toString();
       return UserModel.fromJson(data);
     } catch (_) {
       return null;
@@ -77,30 +91,48 @@ class Api {
   }
 
   Future<List<EventModel>> getEvents() async {
-    return await pb.collection('events').getFullList(sort: 'when', filter: "when >= '${DateTime.now().toIso8601String()}'").then((value) {
+    return await pb
+        .collection('events')
+        .getFullList(
+            sort: 'when',
+            filter: "when >= '${DateTime.now().toIso8601String()}'")
+        .then((value) {
       return value.map((e) {
         Map<String, dynamic> data = e.toJson();
-        data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
+        data["image"] =
+            pb.files.getUrl(e, e.getStringValue("image")).toString();
         return EventModel.fromJson(data);
       }).toList();
     });
   }
 
   Future<EventModel> getFirstNextEvent() async {
-    return await pb.collection('events').getList(page: 1, perPage: 1, filter: "when >= '${DateTime.now().toIso8601String()}'", sort: 'when').then((value) {
+    return await pb
+        .collection('events')
+        .getList(
+            page: 1,
+            perPage: 1,
+            filter: "when >= '${DateTime.now().toIso8601String()}'",
+            sort: 'when')
+        .then((value) {
       return value.items.map((e) {
         Map<String, dynamic> data = e.toJson();
-        data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
+        data["image"] =
+            pb.files.getUrl(e, e.getStringValue("image")).toString();
         return EventModel.fromJson(data);
       }).first;
     });
   }
 
   Future<SigModel> getLastInsertedSig() async {
-    return await pb.collection('sigs').getList(page: 1, perPage: 1, sort: 'created').then((value) {
+    return await pb
+        .collection('sigs')
+        .getList(page: 1, perPage: 1, sort: 'created')
+        .then((value) {
       return value.items.map((e) {
         Map<String, dynamic> data = e.toJson();
-        data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
+        data["image"] =
+            pb.files.getUrl(e, e.getStringValue("image")).toString();
         return SigModel.fromJson(data);
       }).first;
     });

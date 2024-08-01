@@ -27,7 +27,7 @@ class EventPage extends StackedView<EventPageModel> {
                 'Events',
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
-              Container(
+              SizedBox(
                 height: 40,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 15, top: 3),
@@ -96,21 +96,26 @@ class _EventTile extends ViewModelWidget<EventPageModel> {
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: [
-                    Text(
-                      event.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Expanded(
+                      child: Text(
+                        event.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Spacer(),
                     Text(
                       DateFormat.yMMMd().format(event.when),
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
