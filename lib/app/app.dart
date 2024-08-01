@@ -7,8 +7,6 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:mensa_italia_app/ui/views/sigs_list/sigs_list_view.dart';
 import 'package:mensa_italia_app/ui/views/home/home_view.dart';
 import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart';
-import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart';
-import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dart';
 import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view.dart';
 import 'package:mensa_italia_app/ui/views/renew_membership_webview/renew_membership_webview_view.dart';
