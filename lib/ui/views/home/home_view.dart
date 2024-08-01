@@ -4,7 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
-import 'package:mensa_italia_app/ui/views/sigs_list/sigs_list_view.dart';
+import 'package:mensa_italia_app/ui/widgets/common/sigs_page/sigs_page_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/addon_page/addon_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_page/event_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/membership_page/membership_page.dart';
@@ -105,7 +105,7 @@ class HomeView extends StackedView<HomeViewModel> {
       case 0:
         return const EventPage();
       case 1:
-        return const SigsListView();
+        return const SigsPage();
       case 2:
         return const MembershipPage();
       case 3:

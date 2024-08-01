@@ -12,7 +12,8 @@ class AddonPage extends StackedView<AddonPageModel> {
   const AddonPage({super.key});
 
   @override
-  Widget builder(BuildContext context, AddonPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddonPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -41,7 +42,8 @@ class AddonPage extends StackedView<AddonPageModel> {
             ],
           ),
           stretch: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
             'Addons',
@@ -54,7 +56,8 @@ class AddonPage extends StackedView<AddonPageModel> {
           children: [
             if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20)
+                    .copyWith(top: 10),
                 child: const Text(
                   "Officials",
                   style: TextStyle(
@@ -65,27 +68,34 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("contacts"))
               _InternalAddonButton(
                 name: "Contacts",
-                description: "You Mensa Italia contacts, you can find any contact you need!",
-                icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
+                description:
+                    "You Mensa Italia contacts, you can find any contact you need!",
+                icon: const Icon(EneftyIcons.bookmark_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openContacts,
               ),
             if (viewModel.isSearching("documents"))
               _InternalAddonButton(
                 name: "Documents",
                 description: "Official documents of Mensa Italia",
-                icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.document_cloud_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openDocuments,
               ),
-            if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
+            if (viewModel.allowTestMakerAddon() &&
+                viewModel.isSearching("testmakers"))
               _InternalAddonButton(
                 name: "TestMakers",
-                description: "You see this because you're one of the test makers!",
-                icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
+                description:
+                    "You see this because you're one of the test makers!",
+                icon: const Icon(EneftyIcons.teacher_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openTestMakers,
               ),
             if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 20)
+                    .copyWith(top: 30),
                 child: const Text(
                   "Verified",
                   style: TextStyle(
@@ -98,7 +108,8 @@ class AddonPage extends StackedView<AddonPageModel> {
             }).toList(),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -203,7 +214,13 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
   final Widget icon;
   final Function() onTap;
 
-  const _InternalAddonButton({Key? key, required this.name, required this.description, required this.icon, required this.onTap}) : super(key: key);
+  const _InternalAddonButton(
+      {Key? key,
+      required this.name,
+      required this.description,
+      required this.icon,
+      required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {

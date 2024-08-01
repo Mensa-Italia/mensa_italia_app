@@ -5,14 +5,13 @@ import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
-import 'sigs_list_viewmodel.dart';
+import 'sigs_page_viewmodel.dart';
 
-class SigsListView extends StackedView<SigsListViewModel> {
-  const SigsListView({Key? key}) : super(key: key);
+class SigsPage extends StackedView<SigsPageModel> {
+  const SigsPage({Key? key}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, SigsListViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, SigsPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -64,17 +63,16 @@ class SigsListView extends StackedView<SigsListViewModel> {
   }
 
   @override
-  SigsListViewModel viewModelBuilder(BuildContext context) =>
-      SigsListViewModel();
+  SigsPageModel viewModelBuilder(BuildContext context) => SigsPageModel();
 }
 
-class _SigTile extends ViewModelWidget<SigsListViewModel> {
+class _SigTile extends ViewModelWidget<SigsPageModel> {
   final SigModel sig;
 
   const _SigTile({Key? key, required this.sig}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, SigsListViewModel viewModel) {
+  Widget build(BuildContext context, SigsPageModel viewModel) {
     return GestureDetector(
       onTap: viewModel.onTapOnSIG(sig),
       child: Padding(

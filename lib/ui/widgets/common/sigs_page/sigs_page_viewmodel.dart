@@ -5,7 +5,7 @@ import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class SigsListViewModel extends MasterModel {
+class SigsPageModel extends MasterModel {
   final List<SigModel> _originalSigs = [];
   final List<SigModel> sigs = [];
 
@@ -13,7 +13,7 @@ class SigsListViewModel extends MasterModel {
 
   TextEditingController searchController = TextEditingController();
 
-  SigsListViewModel() {
+  SigsPageModel() {
     Api().getSigs().then((value) {
       _originalSigs.clear();
       _originalSigs.addAll(value);
@@ -40,7 +40,7 @@ class SigsListViewModel extends MasterModel {
       if (await canLaunchUrlString(sig.link)) {
         launchUrlString(
           sig.link,
-          mode: LaunchMode.externalNonBrowserApplication,
+          mode: LaunchMode.externalApplication,
         );
       }
     };

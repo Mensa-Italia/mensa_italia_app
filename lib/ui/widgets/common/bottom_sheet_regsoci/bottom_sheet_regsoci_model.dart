@@ -90,6 +90,6 @@ class BottomSheetRegsociModel extends MasterModel {
 
   linkToProfile() async {
     String url = regSoci.linkToFullProfile;
-    navigationService.navigateToRenewMembershipWebviewView(url: url);
+    navigationService.navigateToGenericWebviewView(url: url);
   }
 }

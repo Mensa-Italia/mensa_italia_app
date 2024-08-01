@@ -4,11 +4,11 @@ import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class RenewMembershipWebviewViewModel extends MasterModel {
+class GenericWebviewViewModel extends MasterModel {
   WebViewController? controller;
   final String url;
 
-  RenewMembershipWebviewViewModel({required this.url}) {
+  GenericWebviewViewModel({required this.url}) {
     ScraperApi().getCookieJar().then((cookieManager) {
       cookieManager.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) {
         for (var cookie in cookies) {

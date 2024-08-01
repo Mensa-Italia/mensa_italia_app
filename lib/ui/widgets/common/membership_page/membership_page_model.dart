@@ -9,6 +9,7 @@ import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MembershipPageModel extends MasterModel {
   RssItem? lastBlogPost;
@@ -35,7 +36,11 @@ class MembershipPageModel extends MasterModel {
       favsAddons.clear();
       favsAddons.clear();
       if (!allowTestMakerAddon()) {
-        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
+        await prefs.setStringList(
+            "addons_fav",
+            (prefs.getStringList("addons_fav") ?? [])
+              ..removeWhere(
+                  (element) => element.startsWith("INTERNAL:testmakers")));
       }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
@@ -44,7 +49,8 @@ class MembershipPageModel extends MasterModel {
         List<String> toRemove = [];
         for (var favsAddon in favsAddons) {
           if (favsAddon.startsWith("EXTERNAL:")) {
-            if (!value.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+            if (!value
+                .any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
               toRemove.add(favsAddon);
             }
           }
@@ -101,6 +107,37 @@ class MembershipPageModel extends MasterModel {
           break;
         default:
           break;
+      }
+    };
+  }
+
+  openExternalEvent(EventModel nextEvent) {
+    return () async {
+      if (await canLaunchUrlString(nextEvent.infoLink.trim())) {
+        launchUrlString(
+          nextEvent.infoLink.trim(),
+        );
+      }
+    };
+  }
+
+  openExternalSig(SigModel lastSig) {
+    return () async {
+      if (await canLaunchUrlString(lastSig.link.trim())) {
+        launchUrlString(
+          lastSig.link.trim(),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    };
+  }
+
+  openExternalBlog(RssItem lastBlogPost) {
+    return () async {
+      if (await canLaunchUrlString(lastBlogPost.link!.trim())) {
+        launchUrlString(
+          lastBlogPost.link!.trim(),
+        );
       }
     };
   }
