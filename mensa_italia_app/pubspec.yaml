@@ -37,6 +37,10 @@ dependencies:
   validation_pro: ^1.2.0
   webview_flutter: ^4.8.0
 
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  
 dev_dependencies:
   build_runner: ^2.4.5
   flutter_test:

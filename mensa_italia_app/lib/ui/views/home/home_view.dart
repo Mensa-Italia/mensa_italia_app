@@ -8,6 +8,7 @@ import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/views/sigs_list/sigs_list_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/addon_page/addon_page.dart';
+import 'package:mensa_italia_app/ui/widgets/common/event_page/event_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/front_card_shine/front_card_shine.dart';
 import 'package:mensa_italia_app/ui/widgets/common/option_page/option_page.dart';
 import 'package:stacked/stacked.dart';
@@ -104,7 +105,7 @@ class HomeView extends StackedView<HomeViewModel> {
   Widget switchBetweenPages(HomeViewModel viewModel) {
     switch (viewModel.currentIndex) {
       case 0:
-        return const Center(child: Text("Events"));
+        return const EventPage();
       case 1:
         return const SigsListView();
       case 2:

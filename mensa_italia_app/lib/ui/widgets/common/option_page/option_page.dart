@@ -9,18 +9,14 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         CupertinoSliverNavigationBar(
-          largeTitle: const Text('Settings',
-              style: TextStyle(fontWeight: FontWeight.w900)),
-          middle: const Text('Settings',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          largeTitle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w900)),
+          middle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
           alwaysShowMiddle: false,
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
@@ -35,8 +31,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

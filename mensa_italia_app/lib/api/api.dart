@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';
+import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
@@ -87,5 +88,21 @@ class Api {
     } catch (_) {
       return null;
     }
+  }
+
+  Future<List<EventModel>> getEvents() async {
+    return await pb
+        .collection('events')
+        .getFullList(
+            sort: 'when',
+            filter: "when >= '${DateTime.now().toIso8601String()}'")
+        .then((value) {
+      return value.map((e) {
+        Map<String, dynamic> data = e.toJson();
+        data["image"] =
+            pb.files.getUrl(e, e.getStringValue("image")).toString();
+        return EventModel.fromJson(data);
+      }).toList();
+    });
   }
 }

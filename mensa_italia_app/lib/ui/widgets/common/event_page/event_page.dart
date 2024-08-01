@@ -1,17 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/model/sig.dart';
+import 'package:intl/intl.dart';
+import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
-import 'sigs_list_viewmodel.dart';
+import 'event_page_model.dart';
 
-class SigsListView extends StackedView<SigsListViewModel> {
-  const SigsListView({Key? key}) : super(key: key);
+class EventPage extends StackedView<EventPageModel> {
+  const EventPage({super.key});
 
   @override
-  Widget builder(BuildContext context, SigsListViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -22,7 +23,7 @@ class SigsListView extends StackedView<SigsListViewModel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'SiGs',
+                'Events',
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
               Container(
@@ -43,16 +44,16 @@ class SigsListView extends StackedView<SigsListViewModel> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
-            'SiGs',
+            'Events',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           alwaysShowMiddle: false,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.builder(
-          itemCount: viewModel.sigs.length,
+          itemCount: viewModel.events.length,
           itemBuilder: (context, index) {
-            return _SigTile(sig: viewModel.sigs[index]);
+            return _EventTile(event: viewModel.events[index]);
           },
         ),
         const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
@@ -61,47 +62,57 @@ class SigsListView extends StackedView<SigsListViewModel> {
   }
 
   @override
-  SigsListViewModel viewModelBuilder(BuildContext context) => SigsListViewModel();
+  EventPageModel viewModelBuilder(
+    BuildContext context,
+  ) =>
+      EventPageModel();
 }
 
-class _SigTile extends ViewModelWidget<SigsListViewModel> {
-  final SigModel sig;
+class _EventTile extends ViewModelWidget<EventPageModel> {
+  final EventModel event;
 
-  const _SigTile({Key? key, required this.sig}) : super(key: key);
+  const _EventTile({required this.event});
 
   @override
-  Widget build(BuildContext context, SigsListViewModel viewModel) {
+  Widget build(BuildContext context, EventPageModel viewModel) {
     return GestureDetector(
-      onTap: viewModel.onTapOnSIG(sig),
+      onTap: viewModel.onTapOnEvent(event),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: AspectRatio(
-          aspectRatio: 1528 / 603,
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  kcPrimaryColor,
-                  kcPrimaryColorDark,
-                ],
-              ),
-            ),
-            child: sig.image.isEmpty
-                ? Center(
-                    child: Text(
-                      sig.name,
+        padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: kcPrimaryColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CachedNetworkImage(imageUrl: event.image, fit: BoxFit.cover),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Text(
+                      event.name,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  )
-                : CachedNetworkImage(imageUrl: sig.image, fit: BoxFit.cover),
+                    const Spacer(),
+                    Text(
+                      DateFormat.yMMMd().format(event.when),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

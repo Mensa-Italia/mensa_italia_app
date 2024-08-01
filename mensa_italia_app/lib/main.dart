@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/find_locale.dart';
+import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/app/app.bottomsheets.dart';
 import 'package:mensa_italia_app/app/app.dialogs.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Intl.defaultLocale = await findSystemLocale();
   await setupLocator();
   setupDialogUi();
   setupBottomSheetUi();
@@ -25,6 +29,15 @@ class MainApp extends StatelessWidget {
       navigatorKey: StackedService.navigatorKey,
       navigatorObservers: [
         StackedService.routeObserver,
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('it'),
       ],
       theme: ThemeData(
         fontFamily: "Gotham",

@@ -94,7 +94,7 @@ class FrontCardShine extends StackedView<FrontCardShineModel> {
                       ],
                       colors: [
                         Colors.transparent,
-                        Colors.white.withOpacity(.1),
+                        Colors.white.withOpacity(.08),
                         Colors.transparent,
                       ],
                     ),

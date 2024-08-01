@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/addon.dart';
@@ -5,6 +6,10 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonPageModel extends MasterModel {
   final List<AddonModel> addons = [];
+
+  TextEditingController searchController = TextEditingController();
+
+  ScrollController scrollController = ScrollController();
 
   AddonPageModel() {
     Api().getAddons().then((value) {
@@ -26,4 +31,6 @@ class AddonPageModel extends MasterModel {
   openTestMakers() {
     navigationService.navigateToAddonTestAssistantView();
   }
+
+  void search(String value) {}
 }

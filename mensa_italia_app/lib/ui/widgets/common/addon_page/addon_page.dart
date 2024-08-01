@@ -15,16 +15,41 @@ class AddonPage extends StackedView<AddonPageModel> {
   Widget builder(
       BuildContext context, AddonPageModel viewModel, Widget? child) {
     return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: viewModel.scrollController,
+      anchor: 0.06,
       slivers: [
         CupertinoSliverNavigationBar(
-          largeTitle: const Text('Addons',
-              style: TextStyle(fontWeight: FontWeight.w900)),
-          middle: const Text('Addons',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          alwaysShowMiddle: false,
+          largeTitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Addons',
+                style: TextStyle(fontWeight: FontWeight.w900),
+              ),
+              Container(
+                height: 40,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 15, top: 3),
+                  child: CupertinoSearchTextField(
+                    onChanged: viewModel.search,
+                    controller: viewModel.searchController,
+                    prefixIcon: const Icon(CupertinoIcons.search),
+                    onSubmitted: viewModel.search,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          stretch: true,
           backgroundColor:
               Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
+          middle: const Text(
+            'Addons',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          alwaysShowMiddle: false,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(
