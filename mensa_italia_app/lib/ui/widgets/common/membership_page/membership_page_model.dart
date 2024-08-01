@@ -1,0 +1,89 @@
+import 'package:dart_rss/dart_rss.dart';
+import 'package:enefty_icons/enefty_icons.dart';
+import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/api/api.dart';
+import 'package:mensa_italia_app/api/scraperapi.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/model/addon.dart';
+import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/model/sig.dart';
+import 'package:mensa_italia_app/ui/common/master_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class MembershipPageModel extends MasterModel {
+  RssItem? lastBlogPost;
+  SigModel? lastSig;
+  EventModel? nextEvent;
+  List<AddonModel> addons = [];
+  List<String> favsAddons = [];
+
+  MembershipPageModel() {
+    ScraperApi().getBlog().then((value) {
+      lastBlogPost = value.items.first;
+      rebuildUi();
+    });
+    Api().getLastInsertedSig().then((value) {
+      lastSig = value;
+      rebuildUi();
+    });
+    Api().getFirstNextEvent().then((value) {
+      nextEvent = value;
+      rebuildUi();
+    });
+
+    SharedPreferences.getInstance().then((prefs) {
+      favsAddons.clear();
+      favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
+      Api().getAddons().then((value) {
+        addons.clear();
+        for (final addon in value) {
+          if (favsAddons.contains("EXTERNAL:${addon.id}")) {
+            addons.add(addon);
+          }
+        }
+        rebuildUi();
+      });
+    });
+  }
+
+  bool hasInternalAddon(String addonName) {
+    return favsAddons.contains("INTERNAL:${addonName.toLowerCase()}");
+  }
+
+  IconData getIconForInternalAddon(String addonName) {
+    switch (addonName.toLowerCase()) {
+      case "contacts":
+        return EneftyIcons.bookmark_outline;
+      case "testmakers":
+        return EneftyIcons.teacher_outline;
+      case "documents":
+        return EneftyIcons.document_cloud_outline;
+      default:
+        return EneftyIcons.bookmark_outline;
+    }
+  }
+
+  Function() openExternalAddon(AddonModel addon) {
+    return () {
+      navigationService.navigateToExternalAddonWebviewView(addonID: addon.id);
+    };
+  }
+
+  Function() openInternalAddon(String addonName) {
+    return () {
+      switch (addonName.toLowerCase()) {
+        case "contacts":
+          navigationService.navigateToAddonContactsView();
+          break;
+        case "testmakers":
+          navigationService.navigateToAddonTestAssistantView();
+          break;
+        case "documents":
+          navigationService.navigateToAddonAreaDocumentsView();
+          break;
+        default:
+          break;
+      }
+    };
+  }
+}

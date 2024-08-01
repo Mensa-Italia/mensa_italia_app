@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dart_rss/dart_rss.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:html/dom.dart';
+import 'package:mensa_italia_app/model/area_document.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/model/testelab.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
@@ -342,6 +344,49 @@ class ScraperApi {
     }
   }
 
+  Future<List<AreaDocumentModel>> getAreaDocument(
+      {required int page, String? search}) async {
+    try {
+      Response response;
+      response = await dio.get(
+        "https://www.cloud32.it/Associazioni/utenti/documenti/docs?docdescr=$search&datada=&dataa=&tags=&page=$page",
+        options: Options(
+          headers: getHeader(),
+          followRedirects: Platform.isAndroid,
+          validateStatus: (status) {
+            return (status ?? 0) < 500;
+          },
+        ),
+      );
+
+      Document document = html.parse(response.data);
+      List<AreaDocumentModel> testelab = [];
+      document
+          .getElementsByClassName("table")
+          .first
+          .getElementsByTagName("tr")
+          .skip(1)
+          .forEach((element) {
+        List<String> data = element
+            .getElementsByTagName("td")
+            .map((e) => e.text.trim())
+            .toList();
+        testelab.add(AreaDocumentModel(
+          description: data[1],
+          image:
+              "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+          dimension: data[6],
+          link:
+              "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+        ));
+      });
+
+      return testelab;
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<Map<String, String>> getRegSocioDeepData(String url) async {
     Response response;
     response = await dio.get(
@@ -374,8 +419,34 @@ class ScraperApi {
       }
     }).toList());
 
-    print(data);
-
     return data;
+  }
+
+  Future<String> getMyProfileSetting({required String name}) async {
+    Response response;
+    response = await dio.get(
+      "https://www.cloud32.it/Associazioni/utenti/home",
+      options: Options(
+        headers: getHeader(),
+        followRedirects: Platform.isAndroid,
+        validateStatus: (status) {
+          return (status ?? 0) < 500;
+        },
+      ),
+    );
+
+    Document document = html.parse(response.data);
+
+    for (var element in document.getElementsByTagName("a")) {
+      if (element.text.trim().toLowerCase() == name) {
+        return "https://www.cloud32.it${element.attributes["href"]}";
+      }
+    }
+
+    return "";
+  }
+
+  Future<RssFeed> getBlog() async {
+    return RssFeed.parse(await getBlogEvent());
   }
 }

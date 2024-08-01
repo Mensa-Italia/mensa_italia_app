@@ -11,7 +11,8 @@ class SigsListView extends StackedView<SigsListViewModel> {
   const SigsListView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, SigsListViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, SigsListViewModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -40,7 +41,8 @@ class SigsListView extends StackedView<SigsListViewModel> {
             ],
           ),
           stretch: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
             'SiGs',
@@ -55,13 +57,15 @@ class SigsListView extends StackedView<SigsListViewModel> {
             return _SigTile(sig: viewModel.sigs[index]);
           },
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
 
   @override
-  SigsListViewModel viewModelBuilder(BuildContext context) => SigsListViewModel();
+  SigsListViewModel viewModelBuilder(BuildContext context) =>
+      SigsListViewModel();
 }
 
 class _SigTile extends ViewModelWidget<SigsListViewModel> {

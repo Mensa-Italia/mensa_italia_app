@@ -40,6 +40,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  dart_rss: ^3.0.3
   
 dev_dependencies:
   build_runner: ^2.4.5

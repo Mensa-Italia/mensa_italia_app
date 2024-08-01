@@ -10,17 +10,32 @@ class EventPageModel extends BaseViewModel {
 
   TextEditingController searchController = TextEditingController();
 
+  List<EventModel> _originalEvents = [];
   List<EventModel> events = [];
 
   EventPageModel() {
     Api().getEvents().then((value) {
+      _originalEvents.clear();
+      _originalEvents.addAll(value);
       events.clear();
       events.addAll(value);
       rebuildUi();
     });
   }
 
-  void search(String value) {}
+  void search(String value) {
+    if (value.isEmpty) {
+      events.clear();
+      events.addAll(_originalEvents);
+      rebuildUi();
+      return;
+    }
+    events.clear();
+    events.addAll(_originalEvents.where((element) {
+      return element.name.toLowerCase().contains(value.toLowerCase());
+    }));
+    rebuildUi();
+  }
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
