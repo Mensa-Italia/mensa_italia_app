@@ -48,7 +48,9 @@ class AddonTestAssistantViewModel extends MasterModel {
   Function() tapOnCandidate(int index) {
     return () {
       final candidate = testelabs[index];
-      navigationService.navigateToGenericWebviewView(url: "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit");
+      navigationService.navigateToGenericWebviewView(
+          url:
+              "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit");
     };
   }
 

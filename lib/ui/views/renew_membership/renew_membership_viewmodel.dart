@@ -6,7 +6,8 @@ class RenewMembershipViewModel extends MasterModel {
   RenewMembershipViewModel() {}
 
   void goToRenewMembershipWebview() {
-    navigationService.navigateToGenericWebviewView(url: "https://www.cloud32.it/Associazioni/utenti/richirinnovo");
+    navigationService.navigateToGenericWebviewView(
+        url: "https://www.cloud32.it/Associazioni/utenti/richirinnovo");
   }
 
   void logout() {

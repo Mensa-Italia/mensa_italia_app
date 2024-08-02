@@ -38,7 +38,7 @@ import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_docume
   ],
   dialogs: [
     StackedDialog(classType: InfoAlertDialog),
-    // @stacked-dialog
+// @stacked-dialog
   ],
 )
 class App {}

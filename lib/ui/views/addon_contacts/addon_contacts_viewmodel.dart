@@ -3,8 +3,6 @@ import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 class AddonContactsViewModel extends MasterModel {
   List<RegSociModel> contacts = [];
@@ -49,15 +47,9 @@ class AddonContactsViewModel extends MasterModel {
   Function() tapOnContact(int index) {
     final contact = contacts[index];
     return () {
-      showMaterialModalBottomSheet(
-        context: StackedService.navigatorKey!.currentContext!,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        builder: (context) => SingleChildScrollView(
-          controller: ModalScrollController.of(context),
-          child: BottomSheetRegsoci(
-            regSoci: contact,
-          ),
+      showBeautifulBottomSheet(
+        child: BottomSheetRegsoci(
+          regSoci: contact,
         ),
       );
     };

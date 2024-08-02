@@ -25,7 +25,7 @@ class SigsPage extends StackedView<SigsPageModel> {
                 'SiGs',
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
-              Container(
+              SizedBox(
                 height: 40,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 15, top: 3),
@@ -43,6 +43,16 @@ class SigsPage extends StackedView<SigsPageModel> {
           backgroundColor:
               Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
+          trailing: viewModel.allowControlSigs()
+              ? IconButton(
+                  icon: const Icon(
+                    CupertinoIcons.add_circled_solid,
+                    size: 25,
+                    color: kcPrimaryColor,
+                  ),
+                  onPressed: viewModel.onTapAddSig,
+                )
+              : null,
           middle: const Text(
             'SiGs',
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -75,6 +85,7 @@ class _SigTile extends ViewModelWidget<SigsPageModel> {
   Widget build(BuildContext context, SigsPageModel viewModel) {
     return GestureDetector(
       onTap: viewModel.onTapOnSIG(sig),
+      onLongPress: viewModel.onLongTapEditSig(sig),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: AspectRatio(

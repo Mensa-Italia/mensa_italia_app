@@ -42,10 +42,10 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Gotham",
         scaffoldBackgroundColor: const Color.fromRGBO(241, 245, 255, 1),
-        inputDecorationTheme: const InputDecorationTheme(
+        inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: kcBackgroundColor,
-          border: OutlineInputBorder(
+          fillColor: kcBackgroundColor.withOpacity(.8),
+          border: const OutlineInputBorder(
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),

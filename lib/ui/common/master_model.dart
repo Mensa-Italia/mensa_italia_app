@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/model/user.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -33,5 +35,22 @@ class MasterModel extends ReactiveViewModel {
 
   allowControlAddons() {
     return hasPower("addons");
+  }
+
+  Future showBeautifulBottomSheet({required Widget child}) async {
+    return await showCupertinoModalBottomSheet(
+      context: StackedService.navigatorKey!.currentContext!,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: SingleChildScrollView(
+          controller: ModalScrollController.of(context),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: child,
+        ),
+      ),
+    );
   }
 }

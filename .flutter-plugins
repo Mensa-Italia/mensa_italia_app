@@ -1,7 +1,18 @@
 # This is a generated file; do not edit or check into version control.
 cronet_http=/Users/sipioteo/.pub-cache/hosted/pub.dev/cronet_http-1.3.2/
 cupertino_http=/Users/sipioteo/.pub-cache/hosted/pub.dev/cupertino_http-1.5.1/
+file_selector_linux=/Users/sipioteo/.pub-cache/hosted/pub.dev/file_selector_linux-0.9.2+1/
+file_selector_macos=/Users/sipioteo/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4/
+file_selector_windows=/Users/sipioteo/.pub-cache/hosted/pub.dev/file_selector_windows-0.9.3+2/
+flutter_plugin_android_lifecycle=/Users/sipioteo/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.21/
 gyro_provider=/Users/sipioteo/.pub-cache/hosted/pub.dev/gyro_provider-0.1.0/
+image_picker=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker-1.1.2/
+image_picker_android=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+10/
+image_picker_for_web=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_for_web-3.0.5/
+image_picker_ios=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_ios-0.8.12/
+image_picker_linux=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_linux-0.2.1+1/
+image_picker_macos=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_macos-0.2.1+1/
+image_picker_windows=/Users/sipioteo/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.1+1/
 jni=/Users/sipioteo/.pub-cache/hosted/pub.dev/jni-0.10.1/
 path_provider=/Users/sipioteo/.pub-cache/hosted/pub.dev/path_provider-2.1.3/
 path_provider_android=/Users/sipioteo/.pub-cache/hosted/pub.dev/path_provider_android-2.2.9/

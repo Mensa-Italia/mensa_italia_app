@@ -20,4 +20,8 @@ class Memoized {
   void clear() {
     _cache.clear();
   }
+
+  void remove(String s) {
+    _cache.remove(s);
+  }
 }

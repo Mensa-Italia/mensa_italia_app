@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';
@@ -7,6 +8,7 @@ import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:http/http.dart' as http;
 
 class Api {
   final Dio dio = Dio(BaseOptions(baseUrl: 'https://svc.mensa.it'));
@@ -125,7 +127,7 @@ class Api {
     if (Memoized().has("last_sig")) {
       return Memoized().get("last_sig");
     }
-    return await pb.collection('sigs').getList(page: 1, perPage: 1, sort: 'created').then((value) {
+    return await pb.collection('sigs').getList(page: 1, perPage: 1, sort: '-created').then((value) {
       Memoized().set(
           "last_sig",
           value.items.map((e) {
@@ -135,5 +137,62 @@ class Api {
           }).first);
       return Memoized().get("last_sig");
     });
+  }
+
+  Future<bool> addSig({required String name, required String link, required XFile image}) async {
+    try {
+      await pb.collection('sigs').create(
+        body: {
+          "name": name,
+          "link": link,
+        },
+        files: [
+          http.MultipartFile.fromBytes(
+            'image',
+            await image.readAsBytes(),
+            filename: image.path.split("/").last,
+          ),
+        ],
+      );
+      Memoized().remove("all_sigs");
+      Memoized().remove("last_sig");
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> updateSig({required String id, required String name, required String link, required XFile? image}) async {
+    try {
+      await pb.collection('sigs').update(
+            id,
+            body: {
+              "name": name,
+              "link": link,
+            },
+            files: image == null
+                ? []
+                : [
+                    http.MultipartFile.fromBytes(
+                      'image',
+                      await image.readAsBytes(),
+                      filename: image.path.split("/").last,
+                    ),
+                  ],
+          );
+      Memoized().remove("all_sigs");
+      Memoized().remove("last_sig");
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future deleteSig(String id) async {
+    await pb.collection('sigs').delete(id);
+    Memoized().remove("all_sigs");
+    Memoized().remove("last_sig");
   }
 }
