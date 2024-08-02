@@ -14,8 +14,7 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
   const BottomSheetAddSig({super.key, this.sig});
 
   @override
-  Widget builder(
-      BuildContext context, BottomSheetAddSigModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, BottomSheetAddSigModel viewModel, Widget? child) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -37,30 +36,31 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(EneftyIcons.trash_outline,
-                          color: Colors.transparent),
-                      onPressed: () {},
-                    ),
+                    if (sig != null)
+                      IconButton(
+                        icon: const Icon(EneftyIcons.trash_outline, color: Colors.transparent),
+                        onPressed: () {},
+                      ),
                     Expanded(
                       child: Text(
                         sig == null ? 'Create a SiG' : 'Edit SiG',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(EneftyIcons.trash_outline),
-                      onPressed: viewModel.deleteSig,
-                      color: Colors.red,
-                    ),
+                    if (sig != null)
+                      IconButton(
+                        icon: const Icon(EneftyIcons.trash_outline),
+                        onPressed: viewModel.deleteSig,
+                        color: Colors.red,
+                      ),
                   ],
                 ),
                 GestureDetector(
@@ -69,11 +69,11 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                     padding: const EdgeInsets.all(20.0),
                     child: DottedBorder(
                       borderType: BorderType.RRect,
-                      radius: Radius.circular(30),
+                      radius: const Radius.circular(30),
                       strokeWidth: 3,
                       dashPattern: [3, 5],
                       child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        borderRadius: const BorderRadius.all(Radius.circular(30)),
                         child: AspectRatio(
                           aspectRatio: 1528 / 603,
                           child: Container(
@@ -92,8 +92,7 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                                         )
                                       : null,
                             ),
-                            child: !(viewModel.imageBytes != null ||
-                                    sig?.image != null)
+                            child: !(viewModel.imageBytes != null || sig?.image != null)
                                 ? const Text(
                                     'Add Image',
                                     style: TextStyle(
@@ -168,6 +167,5 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
   }
 
   @override
-  BottomSheetAddSigModel viewModelBuilder(BuildContext context) =>
-      BottomSheetAddSigModel(sig: sig);
+  BottomSheetAddSigModel viewModelBuilder(BuildContext context) => BottomSheetAddSigModel(sig: sig);
 }
