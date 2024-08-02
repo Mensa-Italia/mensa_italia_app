@@ -52,7 +52,7 @@ jobs:
         run: echo "Build number is $BUILD_NUMBER"
 
       - name: Make Release
-        uses: ncipollo/release-action@v3
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/bundle/release/app-release.aab"
           allowUpdates: true
