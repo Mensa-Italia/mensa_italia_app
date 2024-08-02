@@ -3,7 +3,7 @@
 
     <application
         android:label="mensa_italia_app"
-        android:name="${applicationName}"
+        android:name="Mensa"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
