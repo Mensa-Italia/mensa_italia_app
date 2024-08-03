@@ -11,7 +11,8 @@ class EventsMapView extends StackedView<EventsMapViewModel> {
   const EventsMapView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, EventsMapViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventsMapViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -21,7 +22,8 @@ class EventsMapView extends StackedView<EventsMapViewModel> {
         middle: const Text('Events Map'),
       ),
       body: MapLibreMap(
-        styleString: "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
+        styleString:
+            "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
         initialCameraPosition: const CameraPosition(
           target: LatLng(42.715210940127285, 12.854392595268873),
           zoom: 4,
@@ -38,5 +40,6 @@ class EventsMapView extends StackedView<EventsMapViewModel> {
   }
 
   @override
-  EventsMapViewModel viewModelBuilder(BuildContext context) => EventsMapViewModel();
+  EventsMapViewModel viewModelBuilder(BuildContext context) =>
+      EventsMapViewModel();
 }

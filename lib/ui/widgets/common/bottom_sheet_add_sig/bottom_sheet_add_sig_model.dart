@@ -65,7 +65,7 @@ class BottomSheetAddSigModel extends MasterModel {
     final XFile? imaget = await picker.pickImage(source: ImageSource.gallery);
     if (imaget != null) {
       image = imaget;
-    } else if (Platform.isIOS) {
+    } else {
       final LostDataResponse response = await picker.retrieveLostData();
       if (response.isEmpty) {
         return;

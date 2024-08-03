@@ -44,13 +44,13 @@ class SigsPage extends StackedView<SigsPageModel> {
               Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           trailing: viewModel.allowControlSigs()
-              ? IconButton(
-                  icon: const Icon(
+              ? CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: viewModel.onTapAddSig,
+                  child: const Icon(
                     CupertinoIcons.add_circled_solid,
-                    size: 25,
                     color: kcPrimaryColor,
                   ),
-                  onPressed: viewModel.onTapAddSig,
                 )
               : null,
           middle: const Text(

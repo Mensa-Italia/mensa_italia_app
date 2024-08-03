@@ -40,7 +40,8 @@ class EventPageModel extends MasterModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
+      if (event.infoLink.trim().isNotEmpty &&
+          await canLaunchUrlString(event.infoLink.trim())) {
         launchUrlString(
           event.infoLink.trim(),
         );
@@ -55,5 +56,9 @@ class EventPageModel extends MasterModel {
 
   void navigateToMap() {
     navigationService.navigateToEventsMapView();
+  }
+
+  void navigateToAddEvent() {
+    navigationService.navigateToAddEventView();
   }
 }

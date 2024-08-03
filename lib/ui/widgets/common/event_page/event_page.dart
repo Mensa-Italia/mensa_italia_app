@@ -12,7 +12,8 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -41,17 +42,35 @@ class EventPage extends StackedView<EventPageModel> {
             ],
           ),
           stretch: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
             'Events',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           alwaysShowMiddle: false,
-          trailing: CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: viewModel.navigateToMap,
-            child: const Icon(CupertinoIcons.map),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (viewModel.allowControlEvents())
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: viewModel.navigateToAddEvent,
+                  child: const Icon(
+                    CupertinoIcons.add_circled_solid,
+                    color: kcPrimaryColor,
+                  ),
+                ),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: viewModel.navigateToMap,
+                child: const Icon(
+                  CupertinoIcons.map,
+                  color: kcPrimaryColor,
+                ),
+              )
+            ],
           ),
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
@@ -61,7 +80,8 @@ class EventPage extends StackedView<EventPageModel> {
             return _EventTile(event: viewModel.events[index]);
           },
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
