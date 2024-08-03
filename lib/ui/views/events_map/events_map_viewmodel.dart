@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:mensa_italia_app/api/api.dart';
@@ -13,7 +15,7 @@ class EventsMapViewModel extends MasterModel {
   load() {
     Api().getEvents().then((value) {
       events = value;
-      loadEventsAsMarkers();
+      advancedMapUsage();
     });
   }
 
@@ -21,18 +23,11 @@ class EventsMapViewModel extends MasterModel {
 
   void onMapCreated(MapLibreMapController controller) {
     mapController = controller;
-    loadMarkerImage('assets/images/marker.png').then((value) {
-      controller.addImage('marker_cs_image', value).then((value) {
-        loadMarkerImage('assets/images/marker_blue.png').then((value2) {
-          return controller.addImage('marker_cs_image_blue', value2);
-        });
-      });
-    });
-    controller.onSymbolTapped.add(onSymbolTapped);
+    controller.onFeatureTapped.add(onSymbolTapped);
   }
 
-  void onSymbolTapped(Symbol symbol) async {
-    final event = (symbol.data!['event'] as EventModel);
+  void onSymbolTapped(dynamic id, Point<double> point, LatLng coordinates) async {
+    final event = events.firstWhere((element) => element.id == id);
     if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
@@ -45,7 +40,7 @@ class EventsMapViewModel extends MasterModel {
     }
   }
 
-  void onStyleLoadedCallback() {
+  void onStyleLoadedCallback() async {
     mapController?.requestMyLocationLatLng().then((value) async {
       if (value != null) {
         mapController?.moveCamera(
@@ -56,32 +51,65 @@ class EventsMapViewModel extends MasterModel {
         );
       }
     });
-    load();
+    Future.delayed(const Duration(seconds: 1), () {
+      load();
+    });
   }
 
-  void loadEventsAsMarkers() {
-    for (var event in events) {
-      if (event.position == null) {
-        continue;
-      }
-      mapController?.addSymbol(
-        SymbolOptions(
-          geometry: event.position!.toLatLng(),
-          iconImage: event.isNational ? 'marker_cs_image' : 'marker_cs_image_blue',
-          iconSize: event.isNational ? 0.35 : 0.25,
-          textField: event.isNational ? event.name : null,
-          iconAnchor: 'bottom',
-          textColor: "#184295",
-          textAnchor: 'top',
-          textHaloColor: '#ffffff',
-          textHaloWidth: 2,
-          textOffset: const Offset(0, 0),
-        ),
-        {
-          'event': event,
+  void advancedMapUsage() async {
+    await loadMarkerImage('assets/images/marker.png').then((value) async {
+      await mapController!.addImage('marker_cs_image', value);
+    });
+
+    await loadMarkerImage('assets/images/marker_blue.png').then((value) async {
+      await mapController!.addImage('marker_cs_image_blue', value);
+    });
+
+    await mapController?.addSource(
+      "events-source",
+      GeojsonSourceProperties(
+        data: {
+          "type": "FeatureCollection",
+          "features": events
+              .where((e) => e.position != null)
+              .map(
+                (e) => {
+                  "type": "Feature",
+                  "id": e.id,
+                  "geometry": {
+                    "type": "Point",
+                    "coordinates": [e.position!.lon, e.position!.lat],
+                  },
+                  "properties": {
+                    "icon-image": e.isNational ? "marker_cs_image" : "marker_cs_image_blue",
+                    "icon-size": e.isNational ? 0.35 : 0.25,
+                    "title": e.isNational ? e.name : "",
+                    "event": e.toJson(),
+                  },
+                },
+              )
+              .toList(),
         },
-      );
-    }
+      ),
+    );
+    await mapController!.addSymbolLayer(
+      "events-source",
+      "events-layer",
+      const SymbolLayerProperties(
+        iconImage: "{icon-image}",
+        iconSize: ['get', 'icon-size'],
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+        iconAnchor: "bottom",
+        iconPitchAlignment: "viewport",
+        textField: "{title}",
+        textAnchor: "top",
+        textColor: "#000000",
+        textHaloColor: "#ffffff",
+        textHaloWidth: 1,
+      ),
+      enableInteraction: true,
+    );
   }
 }
 
@@ -92,10 +120,5 @@ Future<Uint8List> loadMarkerImage(String image) async {
   } catch (e) {
     print(e);
     return Uint8List(0);
-  }
-
-
-  void advancedMapUsage() async{
-    
   }
 }
