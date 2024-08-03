@@ -11,6 +11,7 @@ import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view
 import 'package:mensa_italia_app/ui/views/generic_webview/generic_webview_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_test_assistant/addon_test_assistant_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_documents_view.dart';
+import 'package:mensa_italia_app/ui/views/events_map/events_map_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -24,6 +25,7 @@ import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_docume
     MaterialRoute(page: GenericWebviewView),
     MaterialRoute(page: AddonTestAssistantView),
     MaterialRoute(page: AddonAreaDocumentsView),
+    MaterialRoute(page: EventsMapView),
 // @stacked-route
   ],
   dependencies: [

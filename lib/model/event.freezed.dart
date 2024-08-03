@@ -28,6 +28,9 @@ mixin _$EventModel {
   String get bookingLink => throw _privateConstructorUsedError;
   DateTime get when => throw _privateConstructorUsedError;
   String get contact => throw _privateConstructorUsedError;
+  bool get isNational => throw _privateConstructorUsedError;
+  @JsonKey(readValue: getDataFromExpanded)
+  LocationModel? get position => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -49,7 +52,11 @@ abstract class $EventModelCopyWith<$Res> {
       String infoLink,
       String bookingLink,
       DateTime when,
-      String contact});
+      String contact,
+      bool isNational,
+      @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
+
+  $LocationModelCopyWith<$Res>? get position;
 }
 
 /// @nodoc
@@ -73,6 +80,8 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
     Object? bookingLink = null,
     Object? when = null,
     Object? contact = null,
+    Object? isNational = null,
+    Object? position = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -107,7 +116,27 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
           ? _value.contact
           : contact // ignore: cast_nullable_to_non_nullable
               as String,
+      isNational: null == isNational
+          ? _value.isNational
+          : isNational // ignore: cast_nullable_to_non_nullable
+              as bool,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as LocationModel?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $LocationModelCopyWith<$Res>? get position {
+    if (_value.position == null) {
+      return null;
+    }
+
+    return $LocationModelCopyWith<$Res>(_value.position!, (value) {
+      return _then(_value.copyWith(position: value) as $Val);
+    });
   }
 }
 
@@ -127,7 +156,12 @@ abstract class _$$EventModelImplCopyWith<$Res>
       String infoLink,
       String bookingLink,
       DateTime when,
-      String contact});
+      String contact,
+      bool isNational,
+      @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
+
+  @override
+  $LocationModelCopyWith<$Res>? get position;
 }
 
 /// @nodoc
@@ -149,6 +183,8 @@ class __$$EventModelImplCopyWithImpl<$Res>
     Object? bookingLink = null,
     Object? when = null,
     Object? contact = null,
+    Object? isNational = null,
+    Object? position = freezed,
   }) {
     return _then(_$EventModelImpl(
       id: null == id
@@ -183,6 +219,14 @@ class __$$EventModelImplCopyWithImpl<$Res>
           ? _value.contact
           : contact // ignore: cast_nullable_to_non_nullable
               as String,
+      isNational: null == isNational
+          ? _value.isNational
+          : isNational // ignore: cast_nullable_to_non_nullable
+              as bool,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as LocationModel?,
     ));
   }
 }
@@ -198,7 +242,9 @@ class _$EventModelImpl implements _EventModel {
       required this.infoLink,
       required this.bookingLink,
       required this.when,
-      required this.contact});
+      required this.contact,
+      required this.isNational,
+      @JsonKey(readValue: getDataFromExpanded) required this.position});
 
   factory _$EventModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$EventModelImplFromJson(json);
@@ -219,10 +265,15 @@ class _$EventModelImpl implements _EventModel {
   final DateTime when;
   @override
   final String contact;
+  @override
+  final bool isNational;
+  @override
+  @JsonKey(readValue: getDataFromExpanded)
+  final LocationModel? position;
 
   @override
   String toString() {
-    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, when: $when, contact: $contact)';
+    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, when: $when, contact: $contact, isNational: $isNational, position: $position)';
   }
 
   @override
@@ -240,13 +291,17 @@ class _$EventModelImpl implements _EventModel {
             (identical(other.bookingLink, bookingLink) ||
                 other.bookingLink == bookingLink) &&
             (identical(other.when, when) || other.when == when) &&
-            (identical(other.contact, contact) || other.contact == contact));
+            (identical(other.contact, contact) || other.contact == contact) &&
+            (identical(other.isNational, isNational) ||
+                other.isNational == isNational) &&
+            (identical(other.position, position) ||
+                other.position == position));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, image, description,
-      infoLink, bookingLink, when, contact);
+      infoLink, bookingLink, when, contact, isNational, position);
 
   @JsonKey(ignore: true)
   @override
@@ -271,7 +326,10 @@ abstract class _EventModel implements EventModel {
       required final String infoLink,
       required final String bookingLink,
       required final DateTime when,
-      required final String contact}) = _$EventModelImpl;
+      required final String contact,
+      required final bool isNational,
+      @JsonKey(readValue: getDataFromExpanded)
+      required final LocationModel? position}) = _$EventModelImpl;
 
   factory _EventModel.fromJson(Map<String, dynamic> json) =
       _$EventModelImpl.fromJson;
@@ -292,6 +350,11 @@ abstract class _EventModel implements EventModel {
   DateTime get when;
   @override
   String get contact;
+  @override
+  bool get isNational;
+  @override
+  @JsonKey(readValue: getDataFromExpanded)
+  LocationModel? get position;
   @override
   @JsonKey(ignore: true)
   _$$EventModelImplCopyWith<_$EventModelImpl> get copyWith =>

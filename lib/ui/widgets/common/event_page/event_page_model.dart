@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/api/api.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
-import 'package:stacked/stacked.dart';
+import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class EventPageModel extends BaseViewModel {
+class EventPageModel extends MasterModel {
   ScrollController scrollController = ScrollController();
 
   TextEditingController searchController = TextEditingController();
 
-  List<EventModel> _originalEvents = [];
-  List<EventModel> events = [];
+  final List<EventModel> _originalEvents = [];
+  final List<EventModel> events = [];
 
   EventPageModel() {
     Api().getEvents().then((value) {
@@ -39,11 +40,20 @@ class EventPageModel extends BaseViewModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (await canLaunchUrlString(event.infoLink.trim())) {
+      if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
         launchUrlString(
           event.infoLink.trim(),
         );
+      } else {
+        dialogService.showDialog(
+          title: 'Not ready yet',
+          description: 'This event is being prepared, please try again later.',
+        );
       }
     };
+  }
+
+  void navigateToMap() {
+    navigationService.navigateToEventsMapView();
   }
 }

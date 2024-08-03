@@ -14,7 +14,8 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
   const BottomSheetAddSig({super.key, this.sig});
 
   @override
-  Widget builder(BuildContext context, BottomSheetAddSigModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, BottomSheetAddSigModel viewModel, Widget? child) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -42,7 +43,8 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                   children: [
                     if (sig != null)
                       IconButton(
-                        icon: const Icon(EneftyIcons.trash_outline, color: Colors.transparent),
+                        icon: const Icon(EneftyIcons.trash_outline,
+                            color: Colors.transparent),
                         onPressed: () {},
                       ),
                     Expanded(
@@ -73,7 +75,8 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                       strokeWidth: 3,
                       dashPattern: [3, 5],
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(30)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(30)),
                         child: AspectRatio(
                           aspectRatio: 1528 / 603,
                           child: Container(
@@ -92,7 +95,8 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                                         )
                                       : null,
                             ),
-                            child: !(viewModel.imageBytes != null || sig?.image != null)
+                            child: !(viewModel.imageBytes != null ||
+                                    sig?.image != null)
                                 ? const Text(
                                     'Add Image',
                                     style: TextStyle(
@@ -167,5 +171,6 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
   }
 
   @override
-  BottomSheetAddSigModel viewModelBuilder(BuildContext context) => BottomSheetAddSigModel(sig: sig);
+  BottomSheetAddSigModel viewModelBuilder(BuildContext context) =>
+      BottomSheetAddSigModel(sig: sig);
 }

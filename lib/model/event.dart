@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mensa_italia_app/model/location.dart';
 
 part 'event.freezed.dart';
 
@@ -15,8 +16,25 @@ class EventModel with _$EventModel {
     required String bookingLink,
     required DateTime when,
     required String contact,
+    required bool isNational,
+    @JsonKey(
+      readValue: getDataFromExpanded,
+    )
+    required LocationModel? position,
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);
+}
+
+getDataFromExpanded(Map<dynamic, dynamic> json, String key) {
+  try {
+    if (json[key] is String) {
+      return json["expand"][key];
+    } else {
+      return json[key];
+    }
+  } catch (_) {
+    return null;
+  }
 }

@@ -16,6 +16,11 @@ _$EventModelImpl _$$EventModelImplFromJson(Map<String, dynamic> json) =>
       bookingLink: json['booking_link'] as String,
       when: DateTime.parse(json['when'] as String),
       contact: json['contact'] as String,
+      isNational: json['is_national'] as bool,
+      position: getDataFromExpanded(json, 'position') == null
+          ? null
+          : LocationModel.fromJson(
+              getDataFromExpanded(json, 'position') as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$EventModelImplToJson(_$EventModelImpl instance) =>
@@ -28,4 +33,6 @@ Map<String, dynamic> _$$EventModelImplToJson(_$EventModelImpl instance) =>
       'booking_link': instance.bookingLink,
       'when': instance.when.toIso8601String(),
       'contact': instance.contact,
+      'is_national': instance.isNational,
+      'position': instance.position?.toJson(),
     };
