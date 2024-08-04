@@ -2,7 +2,6 @@ class Memoized {
   static final Memoized _instance = Memoized._internal();
   factory Memoized() => _instance;
   Memoized._internal();
-
   final Map<String, dynamic> _cache = {};
 
   void set(String key, dynamic value) {
