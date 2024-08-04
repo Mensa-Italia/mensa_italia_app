@@ -11,6 +11,10 @@ class ExternalAddonWebviewViewModel extends MasterModel {
   bool _canGoBack = true;
 
   ExternalAddonWebviewViewModel(String addonId) {
+    load(addonId);
+  }
+  load(String addonId) async {
+    await WebViewCookieManager().clearCookies();
     Api().getAddonAccessData(addonId).then(
       (value) {
         Uri url = Uri.parse('https://mensa-italia.github.io/mensa_app_addon/');

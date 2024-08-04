@@ -10,20 +10,15 @@ class GenericWebviewViewModel extends MasterModel {
 
   GenericWebviewViewModel({required this.url}) {
     ScraperApi().getCookieJar().then((cookieManager) {
-      cookieManager.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) {
+      cookieManager.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) async {
+        await WebViewCookieManager().clearCookies();
+
         for (var cookie in cookies) {
-          WebViewCookieManager().setCookie(
+          await WebViewCookieManager().setCookie(
             WebViewCookie(
               name: cookie.name,
               value: cookie.value,
               domain: cookie.domain ?? "",
-            ),
-          );
-          WebViewCookieManager().setCookie(
-            WebViewCookie(
-              name: cookie.name,
-              value: cookie.value,
-              domain: url,
             ),
           );
         }
