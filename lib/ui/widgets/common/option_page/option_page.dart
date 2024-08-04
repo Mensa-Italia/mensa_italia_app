@@ -63,7 +63,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             _SettingContainer(
               children: [
                 _OptionTile(
-                  title: "Renew Subscription",
+                  title: "Renew Membership",
                   subtitle: DateFormat.yMMMd().format(viewModel.user.expireMembership),
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.renewSubscription,

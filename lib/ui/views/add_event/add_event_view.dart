@@ -55,7 +55,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
                                   )
                                 : null,
                       ),
-                      child: !(viewModel.imageBytes != null || event?.image != null)
+                      child: !(viewModel.imageBytes != null ||
+                              event?.image != null)
                           ? const Text(
                               'Add Image',
                               style: TextStyle(

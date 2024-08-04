@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   sentry_flutter
+  syncfusion_pdfviewer_windows
   url_launcher_windows
   validation_pro
 )

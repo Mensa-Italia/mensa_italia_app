@@ -7,6 +7,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:flutter/material.dart' as _i14;
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/model/event.dart' as _i15;
 import 'package:mensa_italia_app/ui/views/add_event/add_event_view.dart'
     as _i12;
 import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_documents_view.dart'
@@ -29,7 +30,7 @@ import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view
     as _i7;
 import 'package:mensa_italia_app/ui/views/startup/startup_view.dart' as _i3;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i15;
+import 'package:stacked_services/stacked_services.dart' as _i16;
 
 class Routes {
   static const loginView = '/login-view';
@@ -167,8 +168,11 @@ class StackedRouter extends _i1.RouterBase {
     _i8.GenericWebviewView: (data) {
       final args = data.getArgs<GenericWebviewViewArguments>(nullOk: false);
       return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) =>
-            _i8.GenericWebviewView(key: args.key, url: args.url),
+        builder: (context) => _i8.GenericWebviewView(
+            key: args.key,
+            url: args.url,
+            title: args.title,
+            previousPageTitle: args.previousPageTitle),
         settings: data,
       );
     },
@@ -191,8 +195,12 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i12.AddEventView: (data) {
+      final args = data.getArgs<AddEventViewArguments>(
+        orElse: () => const AddEventViewArguments(),
+      );
       return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i12.AddEventView(),
+        builder: (context) =>
+            _i12.AddEventView(key: args.key, event: args.event),
         settings: data,
       );
     },
@@ -242,30 +250,69 @@ class GenericWebviewViewArguments {
   const GenericWebviewViewArguments({
     this.key,
     required this.url,
+    required this.title,
+    required this.previousPageTitle,
   });
 
   final _i14.Key? key;
 
   final String url;
 
+  final String title;
+
+  final String previousPageTitle;
+
   @override
   String toString() {
-    return '{"key": "$key", "url": "$url"}';
+    return '{"key": "$key", "url": "$url", "title": "$title", "previousPageTitle": "$previousPageTitle"}';
   }
 
   @override
   bool operator ==(covariant GenericWebviewViewArguments other) {
     if (identical(this, other)) return true;
-    return other.key == key && other.url == url;
+    return other.key == key &&
+        other.url == url &&
+        other.title == title &&
+        other.previousPageTitle == previousPageTitle;
   }
 
   @override
   int get hashCode {
-    return key.hashCode ^ url.hashCode;
+    return key.hashCode ^
+        url.hashCode ^
+        title.hashCode ^
+        previousPageTitle.hashCode;
   }
 }
 
-extension NavigatorStateExtension on _i15.NavigationService {
+class AddEventViewArguments {
+  const AddEventViewArguments({
+    this.key,
+    this.event,
+  });
+
+  final _i14.Key? key;
+
+  final _i15.EventModel? event;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "event": "$event"}';
+  }
+
+  @override
+  bool operator ==(covariant AddEventViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.event == event;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ event.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i16.NavigationService {
   Future<dynamic> navigateToLoginView([
     int? routerId,
     bool preventDuplicates = true,
@@ -357,6 +404,8 @@ extension NavigatorStateExtension on _i15.NavigationService {
   Future<dynamic> navigateToGenericWebviewView({
     _i14.Key? key,
     required String url,
+    required String title,
+    required String previousPageTitle,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -364,7 +413,11 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition,
   }) async {
     return navigateTo<dynamic>(Routes.genericWebviewView,
-        arguments: GenericWebviewViewArguments(key: key, url: url),
+        arguments: GenericWebviewViewArguments(
+            key: key,
+            url: url,
+            title: title,
+            previousPageTitle: previousPageTitle),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -413,14 +466,17 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToAddEventView([
+  Future<dynamic> navigateToAddEventView({
+    _i14.Key? key,
+    _i15.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return navigateTo<dynamic>(Routes.addEventView,
+        arguments: AddEventViewArguments(key: key, event: event),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -532,6 +588,8 @@ extension NavigatorStateExtension on _i15.NavigationService {
   Future<dynamic> replaceWithGenericWebviewView({
     _i14.Key? key,
     required String url,
+    required String title,
+    required String previousPageTitle,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -539,7 +597,11 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition,
   }) async {
     return replaceWith<dynamic>(Routes.genericWebviewView,
-        arguments: GenericWebviewViewArguments(key: key, url: url),
+        arguments: GenericWebviewViewArguments(
+            key: key,
+            url: url,
+            title: title,
+            previousPageTitle: previousPageTitle),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -588,14 +650,17 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithAddEventView([
+  Future<dynamic> replaceWithAddEventView({
+    _i14.Key? key,
+    _i15.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return replaceWith<dynamic>(Routes.addEventView,
+        arguments: AddEventViewArguments(key: key, event: event),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

@@ -16,8 +16,7 @@ class BottomSheetRegsociModel extends MasterModel {
   }
 
   bool hasPhoneNumbers() {
-    return deepData.containsKey("Telefono:") ||
-        deepData.containsKey("Cellulare:");
+    return deepData.containsKey("Telefono:") || deepData.containsKey("Cellulare:");
   }
 
   String getPhoneNumber() {
@@ -90,6 +89,11 @@ class BottomSheetRegsociModel extends MasterModel {
 
   linkToProfile() async {
     String url = regSoci.linkToFullProfile;
-    navigationService.navigateToGenericWebviewView(url: url);
+    await navigationService.back();
+    navigationService.navigateToGenericWebviewView(
+      url: url,
+      title: "Profile",
+      previousPageTitle: "Contacts",
+    );
   }
 }
