@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
@@ -12,18 +13,14 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         CupertinoSliverNavigationBar(
-          largeTitle: const Text('Settings',
-              style: TextStyle(fontWeight: FontWeight.w900)),
-          middle: const Text('Settings',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          largeTitle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w900)),
+          middle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
           alwaysShowMiddle: false,
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
@@ -39,26 +36,15 @@ class OptionPage extends StackedView<OptionPageModel> {
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: kcLightGrey,
-                        backgroundImage:
-                            CachedNetworkImageProvider(viewModel.user.avatar),
+                        backgroundImage: CachedNetworkImageProvider(viewModel.user.avatar),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AutoSizeText(viewModel.user.name,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 1.2)),
-                            AutoSizeText(viewModel.user.email,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                    height: 1.2)),
+                            AutoSizeText(viewModel.user.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, height: 1.2)),
+                            AutoSizeText(viewModel.user.email, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14, height: 1.2)),
                           ],
                         ),
                       ),
@@ -76,6 +62,13 @@ class OptionPage extends StackedView<OptionPageModel> {
             const SizedBox(height: 20),
             _SettingContainer(
               children: [
+                _OptionTile(
+                  title: "Renew Subscription",
+                  subtitle: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  icon: EneftyIcons.card_outline,
+                  onTap: viewModel.renewSubscription,
+                  color: Colors.orange,
+                ),
                 _OptionTile(
                   title: "Change Password",
                   icon: EneftyIcons.lock_outline,
@@ -103,8 +96,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -116,11 +108,13 @@ class OptionPage extends StackedView<OptionPageModel> {
 class _OptionTile extends StatelessWidget {
   final String title;
   final IconData icon;
+  final String subtitle;
   final Function()? onTap;
   final Color color;
   const _OptionTile({
     super.key,
     this.title = "Logout",
+    this.subtitle = "",
     this.icon = EneftyIcons.logout_outline,
     this.onTap,
     this.color = Colors.red,
@@ -131,21 +125,24 @@ class _OptionTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       dense: true,
-      title: Text(title,
-          style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-              fontSize: 16)),
+      title: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 16)),
       leading: Container(
         padding: const EdgeInsets.all(5),
-        child: Icon(icon, size: 20, color: Colors.white),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(5),
         ),
+        child: Icon(icon, size: 20, color: Colors.white),
       ),
       visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      trailing: subtitle.isEmpty
+          ? null
+          : Text.rich(
+              TextSpan(children: [
+                TextSpan(text: subtitle),
+              ]),
+              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14)),
     );
   }
 }

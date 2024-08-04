@@ -12,15 +12,20 @@ class GenericWebviewViewModel extends MasterModel {
     ScraperApi().getCookieJar().then((cookieManager) {
       cookieManager.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) {
         for (var cookie in cookies) {
-          if (cookie.name == "PHPSESSID") {
-            WebViewCookieManager().setCookie(
-              WebViewCookie(
-                name: cookie.name,
-                value: cookie.value,
-                domain: cookie.domain ?? "",
-              ),
-            );
-          }
+          WebViewCookieManager().setCookie(
+            WebViewCookie(
+              name: cookie.name,
+              value: cookie.value,
+              domain: cookie.domain ?? "",
+            ),
+          );
+          WebViewCookieManager().setCookie(
+            WebViewCookie(
+              name: cookie.name,
+              value: cookie.value,
+              domain: url,
+            ),
+          );
         }
 
         controller = WebViewController()

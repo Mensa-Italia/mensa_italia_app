@@ -69,7 +69,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               _InternalAddonButton(
                 name: "Contacts",
                 description:
-                    "You Mensa Italia contacts, you can find any contact you need!",
+                    "Your Mensa Italia contacts, you can find any contact you need!",
                 icon: const Icon(EneftyIcons.bookmark_outline,
                     color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openContacts,

@@ -35,7 +35,7 @@ class MembershipPage extends StackedView<MembershipPageModel> {
             viewModel.lastBlogPost != null) ...[
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text("Highligths"),
+            child: Text("Highlights"),
           ),
           const _highlights(),
         ],
