@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ExternalAddonWebviewViewModel extends MasterModel {
+  WebviewCookieManager cookieManager = WebviewCookieManager();
   WebViewController? controller;
   bool _canGoBack = true;
 
@@ -14,7 +16,6 @@ class ExternalAddonWebviewViewModel extends MasterModel {
     load(addonId);
   }
   load(String addonId) async {
-    await WebViewCookieManager().clearCookies();
     Api().getAddonAccessData(addonId).then(
       (value) {
         Uri url = Uri.parse('https://mensa-italia.github.io/mensa_app_addon/');

@@ -94,6 +94,14 @@ class OptionPage extends StackedView<OptionPageModel> {
                 ),
               ],
             ),
+            const SizedBox(height: 100),
+            Opacity(
+              opacity: .3,
+              child: Text(
+                "Created by Matteo Sipione\nVersion: ${viewModel.version}",
+                textAlign: TextAlign.center,
+              ),
+            ),
           ],
         ),
         const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),

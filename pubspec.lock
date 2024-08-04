@@ -830,7 +830,7 @@ packages:
     source: hosted
     version: "2.1.0"
   package_info_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: package_info_plus
       sha256: "7e76fad405b3e4016cd39d08f455a4eb5199723cf594cd1b8916d47140d93017"
@@ -1426,6 +1426,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  webview_cookie_manager:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "923e514752ad7bb7e83849f11de767a301ac57b5"
+      url: "https://github.com/fryette/webview_cookie_manager.git"
+    source: git
+    version: "2.0.7"
   webview_flutter:
     dependency: "direct main"
     description:
