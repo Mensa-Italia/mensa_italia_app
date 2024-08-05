@@ -220,8 +220,10 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i14.DocumentViewerView: (data) {
+      final args = data.getArgs<DocumentViewerViewArguments>(nullOk: false);
       return _i15.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i14.DocumentViewerView(),
+        builder: (context) => _i14.DocumentViewerView(
+            key: args.key, downlaodUrl: args.downlaodUrl),
         settings: data,
       );
     },
@@ -324,6 +326,33 @@ class AddEventViewArguments {
   @override
   int get hashCode {
     return key.hashCode ^ event.hashCode;
+  }
+}
+
+class DocumentViewerViewArguments {
+  const DocumentViewerViewArguments({
+    this.key,
+    required this.downlaodUrl,
+  });
+
+  final _i15.Key? key;
+
+  final String downlaodUrl;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "downlaodUrl": "$downlaodUrl"}';
+  }
+
+  @override
+  bool operator ==(covariant DocumentViewerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.downlaodUrl == downlaodUrl;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ downlaodUrl.hashCode;
   }
 }
 
@@ -512,14 +541,18 @@ extension NavigatorStateExtension on _i17.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToDocumentViewerView([
+  Future<dynamic> navigateToDocumentViewerView({
+    _i15.Key? key,
+    required String downlaodUrl,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return navigateTo<dynamic>(Routes.documentViewerView,
+        arguments:
+            DocumentViewerViewArguments(key: key, downlaodUrl: downlaodUrl),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -710,14 +743,18 @@ extension NavigatorStateExtension on _i17.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithDocumentViewerView([
+  Future<dynamic> replaceWithDocumentViewerView({
+    _i15.Key? key,
+    required String downlaodUrl,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return replaceWith<dynamic>(Routes.documentViewerView,
+        arguments:
+            DocumentViewerViewArguments(key: key, downlaodUrl: downlaodUrl),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

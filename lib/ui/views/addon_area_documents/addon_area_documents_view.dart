@@ -9,11 +9,7 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
   const AddonAreaDocumentsView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(
-    BuildContext context,
-    AddonAreaDocumentsViewModel viewModel,
-    Widget? child,
-  ) {
+  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel, Widget? child) {
     return Scaffold(
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -44,8 +40,7 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
             ),
             stretch: true,
             previousPageTitle: "Addons",
-            backgroundColor:
-                Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
             border: null,
             middle: const Text(
               'Documents',
@@ -91,14 +86,12 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
               },
               separatorBuilder: (context, index) => const Divider(),
             ),
-          const SliverSafeArea(
-              sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+          const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
         ],
       ),
     );
   }
 
   @override
-  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) =>
-      AddonAreaDocumentsViewModel();
+  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) => AddonAreaDocumentsViewModel();
 }

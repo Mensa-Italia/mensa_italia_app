@@ -1,7 +1,7 @@
 name: mensa_italia_app
 description: A new Flutter project.
 publish_to: "none"
-version: 20.01.01+200101
+version: 20.01.10+200110
 
 environment:
   sdk: ">=3.0.3 <4.0.0"
@@ -51,6 +51,7 @@ dependencies:
     git:
       url: https://github.com/fryette/webview_cookie_manager.git
       ref: master
+  open_filex: ^4.4.0
   
 dev_dependencies:
   build_runner: ^2.4.5

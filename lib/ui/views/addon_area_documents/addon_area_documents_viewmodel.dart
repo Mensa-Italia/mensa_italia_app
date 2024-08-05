@@ -21,9 +21,7 @@ class AddonAreaDocumentsViewModel extends MasterModel {
   }
 
   startRequestFlow() {
-    ScraperApi()
-        .getAreaDocument(page: _page, search: nameToSearch)
-        .then((value) {
+    ScraperApi().getAreaDocument(page: _page, search: nameToSearch).then((value) {
       documents.clear();
       documents.addAll(value);
       rebuildUi();
@@ -36,9 +34,7 @@ class AddonAreaDocumentsViewModel extends MasterModel {
       if (_isRequiringData) return;
       _isRequiringData = true;
       _page++;
-      ScraperApi()
-          .getAreaDocument(page: _page, search: nameToSearch)
-          .then((value) {
+      ScraperApi().getAreaDocument(page: _page, search: nameToSearch).then((value) {
         if (value.isEmpty) {
           _isRequiringData = true;
           return;
@@ -52,10 +48,10 @@ class AddonAreaDocumentsViewModel extends MasterModel {
 
   Function() onTap(AreaDocumentModel document) {
     return () async {
-      navigationService.navigateToGenericWebviewView(
-        url: document.link,
-        title: "Document",
-        previousPageTitle: "Documents",
+      navigationService.navigateToDocumentViewerView(
+        downlaodUrl: document.link,
+        //title: "Document",
+        //previousPageTitle: "Documents",
       );
     };
   }

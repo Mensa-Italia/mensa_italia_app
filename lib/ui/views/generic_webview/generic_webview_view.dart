@@ -9,16 +9,10 @@ class GenericWebviewView extends StackedView<GenericWebviewViewModel> {
   final String title;
   final String previousPageTitle;
   final String url;
-  const GenericWebviewView(
-      {Key? key,
-      required this.url,
-      required this.title,
-      required this.previousPageTitle})
-      : super(key: key);
+  const GenericWebviewView({Key? key, required this.url, required this.title, required this.previousPageTitle}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, GenericWebviewViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, GenericWebviewViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         middle: Text(title),
@@ -38,6 +32,5 @@ class GenericWebviewView extends StackedView<GenericWebviewViewModel> {
   }
 
   @override
-  GenericWebviewViewModel viewModelBuilder(BuildContext context) =>
-      GenericWebviewViewModel(url: url);
+  GenericWebviewViewModel viewModelBuilder(BuildContext context) => GenericWebviewViewModel(url: url);
 }
