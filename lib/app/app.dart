@@ -14,6 +14,7 @@ import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_docume
 import 'package:mensa_italia_app/ui/views/events_map/events_map_view.dart';
 import 'package:mensa_italia_app/ui/views/add_event/add_event_view.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_view.dart';
+import 'package:mensa_italia_app/ui/views/document_viewer/document_viewer_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -30,6 +31,7 @@ import 'package:mensa_italia_app/ui/views/map_picker/map_picker_view.dart';
     MaterialRoute(page: EventsMapView),
     MaterialRoute(page: AddEventView),
     MaterialRoute(page: MapPickerView),
+    MaterialRoute(page: DocumentViewerView),
 // @stacked-route
   ],
   dependencies: [

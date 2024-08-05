@@ -49,7 +49,8 @@ class AddonTestAssistantViewModel extends MasterModel {
     return () {
       final candidate = testelabs[index];
       navigationService.navigateToGenericWebviewView(
-        url: "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit",
+        url:
+            "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit",
         title: "Candidate",
         previousPageTitle: "Candidates",
       );

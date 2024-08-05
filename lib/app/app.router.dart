@@ -5,9 +5,9 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i14;
+import 'package:flutter/material.dart' as _i15;
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/model/event.dart' as _i15;
+import 'package:mensa_italia_app/model/event.dart' as _i16;
 import 'package:mensa_italia_app/ui/views/add_event/add_event_view.dart'
     as _i12;
 import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_documents_view.dart'
@@ -16,6 +16,8 @@ import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dar
     as _i6;
 import 'package:mensa_italia_app/ui/views/addon_test_assistant/addon_test_assistant_view.dart'
     as _i9;
+import 'package:mensa_italia_app/ui/views/document_viewer/document_viewer_view.dart'
+    as _i14;
 import 'package:mensa_italia_app/ui/views/events_map/events_map_view.dart'
     as _i11;
 import 'package:mensa_italia_app/ui/views/external_addon_webview/external_addon_webview_view.dart'
@@ -30,7 +32,7 @@ import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view
     as _i7;
 import 'package:mensa_italia_app/ui/views/startup/startup_view.dart' as _i3;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i16;
+import 'package:stacked_services/stacked_services.dart' as _i17;
 
 class Routes {
   static const loginView = '/login-view';
@@ -57,6 +59,8 @@ class Routes {
 
   static const mapPickerView = '/map-picker-view';
 
+  static const documentViewerView = '/document-viewer-view';
+
   static const all = <String>{
     loginView,
     startupView,
@@ -70,6 +74,7 @@ class Routes {
     eventsMapView,
     addEventView,
     mapPickerView,
+    documentViewerView,
   };
 }
 
@@ -123,23 +128,27 @@ class StackedRouter extends _i1.RouterBase {
       Routes.mapPickerView,
       page: _i13.MapPickerView,
     ),
+    _i1.RouteDef(
+      Routes.documentViewerView,
+      page: _i14.DocumentViewerView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.LoginView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i2.LoginView(),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.StartupView(),
         settings: data,
       );
     },
     _i4.HomeView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.HomeView(),
         settings: data,
       );
@@ -147,27 +156,27 @@ class StackedRouter extends _i1.RouterBase {
     _i5.ExternalAddonWebviewView: (data) {
       final args =
           data.getArgs<ExternalAddonWebviewViewArguments>(nullOk: false);
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i5.ExternalAddonWebviewView(key: args.key, addonID: args.addonID),
         settings: data,
       );
     },
     _i6.AddonContactsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i6.AddonContactsView(),
         settings: data,
       );
     },
     _i7.RenewMembershipView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i7.RenewMembershipView(),
         settings: data,
       );
     },
     _i8.GenericWebviewView: (data) {
       final args = data.getArgs<GenericWebviewViewArguments>(nullOk: false);
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => _i8.GenericWebviewView(
             key: args.key,
             url: args.url,
@@ -177,19 +186,19 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i9.AddonTestAssistantView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i9.AddonTestAssistantView(),
         settings: data,
       );
     },
     _i10.AddonAreaDocumentsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i10.AddonAreaDocumentsView(),
         settings: data,
       );
     },
     _i11.EventsMapView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i11.EventsMapView(),
         settings: data,
       );
@@ -198,15 +207,21 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddEventViewArguments>(
         orElse: () => const AddEventViewArguments(),
       );
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i12.AddEventView(key: args.key, event: args.event),
         settings: data,
       );
     },
     _i13.MapPickerView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i15.MaterialPageRoute<dynamic>(
         builder: (context) => const _i13.MapPickerView(),
+        settings: data,
+      );
+    },
+    _i14.DocumentViewerView: (data) {
+      return _i15.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i14.DocumentViewerView(),
         settings: data,
       );
     },
@@ -225,7 +240,7 @@ class ExternalAddonWebviewViewArguments {
     required this.addonID,
   });
 
-  final _i14.Key? key;
+  final _i15.Key? key;
 
   final String addonID;
 
@@ -254,7 +269,7 @@ class GenericWebviewViewArguments {
     required this.previousPageTitle,
   });
 
-  final _i14.Key? key;
+  final _i15.Key? key;
 
   final String url;
 
@@ -291,9 +306,9 @@ class AddEventViewArguments {
     this.event,
   });
 
-  final _i14.Key? key;
+  final _i15.Key? key;
 
-  final _i15.EventModel? event;
+  final _i16.EventModel? event;
 
   @override
   String toString() {
@@ -312,7 +327,7 @@ class AddEventViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i16.NavigationService {
+extension NavigatorStateExtension on _i17.NavigationService {
   Future<dynamic> navigateToLoginView([
     int? routerId,
     bool preventDuplicates = true,
@@ -356,7 +371,7 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> navigateToExternalAddonWebviewView({
-    _i14.Key? key,
+    _i15.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -402,7 +417,7 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> navigateToGenericWebviewView({
-    _i14.Key? key,
+    _i15.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -467,8 +482,8 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> navigateToAddEventView({
-    _i14.Key? key,
-    _i15.EventModel? event,
+    _i15.Key? key,
+    _i16.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -491,6 +506,20 @@ extension NavigatorStateExtension on _i16.NavigationService {
         transition,
   ]) async {
     return navigateTo<dynamic>(Routes.mapPickerView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToDocumentViewerView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.documentViewerView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -540,7 +569,7 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> replaceWithExternalAddonWebviewView({
-    _i14.Key? key,
+    _i15.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -586,7 +615,7 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> replaceWithGenericWebviewView({
-    _i14.Key? key,
+    _i15.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -651,8 +680,8 @@ extension NavigatorStateExtension on _i16.NavigationService {
   }
 
   Future<dynamic> replaceWithAddEventView({
-    _i14.Key? key,
-    _i15.EventModel? event,
+    _i15.Key? key,
+    _i16.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -675,6 +704,20 @@ extension NavigatorStateExtension on _i16.NavigationService {
         transition,
   ]) async {
     return replaceWith<dynamic>(Routes.mapPickerView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithDocumentViewerView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.documentViewerView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

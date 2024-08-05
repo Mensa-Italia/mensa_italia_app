@@ -27,7 +27,8 @@ class GenericWebviewViewModel extends MasterModel {
               },
               onPageFinished: (String url) async {
                 try {
-                  await controller!.runJavaScript("""const headerTag = document.querySelector('header');
+                  await controller!.runJavaScript(
+                      """const headerTag = document.querySelector('header');
 if (headerTag) {
   headerTag.remove();
 }
