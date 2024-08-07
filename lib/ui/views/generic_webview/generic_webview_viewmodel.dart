@@ -1,34 +1,28 @@
 import 'dart:ui';
-
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class GenericWebviewViewModel extends MasterModel {
-  WebviewCookieManager cookieManager = WebviewCookieManager();
-  WebViewController? controller;
-  double wholeOpacity = 0;
-  final String url;
+String jsForceLogin = """
+    var form = document.querySelector('form');
+    if (form) {
+        // Get the email and password input fields
+        var emailField = form.querySelector('input[name="email"]');
+        var passwordField = form.querySelector('input[name="password"]');
 
-  GenericWebviewViewModel({required this.url}) {
-    ScraperApi().getCookieJar().then((cookieMn) {
-      cookieMn.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) async {
-        await cookieManager.setCookies(cookies);
-        controller = WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setBackgroundColor(const Color(0x00000000))
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onProgress: (int progress) {},
-              onPageStarted: (String url) {
-                wholeOpacity = 0;
-                rebuildUi();
-              },
-              onPageFinished: (String url) async {
-                try {
-                  await controller!.runJavaScript(
-                      """const headerTag = document.querySelector('header');
+        // Check if both fields exist
+        if (emailField && passwordField) {
+            // Set the values for email and password fields
+            emailField.value = `{email}`;
+            passwordField.value = `{password}`;
+            form.submit();
+        }
+    }
+""";
+
+String jsBeautifyPage = """
+const headerTag = document.querySelector('header');
 if (headerTag) {
   headerTag.remove();
 }
@@ -49,7 +43,53 @@ const footerDiv = document.querySelector('div.footer');
 if (footerDiv) {
   footerDiv.remove();
 }
-""");
+""";
+
+String jsRedirectToURL = """
+window.location.href = `{url}`;
+""";
+
+class GenericWebviewViewModel extends MasterModel {
+  WebviewCookieManager cookieManager = WebviewCookieManager();
+  WebViewController? controller;
+  double wholeOpacity = 0;
+  final String url;
+  bool _pageOpened = false;
+
+  GenericWebviewViewModel({required this.url}) {
+    ScraperApi().getCookieJar().then((cookieMn) {
+      cookieMn.cookieJar.loadForRequest(Uri.parse(url)).then((cookies) async {
+        await cookieManager.setCookies(cookies);
+        cookieManager.clearCookies();
+        controller = WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setBackgroundColor(const Color(0x00000000))
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onProgress: (int progress) {},
+              onPageStarted: (String url) {
+                wholeOpacity = 0;
+                rebuildUi();
+              },
+              onPageFinished: (String url) async {
+                try {
+                  if (url.startsWith("https://www.cloud32.it/Associazioni/utenti/login")) {
+                    await controller!.runJavaScript(jsForceLogin
+                        .replaceAll(
+                          "{email}",
+                          await ScraperApi().getStoredEmail(),
+                        )
+                        .replaceAll(
+                          "{password}",
+                          await ScraperApi().getStoredPassword(),
+                        ));
+                  } else {
+                    await controller!.runJavaScript(jsBeautifyPage);
+                    if (!_pageOpened && url != this.url) {
+                      _pageOpened = true;
+                      await controller!.runJavaScript(jsRedirectToURL.replaceAll("{url}", this.url));
+                    }
+                  }
                 } catch (_) {}
                 wholeOpacity = 1;
                 rebuildUi();
