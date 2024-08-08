@@ -24,6 +24,7 @@ mixin _$LocationModel {
   String get name => throw _privateConstructorUsedError;
   double get lat => throw _privateConstructorUsedError;
   double get lon => throw _privateConstructorUsedError;
+  String get state => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -37,7 +38,7 @@ abstract class $LocationModelCopyWith<$Res> {
           LocationModel value, $Res Function(LocationModel) then) =
       _$LocationModelCopyWithImpl<$Res, LocationModel>;
   @useResult
-  $Res call({String id, String name, double lat, double lon});
+  $Res call({String id, String name, double lat, double lon, String state});
 }
 
 /// @nodoc
@@ -57,6 +58,7 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
     Object? name = null,
     Object? lat = null,
     Object? lon = null,
+    Object? state = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -75,6 +77,10 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
           ? _value.lon
           : lon // ignore: cast_nullable_to_non_nullable
               as double,
+      state: null == state
+          ? _value.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -87,7 +93,7 @@ abstract class _$$LocationModelImplCopyWith<$Res>
       __$$LocationModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, double lat, double lon});
+  $Res call({String id, String name, double lat, double lon, String state});
 }
 
 /// @nodoc
@@ -105,6 +111,7 @@ class __$$LocationModelImplCopyWithImpl<$Res>
     Object? name = null,
     Object? lat = null,
     Object? lon = null,
+    Object? state = null,
   }) {
     return _then(_$LocationModelImpl(
       id: null == id
@@ -123,6 +130,10 @@ class __$$LocationModelImplCopyWithImpl<$Res>
           ? _value.lon
           : lon // ignore: cast_nullable_to_non_nullable
               as double,
+      state: null == state
+          ? _value.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -134,7 +145,8 @@ class _$LocationModelImpl extends _LocationModel {
       {required this.id,
       required this.name,
       required this.lat,
-      required this.lon})
+      required this.lon,
+      required this.state})
       : super._();
 
   factory _$LocationModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -148,10 +160,12 @@ class _$LocationModelImpl extends _LocationModel {
   final double lat;
   @override
   final double lon;
+  @override
+  final String state;
 
   @override
   String toString() {
-    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon)';
+    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, state: $state)';
   }
 
   @override
@@ -162,12 +176,13 @@ class _$LocationModelImpl extends _LocationModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.lat, lat) || other.lat == lat) &&
-            (identical(other.lon, lon) || other.lon == lon));
+            (identical(other.lon, lon) || other.lon == lon) &&
+            (identical(other.state, state) || other.state == state));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, lat, lon);
+  int get hashCode => Object.hash(runtimeType, id, name, lat, lon, state);
 
   @JsonKey(ignore: true)
   @override
@@ -188,7 +203,8 @@ abstract class _LocationModel extends LocationModel {
       {required final String id,
       required final String name,
       required final double lat,
-      required final double lon}) = _$LocationModelImpl;
+      required final double lon,
+      required final String state}) = _$LocationModelImpl;
   const _LocationModel._() : super._();
 
   factory _LocationModel.fromJson(Map<String, dynamic> json) =
@@ -202,6 +218,8 @@ abstract class _LocationModel extends LocationModel {
   double get lat;
   @override
   double get lon;
+  @override
+  String get state;
   @override
   @JsonKey(ignore: true)
   _$$LocationModelImplCopyWith<_$LocationModelImpl> get copyWith =>

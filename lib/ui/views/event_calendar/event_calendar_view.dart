@@ -13,7 +13,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         backgroundColor: Colors.white.withOpacity(0.6),
@@ -72,7 +73,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   }
 
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
+  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
+      EventCalendarViewModel();
 }
 
 class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
@@ -113,7 +115,7 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
                       ),
                     ),
                     Text(
-                      DateFormat.yMMMd().format(event.when),
+                      DateFormat.yMMMd().format(event.whenStart),
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white,

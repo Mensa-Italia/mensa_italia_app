@@ -16,7 +16,8 @@ class EventModel with _$EventModel {
     required String description,
     required String infoLink,
     required String bookingLink,
-    required DateTime when,
+    required DateTime whenStart,
+    required DateTime whenEnd,
     required String contact,
     required bool isNational,
     @JsonKey(

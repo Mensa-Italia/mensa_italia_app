@@ -29,16 +29,22 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events.where((element) => isSameDay(element.when, selectedDate)).toList();
+    return events
+        .where((element) => isSameDay(element.whenStart, selectedDate))
+        .toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events.where((element) => isSameDay(element.when, day)).map((e) => e.name).toList();
+    return events
+        .where((element) => isSameDay(element.whenStart, day))
+        .map((e) => e.name)
+        .toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
+      if (event.infoLink.trim().isNotEmpty &&
+          await canLaunchUrlString(event.infoLink.trim())) {
         launchUrlString(
           event.infoLink.trim(),
         );

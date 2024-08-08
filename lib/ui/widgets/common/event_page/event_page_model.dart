@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/model/location.dart';
+import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class EventPageModel extends MasterModel {
@@ -15,6 +17,7 @@ class EventPageModel extends MasterModel {
 
   final List<EventModel> _originalEvents = [];
   final List<EventModel> events = [];
+  String selectedState = "";
   Position? position;
 
   EventPageModel() {
@@ -23,7 +26,7 @@ class EventPageModel extends MasterModel {
 
   load() async {
     try {
-      position = await determinePosition();
+      position ??= await determinePosition();
     } catch (_) {}
     Api().getEvents().then((value) {
       _originalEvents.clear();
@@ -32,6 +35,9 @@ class EventPageModel extends MasterModel {
       events.addAll(value.where((element) {
         if (element.isNational) {
           return true;
+        }
+        if (selectedState.isNotEmpty) {
+          return element.position?.state == selectedState;
         }
         if (position == null) {
           return false;
@@ -50,7 +56,7 @@ class EventPageModel extends MasterModel {
         if (!a.isNational && b.isNational) {
           return 1;
         }
-        return a.when.compareTo(b.when);
+        return a.whenStart.compareTo(b.whenStart);
       },
     );
   }
@@ -96,10 +102,70 @@ class EventPageModel extends MasterModel {
     navigationService.navigateToEventCalendarView();
   }
 
-  void changeSearchRadius() {
-    dialogService.showDialog(
-      title: 'Your location',
-      description: 'We are using your location to show you events near you. You can use the map above to see events in other locations.',
+  void changeSearchRadius() async {
+    final UsableListOfStates = ["Nearby", ...ListOfStates];
+    await showCupertinoModalPopup<void>(
+      context: StackedService.navigatorKey!.currentContext!,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Spacer(),
+                  CupertinoButton(
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        color: kcPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  itemExtent: 32.0,
+                  scrollController: FixedExtentScrollController(
+                    initialItem: UsableListOfStates.indexOf(selectedState),
+                  ),
+                  onSelectedItemChanged: (int index) {
+                    if (index == 0) {
+                      selectedState = "";
+                    } else {
+                      selectedState = UsableListOfStates[index];
+                    }
+                    rebuildUi();
+                  },
+                  children: List<Widget>.generate(
+                    UsableListOfStates.length,
+                    (int index) {
+                      return Center(
+                        child: Text(
+                          UsableListOfStates[index],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+    load();
   }
 }

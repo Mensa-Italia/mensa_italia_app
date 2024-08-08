@@ -26,7 +26,8 @@ mixin _$EventModel {
   String get description => throw _privateConstructorUsedError;
   String get infoLink => throw _privateConstructorUsedError;
   String get bookingLink => throw _privateConstructorUsedError;
-  DateTime get when => throw _privateConstructorUsedError;
+  DateTime get whenStart => throw _privateConstructorUsedError;
+  DateTime get whenEnd => throw _privateConstructorUsedError;
   String get contact => throw _privateConstructorUsedError;
   bool get isNational => throw _privateConstructorUsedError;
   @JsonKey(readValue: getDataFromExpanded)
@@ -51,7 +52,8 @@ abstract class $EventModelCopyWith<$Res> {
       String description,
       String infoLink,
       String bookingLink,
-      DateTime when,
+      DateTime whenStart,
+      DateTime whenEnd,
       String contact,
       bool isNational,
       @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
@@ -78,7 +80,8 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
     Object? description = null,
     Object? infoLink = null,
     Object? bookingLink = null,
-    Object? when = null,
+    Object? whenStart = null,
+    Object? whenEnd = null,
     Object? contact = null,
     Object? isNational = null,
     Object? position = freezed,
@@ -108,9 +111,13 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
           ? _value.bookingLink
           : bookingLink // ignore: cast_nullable_to_non_nullable
               as String,
-      when: null == when
-          ? _value.when
-          : when // ignore: cast_nullable_to_non_nullable
+      whenStart: null == whenStart
+          ? _value.whenStart
+          : whenStart // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      whenEnd: null == whenEnd
+          ? _value.whenEnd
+          : whenEnd // ignore: cast_nullable_to_non_nullable
               as DateTime,
       contact: null == contact
           ? _value.contact
@@ -155,7 +162,8 @@ abstract class _$$EventModelImplCopyWith<$Res>
       String description,
       String infoLink,
       String bookingLink,
-      DateTime when,
+      DateTime whenStart,
+      DateTime whenEnd,
       String contact,
       bool isNational,
       @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
@@ -181,7 +189,8 @@ class __$$EventModelImplCopyWithImpl<$Res>
     Object? description = null,
     Object? infoLink = null,
     Object? bookingLink = null,
-    Object? when = null,
+    Object? whenStart = null,
+    Object? whenEnd = null,
     Object? contact = null,
     Object? isNational = null,
     Object? position = freezed,
@@ -211,9 +220,13 @@ class __$$EventModelImplCopyWithImpl<$Res>
           ? _value.bookingLink
           : bookingLink // ignore: cast_nullable_to_non_nullable
               as String,
-      when: null == when
-          ? _value.when
-          : when // ignore: cast_nullable_to_non_nullable
+      whenStart: null == whenStart
+          ? _value.whenStart
+          : whenStart // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      whenEnd: null == whenEnd
+          ? _value.whenEnd
+          : whenEnd // ignore: cast_nullable_to_non_nullable
               as DateTime,
       contact: null == contact
           ? _value.contact
@@ -241,7 +254,8 @@ class _$EventModelImpl implements _EventModel {
       required this.description,
       required this.infoLink,
       required this.bookingLink,
-      required this.when,
+      required this.whenStart,
+      required this.whenEnd,
       required this.contact,
       required this.isNational,
       @JsonKey(readValue: getDataFromExpanded) required this.position});
@@ -262,7 +276,9 @@ class _$EventModelImpl implements _EventModel {
   @override
   final String bookingLink;
   @override
-  final DateTime when;
+  final DateTime whenStart;
+  @override
+  final DateTime whenEnd;
   @override
   final String contact;
   @override
@@ -273,7 +289,7 @@ class _$EventModelImpl implements _EventModel {
 
   @override
   String toString() {
-    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, when: $when, contact: $contact, isNational: $isNational, position: $position)';
+    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, position: $position)';
   }
 
   @override
@@ -290,7 +306,9 @@ class _$EventModelImpl implements _EventModel {
                 other.infoLink == infoLink) &&
             (identical(other.bookingLink, bookingLink) ||
                 other.bookingLink == bookingLink) &&
-            (identical(other.when, when) || other.when == when) &&
+            (identical(other.whenStart, whenStart) ||
+                other.whenStart == whenStart) &&
+            (identical(other.whenEnd, whenEnd) || other.whenEnd == whenEnd) &&
             (identical(other.contact, contact) || other.contact == contact) &&
             (identical(other.isNational, isNational) ||
                 other.isNational == isNational) &&
@@ -301,7 +319,7 @@ class _$EventModelImpl implements _EventModel {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, image, description,
-      infoLink, bookingLink, when, contact, isNational, position);
+      infoLink, bookingLink, whenStart, whenEnd, contact, isNational, position);
 
   @JsonKey(ignore: true)
   @override
@@ -325,7 +343,8 @@ abstract class _EventModel implements EventModel {
       required final String description,
       required final String infoLink,
       required final String bookingLink,
-      required final DateTime when,
+      required final DateTime whenStart,
+      required final DateTime whenEnd,
       required final String contact,
       required final bool isNational,
       @JsonKey(readValue: getDataFromExpanded)
@@ -347,7 +366,9 @@ abstract class _EventModel implements EventModel {
   @override
   String get bookingLink;
   @override
-  DateTime get when;
+  DateTime get whenStart;
+  @override
+  DateTime get whenEnd;
   @override
   String get contact;
   @override
