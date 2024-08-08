@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,8 +13,7 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, EventPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -23,9 +23,30 @@ class EventPage extends StackedView<EventPageModel> {
           largeTitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Events',
-                style: TextStyle(fontWeight: FontWeight.w900),
+              Row(
+                children: [
+                  const Text(
+                    'Events',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  Expanded(child: SizedBox()),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15, top: 3),
+                    child: TextButton.icon(
+                      onPressed: viewModel.changeSearchRadius,
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.only(left: 10, right: 5),
+                      ),
+                      iconAlignment: IconAlignment.end,
+                      label: const Text('Nearby (90km)', style: TextStyle(color: Colors.black, fontSize: 12)),
+                      icon: const Icon(
+                        EneftyIcons.location_bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 40,
@@ -42,26 +63,34 @@ class EventPage extends StackedView<EventPageModel> {
             ],
           ),
           stretch: true,
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
             'Events',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           alwaysShowMiddle: false,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (viewModel.allowControlEvents())
-                CupertinoButton(
+          leading: (viewModel.allowControlEvents())
+              ? CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.navigateToAddEvent,
                   child: const Icon(
                     CupertinoIcons.add_circled_solid,
                     color: kcPrimaryColor,
                   ),
+                )
+              : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: viewModel.navigateToCalendar,
+                child: const Icon(
+                  CupertinoIcons.calendar,
+                  color: kcPrimaryColor,
                 ),
+              ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: viewModel.navigateToMap,
@@ -80,8 +109,7 @@ class EventPage extends StackedView<EventPageModel> {
             return _EventTile(event: viewModel.events[index]);
           },
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

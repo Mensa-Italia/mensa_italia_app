@@ -6,14 +6,22 @@ import 'document_viewer_viewmodel.dart';
 
 class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   final String downlaodUrl;
-  const DocumentViewerView({Key? key, required this.downlaodUrl}) : super(key: key);
+  final String title;
+  final String previousPageTitle;
+  const DocumentViewerView(
+      {Key? key,
+      required this.downlaodUrl,
+      required this.title,
+      required this.previousPageTitle})
+      : super(key: key);
 
   @override
-  Widget builder(BuildContext context, DocumentViewerViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, DocumentViewerViewModel viewModel, Widget? child) {
     return Scaffold(
-      appBar: const CupertinoNavigationBar(
-        middle: Text("Document"),
-        previousPageTitle: "Documents",
+      appBar: CupertinoNavigationBar(
+        middle: Text(title),
+        previousPageTitle: previousPageTitle,
       ),
       body: viewModel.hasFailed
           ? failedInfos(viewModel)
@@ -34,7 +42,7 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   Widget failedInfos(DocumentViewerViewModel viewModel) {
     return Container(
       margin: const EdgeInsets.all(20),
-      child: Column(
+      child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -56,5 +64,6 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   }
 
   @override
-  DocumentViewerViewModel viewModelBuilder(BuildContext context) => DocumentViewerViewModel(downloadUrl: downlaodUrl);
+  DocumentViewerViewModel viewModelBuilder(BuildContext context) =>
+      DocumentViewerViewModel(downloadUrl: downlaodUrl);
 }

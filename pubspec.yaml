@@ -53,6 +53,10 @@ dependencies:
       ref: master
   open_filex: ^4.4.0
   table_calendar: ^3.1.2
+  geocoding: ^3.0.0
+  board_datetime_picker: ^2.1.0
+  geolocator: ^13.0.1
+  latlong2: ^0.9.1
   
 dev_dependencies:
   build_runner: ^2.4.5

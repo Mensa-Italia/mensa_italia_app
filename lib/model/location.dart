@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:latlong2/latlong.dart' as latlong2;
 
 part 'location.freezed.dart';
 
@@ -16,10 +17,13 @@ class LocationModel with _$LocationModel {
     required double lon,
   }) = _LocationModel;
 
-  factory LocationModel.fromJson(Map<String, dynamic> json) =>
-      _$LocationModelFromJson(json);
+  factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
 
   LatLng toLatLng() {
     return LatLng(lat, lon);
+  }
+
+  latlong2.LatLng toLatLong2() {
+    return latlong2.LatLng(lat, lon);
   }
 }

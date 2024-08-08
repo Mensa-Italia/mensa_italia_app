@@ -12,10 +12,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
 
   @override
   Widget builder(
-    BuildContext context,
-    AddEventViewModel viewModel,
-    Widget? child,
-  ) {
+      BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -79,7 +76,40 @@ class AddEventView extends StackedView<AddEventViewModel> {
                   child: TextFormField(
                     controller: viewModel.nameController,
                     decoration: const InputDecoration(
-                      labelText: 'Name',
+                      hintText: 'Name',
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
+                  child: TextFormField(
+                    controller: viewModel.descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Description',
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
+                  child: TextFormField(
+                    controller: viewModel.locationController,
+                    onTap: viewModel.pickLocation,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    decoration: const InputDecoration(
+                      hintText: 'Where',
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
+                  child: TextFormField(
+                    controller: viewModel.dateTimeEvent,
+                    onTap: viewModel.pickDateTime,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    decoration: const InputDecoration(
+                      hintText: 'When',
                     ),
                   ),
                 ),
@@ -88,34 +118,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                   child: TextFormField(
                     controller: viewModel.linkController,
                     decoration: const InputDecoration(
-                      labelText: 'Description',
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
-                  child: TextFormField(
-                    controller: viewModel.linkController,
-                    decoration: const InputDecoration(
-                      labelText: 'Location',
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
-                  child: TextFormField(
-                    controller: viewModel.linkController,
-                    decoration: const InputDecoration(
-                      labelText: 'When',
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
-                  child: TextFormField(
-                    controller: viewModel.linkController,
-                    decoration: const InputDecoration(
-                      labelText: 'Info Link',
+                      hintText: 'Info Link',
                     ),
                   ),
                 ),
@@ -135,8 +138,6 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(
-    BuildContext context,
-  ) =>
+  AddEventViewModel viewModelBuilder(BuildContext context) =>
       AddEventViewModel();
 }
