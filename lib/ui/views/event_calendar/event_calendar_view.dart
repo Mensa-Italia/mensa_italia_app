@@ -30,7 +30,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
             selectedDayPredicate: viewModel.isSelectedDay,
             eventLoader: viewModel.retrieveEvents,
             onDaySelected: viewModel.onDaySelected,
-            availableCalendarFormats: {
+            availableCalendarFormats: const {
               CalendarFormat.month: 'Month',
             },
             calendarBuilders: CalendarBuilders(

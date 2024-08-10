@@ -66,11 +66,11 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events.where((element) => isSameDay(element.whenStart, selectedDate)).toList();
+    return events.where((element) => isDateBetween(element.whenStart, element.whenEnd, selectedDate)).toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events.where((element) => isSameDay(element.whenStart, day)).map((e) => e.name).toList();
+    return events.where((element) => isDateBetween(element.whenStart, element.whenEnd, day)).map((e) => e.name).toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
@@ -150,4 +150,8 @@ class EventCalendarViewModel extends MasterModel {
     );
     load();
   }
+}
+
+bool isDateBetween(DateTime date, DateTime start, DateTime end) {
+  return (date.isAfter(normalizeDate(start)) && date.isBefore(normalizeDate(end))) || isSameDay(date, start) || isSameDay(date, end);
 }
