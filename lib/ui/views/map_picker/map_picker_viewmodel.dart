@@ -4,12 +4,12 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class LocationSelected {
   final String locationName;
-  final Placemark location;
+  final Placemark? location;
   final LatLng coordinates;
 
   LocationSelected({
     required this.locationName,
-    required this.location,
+    this.location,
     required this.coordinates,
   });
 }

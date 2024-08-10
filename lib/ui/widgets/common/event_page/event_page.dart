@@ -1,10 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/widgets/common/event_tile/event_tile.dart';
 import 'package:stacked/stacked.dart';
 
 import 'event_page_model.dart';
@@ -136,7 +134,14 @@ class EventPage extends StackedView<EventPageModel> {
         SliverList.builder(
           itemCount: viewModel.events.length,
           itemBuilder: (context, index) {
-            return _EventTile(event: viewModel.events[index]);
+            final event = viewModel.events[index];
+            return EventTile(
+              event: event,
+              onTap: viewModel.onTapOnEvent(event),
+              onLongTap: (viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper()
+                  ? viewModel.onLongTapEditEvent(event)
+                  : null,
+            );
           },
         ),
         const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
@@ -146,132 +151,4 @@ class EventPage extends StackedView<EventPageModel> {
 
   @override
   EventPageModel viewModelBuilder(BuildContext context) => EventPageModel();
-}
-
-class _EventTile extends ViewModelWidget<EventPageModel> {
-  final EventModel event;
-
-  const _EventTile({required this.event});
-
-  @override
-  Widget build(BuildContext context, EventPageModel viewModel) {
-    if (event.isNational) {
-      return GestureDetector(
-        onTap: viewModel.onTapOnEvent(event),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: kcPrimaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  child: CachedNetworkImage(
-                    imageUrl: event.image,
-                    fit: BoxFit.cover,
-                  ),
-                  aspectRatio: 16 / 9,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          event.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd().format(event.whenStart),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      return GestureDetector(
-        onTap: viewModel.onTapOnEvent(event),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-          child: Container(
-            height: 100,
-            decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: CachedNetworkImage(
-                    imageUrl: event.image,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(5).copyWith(left: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text.rich(
-                          TextSpan(
-                            text: event.name,
-                            children: [
-                              const TextSpan(text: '\n'),
-                              TextSpan(
-                                text: event.position?.state ?? "Online",
-                                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.1,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd().format(event.whenStart),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  }
 }

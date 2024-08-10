@@ -20,6 +20,7 @@ class EventModel with _$EventModel {
     required DateTime whenEnd,
     required String contact,
     required bool isNational,
+    required String owner,
     @JsonKey(
       readValue: getDataFromExpanded,
     )

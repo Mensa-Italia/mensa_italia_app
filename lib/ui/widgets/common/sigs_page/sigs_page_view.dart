@@ -1,8 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/widgets/common/sig_tile/sig_tile.dart';
 import 'package:stacked/stacked.dart';
 
 import 'sigs_page_viewmodel.dart';
@@ -43,7 +42,7 @@ class SigsPage extends StackedView<SigsPageModel> {
           backgroundColor:
               Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
-          trailing: viewModel.allowControlSigs()
+          leading: viewModel.allowControlSigs()
               ? CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.onTapAddSig,
@@ -63,7 +62,14 @@ class SigsPage extends StackedView<SigsPageModel> {
         SliverList.builder(
           itemCount: viewModel.sigs.length,
           itemBuilder: (context, index) {
-            return _SigTile(sig: viewModel.sigs[index]);
+            final sig = viewModel.sigs[index];
+            return SigTile(
+              sig: sig,
+              onTap: viewModel.onTapOnSIG(sig),
+              onLongTap: (viewModel.allowControlSigs())
+                  ? viewModel.onLongTapEditSig(sig)
+                  : null,
+            );
           },
         ),
         const SliverSafeArea(
@@ -74,50 +80,4 @@ class SigsPage extends StackedView<SigsPageModel> {
 
   @override
   SigsPageModel viewModelBuilder(BuildContext context) => SigsPageModel();
-}
-
-class _SigTile extends ViewModelWidget<SigsPageModel> {
-  final SigModel sig;
-
-  const _SigTile({Key? key, required this.sig}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, SigsPageModel viewModel) {
-    return GestureDetector(
-      onTap: viewModel.onTapOnSIG(sig),
-      onLongPress: viewModel.onLongTapEditSig(sig),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: AspectRatio(
-          aspectRatio: 1528 / 603,
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  kcPrimaryColor,
-                  kcPrimaryColorDark,
-                ],
-              ),
-            ),
-            child: sig.image.isEmpty
-                ? Center(
-                    child: Text(
-                      sig.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                : CachedNetworkImage(imageUrl: sig.image, fit: BoxFit.cover),
-          ),
-        ),
-      ),
-    );
-  }
 }

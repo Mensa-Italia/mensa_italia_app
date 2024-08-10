@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
@@ -28,6 +29,31 @@ class AddEventViewModel extends MasterModel {
   bool isNational = false;
   bool isOnline = false;
   // END FORM DATA
+
+  EventModel? eventEditing;
+  bool get isEditing => eventEditing != null;
+
+  AddEventViewModel({EventModel? event}) {
+    if (event != null) {
+      eventEditing = event;
+      nameController.text = event.name;
+      descriptionController.text = event.description;
+      linkController.text = event.infoLink;
+
+      dateTimeOptions = BoardDateTimeMultiSelection(
+        start: event.whenStart,
+        end: event.whenEnd,
+      );
+      dateTimeEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start) + " - " + DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end);
+      location = LocationSelected(
+        locationName: event.position!.name,
+        coordinates: event.position!.toLatLng(),
+      );
+      locationController.text = location!.locationName;
+      isNational = event.isNational;
+      isOnline = event.position == null;
+    }
+  }
 
   void pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -58,17 +84,33 @@ class AddEventViewModel extends MasterModel {
     if (formKey.currentState!.validate() && !isBusy) {
       setBusy(true);
       try {
-        await Api().createEvent(
-          name: nameController.text,
-          description: descriptionController.text,
-          image: image,
-          location: location,
-          link: linkController.text,
-          startDate: dateTimeOptions!.start,
-          endDate: dateTimeOptions!.end,
-          isNational: isNational,
-          isOnline: isOnline,
-        );
+        if (isEditing) {
+          print("editing");
+          await Api().updateEvent(
+            id: eventEditing!.id,
+            name: nameController.text,
+            description: descriptionController.text,
+            image: image,
+            location: location,
+            link: linkController.text,
+            startDate: dateTimeOptions!.start,
+            endDate: dateTimeOptions!.end,
+            isNational: isNational,
+            isOnline: isOnline,
+          );
+        } else {
+          await Api().createEvent(
+            name: nameController.text,
+            description: descriptionController.text,
+            image: image,
+            location: location,
+            link: linkController.text,
+            startDate: dateTimeOptions!.start,
+            endDate: dateTimeOptions!.end,
+            isNational: isNational,
+            isOnline: isOnline,
+          );
+        }
         navigationService.back();
       } catch (_) {}
       setBusy(false);
@@ -87,8 +129,8 @@ class AddEventViewModel extends MasterModel {
   void pickDateTime() {
     showBoardDateTimeMultiPicker(
       context: StackedService.navigatorKey!.currentContext!,
-      startDate: DateTime.now(),
-      endDate: DateTime.now().add(const Duration(days: 365 * 10)),
+      startDate: dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
+      endDate: dateTimeOptions?.end ?? DateTime.now().add(Duration(hours: 2, days: 2)),
       pickerType: DateTimePickerType.datetime,
       options: BoardDateTimeOptions(
         startDayOfWeek: DateTime.monday,
@@ -113,5 +155,29 @@ class AddEventViewModel extends MasterModel {
   void toggleOnline(bool value) {
     isOnline = value;
     rebuildUi();
+  }
+
+  void deleteEvent() async {
+    try {
+      if (eventEditing != null) {
+        setBusy(true);
+        await dialogService
+            .showConfirmationDialog(
+          title: 'Delete event',
+          description: 'Are you sure you want to delete this event?',
+          confirmationTitle: 'Yes',
+          cancelTitle: 'No',
+        )
+            .then(
+          (value) async {
+            if (value != null && value.confirmed == true) {
+              await Api().deleteEvent(eventEditing!.id);
+              navigationService.back();
+            }
+          },
+        );
+      }
+    } catch (_) {}
+    setBusy(false);
   }
 }

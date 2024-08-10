@@ -19,7 +19,7 @@ class MasterModel extends ReactiveViewModel {
   }
 
   hasPower(String power) {
-    return user.powers.contains(power);
+    return user.powers.contains(power) || user.powers.contains("super");
   }
 
   allowTestMakerAddon() {
@@ -36,6 +36,10 @@ class MasterModel extends ReactiveViewModel {
 
   allowControlAddons() {
     return hasPower("addons");
+  }
+
+  isSuper() {
+    return hasPower("super");
   }
 
   Future showBeautifulBottomSheet({required Widget child}) async {

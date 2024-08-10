@@ -3,40 +3,6 @@ PODS:
     - Flutter
   - device_info_plus (0.0.1):
     - Flutter
-  - DKImagePickerController/Core (4.3.9):
-    - DKImagePickerController/ImageDataManager
-    - DKImagePickerController/Resource
-  - DKImagePickerController/ImageDataManager (4.3.9)
-  - DKImagePickerController/PhotoGallery (4.3.9):
-    - DKImagePickerController/Core
-    - DKPhotoGallery
-  - DKImagePickerController/Resource (4.3.9)
-  - DKPhotoGallery (0.0.19):
-    - DKPhotoGallery/Core (= 0.0.19)
-    - DKPhotoGallery/Model (= 0.0.19)
-    - DKPhotoGallery/Preview (= 0.0.19)
-    - DKPhotoGallery/Resource (= 0.0.19)
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Core (0.0.19):
-    - DKPhotoGallery/Model
-    - DKPhotoGallery/Preview
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Model (0.0.19):
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Preview (0.0.19):
-    - DKPhotoGallery/Model
-    - DKPhotoGallery/Resource
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Resource (0.0.19):
-    - SDWebImage
-    - SwiftyGif
-  - file_picker (0.0.1):
-    - DKImagePickerController/PhotoGallery
-    - Flutter
   - Flutter (1.0.0)
   - geocoding_ios (1.0.5):
     - Flutter
@@ -57,11 +23,6 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - pointer_interceptor_ios (0.0.1):
-    - Flutter
-  - SDWebImage (5.19.6):
-    - SDWebImage/Core (= 5.19.6)
-  - SDWebImage/Core (5.19.6)
   - Sentry/HybridSDK (8.33.0)
   - sentry_flutter (8.7.0):
     - Flutter
@@ -73,7 +34,6 @@ PODS:
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
-  - SwiftyGif (5.4.5)
   - syncfusion_flutter_pdfviewer (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
@@ -88,7 +48,6 @@ PODS:
 DEPENDENCIES:
   - cupertino_http (from `.symlinks/plugins/cupertino_http/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
-  - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
@@ -98,7 +57,6 @@ DEPENDENCIES:
   - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - pointer_interceptor_ios (from `.symlinks/plugins/pointer_interceptor_ios/ios`)
   - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
@@ -110,20 +68,14 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - DKImagePickerController
-    - DKPhotoGallery
     - MapLibre
-    - SDWebImage
     - Sentry
-    - SwiftyGif
 
 EXTERNAL SOURCES:
   cupertino_http:
     :path: ".symlinks/plugins/cupertino_http/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
-  file_picker:
-    :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
   geocoding_ios:
@@ -142,8 +94,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
-  pointer_interceptor_ios:
-    :path: ".symlinks/plugins/pointer_interceptor_ios/ios"
   sentry_flutter:
     :path: ".symlinks/plugins/sentry_flutter/ios"
   shared_preferences_foundation:
@@ -164,9 +114,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   cupertino_http: 1a3a0f163c1b26e7f1a293b33d476e0fde7a64ec
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
-  DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
-  DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
-  file_picker: 15fd9539e4eb735dc54bae8c0534a7a9511a03de
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   geocoding_ios: d7460f56e80e118d57678efe5c2cdc888739ff18
   geolocator_apple: 6cbaf322953988e009e5ecb481f07efece75c450
@@ -177,13 +124,10 @@ SPEC CHECKSUMS:
   open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
   package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  pointer_interceptor_ios: 508241697ff0947f853c061945a8b822463947c1
-  SDWebImage: a79252b60f4678812d94316c91da69ec83089c9f
   Sentry: 8560050221424aef0bebc8e31eedf00af80f90a6
   sentry_flutter: e26b861f744e5037a3faf9bf56603ec65d658a61
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
-  SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   syncfusion_flutter_pdfviewer: bb9998884b864cfedf72628df3503bdf57e397c0
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
   validation_pro: 1a7be6751fb62d196fe16ba0690e4f9fac4ca65b

@@ -30,6 +30,9 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
             selectedDayPredicate: viewModel.isSelectedDay,
             eventLoader: viewModel.retrieveEvents,
             onDaySelected: viewModel.onDaySelected,
+            availableCalendarFormats: {
+              CalendarFormat.month: 'Month',
+            },
             calendarBuilders: CalendarBuilders(
               selectedBuilder: (context, date, events) => Container(
                 margin: const EdgeInsets.all(4.0),
@@ -43,6 +46,38 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
+              headerTitleBuilder: (context, title) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          DateFormat.yMMMM().format(title),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: viewModel.changeSearchRadius,
+                        iconAlignment: IconAlignment.end,
+                        style: ButtonStyle(
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor: const WidgetStatePropertyAll(Colors.white),
+                          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 10)),
+                          side: const WidgetStatePropertyAll(BorderSide(color: Colors.black)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                        ),
+                        child: Text(
+                          viewModel.selectedState,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
               dowBuilder: (context, day) {
                 if (day.weekday == DateTime.sunday) {
                   final text = DateFormat.E().format(day);

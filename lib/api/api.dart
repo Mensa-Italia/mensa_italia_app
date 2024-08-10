@@ -250,4 +250,46 @@ class Api {
     Memoized().remove("all_events");
     Memoized().remove("first_next_event");
   }
+
+  updateEvent({required String id, required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
+    String? positionId;
+    if (!isOnline) {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
+        "lat": location!.coordinates.latitude,
+        "lon": location.coordinates.longitude,
+        "name": location.locationName,
+      });
+      positionId = createPosition.id;
+    }
+    await pb.collection('events').update(
+          id,
+          body: {
+            "name": name,
+            "description": description,
+            "info_link": link,
+            "when_start": startDate.toIso8601String(),
+            "when_end": endDate.toIso8601String(),
+            "is_national": isNational,
+            "owner": pb.authStore.model.id,
+            if (!isOnline) "position": positionId,
+          },
+          files: image == null
+              ? []
+              : [
+                  http.MultipartFile.fromBytes(
+                    'image',
+                    await image.readAsBytes(),
+                    filename: image.path.split("/").last,
+                  ),
+                ],
+        );
+    Memoized().remove("all_events");
+    Memoized().remove("first_next_event");
+  }
+
+  deleteEvent(String id) async {
+    await pb.collection('events').delete(id);
+    Memoized().remove("all_events");
+    Memoized().remove("first_next_event");
+  }
 }

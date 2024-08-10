@@ -42,7 +42,10 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                   children: [
                     if (sig != null)
                       IconButton(
-                        icon: const Icon(EneftyIcons.trash_outline, color: Colors.transparent),
+                        icon: const Icon(
+                          EneftyIcons.trash_outline,
+                          color: Colors.transparent,
+                        ),
                         onPressed: () {},
                       ),
                     Expanded(

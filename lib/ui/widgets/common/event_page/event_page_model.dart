@@ -33,7 +33,7 @@ class EventPageModel extends MasterModel {
       _originalEvents.addAll(value);
       events.clear();
       events.addAll(value.where((element) {
-        if (selectedState == "All") {
+        if (selectedState == "All" || element.owner == user.id) {
           return true;
         }
         if (element.position == null && selectedState.contains("Online")) {
@@ -107,7 +107,9 @@ class EventPageModel extends MasterModel {
   }
 
   void navigateToAddEvent() {
-    navigationService.navigateToAddEventView();
+    navigationService.navigateToAddEventView().then((value) {
+      load();
+    });
   }
 
   void navigateToCalendar() {
@@ -175,5 +177,13 @@ class EventPageModel extends MasterModel {
       ),
     );
     load();
+  }
+
+  Function() onLongTapEditEvent(EventModel event) {
+    return () async {
+      navigationService.navigateToAddEventView(event: event).then((value) {
+        load();
+      });
+    };
   }
 }

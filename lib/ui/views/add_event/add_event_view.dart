@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -10,7 +12,7 @@ import 'add_event_viewmodel.dart';
 
 class AddEventView extends StackedView<AddEventViewModel> {
   final EventModel? event;
-  const AddEventView({Key? key, this.event}) : super(key: key);
+  const AddEventView({super.key, this.event});
 
   @override
   Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
@@ -19,7 +21,18 @@ class AddEventView extends StackedView<AddEventViewModel> {
       appBar: CupertinoNavigationBar(
         backgroundColor: Colors.white.withOpacity(0.6),
         previousPageTitle: "Events",
-        middle: const Text('Add Event'),
+        middle: Text(event == null ? 'Add Event' : 'Edit Event'),
+        trailing: (event != null)
+            ? IconButton(
+                
+                icon: const Icon(
+                  EneftyIcons.trash_outline,
+                  size: 22,
+                  color: Colors.red,
+                ),
+                onPressed: viewModel.deleteEvent,
+              )
+            : null,
       ),
       body: ListView(
         children: [
@@ -47,7 +60,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                               )
                             : event?.image != null
                                 ? DecorationImage(
-                                    image: NetworkImage(event!.image),
+                                    image: CachedNetworkImageProvider(event!.image),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
@@ -77,7 +90,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         children: [
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               "Is online?",
                               style: TextStyle(
@@ -98,7 +111,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         children: [
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               "Is a national event?",
                               style: TextStyle(
@@ -180,7 +193,9 @@ class AddEventView extends StackedView<AddEventViewModel> {
                             color: Colors.white.withOpacity(.8),
                             size: 20,
                           )
-                        : const Text('Add Event'),
+                        : Text(
+                            event == null ? 'Add Event' : 'Edit Event',
+                          ),
                   ),
                 ),
               ],
@@ -192,7 +207,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel();
+  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {

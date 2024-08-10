@@ -18,6 +18,7 @@ _$EventModelImpl _$$EventModelImplFromJson(Map<String, dynamic> json) =>
       whenEnd: DateTime.parse(json['when_end'] as String),
       contact: json['contact'] as String,
       isNational: json['is_national'] as bool,
+      owner: json['owner'] as String,
       position: getDataFromExpanded(json, 'position') == null
           ? null
           : LocationModel.fromJson(
@@ -36,5 +37,6 @@ Map<String, dynamic> _$$EventModelImplToJson(_$EventModelImpl instance) =>
       'when_end': instance.whenEnd.toIso8601String(),
       'contact': instance.contact,
       'is_national': instance.isNational,
+      'owner': instance.owner,
       'position': instance.position?.toJson(),
     };
