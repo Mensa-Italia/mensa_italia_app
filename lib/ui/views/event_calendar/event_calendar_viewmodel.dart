@@ -66,11 +66,11 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events.where((element) => isDateBetween(element.whenStart, element.whenEnd, selectedDate)).toList();
+    return events.where((element) => isDateBetween(selectedDate, element.whenStart, element.whenEnd)).toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events.where((element) => isDateBetween(element.whenStart, element.whenEnd, day)).map((e) => e.name).toList();
+    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).map((e) => e.name).toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
