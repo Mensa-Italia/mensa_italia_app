@@ -1,7 +1,7 @@
 name: mensa_italia_app
 description: A new Flutter project.
 publish_to: "none"
-version: 20.11.00+201100
+version: 20.12.00+201200
 
 environment:
   sdk: ">=3.0.3 <4.0.0"
@@ -57,6 +57,7 @@ dependencies:
   board_datetime_picker: ^2.1.0
   geolocator: ^13.0.1
   latlong2: ^0.9.1
+  fluttertoast: ^8.2.6
   
 dev_dependencies:
   build_runner: ^2.4.5

@@ -13,14 +13,18 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         CupertinoSliverNavigationBar(
-          largeTitle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w900)),
-          middle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+          largeTitle: const Text('Settings',
+              style: TextStyle(fontWeight: FontWeight.w900)),
+          middle: const Text('Settings',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           alwaysShowMiddle: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
@@ -35,15 +39,26 @@ class OptionPage extends StackedView<OptionPageModel> {
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: kcLightGrey,
-                        backgroundImage: CachedNetworkImageProvider(viewModel.user.avatar),
+                        backgroundImage:
+                            CachedNetworkImageProvider(viewModel.user.avatar),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AutoSizeText(viewModel.user.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, height: 1.2)),
-                            AutoSizeText(viewModel.user.email, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14, height: 1.2)),
+                            AutoSizeText(viewModel.user.name,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    height: 1.2)),
+                            AutoSizeText(viewModel.user.email,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                    height: 1.2)),
                           ],
                         ),
                       ),
@@ -56,8 +71,16 @@ class OptionPage extends StackedView<OptionPageModel> {
             _SettingContainer(
               children: [
                 _OptionTile(
+                  title: "Calendare linker",
+                  subtitle: "Mensa calendar on your phone",
+                  icon: EneftyIcons.calendar_2_outline,
+                  onTap: viewModel.openCalendarLinker,
+                  color: Colors.orange,
+                ),
+                _OptionTile(
                   title: "Renew Membership",
-                  subtitle: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  trailing: DateFormat.yMMMd()
+                      .format(viewModel.user.expireMembership),
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
@@ -97,7 +120,8 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -110,12 +134,14 @@ class _OptionTile extends StatelessWidget {
   final String title;
   final IconData icon;
   final String subtitle;
+  final String trailing;
   final Function()? onTap;
   final Color color;
   const _OptionTile({
     super.key,
     this.title = "Logout",
     this.subtitle = "",
+    this.trailing = "",
     this.icon = EneftyIcons.logout_outline,
     this.onTap,
     this.color = Colors.red,
@@ -126,7 +152,28 @@ class _OptionTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       dense: true,
-      title: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 16)),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+          fontSize: 16,
+          height: 0,
+        ),
+      ),
+      subtitle: subtitle.isEmpty
+          ? null
+          : AutoSizeText(
+              subtitle,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 12,
+                height: 0,
+              ),
+              minFontSize: 0,
+              maxLines: 1,
+            ),
       leading: Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
@@ -137,13 +184,16 @@ class _OptionTile extends StatelessWidget {
       ),
       visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-      trailing: subtitle.isEmpty
+      trailing: trailing.isEmpty
           ? null
           : Text.rich(
               TextSpan(children: [
-                TextSpan(text: subtitle),
+                TextSpan(text: trailing),
               ]),
-              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14)),
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14)),
     );
   }
 }

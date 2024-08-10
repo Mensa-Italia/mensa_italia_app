@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';
+import 'package:mensa_italia_app/model/calendar_link.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/user.dart';
@@ -251,7 +252,7 @@ class Api {
     Memoized().remove("first_next_event");
   }
 
-  updateEvent({required String id, required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
+  Future<void> updateEvent({required String id, required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
     String? positionId;
     if (!isOnline) {
       final RecordModel createPosition = await pb.collection("positions").create(body: {
@@ -287,9 +288,26 @@ class Api {
     Memoized().remove("first_next_event");
   }
 
-  deleteEvent(String id) async {
+  Future<void> deleteEvent(String id) async {
     await pb.collection('events').delete(id);
     Memoized().remove("all_events");
     Memoized().remove("first_next_event");
+  }
+
+  Future<CalendarLinkModel> getCalendarLink() async {
+    if (Memoized().has("calendar_link")) {
+      return Memoized().get("calendar_link");
+    }
+    return await pb.collection('calendar_link').getList(page: 1, perPage: 1).then((value) {
+      Memoized().set("calendar_link", CalendarLinkModel.fromJson(value.items.first.toJson()));
+      return Memoized().get("calendar_link");
+    });
+  }
+
+  Future<CalendarLinkModel> changeCalendarLinkState(String id, List<String> state) async {
+    return await pb.collection('calendar_link').update(id, body: {"state": state}).then((value) {
+      Memoized().set("calendar_link", CalendarLinkModel.fromJson(value.toJson()));
+      return Memoized().get("calendar_link");
+    });
   }
 }

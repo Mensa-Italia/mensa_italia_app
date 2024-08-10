@@ -10,8 +10,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   Intl.defaultLocale = await findSystemLocale();
   await setupLocator();
   setupDialogUi();

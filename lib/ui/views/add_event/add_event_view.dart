@@ -15,7 +15,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   const AddEventView({super.key, this.event});
 
   @override
-  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CupertinoNavigationBar(
@@ -24,7 +25,6 @@ class AddEventView extends StackedView<AddEventViewModel> {
         middle: Text(event == null ? 'Add Event' : 'Edit Event'),
         trailing: (event != null)
             ? IconButton(
-                
                 icon: const Icon(
                   EneftyIcons.trash_outline,
                   size: 22,
@@ -60,12 +60,14 @@ class AddEventView extends StackedView<AddEventViewModel> {
                               )
                             : event?.image != null
                                 ? DecorationImage(
-                                    image: CachedNetworkImageProvider(event!.image),
+                                    image: CachedNetworkImageProvider(
+                                        event!.image),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                       ),
-                      child: !(viewModel.imageBytes != null || event?.image != null)
+                      child: !(viewModel.imageBytes != null ||
+                              event?.image != null)
                           ? const Text(
                               'Add Image',
                               style: TextStyle(
@@ -207,7 +209,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
+  AddEventViewModel viewModelBuilder(BuildContext context) =>
+      AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {

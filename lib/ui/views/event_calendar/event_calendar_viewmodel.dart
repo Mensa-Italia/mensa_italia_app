@@ -29,7 +29,9 @@ class EventCalendarViewModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+        if (element.position != null &&
+            selectedState.contains("Online") &&
+            !selectedState.contains("Nearby")) {
           return false;
         }
         if (element.isNational) {
@@ -44,7 +46,9 @@ class EventCalendarViewModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
+          final distance = const Distance().distance(
+              LatLng(position!.latitude, position!.longitude),
+              element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -66,16 +70,24 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events.where((element) => isDateBetween(selectedDate, element.whenStart, element.whenEnd)).toList();
+    return events
+        .where((element) =>
+            isDateBetween(selectedDate, element.whenStart, element.whenEnd))
+        .toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).map((e) => e.name).toList();
+    return events
+        .where(
+            (element) => isDateBetween(day, element.whenStart, element.whenEnd))
+        .map((e) => e.name)
+        .toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
+      if (event.infoLink.trim().isNotEmpty &&
+          await canLaunchUrlString(event.infoLink.trim())) {
         launchUrlString(
           event.infoLink.trim(),
         );
@@ -89,7 +101,13 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", ...ListOfStates, "All"];
+    final UsableListOfStates = [
+      "Nearby & Online",
+      "Nearby",
+      "Online",
+      ...ListOfStates,
+      "All"
+    ];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (BuildContext context) => Container(
@@ -153,5 +171,8 @@ class EventCalendarViewModel extends MasterModel {
 }
 
 bool isDateBetween(DateTime date, DateTime start, DateTime end) {
-  return (date.isAfter(normalizeDate(start)) && date.isBefore(normalizeDate(end))) || isSameDay(date, start) || isSameDay(date, end);
+  return (date.isAfter(normalizeDate(start)) &&
+          date.isBefore(normalizeDate(end))) ||
+      isSameDay(date, start) ||
+      isSameDay(date, end);
 }
