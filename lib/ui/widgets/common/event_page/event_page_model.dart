@@ -17,7 +17,7 @@ class EventPageModel extends MasterModel {
 
   final List<EventModel> _originalEvents = [];
   final List<EventModel> events = [];
-  String selectedState = "";
+  String selectedState = "Nearby & Online";
   Position? position;
 
   EventPageModel() {
@@ -33,15 +33,27 @@ class EventPageModel extends MasterModel {
       _originalEvents.addAll(value);
       events.clear();
       events.addAll(value.where((element) {
+        if (selectedState == "All") {
+          return true;
+        }
+        if (element.position == null && selectedState.contains("Online")) {
+          return true;
+        }
+        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+          return false;
+        }
         if (element.isNational) {
           return true;
         }
-        if (selectedState.isNotEmpty) {
+        if (!selectedState.contains("Nearby")) {
           return element.position?.state == selectedState;
         }
         if (position == null) {
           return false;
         } else {
+          if (element.position == null) {
+            return false;
+          }
           final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
           return distance < 90000;
         }
@@ -103,7 +115,7 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = ["Nearby", ...ListOfStates];
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", ...ListOfStates, "All"];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (BuildContext context) => Container(
@@ -142,11 +154,7 @@ class EventPageModel extends MasterModel {
                     initialItem: UsableListOfStates.indexOf(selectedState),
                   ),
                   onSelectedItemChanged: (int index) {
-                    if (index == 0) {
-                      selectedState = "";
-                    } else {
-                      selectedState = UsableListOfStates[index];
-                    }
+                    selectedState = UsableListOfStates[index];
                     rebuildUi();
                   },
                   children: List<Widget>.generate(

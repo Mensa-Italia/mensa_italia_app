@@ -1,7 +1,9 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
 import 'add_event_viewmodel.dart';
@@ -11,10 +13,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   const AddEventView({Key? key, this.event}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
-      extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: CupertinoNavigationBar(
         backgroundColor: Colors.white.withOpacity(0.6),
@@ -52,8 +52,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                                   )
                                 : null,
                       ),
-                      child: !(viewModel.imageBytes != null ||
-                              event?.image != null)
+                      child: !(viewModel.imageBytes != null || event?.image != null)
                           ? const Text(
                               'Add Image',
                               style: TextStyle(
@@ -68,9 +67,56 @@ class AddEventView extends StackedView<AddEventViewModel> {
             ),
           ),
           Form(
+            key: viewModel.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                _SettingContainer(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Is online?",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          CupertinoSwitch(
+                            value: viewModel.isOnline,
+                            onChanged: viewModel.toggleOnline,
+                            activeColor: Colors.blue,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Is a national event?",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          CupertinoSwitch(
+                            value: viewModel.isNational,
+                            onChanged: viewModel.toggleNational,
+                            activeColor: Colors.blue,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: TextFormField(
@@ -84,23 +130,26 @@ class AddEventView extends StackedView<AddEventViewModel> {
                   padding: const EdgeInsets.all(20.0).copyWith(top: 0),
                   child: TextFormField(
                     controller: viewModel.descriptionController,
+                    minLines: 3,
+                    maxLines: 5,
                     decoration: const InputDecoration(
                       hintText: 'Description',
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
-                  child: TextFormField(
-                    controller: viewModel.locationController,
-                    onTap: viewModel.pickLocation,
-                    canRequestFocus: false,
-                    enableInteractiveSelection: false,
-                    decoration: const InputDecoration(
-                      hintText: 'Where',
+                if (!viewModel.isOnline)
+                  Padding(
+                    padding: const EdgeInsets.all(20.0).copyWith(top: 0),
+                    child: TextFormField(
+                      controller: viewModel.locationController,
+                      onTap: viewModel.pickLocation,
+                      canRequestFocus: false,
+                      enableInteractiveSelection: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Where',
+                      ),
                     ),
                   ),
-                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0).copyWith(top: 0),
                   child: TextFormField(
@@ -126,7 +175,12 @@ class AddEventView extends StackedView<AddEventViewModel> {
                   padding: const EdgeInsets.all(20.0),
                   child: ElevatedButton(
                     onPressed: viewModel.addEvent,
-                    child: const Text('Add Event'),
+                    child: viewModel.isBusy
+                        ? LoadingAnimationWidget.beat(
+                            color: Colors.white.withOpacity(.8),
+                            size: 20,
+                          )
+                        : const Text('Add Event'),
                   ),
                 ),
               ],
@@ -138,6 +192,33 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) =>
-      AddEventViewModel();
+  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel();
+}
+
+class _SettingContainer extends StatelessWidget {
+  final List<Widget> children;
+  const _SettingContainer({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(8).copyWith(right: 0, left: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: children.length,
+        padding: EdgeInsets.zero,
+        itemBuilder: (context, index) => children[index],
+        separatorBuilder: (context, index) => Divider(
+          indent: 50,
+          color: kcLightGrey.withOpacity(.0),
+        ),
+      ),
+    );
+  }
 }

@@ -13,8 +13,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         backgroundColor: Colors.white.withOpacity(0.6),
@@ -73,8 +72,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   }
 
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
-      EventCalendarViewModel();
+  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
 }
 
 class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
@@ -84,52 +82,123 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
 
   @override
   Widget build(BuildContext context, EventCalendarViewModel viewModel) {
-    return GestureDetector(
-      onTap: viewModel.onTapOnEvent(event),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: kcPrimaryColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CachedNetworkImage(imageUrl: event.image, fit: BoxFit.cover),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        event.name,
+    if (event.isNational) {
+      return GestureDetector(
+        onTap: viewModel.onTapOnEvent(event),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: kcPrimaryColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AspectRatio(
+                  child: CachedNetworkImage(
+                    imageUrl: event.image,
+                    fit: BoxFit.cover,
+                  ),
+                  aspectRatio: 16 / 9,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          event.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMd().format(event.whenStart),
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                           color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      DateFormat.yMMMd().format(event.whenStart),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return GestureDetector(
+        onTap: viewModel.onTapOnEvent(event),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+          child: Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: kcPrimaryColor.withOpacity(.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: CachedNetworkImage(
+                    imageUrl: event.image,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5).copyWith(left: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            text: event.name,
+                            children: [
+                              const TextSpan(text: '\n'),
+                              TextSpan(
+                                text: event.position?.state ?? "Online",
+                                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            height: 1.1,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMd().format(event.whenStart),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

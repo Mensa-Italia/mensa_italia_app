@@ -6,6 +6,7 @@ import 'package:mensa_italia_app/model/addon.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/user.dart';
+import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:http/http.dart' as http;
@@ -213,5 +214,40 @@ class Api {
     await pb.collection('sigs').delete(id);
     Memoized().remove("all_sigs");
     Memoized().remove("last_sig");
+  }
+
+  Future createEvent({required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
+    String? positionId;
+    if (!isOnline) {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
+        "lat": location!.coordinates.latitude,
+        "lon": location.coordinates.longitude,
+        "name": location.locationName,
+      });
+      positionId = createPosition.id;
+    }
+    await pb.collection('events').create(
+      body: {
+        "name": name,
+        "description": description,
+        "info_link": link,
+        "when_start": startDate.toIso8601String(),
+        "when_end": endDate.toIso8601String(),
+        "is_national": isNational,
+        "owner": pb.authStore.model.id,
+        if (!isOnline) "position": positionId,
+      },
+      files: image == null
+          ? []
+          : [
+              http.MultipartFile.fromBytes(
+                'image',
+                await image.readAsBytes(),
+                filename: image.path.split("/").last,
+              ),
+            ],
+    );
+    Memoized().remove("all_events");
+    Memoized().remove("first_next_event");
   }
 }

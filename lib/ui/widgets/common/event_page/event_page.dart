@@ -40,7 +40,7 @@ class EventPage extends StackedView<EventPageModel> {
                       ),
                       iconAlignment: IconAlignment.end,
                       label: Text(
-                        viewModel.selectedState.isEmpty ? 'Nearby (90km)' : viewModel.selectedState,
+                        viewModel.selectedState.contains("Nearby") ? "${viewModel.selectedState} (90km)" : viewModel.selectedState,
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 12,
@@ -169,7 +169,13 @@ class _EventTile extends ViewModelWidget<EventPageModel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                CachedNetworkImage(imageUrl: event.image, fit: BoxFit.cover),
+                AspectRatio(
+                  child: CachedNetworkImage(
+                    imageUrl: event.image,
+                    fit: BoxFit.cover,
+                  ),
+                  aspectRatio: 16 / 9,
+                ),
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: Row(
@@ -219,7 +225,10 @@ class _EventTile extends ViewModelWidget<EventPageModel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: CachedNetworkImage(imageUrl: event.image, fit: BoxFit.cover),
+                  child: CachedNetworkImage(
+                    imageUrl: event.image,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(5).copyWith(left: 10),
@@ -232,7 +241,7 @@ class _EventTile extends ViewModelWidget<EventPageModel> {
                             children: [
                               const TextSpan(text: '\n'),
                               TextSpan(
-                                text: event.position!.state,
+                                text: event.position?.state ?? "Online",
                                 style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
                               ),
                             ],

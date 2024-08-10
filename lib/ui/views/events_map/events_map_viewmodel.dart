@@ -14,7 +14,7 @@ class EventsMapViewModel extends MasterModel {
 
   load() {
     Api().getEvents().then((value) {
-      events = value;
+      events = value.where((element) => element.position != null).toList();
       advancedMapUsage();
     });
   }
@@ -26,11 +26,9 @@ class EventsMapViewModel extends MasterModel {
     controller.onFeatureTapped.add(onSymbolTapped);
   }
 
-  void onSymbolTapped(
-      dynamic id, Point<double> point, LatLng coordinates) async {
+  void onSymbolTapped(dynamic id, Point<double> point, LatLng coordinates) async {
     final event = events.firstWhere((element) => element.id == id);
-    if (event.infoLink.trim().isNotEmpty &&
-        await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );
@@ -83,9 +81,7 @@ class EventsMapViewModel extends MasterModel {
                     "coordinates": [e.position!.lon, e.position!.lat],
                   },
                   "properties": {
-                    "icon-image": e.isNational
-                        ? "marker_cs_image"
-                        : "marker_cs_image_blue",
+                    "icon-image": e.isNational ? "marker_cs_image" : "marker_cs_image_blue",
                     "icon-size": e.isNational ? 0.35 : 0.25,
                     "title": e.isNational ? e.name : "",
                     "event": e.toJson(),
