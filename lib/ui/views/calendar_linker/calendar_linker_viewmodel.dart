@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -30,8 +29,10 @@ class CalendarLinkerViewModel extends MasterModel {
         launchUrlString("webcal:$baseUrl");
       }
     } else {
-      if (await canLaunchUrlString("https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}")) {
-        launchUrlString("https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}");
+      if (await canLaunchUrlString(
+          "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}")) {
+        launchUrlString(
+            "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}");
       }
     }
   }
@@ -40,7 +41,8 @@ class CalendarLinkerViewModel extends MasterModel {
     print("Copying to clipboard");
     String url = "https:$baseUrl";
     if (Platform.isAndroid) {
-      url = "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}";
+      url =
+          "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}";
     }
     Clipboard.setData(ClipboardData(text: url));
     Fluttertoast.showToast(
@@ -64,7 +66,9 @@ class CalendarLinkerViewModel extends MasterModel {
       if (value) {
         newState.add(state);
       } else {
-        newState = newState..removeWhere((element) => element.toLowerCase() == state.toLowerCase());
+        newState = newState
+          ..removeWhere(
+              (element) => element.toLowerCase() == state.toLowerCase());
       }
       Api().changeCalendarLinkState(calendarLink!.id, newState).then((value) {
         calendarLink = value;

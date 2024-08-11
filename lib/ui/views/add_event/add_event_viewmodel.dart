@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
@@ -18,6 +19,7 @@ class AddEventViewModel extends MasterModel {
   Uint8List? imageBytes;
   TextEditingController locationController = TextEditingController();
   TextEditingController dateTimeEvent = TextEditingController();
+  List<EventScheduleModel> eventSchedules = [];
 
   //FORM DATA
   XFile? image;
@@ -35,6 +37,11 @@ class AddEventViewModel extends MasterModel {
 
   AddEventViewModel({EventModel? event}) {
     if (event != null) {
+      Api().getEventSchedules(event.id).then((value) {
+        eventSchedules.clear();
+        eventSchedules.addAll(value);
+        rebuildUi();
+      });
       eventEditing = event;
       nameController.text = event.name;
       descriptionController.text = event.description;
@@ -44,10 +51,7 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text =
-          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start) +
-              " - " +
-              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end);
+      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -88,7 +92,6 @@ class AddEventViewModel extends MasterModel {
       setBusy(true);
       try {
         if (isEditing) {
-          print("editing");
           await Api().updateEvent(
             id: eventEditing!.id,
             name: nameController.text,
@@ -100,6 +103,7 @@ class AddEventViewModel extends MasterModel {
             endDate: dateTimeOptions!.end,
             isNational: isNational,
             isOnline: isOnline,
+            schedules: eventSchedules,
           );
         } else {
           await Api().createEvent(
@@ -112,6 +116,7 @@ class AddEventViewModel extends MasterModel {
             endDate: dateTimeOptions!.end,
             isNational: isNational,
             isOnline: isOnline,
+            schedules: eventSchedules,
           );
         }
         navigationService.back();
@@ -132,10 +137,8 @@ class AddEventViewModel extends MasterModel {
   void pickDateTime() {
     showBoardDateTimeMultiPicker(
       context: StackedService.navigatorKey!.currentContext!,
-      startDate:
-          dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
-      endDate: dateTimeOptions?.end ??
-          DateTime.now().add(Duration(hours: 2, days: 2)),
+      startDate: dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
+      endDate: dateTimeOptions?.end ?? DateTime.now().add(Duration(hours: 2, days: 2)),
       pickerType: DateTimePickerType.datetime,
       options: BoardDateTimeOptions(
         startDayOfWeek: DateTime.monday,
@@ -147,10 +150,7 @@ class AddEventViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text =
-            DateFormat("dd/MM/yyyy HH:mm").format(value.start) +
-                " - " +
-                DateFormat("dd/MM/yyyy HH:mm").format(value.end);
+        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
       }
     });
   }
@@ -187,5 +187,11 @@ class AddEventViewModel extends MasterModel {
       }
     } catch (_) {}
     setBusy(false);
+  }
+
+  void editSchedule() {
+    navigationService.navigateToAddEventScheduleListView(
+      eventSchedules: eventSchedules,
+    );
   }
 }

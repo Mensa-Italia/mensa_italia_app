@@ -10,7 +10,8 @@ class StartupView extends StackedView<StartupViewModel> {
   const StartupView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, StartupViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, StartupViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),

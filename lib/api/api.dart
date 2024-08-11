@@ -5,6 +5,7 @@ import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';
 import 'package:mensa_italia_app/model/calendar_link.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
@@ -217,7 +218,18 @@ class Api {
     Memoized().remove("last_sig");
   }
 
-  Future createEvent({required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
+  Future createEvent({
+    required String name,
+    required String description,
+    XFile? image,
+    LocationSelected? location,
+    required String link,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isNational,
+    required bool isOnline,
+    List<EventScheduleModel> schedules = const [],
+  }) async {
     String? positionId;
     if (!isOnline) {
       final RecordModel createPosition = await pb.collection("positions").create(body: {
@@ -247,12 +259,40 @@ class Api {
                 filename: image.path.split("/").last,
               ),
             ],
-    );
+    ).then((value) async {
+      for (EventScheduleModel schedule in schedules) {
+        await pb.collection('events_schedule').create(
+          body: {
+            "title": schedule.title,
+            "description": schedule.description,
+            "when_start": schedule.whenStart.toIso8601String(),
+            "when_end": schedule.whenEnd.toIso8601String(),
+            "max_external_guests": schedule.maxExternalGuests,
+            "price": schedule.price,
+            "info_link": schedule.infoLink,
+            "is_subscriptable": schedule.isSubscriptable,
+            "event": value.id,
+          },
+        );
+      }
+    });
     Memoized().remove("all_events");
     Memoized().remove("first_next_event");
   }
 
-  Future<void> updateEvent({required String id, required String name, required String description, XFile? image, LocationSelected? location, required String link, required DateTime startDate, required DateTime endDate, required bool isNational, required bool isOnline}) async {
+  Future<void> updateEvent({
+    required String id,
+    required String name,
+    required String description,
+    XFile? image,
+    LocationSelected? location,
+    required String link,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isNational,
+    required bool isOnline,
+    List<EventScheduleModel> schedules = const [],
+  }) async {
     String? positionId;
     if (!isOnline) {
       final RecordModel createPosition = await pb.collection("positions").create(body: {
@@ -262,7 +302,9 @@ class Api {
       });
       positionId = createPosition.id;
     }
-    await pb.collection('events').update(
+    await pb
+        .collection('events')
+        .update(
           id,
           body: {
             "name": name,
@@ -283,9 +325,62 @@ class Api {
                     filename: image.path.split("/").last,
                   ),
                 ],
-        );
+        )
+        .then((value) async {
+      for (EventScheduleModel schedule in schedules) {
+        if (schedule.id == null) {
+          await pb.collection('events_schedule').create(
+            body: {
+              "title": schedule.title,
+              "description": schedule.description,
+              "when_start": schedule.whenStart.toIso8601String(),
+              "when_end": schedule.whenEnd.toIso8601String(),
+              "max_external_guests": schedule.maxExternalGuests,
+              "price": schedule.price,
+              "info_link": schedule.infoLink,
+              "is_subscriptable": schedule.isSubscriptable,
+              "event": value.id,
+            },
+          );
+        } else if (schedule.id!.startsWith("DELETE:")) {
+          try {
+            await pb.collection('events_schedule').delete(schedule.id!.split(":").last);
+          } catch (_) {}
+        } else {
+          await pb.collection('events_schedule').update(
+            schedule.id!,
+            body: {
+              "title": schedule.title,
+              "description": schedule.description,
+              "when_start": schedule.whenStart.toIso8601String(),
+              "when_end": schedule.whenEnd.toIso8601String(),
+              "max_external_guests": schedule.maxExternalGuests,
+              "price": schedule.price,
+              "info_link": schedule.infoLink,
+              "is_subscriptable": schedule.isSubscriptable,
+              "event": value.id,
+            },
+          );
+        }
+      }
+    });
     Memoized().remove("all_events");
     Memoized().remove("first_next_event");
+    Memoized().remove("event_schedules_$id");
+  }
+
+  Future<List<EventScheduleModel>> getEventSchedules(String eventId) async {
+    if (Memoized().has("event_schedules_$eventId")) {
+      return Memoized().get("event_schedules_$eventId");
+    }
+    return await pb.collection('events_schedule').getFullList(filter: "event='$eventId'").then((value) {
+      Memoized().set(
+          "event_schedules_$eventId",
+          value.map((e) {
+            return EventScheduleModel.fromJson(e.toJson());
+          }).toList());
+      return Memoized().get("event_schedules_$eventId");
+    });
   }
 
   Future<void> deleteEvent(String id) async {
@@ -309,5 +404,11 @@ class Api {
       Memoized().set("calendar_link", CalendarLinkModel.fromJson(value.toJson()));
       return Memoized().get("calendar_link");
     });
+  }
+
+  void deleteEventSchedule(String split) {
+    pb.collection('events_schedule').delete(split);
+    Memoized().remove("all_events");
+    Memoized().remove("first_next_event");
   }
 }

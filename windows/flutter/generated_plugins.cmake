@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   geolocator_windows
+  maps_launcher
   sentry_flutter
   syncfusion_pdfviewer_windows
   url_launcher_windows

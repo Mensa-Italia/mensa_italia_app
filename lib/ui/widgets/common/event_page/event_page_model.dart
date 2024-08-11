@@ -8,7 +8,6 @@ import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class EventPageModel extends MasterModel {
   ScrollController scrollController = ScrollController();
@@ -39,9 +38,7 @@ class EventPageModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null &&
-            selectedState.contains("Online") &&
-            !selectedState.contains("Nearby")) {
+        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
           return false;
         }
         if (element.isNational) {
@@ -56,9 +53,7 @@ class EventPageModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(
-              LatLng(position!.latitude, position!.longitude),
-              element.position!.toLatLong2());
+          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -93,17 +88,7 @@ class EventPageModel extends MasterModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (event.infoLink.trim().isNotEmpty &&
-          await canLaunchUrlString(event.infoLink.trim())) {
-        launchUrlString(
-          event.infoLink.trim(),
-        );
-      } else {
-        dialogService.showDialog(
-          title: 'Not ready yet',
-          description: 'This event is being prepared, please try again later.',
-        );
-      }
+      navigationService.navigateToEventShowcaseView(event: event);
     };
   }
 
@@ -122,13 +107,7 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = [
-      "Nearby & Online",
-      "Nearby",
-      "Online",
-      ...ListOfStates,
-      "All"
-    ];
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", ...ListOfStates, "All"];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (BuildContext context) => Container(

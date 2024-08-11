@@ -10,7 +10,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   const CalendarLinkerView({super.key});
 
   @override
-  Widget builder(BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: const CupertinoNavigationBar(
         previousPageTitle: "Settings",
@@ -50,7 +51,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.all(16).copyWith(left: 32, right: 32, top: 0),
+                  margin: const EdgeInsets.all(16)
+                      .copyWith(left: 32, right: 32, top: 0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -64,7 +66,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16)
+                      .copyWith(top: 16),
                   child: Text("Events subscriptions"),
                 ),
                 const Divider(indent: 16, endIndent: 16),
@@ -106,5 +109,6 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   }
 
   @override
-  CalendarLinkerViewModel viewModelBuilder(BuildContext context) => CalendarLinkerViewModel();
+  CalendarLinkerViewModel viewModelBuilder(BuildContext context) =>
+      CalendarLinkerViewModel();
 }

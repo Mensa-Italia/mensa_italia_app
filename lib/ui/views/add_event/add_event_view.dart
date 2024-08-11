@@ -15,8 +15,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
   const AddEventView({super.key, this.event});
 
   @override
-  Widget builder(
-      BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CupertinoNavigationBar(
@@ -60,14 +59,12 @@ class AddEventView extends StackedView<AddEventViewModel> {
                               )
                             : event?.image != null
                                 ? DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                        event!.image),
+                                    image: CachedNetworkImageProvider(event!.image),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                       ),
-                      child: !(viewModel.imageBytes != null ||
-                              event?.image != null)
+                      child: !(viewModel.imageBytes != null || event?.image != null)
                           ? const Text(
                               'Add Image',
                               style: TextStyle(
@@ -186,6 +183,19 @@ class AddEventView extends StackedView<AddEventViewModel> {
                     ),
                   ),
                 ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.all(8).copyWith(right: 0, left: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    onTap: viewModel.editSchedule,
+                    title: Text("Edit schedule"),
+                    trailing: const Icon(CupertinoIcons.chevron_forward),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: ElevatedButton(
@@ -209,8 +219,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) =>
-      AddEventViewModel(event: event);
+  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {
