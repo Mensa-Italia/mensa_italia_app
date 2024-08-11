@@ -20,6 +20,9 @@ class AddEventScheduleListViewModel extends MasterModel {
 
   VoidCallback tapEdit(EventScheduleModel event) {
     return () {
+      if ((event.id ?? "").startsWith("DELETE:")) {
+        return;
+      }
       navigationService.navigateToAddScheduleView(event: event).then((value) {
         if (value != null && value is EventScheduleModel) {
           eventSchedules[eventSchedules.indexOf(event)] = value;
