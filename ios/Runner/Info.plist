@@ -52,13 +52,13 @@
 		<string>mailto</string>
 		<string>webcal</string>
 	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
-	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your microphone</string>	
   	<key>NSLocationWhenInUseUsageDescription</key>
-  	<string>Mensa would like to use your location</string>
+  	<string>We use your location to provide information about the nearest Mensa Italia events.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access to your photo library is required if you want to upload an image.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to allow you to take a photo and upload it to the app.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to allow admin members to record audio during video recording.</string>
 </dict>
 </plist>

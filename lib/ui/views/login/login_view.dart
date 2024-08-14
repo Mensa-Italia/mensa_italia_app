@@ -12,8 +12,7 @@ class LoginView extends StackedView<LoginViewModel> {
   const LoginView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, LoginViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, LoginViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -47,8 +46,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 60),
+                      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 60),
                       child: const Text(
                         "Welcome to Mensa Italia,\nSign in to continue",
                         style: TextStyle(
@@ -69,6 +67,8 @@ class LoginView extends StackedView<LoginViewModel> {
                               decoration: const InputDecoration(
                                 hintText: "Email",
                               ),
+                              autocorrect: false,
+                              enableSuggestions: true,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               onSaved: viewModel.saveEmail,
@@ -80,6 +80,8 @@ class LoginView extends StackedView<LoginViewModel> {
                                 hintText: "Password",
                               ),
                               textInputAction: TextInputAction.done,
+                              autocorrect: false,
+                              enableSuggestions: false,
                               obscureText: true,
                               validator: viewModel.validatePassword,
                               onSaved: viewModel.savePassword,
@@ -88,7 +90,7 @@ class LoginView extends StackedView<LoginViewModel> {
                               children: [
                                 Expanded(child: SizedBox()),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: viewModel.goToResetPassword,
                                   child: const Text.rich(
                                     TextSpan(
                                       text: "Forgot password? ",
@@ -126,9 +128,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 20)
-                          .copyWith(top: 70),
+                      margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20).copyWith(top: 70),
                       child: const Text(
                         "There is no way to signup. You must be a Mensa member to sign in into this app.",
                         textAlign: TextAlign.center,

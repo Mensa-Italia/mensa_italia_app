@@ -66,4 +66,12 @@ class LoginViewModel extends MasterModel {
       });
     }
   }
+
+  void goToResetPassword() {
+    navigationService.navigateToGenericWebviewView(
+      url: "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
+      title: "Reset Password",
+      previousPageTitle: "Login",
+    );
+  }
 }

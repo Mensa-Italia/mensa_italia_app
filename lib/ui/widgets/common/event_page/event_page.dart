@@ -11,8 +11,7 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, EventPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: viewModel.scrollController,
@@ -39,9 +38,7 @@ class EventPage extends StackedView<EventPageModel> {
                       ),
                       iconAlignment: IconAlignment.end,
                       label: Text(
-                        viewModel.selectedState.contains("Nearby")
-                            ? "${viewModel.selectedState} (90km)"
-                            : viewModel.selectedState,
+                        viewModel.selectedState.contains("Nearby") ? "${viewModel.selectedState} (90km)" : viewModel.selectedState,
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 12,
@@ -70,8 +67,7 @@ class EventPage extends StackedView<EventPageModel> {
             ],
           ),
           stretch: true,
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
           border: null,
           middle: const Text(
             'Events',
@@ -142,16 +138,11 @@ class EventPage extends StackedView<EventPageModel> {
             return EventTile(
               event: event,
               onTap: viewModel.onTapOnEvent(event),
-              onLongTap: (viewModel.allowControlEvents() &&
-                          event.owner == viewModel.user.id) ||
-                      viewModel.isSuper()
-                  ? viewModel.onLongTapEditEvent(event)
-                  : null,
+              onLongTap: (viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper() ? viewModel.onLongTapEditEvent(event) : null,
             );
           },
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

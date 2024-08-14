@@ -41,11 +41,12 @@ class EventPageModel extends MasterModel {
         if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
           return false;
         }
-        if (element.isNational) {
-          return true;
-        }
         if (!selectedState.contains("Nearby")) {
           return element.position?.state == selectedState;
+        } else {
+          if (element.isNational) {
+            return true;
+          }
         }
         if (position == null) {
           return false;
@@ -107,7 +108,7 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", ...ListOfStates, "All"];
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", "All", ...ListOfStates];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (BuildContext context) => Container(
