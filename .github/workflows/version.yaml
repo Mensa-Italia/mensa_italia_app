@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-
+      
 jobs:
   clean_older_workflows:
     name: Clean older workflows
