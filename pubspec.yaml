@@ -51,7 +51,7 @@ dependencies:
     git:
       url: https://github.com/fryette/webview_cookie_manager.git
       ref: master
-  open_filex: ^4.4.0
+  open_filex: ^4.5.0
   table_calendar: ^3.1.2
   geocoding: ^3.0.0
   board_datetime_picker: ^2.1.1
