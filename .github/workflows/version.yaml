@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      
+
 jobs:
   clean_older_workflows:
     name: Clean older workflows
@@ -26,17 +26,22 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
         
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
+      - name: Retrieve version name
+        run: |
+          echo "VERSION=$(grep -oP '(?<=version: )(\d+\.\d+\.\d+)' ./pubspec.yaml)" >> $GITHUB_ENV
+
 
       - name: Increase version
         run: |
           perl -i -pe 's/^(version:\s+\d+\.\d+\.)(\d+)(\+)(\d+)$/$1.($2+1).$3.($4+1)/e' ./pubspec.yaml
     
-      - name: Retrieve tag name
+      - name: Retrieve new version name
         run: |
           echo "NEW_VERSION=$(grep -oP '(?<=version: )(\d+\.\d+\.\d+)' ./pubspec.yaml)" >> $GITHUB_ENV
+
+      - name: Replace all version occurrences with new version in README (wholefile.replace(version, new_version))
+        run: |
+          sed -i "s/${{ env.VERSION }}/${{ env.NEW_VERSION }}/g" README.md
           
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
