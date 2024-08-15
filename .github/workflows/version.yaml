@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "NEW_VERSION=$(grep -oP '(?<=version: )(\d+\.\d+\.\d+)' ./pubspec.yaml)" >> $GITHUB_ENV
 
-      - name: Replace all version occurrences with new version in README (wholefile.replace(version, new_version))
+      - name: Replace all version occurrences with new version in README
         run: |
           sed -i "s/${{ env.VERSION }}/${{ env.NEW_VERSION }}/g" README.md
           
