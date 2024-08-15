@@ -57,7 +57,7 @@ dependencies:
   board_datetime_picker: ^2.1.1
   geolocator: ^13.0.1
   latlong2: ^0.9.1
-  fluttertoast: ^8.2.6
+  fluttertoast: ^8.2.8
   maps_launcher: ^2.2.1
   
 dev_dependencies:
