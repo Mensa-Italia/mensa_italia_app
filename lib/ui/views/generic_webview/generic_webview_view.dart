@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -10,18 +11,17 @@ class GenericWebviewView extends StackedView<GenericWebviewViewModel> {
   final String previousPageTitle;
   final String url;
   const GenericWebviewView(
-      {Key? key,
+      {super.key,
       required this.url,
       required this.title,
-      required this.previousPageTitle})
-      : super(key: key);
+      required this.previousPageTitle});
 
   @override
   Widget builder(
       BuildContext context, GenericWebviewViewModel viewModel, Widget? child) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        middle: Text(title),
+      appBar: getAppBarPlatform(
+        title: title,
         previousPageTitle: previousPageTitle,
       ),
       body: SafeArea(

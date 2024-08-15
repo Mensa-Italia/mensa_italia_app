@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
+import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_area_documents_viewmodel.dart';
@@ -12,43 +14,17 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
   Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel,
       Widget? child) {
     return Scaffold(
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+      body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
-        anchor: 0.06,
         slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Documents',
-                  style: TextStyle(fontWeight: FontWeight.w900),
-                ),
-                Container(
-                  height: 40,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15, top: 3),
-                    child: CupertinoSearchTextField(
-                      onChanged: viewModel.search,
-                      controller: viewModel.searchController,
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      onSubmitted: viewModel.search,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            stretch: true,
+          getAppBarSliverPlatform(
+            title: "Documents",
             previousPageTitle: "Addons",
-            backgroundColor:
-                Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-            border: null,
-            middle: const Text(
-              'Documents',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            searchBarActions: SearchBarActions(
+              onChanged: viewModel.search,
+              controller: viewModel.searchController,
+              onSubmitted: viewModel.search,
             ),
-            alwaysShowMiddle: false,
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
           if (viewModel.documents.isEmpty)

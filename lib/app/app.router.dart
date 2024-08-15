@@ -5,10 +5,11 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i20;
+import 'package:flutter/material.dart' as _i22;
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/model/event.dart' as _i21;
-import 'package:mensa_italia_app/model/event_schedule.dart' as _i22;
+import 'package:mensa_italia_app/model/deal.dart' as _i25;
+import 'package:mensa_italia_app/model/event.dart' as _i23;
+import 'package:mensa_italia_app/model/event_schedule.dart' as _i24;
 import 'package:mensa_italia_app/ui/views/add_event/add_event_view.dart'
     as _i12;
 import 'package:mensa_italia_app/ui/views/add_event_schedule_list/add_event_schedule_list_view.dart'
@@ -19,6 +20,10 @@ import 'package:mensa_italia_app/ui/views/addon_area_documents/addon_area_docume
     as _i10;
 import 'package:mensa_italia_app/ui/views/addon_contacts/addon_contacts_view.dart'
     as _i6;
+import 'package:mensa_italia_app/ui/views/addon_deals/addon_deals_view.dart'
+    as _i20;
+import 'package:mensa_italia_app/ui/views/addon_deals_details/addon_deals_details_view.dart'
+    as _i21;
 import 'package:mensa_italia_app/ui/views/addon_test_assistant/addon_test_assistant_view.dart'
     as _i9;
 import 'package:mensa_italia_app/ui/views/calendar_linker/calendar_linker_view.dart'
@@ -43,7 +48,7 @@ import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view
     as _i7;
 import 'package:mensa_italia_app/ui/views/startup/startup_view.dart' as _i3;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i23;
+import 'package:stacked_services/stacked_services.dart' as _i26;
 
 class Routes {
   static const loginView = '/login-view';
@@ -82,6 +87,10 @@ class Routes {
 
   static const addScheduleView = '/add-schedule-view';
 
+  static const addonDealsView = '/addon-deals-view';
+
+  static const addonDealsDetailsView = '/addon-deals-details-view';
+
   static const all = <String>{
     loginView,
     startupView,
@@ -101,6 +110,8 @@ class Routes {
     eventShowcaseView,
     addEventScheduleListView,
     addScheduleView,
+    addonDealsView,
+    addonDealsDetailsView,
   };
 }
 
@@ -178,23 +189,31 @@ class StackedRouter extends _i1.RouterBase {
       Routes.addScheduleView,
       page: _i19.AddScheduleView,
     ),
+    _i1.RouteDef(
+      Routes.addonDealsView,
+      page: _i20.AddonDealsView,
+    ),
+    _i1.RouteDef(
+      Routes.addonDealsDetailsView,
+      page: _i21.AddonDealsDetailsView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.LoginView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i2.LoginView(),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.StartupView(),
         settings: data,
       );
     },
     _i4.HomeView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.HomeView(),
         settings: data,
       );
@@ -202,27 +221,27 @@ class StackedRouter extends _i1.RouterBase {
     _i5.ExternalAddonWebviewView: (data) {
       final args =
           data.getArgs<ExternalAddonWebviewViewArguments>(nullOk: false);
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i5.ExternalAddonWebviewView(key: args.key, addonID: args.addonID),
         settings: data,
       );
     },
     _i6.AddonContactsView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i6.AddonContactsView(),
         settings: data,
       );
     },
     _i7.RenewMembershipView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i7.RenewMembershipView(),
         settings: data,
       );
     },
     _i8.GenericWebviewView: (data) {
       final args = data.getArgs<GenericWebviewViewArguments>(nullOk: false);
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => _i8.GenericWebviewView(
             key: args.key,
             url: args.url,
@@ -232,19 +251,19 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i9.AddonTestAssistantView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i9.AddonTestAssistantView(),
         settings: data,
       );
     },
     _i10.AddonAreaDocumentsView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i10.AddonAreaDocumentsView(),
         settings: data,
       );
     },
     _i11.EventsMapView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i11.EventsMapView(),
         settings: data,
       );
@@ -253,21 +272,21 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddEventViewArguments>(
         orElse: () => const AddEventViewArguments(),
       );
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i12.AddEventView(key: args.key, event: args.event),
         settings: data,
       );
     },
     _i13.MapPickerView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i13.MapPickerView(),
         settings: data,
       );
     },
     _i14.DocumentViewerView: (data) {
       final args = data.getArgs<DocumentViewerViewArguments>(nullOk: false);
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => _i14.DocumentViewerView(
             key: args.key,
             downlaodUrl: args.downlaodUrl,
@@ -277,20 +296,20 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i15.EventCalendarView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i15.EventCalendarView(),
         settings: data,
       );
     },
     _i16.CalendarLinkerView: (data) {
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => const _i16.CalendarLinkerView(),
         settings: data,
       );
     },
     _i17.EventShowcaseView: (data) {
       final args = data.getArgs<EventShowcaseViewArguments>(nullOk: false);
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i17.EventShowcaseView(key: args.key, event: args.event),
         settings: data,
@@ -299,7 +318,7 @@ class StackedRouter extends _i1.RouterBase {
     _i18.AddEventScheduleListView: (data) {
       final args =
           data.getArgs<AddEventScheduleListViewArguments>(nullOk: false);
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) => _i18.AddEventScheduleListView(
             key: args.key, eventSchedules: args.eventSchedules),
         settings: data,
@@ -309,9 +328,23 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddScheduleViewArguments>(
         orElse: () => const AddScheduleViewArguments(),
       );
-      return _i20.MaterialPageRoute<dynamic>(
+      return _i22.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i19.AddScheduleView(key: args.key, event: args.event),
+        settings: data,
+      );
+    },
+    _i20.AddonDealsView: (data) {
+      return _i22.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i20.AddonDealsView(),
+        settings: data,
+      );
+    },
+    _i21.AddonDealsDetailsView: (data) {
+      final args = data.getArgs<AddonDealsDetailsViewArguments>(nullOk: false);
+      return _i22.MaterialPageRoute<dynamic>(
+        builder: (context) =>
+            _i21.AddonDealsDetailsView(key: args.key, deal: args.deal),
         settings: data,
       );
     },
@@ -330,7 +363,7 @@ class ExternalAddonWebviewViewArguments {
     required this.addonID,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
   final String addonID;
 
@@ -359,7 +392,7 @@ class GenericWebviewViewArguments {
     required this.previousPageTitle,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
   final String url;
 
@@ -396,9 +429,9 @@ class AddEventViewArguments {
     this.event,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
-  final _i21.EventModel? event;
+  final _i23.EventModel? event;
 
   @override
   String toString() {
@@ -425,7 +458,7 @@ class DocumentViewerViewArguments {
     required this.previousPageTitle,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
   final String downlaodUrl;
 
@@ -462,9 +495,9 @@ class EventShowcaseViewArguments {
     required this.event,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
-  final _i21.EventModel event;
+  final _i23.EventModel event;
 
   @override
   String toString() {
@@ -489,9 +522,9 @@ class AddEventScheduleListViewArguments {
     required this.eventSchedules,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
-  final List<_i22.EventScheduleModel> eventSchedules;
+  final List<_i24.EventScheduleModel> eventSchedules;
 
   @override
   String toString() {
@@ -516,9 +549,9 @@ class AddScheduleViewArguments {
     this.event,
   });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
-  final _i22.EventScheduleModel? event;
+  final _i24.EventScheduleModel? event;
 
   @override
   String toString() {
@@ -537,7 +570,34 @@ class AddScheduleViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i23.NavigationService {
+class AddonDealsDetailsViewArguments {
+  const AddonDealsDetailsViewArguments({
+    this.key,
+    required this.deal,
+  });
+
+  final _i22.Key? key;
+
+  final _i25.DealModel deal;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "deal": "$deal"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonDealsDetailsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.deal == deal;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ deal.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i26.NavigationService {
   Future<dynamic> navigateToLoginView([
     int? routerId,
     bool preventDuplicates = true,
@@ -581,7 +641,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToExternalAddonWebviewView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -627,7 +687,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToGenericWebviewView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -692,8 +752,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToAddEventView({
-    _i20.Key? key,
-    _i21.EventModel? event,
+    _i22.Key? key,
+    _i23.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -723,7 +783,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToDocumentViewerView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String downlaodUrl,
     required String title,
     required String previousPageTitle,
@@ -774,8 +834,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToEventShowcaseView({
-    _i20.Key? key,
-    required _i21.EventModel event,
+    _i22.Key? key,
+    required _i23.EventModel event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -791,8 +851,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToAddEventScheduleListView({
-    _i20.Key? key,
-    required List<_i22.EventScheduleModel> eventSchedules,
+    _i22.Key? key,
+    required List<_i24.EventScheduleModel> eventSchedules,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -809,8 +869,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> navigateToAddScheduleView({
-    _i20.Key? key,
-    _i22.EventScheduleModel? event,
+    _i22.Key? key,
+    _i24.EventScheduleModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -819,6 +879,37 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }) async {
     return navigateTo<dynamic>(Routes.addScheduleView,
         arguments: AddScheduleViewArguments(key: key, event: event),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToAddonDealsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.addonDealsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToAddonDealsDetailsView({
+    _i22.Key? key,
+    required _i25.DealModel deal,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.addonDealsDetailsView,
+        arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -868,7 +959,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithExternalAddonWebviewView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String addonID,
     int? routerId,
     bool preventDuplicates = true,
@@ -914,7 +1005,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithGenericWebviewView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -979,8 +1070,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithAddEventView({
-    _i20.Key? key,
-    _i21.EventModel? event,
+    _i22.Key? key,
+    _i23.EventModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -1010,7 +1101,7 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithDocumentViewerView({
-    _i20.Key? key,
+    _i22.Key? key,
     required String downlaodUrl,
     required String title,
     required String previousPageTitle,
@@ -1061,8 +1152,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithEventShowcaseView({
-    _i20.Key? key,
-    required _i21.EventModel event,
+    _i22.Key? key,
+    required _i23.EventModel event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -1078,8 +1169,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithAddEventScheduleListView({
-    _i20.Key? key,
-    required List<_i22.EventScheduleModel> eventSchedules,
+    _i22.Key? key,
+    required List<_i24.EventScheduleModel> eventSchedules,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -1096,8 +1187,8 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }
 
   Future<dynamic> replaceWithAddScheduleView({
-    _i20.Key? key,
-    _i22.EventScheduleModel? event,
+    _i22.Key? key,
+    _i24.EventScheduleModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -1106,6 +1197,37 @@ extension NavigatorStateExtension on _i23.NavigationService {
   }) async {
     return replaceWith<dynamic>(Routes.addScheduleView,
         arguments: AddScheduleViewArguments(key: key, event: event),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithAddonDealsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.addonDealsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithAddonDealsDetailsView({
+    _i22.Key? key,
+    required _i25.DealModel deal,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.addonDealsDetailsView,
+        arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

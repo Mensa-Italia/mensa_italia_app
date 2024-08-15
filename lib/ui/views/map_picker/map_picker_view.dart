@@ -5,6 +5,7 @@ import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
 
 import 'map_picker_viewmodel.dart';
@@ -17,8 +18,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
       BuildContext context, MapPickerViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
-      appBar: const CupertinoNavigationBar(
-        middle: Text('Select Location'),
+      appBar: getAppBarPlatform(
+        title: "Select Location",
         previousPageTitle: "Add Event",
       ),
       bottomNavigationBar: SafeArea(

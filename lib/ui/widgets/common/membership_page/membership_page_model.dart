@@ -34,7 +34,6 @@ class MembershipPageModel extends MasterModel {
 
     SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
-      favsAddons.clear();
       if (!allowTestMakerAddon()) {
         await prefs.setStringList(
             "addons_fav",
@@ -82,6 +81,8 @@ class MembershipPageModel extends MasterModel {
         return EneftyIcons.teacher_outline;
       case "documents":
         return EneftyIcons.document_cloud_outline;
+      case "deals":
+        return EneftyIcons.moneys_outline;
       default:
         return EneftyIcons.bookmark_outline;
     }
@@ -104,6 +105,9 @@ class MembershipPageModel extends MasterModel {
           break;
         case "documents":
           navigationService.navigateToAddonAreaDocumentsView();
+          break;
+        case "deals":
+          navigationService.navigateToAddonDealsView();
           break;
         default:
           break;

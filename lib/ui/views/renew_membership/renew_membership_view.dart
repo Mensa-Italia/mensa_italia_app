@@ -9,12 +9,8 @@ class RenewMembershipView extends StackedView<RenewMembershipViewModel> {
 
   @override
   Widget builder(
-    BuildContext context,
-    RenewMembershipViewModel viewModel,
-    Widget? child,
-  ) {
+      BuildContext context, RenewMembershipViewModel viewModel, Widget? child) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

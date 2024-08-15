@@ -140,4 +140,8 @@ class AddonPageModel extends MasterModel {
         ? EneftyIcons.star_bold
         : EneftyIcons.star_outline;
   }
+
+  openDeals() {
+    navigationService.navigateToAddonDealsView();
+  }
 }

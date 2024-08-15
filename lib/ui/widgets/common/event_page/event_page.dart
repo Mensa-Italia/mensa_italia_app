@@ -1,7 +1,9 @@
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_tile/event_tile.dart';
 import 'package:stacked/stacked.dart';
 
@@ -11,100 +13,69 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      controller: viewModel.scrollController,
-      anchor: 0.06,
+  Widget builder(
+      BuildContext context, EventPageModel viewModel, Widget? child) {
+    return getCustomScrollViewPlatform(
       slivers: [
-        CupertinoSliverNavigationBar(
-          largeTitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'Events',
-                    style: TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                  const Expanded(child: SizedBox()),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15, top: 3),
-                    child: TextButton.icon(
-                      onPressed: viewModel.changeSearchRadius,
-                      style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.only(left: 10, right: 5),
-                      ),
-                      iconAlignment: IconAlignment.end,
-                      label: Text(
-                        viewModel.selectedState.contains("Nearby") ? "${viewModel.selectedState} (90km)" : viewModel.selectedState,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                        ),
-                      ),
-                      icon: const Icon(
-                        EneftyIcons.location_bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 40,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 15, top: 3),
-                  child: CupertinoSearchTextField(
-                    onChanged: viewModel.search,
-                    controller: viewModel.searchController,
-                    prefixIcon: const Icon(CupertinoIcons.search),
-                    onSubmitted: viewModel.search,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          stretch: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-          border: null,
-          middle: const Text(
-            'Events',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          alwaysShowMiddle: false,
+        getAppBarSliverPlatform(
+          title: 'Events',
           leading: (viewModel.allowControlEvents())
               ? CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.navigateToAddEvent,
                   child: const Icon(
-                    CupertinoIcons.add_circled_solid,
+                    EneftyIcons.add_circle_bold,
                     color: kcPrimaryColor,
                   ),
                 )
               : null,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: viewModel.navigateToCalendar,
-                child: const Icon(
-                  CupertinoIcons.calendar,
-                  color: kcPrimaryColor,
+          trailings: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: viewModel.navigateToCalendar,
+              child: const Icon(
+                EneftyIcons.calendar_2_outline,
+                color: kcPrimaryColor,
+              ),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: viewModel.navigateToMap,
+              child: const Icon(
+                EneftyIcons.map_2_outline,
+                color: kcPrimaryColor,
+              ),
+            ),
+          ],
+          searchBarActions: SearchBarActions(
+            onChanged: viewModel.search,
+            controller: viewModel.searchController,
+            onSubmitted: viewModel.search,
+          ),
+          trailingTitle: [
+            Padding(
+              padding: const EdgeInsets.only(right: 15, top: 3),
+              child: TextButton.icon(
+                onPressed: viewModel.changeSearchRadius,
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.only(left: 10, right: 5),
+                ),
+                iconAlignment: IconAlignment.end,
+                label: Text(
+                  viewModel.selectedState,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                  ),
+                ),
+                icon: const Icon(
+                  EneftyIcons.location_outline,
+                  color: Colors.black,
                 ),
               ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: viewModel.navigateToMap,
-                child: const Icon(
-                  CupertinoIcons.map,
-                  color: kcPrimaryColor,
-                ),
-              )
-            ],
-          ),
+            ),
+          ],
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         if (viewModel.events.isEmpty)
@@ -138,11 +109,16 @@ class EventPage extends StackedView<EventPageModel> {
             return EventTile(
               event: event,
               onTap: viewModel.onTapOnEvent(event),
-              onLongTap: (viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper() ? viewModel.onLongTapEditEvent(event) : null,
+              onLongTap: (viewModel.allowControlEvents() &&
+                          event.owner == viewModel.user.id) ||
+                      viewModel.isSuper()
+                  ? viewModel.onLongTapEditEvent(event)
+                  : null,
             );
           },
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

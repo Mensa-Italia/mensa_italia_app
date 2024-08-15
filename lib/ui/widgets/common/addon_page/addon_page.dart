@@ -3,7 +3,9 @@ import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/addon.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_page_model.dart';
@@ -14,42 +16,15 @@ class AddonPage extends StackedView<AddonPageModel> {
   @override
   Widget builder(
       BuildContext context, AddonPageModel viewModel, Widget? child) {
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      controller: viewModel.scrollController,
-      anchor: 0.06,
+    return getCustomScrollViewPlatform(
       slivers: [
-        CupertinoSliverNavigationBar(
-          largeTitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Addons',
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              Container(
-                height: 40,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 15, top: 3),
-                  child: CupertinoSearchTextField(
-                    onChanged: viewModel.search,
-                    controller: viewModel.searchController,
-                    prefixIcon: const Icon(CupertinoIcons.search),
-                    onSubmitted: viewModel.search,
-                  ),
-                ),
-              ),
-            ],
+        getAppBarSliverPlatform(
+          title: "Addons",
+          searchBarActions: SearchBarActions(
+            onChanged: viewModel.search,
+            controller: viewModel.searchController,
+            onSubmitted: viewModel.search,
           ),
-          stretch: true,
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-          border: null,
-          middle: const Text(
-            'Addons',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          alwaysShowMiddle: false,
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(
@@ -73,6 +48,14 @@ class AddonPage extends StackedView<AddonPageModel> {
                 icon: const Icon(EneftyIcons.bookmark_outline,
                     color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openContacts,
+              ),
+            if (viewModel.isSearching("deals"))
+              _InternalAddonButton(
+                name: "Deals",
+                description: "Deals and discounts for Mensa Italia members",
+                icon: const Icon(EneftyIcons.moneys_outline,
+                    color: kcPrimaryColor, size: 40),
+                onTap: viewModel.openDeals,
               ),
             if (viewModel.isSearching("documents"))
               _InternalAddonButton(
@@ -132,27 +115,25 @@ class _ExternalAddonButton extends ViewModelWidget<AddonPageModel> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 3,
-                    offset: const Offset(0, 3),
+            Material(
+              color: Colors.transparent,
+              elevation: 1,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 80,
+                height: 80,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: CachedNetworkImage(
+                    imageUrl: addon.icon,
+                    fit: BoxFit.cover,
+                    color: kcPrimaryColor,
                   ),
-                ],
-              ),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: CachedNetworkImage(
-                  imageUrl: addon.icon,
-                  fit: BoxFit.cover,
-                  color: kcPrimaryColor,
                 ),
               ),
             ),
@@ -232,25 +213,23 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 3,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: icon,
+            Material(
+              color: Colors.transparent,
+              elevation: 1,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 80,
+                height: 80,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                alignment: Alignment.center,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: icon,
+                ),
               ),
             ),
             const SizedBox(

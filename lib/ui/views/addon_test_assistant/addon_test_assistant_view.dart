@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
+import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_test_assistant_viewmodel.dart';
@@ -11,43 +13,17 @@ class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
   Widget builder(BuildContext context, AddonTestAssistantViewModel viewModel,
       Widget? child) {
     return Scaffold(
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+      body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
-        anchor: 0.06,
         slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Candidates',
-                  style: TextStyle(fontWeight: FontWeight.w900),
-                ),
-                Container(
-                  height: 40,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15, top: 3),
-                    child: CupertinoSearchTextField(
-                      onChanged: viewModel.search,
-                      controller: viewModel.searchController,
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      onSubmitted: viewModel.search,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            stretch: true,
+          getAppBarSliverPlatform(
+            title: "Candidates",
             previousPageTitle: "Addons",
-            backgroundColor:
-                Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-            border: null,
-            middle: const Text(
-              'Candidates',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            searchBarActions: SearchBarActions(
+              onChanged: viewModel.search,
+              controller: viewModel.searchController,
+              onSubmitted: viewModel.search,
             ),
-            alwaysShowMiddle: false,
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
           if (viewModel.testelabs.isEmpty)

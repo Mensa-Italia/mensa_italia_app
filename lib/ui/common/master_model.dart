@@ -51,7 +51,8 @@ class MasterModel extends ReactiveViewModel {
         color: Colors.transparent,
         child: SingleChildScrollView(
           controller: ModalScrollController.of(context),
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: child,
         ),
       ),
@@ -76,7 +77,8 @@ class MasterModel extends ReactiveViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();

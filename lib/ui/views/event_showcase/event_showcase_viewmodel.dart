@@ -25,7 +25,8 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty &&
+        await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );

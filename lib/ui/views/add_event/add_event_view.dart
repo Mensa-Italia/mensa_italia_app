@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
@@ -15,22 +16,24 @@ class AddEventView extends StackedView<AddEventViewModel> {
   const AddEventView({super.key, this.event});
 
   @override
-  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white.withOpacity(0.6),
+      appBar: getAppBarPlatform(
         previousPageTitle: "Events",
-        middle: Text(event == null ? 'Add Event' : 'Edit Event'),
-        trailing: (event != null)
-            ? IconButton(
-                icon: const Icon(
-                  EneftyIcons.trash_outline,
-                  size: 22,
-                  color: Colors.red,
-                ),
-                onPressed: viewModel.deleteEvent,
-              )
+        title: event == null ? 'Add Event' : 'Edit Event',
+        trailings: (event != null)
+            ? [
+                IconButton(
+                  icon: const Icon(
+                    EneftyIcons.trash_outline,
+                    size: 22,
+                    color: Colors.red,
+                  ),
+                  onPressed: viewModel.deleteEvent,
+                )
+              ]
             : null,
       ),
       body: ListView(
@@ -59,12 +62,14 @@ class AddEventView extends StackedView<AddEventViewModel> {
                               )
                             : event?.image != null
                                 ? DecorationImage(
-                                    image: CachedNetworkImageProvider(event!.image),
+                                    image: CachedNetworkImageProvider(
+                                        event!.image),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                       ),
-                      child: !(viewModel.imageBytes != null || event?.image != null)
+                      child: !(viewModel.imageBytes != null ||
+                              event?.image != null)
                           ? const Text(
                               'Add Image',
                               style: TextStyle(
@@ -219,7 +224,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
+  AddEventViewModel viewModelBuilder(BuildContext context) =>
+      AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {

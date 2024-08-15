@@ -2,48 +2,59 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
 import 'add_event_schedule_list_viewmodel.dart';
 
-class AddEventScheduleListView extends StackedView<AddEventScheduleListViewModel> {
+class AddEventScheduleListView
+    extends StackedView<AddEventScheduleListViewModel> {
   final List<EventScheduleModel> eventSchedules;
 
-  const AddEventScheduleListView({Key? key, required this.eventSchedules}) : super(key: key);
+  const AddEventScheduleListView({Key? key, required this.eventSchedules})
+      : super(key: key);
 
   @override
-  Widget builder(BuildContext context, AddEventScheduleListViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddEventScheduleListViewModel viewModel,
+      Widget? child) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        middle: Text('Event Schedule'),
+      appBar: getAppBarPlatform(
+        title: 'Event Schedules',
         previousPageTitle: 'Back',
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: viewModel.onTapAddSchedule,
-          child: const Icon(
-            CupertinoIcons.add_circled_solid,
-            color: kcPrimaryColor,
-          ),
-        ),
+        trailings: [
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: viewModel.onTapAddSchedule,
+            child: const Icon(
+              CupertinoIcons.add_circled_solid,
+              color: kcPrimaryColor,
+            ),
+          )
+        ],
       ),
       body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           itemCount: viewModel.eventSchedules.length,
           itemBuilder: (context, index) {
             final event = viewModel.eventSchedules[index];
-            return TileSchedue(eventSchedule: event, onTap: viewModel.tapEdit(event));
+            return TileSchedue(
+                eventSchedule: event, onTap: viewModel.tapEdit(event));
           },
           separatorBuilder: (context, index) {
-            if (index != viewModel.eventSchedules.length - 1 && viewModel.eventSchedules[index].whenStart != viewModel.eventSchedules[index + 1].whenStart) {
+            if (index != viewModel.eventSchedules.length - 1 &&
+                viewModel.eventSchedules[index].whenStart !=
+                    viewModel.eventSchedules[index + 1].whenStart) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 30),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                     child: Text(
-                      DateFormat('EEEE, d MMMM').format(viewModel.eventSchedules[index + 1].whenStart),
+                      DateFormat('EEEE, d MMMM').format(
+                          viewModel.eventSchedules[index + 1].whenStart),
                       style: TextStyle(
                         color: Colors.grey.shade500,
                         height: 0,
@@ -61,7 +72,8 @@ class AddEventScheduleListView extends StackedView<AddEventScheduleListViewModel
   }
 
   @override
-  AddEventScheduleListViewModel viewModelBuilder(BuildContext context) => AddEventScheduleListViewModel(
+  AddEventScheduleListViewModel viewModelBuilder(BuildContext context) =>
+      AddEventScheduleListViewModel(
         eventSchedules: eventSchedules,
       );
 }
@@ -69,7 +81,8 @@ class AddEventScheduleListView extends StackedView<AddEventScheduleListViewModel
 class TileSchedue extends StatelessWidget {
   final EventScheduleModel eventSchedule;
   final VoidCallback onTap;
-  const TileSchedue({super.key, required this.eventSchedule, required this.onTap});
+  const TileSchedue(
+      {super.key, required this.eventSchedule, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +90,9 @@ class TileSchedue extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-        foregroundDecoration: (eventSchedule.id ?? "").startsWith("DELETE:") ? StrikeThroughDecoration() : null,
+        foregroundDecoration: (eventSchedule.id ?? "").startsWith("DELETE:")
+            ? StrikeThroughDecoration()
+            : null,
         child: Row(
           children: [
             Expanded(
@@ -114,7 +129,8 @@ class _StrikeThroughPainter extends BoxPainter {
       ..style = PaintingStyle.fill;
 
     final rect = offset & configuration.size!;
-    canvas.drawLine(new Offset(rect.left, rect.top + rect.height / 2), new Offset(rect.right, rect.top + rect.height / 2), paint);
+    canvas.drawLine(new Offset(rect.left, rect.top + rect.height / 2),
+        new Offset(rect.right, rect.top + rect.height / 2), paint);
     canvas.restore();
   }
 }

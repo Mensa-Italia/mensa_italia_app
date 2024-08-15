@@ -4,8 +4,10 @@ import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 import 'option_page_model.dart';
 
@@ -13,15 +15,12 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
-        CupertinoSliverNavigationBar(
-          largeTitle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.w900)),
-          middle: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
-          alwaysShowMiddle: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
-          border: null,
+        getAppBarSliverPlatform(
+          title: "Settings",
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(
@@ -32,17 +31,24 @@ class OptionPage extends StackedView<OptionPageModel> {
                 GestureDetector(
                   child: Row(
                     children: [
+                      const SizedBox(width: 10),
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: kcLightGrey,
-                        backgroundImage: CachedNetworkImageProvider(viewModel.user.avatar),
+                        backgroundImage:
+                            CachedNetworkImageProvider(viewModel.user.avatar),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AutoSizeText(viewModel.user.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, height: 1.2)),
+                            AutoSizeText(viewModel.user.name,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    height: 1.2)),
                             AutoSizeText(
                               viewModel.user.email,
                               style: const TextStyle(
@@ -72,7 +78,8 @@ class OptionPage extends StackedView<OptionPageModel> {
                 ),*/
                 _OptionTile(
                   title: "Renew Membership",
-                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  trailing: DateFormat.yMMMd()
+                      .format(viewModel.user.expireMembership),
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
@@ -112,7 +119,8 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -165,14 +173,7 @@ class _OptionTile extends StatelessWidget {
               minFontSize: 0,
               maxLines: 1,
             ),
-      leading: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Icon(icon, size: 20, color: Colors.white),
-      ),
+      leading: getPlatformIcon(),
       visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
       trailing: trailing.isEmpty
@@ -181,8 +182,29 @@ class _OptionTile extends StatelessWidget {
               TextSpan(children: [
                 TextSpan(text: trailing),
               ]),
-              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14)),
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
     );
+  }
+
+  Widget getPlatformIcon() {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+        TargetPlatform.iOS) {
+      return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Icon(icon, size: 20, color: Colors.white),
+      );
+    } else {
+      return Icon(icon);
+    }
   }
 }
 
@@ -192,11 +214,12 @@ class _SettingContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isiOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(8).copyWith(right: 0, left: 2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isiOS ? Colors.white : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
       ),
       child: ListView.separated(
@@ -206,8 +229,8 @@ class _SettingContainer extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemBuilder: (context, index) => children[index],
         separatorBuilder: (context, index) => Divider(
-          indent: 50,
-          color: kcLightGrey.withOpacity(.2),
+          indent: isiOS ? 50 : 0,
+          color: isiOS ? kcLightGrey.withOpacity(.2) : Colors.transparent,
         ),
       ),
     );

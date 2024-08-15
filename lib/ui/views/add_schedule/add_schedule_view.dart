@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
 
 import 'add_schedule_viewmodel.dart';
@@ -11,19 +12,24 @@ class AddScheduleView extends StackedView<AddScheduleViewModel> {
   const AddScheduleView({Key? key, this.event}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, AddScheduleViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddScheduleViewModel viewModel, Widget? child) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        middle: Text(event == null ? 'Add Schedule' : 'Edit Schedule'),
+      appBar: getAppBarPlatform(
+        title: event == null ? 'Add Event' : 'Edit Event',
         previousPageTitle: 'Back',
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: viewModel.deleteEvent,
-          child: const Icon(
-            CupertinoIcons.trash,
-            color: Colors.red,
-          ),
-        ),
+        trailings: event == null
+            ? null
+            : [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: viewModel.deleteEvent,
+                  child: const Icon(
+                    CupertinoIcons.trash,
+                    color: Colors.red,
+                  ),
+                )
+              ],
       ),
       body: ListView(
         children: [
@@ -97,5 +103,6 @@ class AddScheduleView extends StackedView<AddScheduleViewModel> {
   }
 
   @override
-  AddScheduleViewModel viewModelBuilder(BuildContext context) => AddScheduleViewModel(event: event);
+  AddScheduleViewModel viewModelBuilder(BuildContext context) =>
+      AddScheduleViewModel(event: event);
 }

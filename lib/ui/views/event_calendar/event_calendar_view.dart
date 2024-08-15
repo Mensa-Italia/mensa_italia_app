@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -16,10 +17,9 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   Widget builder(
       BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white.withOpacity(0.6),
+      appBar: getAppBarPlatform(
         previousPageTitle: "Events",
-        middle: const Text('Calendar'),
+        title: "Events Calendar",
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -20,6 +20,8 @@ import 'package:mensa_italia_app/ui/views/calendar_linker/calendar_linker_view.d
 import 'package:mensa_italia_app/ui/views/event_showcase/event_showcase_view.dart';
 import 'package:mensa_italia_app/ui/views/add_event_schedule_list/add_event_schedule_list_view.dart';
 import 'package:mensa_italia_app/ui/views/add_schedule/add_schedule_view.dart';
+import 'package:mensa_italia_app/ui/views/addon_deals/addon_deals_view.dart';
+import 'package:mensa_italia_app/ui/views/addon_deals_details/addon_deals_details_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -42,6 +44,8 @@ import 'package:mensa_italia_app/ui/views/add_schedule/add_schedule_view.dart';
     MaterialRoute(page: EventShowcaseView),
     MaterialRoute(page: AddEventScheduleListView),
     MaterialRoute(page: AddScheduleView),
+    MaterialRoute(page: AddonDealsView),
+    MaterialRoute(page: AddonDealsDetailsView),
 // @stacked-route
   ],
   dependencies: [

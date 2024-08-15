@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
 
 import 'events_map_viewmodel.dart';
@@ -16,10 +17,9 @@ class EventsMapView extends StackedView<EventsMapViewModel> {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white.withOpacity(0.6),
+      appBar: getAppBarPlatform(
         previousPageTitle: "Events",
-        middle: const Text('Events Map'),
+        title: "Events Map",
       ),
       body: MapLibreMap(
         styleString:

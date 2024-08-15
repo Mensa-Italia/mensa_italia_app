@@ -51,7 +51,8 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text =
+          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -137,8 +138,10 @@ class AddEventViewModel extends MasterModel {
   void pickDateTime() {
     showBoardDateTimeMultiPicker(
       context: StackedService.navigatorKey!.currentContext!,
-      startDate: dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
-      endDate: dateTimeOptions?.end ?? DateTime.now().add(Duration(hours: 2, days: 2)),
+      startDate:
+          dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
+      endDate: dateTimeOptions?.end ??
+          DateTime.now().add(Duration(hours: 2, days: 2)),
       pickerType: DateTimePickerType.datetime,
       options: BoardDateTimeOptions(
         startDayOfWeek: DateTime.monday,
@@ -150,7 +153,8 @@ class AddEventViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeEvent.text =
+            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
       }
     });
   }
