@@ -198,4 +198,14 @@ class AddEventViewModel extends MasterModel {
       eventSchedules: eventSchedules,
     );
   }
+
+  @override
+  void dispose() {
+    locationController.dispose();
+    dateTimeEvent.dispose();
+    nameController.dispose();
+    descriptionController.dispose();
+    linkController.dispose();
+    super.dispose();
+  }
 }

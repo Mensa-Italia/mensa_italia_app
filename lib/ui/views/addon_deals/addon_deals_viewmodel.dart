@@ -5,6 +5,7 @@ import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonDealsViewModel extends MasterModel {
+  ScrollController scrollController = ScrollController();
   List<DealModel> _originalDeals = [];
   List<DealModel> deals = [];
 
@@ -29,7 +30,17 @@ class AddonDealsViewModel extends MasterModel {
     }
     deals = _originalDeals
         .where(
-          (element) => element.name.toLowerCase().contains(p1.toLowerCase()) || (element.details ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.howToGet ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.commercialSector).toLowerCase().contains(p1.toLowerCase()),
+          (element) =>
+              element.name.toLowerCase().contains(p1.toLowerCase()) ||
+              (element.details ?? "")
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()) ||
+              (element.howToGet ?? "")
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()) ||
+              (element.commercialSector)
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()),
         )
         .toList();
     rebuildUi();
@@ -43,5 +54,9 @@ class AddonDealsViewModel extends MasterModel {
     return () {
       navigationService.navigateToAddonDealsDetailsView(deal: deals[index]);
     };
+  }
+
+  void tapAddDeal() {
+    navigationService.navigateToAddonDealsAddView();
   }
 }

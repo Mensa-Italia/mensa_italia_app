@@ -9,6 +9,8 @@ part 'deal.g.dart';
 
 @freezed
 class DealModel with _$DealModel {
+  const DealModel._();
+
   const factory DealModel({
     required String id,
     required String name,
@@ -34,4 +36,16 @@ class DealModel with _$DealModel {
 
   factory DealModel.fromJson(Map<String, dynamic> json) =>
       _$DealModelFromJson(json);
+
+  String getWho() {
+    if (who == null) {
+      return "";
+    }
+    if (who == "active_members") {
+      return "Active members";
+    } else if (who == "active_members and relatives") {
+      return "Active members and relatives";
+    }
+    return "";
+  }
 }

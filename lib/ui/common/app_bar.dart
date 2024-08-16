@@ -7,11 +7,21 @@ class SearchBarActions {
   final Function(String) onSubmitted;
   final TextEditingController controller;
 
-  SearchBarActions({required this.onChanged, required this.controller, required this.onSubmitted});
+  SearchBarActions(
+      {required this.onChanged,
+      required this.controller,
+      required this.onSubmitted});
 }
 
-getAppBarSliverPlatform({required String title, String? previousPageTitle, List<Widget>? trailings, Widget? leading, List<Widget>? trailingTitle, SearchBarActions? searchBarActions}) {
-  if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+getAppBarSliverPlatform(
+    {required String title,
+    String? previousPageTitle,
+    List<Widget>? trailings,
+    Widget? leading,
+    List<Widget>? trailingTitle,
+    SearchBarActions? searchBarActions}) {
+  if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+      TargetPlatform.iOS) {
     return CupertinoSliverNavigationBar(
       previousPageTitle: previousPageTitle,
       largeTitle: Column(
@@ -43,7 +53,9 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
         ],
       ),
       stretch: true,
-      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor.withOpacity(.9),
+      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!)
+          .scaffoldBackgroundColor
+          .withOpacity(.9),
       border: null,
       middle: Text(
         title,
@@ -78,7 +90,8 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                         : const SizedBox(),
                     if (searchBarActions != null)
                       Container(
-                        padding: const EdgeInsets.only(right: 15, top: 3, left: 15),
+                        padding:
+                            const EdgeInsets.only(right: 15, top: 3, left: 15),
                         height: kToolbarHeight,
                         child: TextField(
                           onChanged: searchBarActions.onChanged,
@@ -88,7 +101,8 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                             hintText: 'Search',
                             prefixIcon: Icon(Icons.search),
                             isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
                           ),
                         ),
                       ),
@@ -105,44 +119,57 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
       ),
       expandedHeight: kToolbarHeight *
           (searchBarActions != null || trailingTitle != null
-              ? trailings != null
+              ? trailingTitle != null
                   ? 3
                   : 2
               : 1),
       floating: false,
       pinned: true,
       actions: [leading ?? const SizedBox(), ...(trailings ?? [])],
-      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!)
+          .scaffoldBackgroundColor,
     );
   }
 }
 
-getAppBarPlatform({required String title, String? previousPageTitle, List<Widget>? trailings, Widget? leading, SearchBarActions? searchBarActions}) {
-  if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+getAppBarPlatform(
+    {required String title,
+    String? previousPageTitle,
+    List<Widget>? trailings,
+    Widget? leading,
+    SearchBarActions? searchBarActions}) {
+  if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+      TargetPlatform.iOS) {
     return CupertinoNavigationBar(
       previousPageTitle: previousPageTitle,
-      middle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-          ),
-          if (searchBarActions != null)
-            SizedBox(
-              height: 40,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 15, top: 3),
-                child: CupertinoSearchTextField(
-                  onChanged: searchBarActions.onChanged,
-                  controller: searchBarActions.controller,
-                  prefixIcon: const Icon(CupertinoIcons.search),
-                  onSubmitted: searchBarActions.onSubmitted,
+      middle: (searchBarActions != null)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
                 ),
-              ),
+                SizedBox(
+                  height: 40,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 15, top: 3),
+                    child: CupertinoSearchTextField(
+                      onChanged: searchBarActions.onChanged,
+                      controller: searchBarActions.controller,
+                      prefixIcon: const Icon(CupertinoIcons.search),
+                      onSubmitted: searchBarActions.onSubmitted,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Text(
+              title,
             ),
-        ],
-      ),
-      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor.withOpacity(.9),
+      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!)
+          .scaffoldBackgroundColor
+          .withOpacity(.8),
       border: null,
       leading: leading,
       trailing: trailings == null
@@ -161,7 +188,8 @@ getAppBarPlatform({required String title, String? previousPageTitle, List<Widget
         ),
       ),
       actions: [leading ?? SizedBox(), ...(trailings ?? [])],
-      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!)
+          .scaffoldBackgroundColor,
     );
   }
 }

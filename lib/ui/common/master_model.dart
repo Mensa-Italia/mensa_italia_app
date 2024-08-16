@@ -38,6 +38,10 @@ class MasterModel extends ReactiveViewModel {
     return hasPower("addons");
   }
 
+  allowControlDeals() {
+    return hasPower("deals");
+  }
+
   isSuper() {
     return hasPower("super");
   }

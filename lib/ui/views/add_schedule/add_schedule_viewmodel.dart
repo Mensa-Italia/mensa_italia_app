@@ -113,4 +113,16 @@ class AddScheduleViewModel extends MasterModel {
     );
     navigationService.back(result: eventSchedule);
   }
+
+
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    linkController.dispose();
+    dateTimeEvent.dispose();
+    locationController.dispose();
+    super.dispose();
+  }
 }

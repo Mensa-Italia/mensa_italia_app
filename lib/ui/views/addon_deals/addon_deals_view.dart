@@ -20,6 +20,7 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
   ) {
     return Scaffold(
       body: getCustomScrollViewPlatform(
+        controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
             title: "Deals",
@@ -30,11 +31,13 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
               onSubmitted: viewModel.onSubmitted,
             ),
             trailings: [
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Icon(EneftyIcons.add_circle_bold, color: kcPrimaryColor),
-                onPressed: () {},
-              ),
+              if (viewModel.allowControlEvents())
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: viewModel.tapAddDeal,
+                  child: const Icon(EneftyIcons.add_circle_bold,
+                      color: kcPrimaryColor),
+                ),
             ],
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
@@ -46,7 +49,8 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
                 onTap: viewModel.tapOnDeal(index),
               );
             },
-            separatorBuilder: (context, index) => const Divider(height: 0, endIndent: 0, indent: 0),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 0, endIndent: 0, indent: 0),
           ),
           const SliverSafeArea(
             sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10)),
@@ -57,7 +61,8 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
   }
 
   @override
-  AddonDealsViewModel viewModelBuilder(BuildContext context) => AddonDealsViewModel();
+  AddonDealsViewModel viewModelBuilder(BuildContext context) =>
+      AddonDealsViewModel();
 }
 
 class _DealTile extends StatelessWidget {

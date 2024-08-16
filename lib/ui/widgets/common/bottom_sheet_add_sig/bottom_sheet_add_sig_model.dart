@@ -101,4 +101,12 @@ class BottomSheetAddSigModel extends MasterModel {
       }
     });
   }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    linkController.dispose();
+
+    super.dispose();
+  }
 }

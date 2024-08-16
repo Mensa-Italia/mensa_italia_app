@@ -323,7 +323,7 @@ class __$$DealModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$DealModelImpl implements _DealModel {
+class _$DealModelImpl extends _DealModel {
   const _$DealModelImpl(
       {required this.id,
       required this.name,
@@ -341,7 +341,8 @@ class _$DealModelImpl implements _DealModel {
       required this.isActive,
       this.vatNumber,
       required this.created,
-      required this.updated});
+      required this.updated})
+      : super._();
 
   factory _$DealModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DealModelImplFromJson(json);
@@ -454,7 +455,7 @@ class _$DealModelImpl implements _DealModel {
   }
 }
 
-abstract class _DealModel implements DealModel {
+abstract class _DealModel extends DealModel {
   const factory _DealModel(
       {required final String id,
       required final String name,
@@ -474,6 +475,7 @@ abstract class _DealModel implements DealModel {
       final String? vatNumber,
       required final DateTime created,
       required final DateTime updated}) = _$DealModelImpl;
+  const _DealModel._() : super._();
 
   factory _DealModel.fromJson(Map<String, dynamic> json) =
       _$DealModelImpl.fromJson;
