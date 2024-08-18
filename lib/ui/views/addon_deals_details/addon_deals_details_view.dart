@@ -80,6 +80,68 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
                 child: const Text("Open deal information link"),
               ),
             ],
+            if (viewModel.dealsContact != null)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Column(
+                  children: [
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Contact Informations\n',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '(Hidden from public)',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    if (viewModel.dealsContact!.name.isNotEmpty)
+                      _DealBlock(
+                        title: "Name",
+                        content: viewModel.dealsContact!.name,
+                      ),
+                    SizedBox(height: 16),
+                    if (viewModel.dealsContact!.email.isNotEmpty)
+                      _DealBlock(
+                        title: "Email",
+                        content: viewModel.dealsContact!.email,
+                      ),
+                    SizedBox(height: 16),
+                    if (viewModel.dealsContact!.phoneNumber != null &&
+                        viewModel.dealsContact!.phoneNumber!.isNotEmpty)
+                      _DealBlock(
+                        title: "Phone",
+                        content: viewModel.dealsContact!.phoneNumber,
+                      ),
+                    SizedBox(height: 16),
+                    if (viewModel.dealsContact!.note != null &&
+                        viewModel.dealsContact!.note!.isNotEmpty)
+                      _DealBlock(
+                        title: "Note",
+                        content: viewModel.dealsContact!.note,
+                      ),
+                  ],
+                ),
+              ),
             const SizedBox(height: 32),
             Text(
               "Last update: ${DateFormat.yMMMd().format(deal.updated)}",
@@ -98,7 +160,7 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
 
   @override
   AddonDealsDetailsViewModel viewModelBuilder(BuildContext context) =>
-      AddonDealsDetailsViewModel();
+      AddonDealsDetailsViewModel(deal: deal);
 }
 
 class _DealBlock extends StatelessWidget {
@@ -122,20 +184,13 @@ class _DealBlock extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: Colors.white,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              SelectableText(
-                content ?? "",
-              ),
-              const SizedBox(height: 16),
-            ],
+          child: SelectableText(
+            content ?? "",
           ),
         ),
       ],

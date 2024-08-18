@@ -1,5 +1,6 @@
 import 'package:geocoding/geocoding.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:mensa_italia_app/app/app.dialogs.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class LocationSelected {
@@ -39,7 +40,6 @@ class MapPickerViewModel extends MasterModel {
 
   void onCameraIdle() async {
     if (mapController?.cameraPosition == null) return;
-    print("Camera position: ${mapController!.cameraPosition!.zoom}");
     if (mapController!.cameraPosition!.zoom < 13) {
       locationToUse = null;
       rebuildUi();
@@ -70,13 +70,25 @@ class MapPickerViewModel extends MasterModel {
 
   void onLocationSelected() {
     if (locationToUse != null) {
-      navigationService.back(
-        result: LocationSelected(
-          locationName: locationToUse!.name ?? "",
-          location: locationToUse!,
-          coordinates: locationCoordinates,
-        ),
-      );
+      dialogService
+          .showCustomDialog<String, String>(
+        variant: DialogType.inputText,
+        title: "Location selected",
+        description: "If the address is not correct, please correct it",
+        data: locationToUse!.name,
+      )
+          .then((value) {
+        if (value != null && value.data != null) {
+          navigationService.back(
+            result: LocationSelected(
+              locationName: value.data!,
+              location: locationToUse!,
+              coordinates: locationCoordinates,
+            ),
+          );
+          rebuildUi();
+        }
+      });
     }
   }
 }

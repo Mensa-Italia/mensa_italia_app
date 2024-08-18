@@ -31,7 +31,7 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
               onSubmitted: viewModel.onSubmitted,
             ),
             trailings: [
-              if (viewModel.allowControlEvents())
+              if (viewModel.allowControlDeals())
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.tapAddDeal,
@@ -47,6 +47,7 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
               return _DealTile(
                 deal: viewModel.deals[index],
                 onTap: viewModel.tapOnDeal(index),
+                onLongPress: viewModel.onLongPress(index),
               );
             },
             separatorBuilder: (context, index) =>
@@ -68,8 +69,10 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
 class _DealTile extends StatelessWidget {
   final DealModel deal;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
-  const _DealTile({required this.deal, required this.onTap});
+  const _DealTile(
+      {required this.deal, required this.onTap, required this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,7 @@ class _DealTile extends StatelessWidget {
       title: Text(deal.name),
       subtitle: Text(deal.commercialSector),
       onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 }

@@ -114,8 +114,6 @@ class AddScheduleViewModel extends MasterModel {
     navigationService.back(result: eventSchedule);
   }
 
-
-
   @override
   void dispose() {
     nameController.dispose();

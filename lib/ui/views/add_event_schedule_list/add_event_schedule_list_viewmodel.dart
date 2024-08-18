@@ -31,6 +31,4 @@ class AddEventScheduleListViewModel extends MasterModel {
       });
     };
   }
-
-
 }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
+import 'package:validation_pro/validate.dart';
 
 import 'addon_deals_add_viewmodel.dart';
 
 class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
-  const AddonDealsAddView({Key? key}) : super(key: key);
+  final DealModel? deal;
+  const AddonDealsAddView({super.key, this.deal});
 
   @override
   Widget builder(BuildContext context, AddonDealsAddViewModel viewModel, Widget? child) {
@@ -16,11 +20,12 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
         child: ListView(
           children: [
             Form(
-              key: viewModel.formKey, // Add a GlobalKey for validation
+              key: viewModel.formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Deal Name'),
+                    decoration: const InputDecoration(hintText: 'Deal Name'),
                     controller: viewModel.dealNameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -29,9 +34,9 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Commercial Sector'),
+                    decoration: const InputDecoration(hintText: 'Commercial Sector'),
                     controller: viewModel.commercialSectorController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -40,70 +45,133 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Position (Optional)'),
-                    controller: viewModel.positionController,
+                    decoration: const InputDecoration(hintText: 'Position (Optional)'),
+                    controller: viewModel.locationController,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    onTap: viewModel.pickLocation,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Starting Date (YYYY-MM-DD)'),
-                    controller: viewModel.startingDateController,
-                    keyboardType: TextInputType.datetime,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the starting date';
-                      }
-                      return null;
-                    },
+                    controller: viewModel.dateTimeEvent,
+                    onTap: viewModel.pickDateTime,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    decoration: const InputDecoration(
+                      hintText: 'When',
+                    ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Ending Date (YYYY-MM-DD)'),
-                    controller: viewModel.endingDateController,
-                    keyboardType: TextInputType.datetime,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the ending date';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Details (Optional)'),
+                    decoration: const InputDecoration(hintText: 'Details (Optional)'),
                     controller: viewModel.detailsController,
                     maxLines: 4,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Who is Eligible (Optional)'),
+                    decoration: const InputDecoration(hintText: 'Who is Eligible (Optional)'),
                     controller: viewModel.whoController,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    onTap: viewModel.selectEligibility,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'How to Get (Optional)'),
+                    decoration: const InputDecoration(hintText: 'How to Get (Optional)'),
                     controller: viewModel.howToGetController,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Link (Optional)'),
+                    decoration: const InputDecoration(hintText: 'Link (Optional)'),
                     controller: viewModel.linkController,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'VAT Number (Optional)'),
+                    decoration: const InputDecoration(hintText: 'VAT Number (Optional)'),
                     controller: viewModel.vatNumberController,
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text.rich(
+                          TextSpan(
+                            text: 'Contact Informations\n',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '(Hidden from public)',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          decoration: const InputDecoration(hintText: "Name"),
+                          controller: viewModel.contactName,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          decoration: const InputDecoration(hintText: "Email (Optional)"),
+                          controller: viewModel.contactEmail,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return null;
+                            } else {
+                              if (!Validate.isEmail(value)) {
+                                return 'Please enter a valid email';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          decoration: const InputDecoration(hintText: "Phone (Optional)"),
+                          controller: viewModel.contactPhone,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          decoration: const InputDecoration(hintText: 'Notes (Optional)'),
+                          controller: viewModel.contactNotes,
+                          maxLines: 4,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: () {
-                      if (viewModel.formKey.currentState!.validate()) {
-                        // Handle form submission
-                        viewModel.submitDeal();
-                      }
-                    },
-                    child: Text('Submit'),
+                    onPressed: viewModel.submitDeal,
+                    child: viewModel.isBusy
+                        ? LoadingAnimationWidget.beat(
+                            color: Colors.white.withOpacity(.8),
+                            size: 20,
+                          )
+                        : const Text('Submit'),
                   ),
                 ],
               ),
@@ -115,5 +183,5 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
   }
 
   @override
-  AddonDealsAddViewModel viewModelBuilder(BuildContext context) => AddonDealsAddViewModel();
+  AddonDealsAddViewModel viewModelBuilder(BuildContext context) => AddonDealsAddViewModel(deal: deal);
 }
