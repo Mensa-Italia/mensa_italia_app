@@ -15,7 +15,7 @@ dependencies:
   dio: ^5.6.0
   dio_cookie_manager: ^3.1.1
   enefty_icons: ^1.0.7
-  faker: ^2.1.0
+  faker: ^2.2.0
   flutter:
     sdk: flutter
   flutter_flip_card: ^0.0.6
