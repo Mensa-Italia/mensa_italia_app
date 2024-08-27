@@ -44,7 +44,7 @@ dependencies:
   sentry_flutter: ^8.6.0
   maplibre_gl: ^0.20.0
   package_info_plus: ^8.0.2
-  syncfusion_flutter_pdfviewer: ^26.2.10
+  syncfusion_flutter_pdfviewer: ^26.2.11
   flutter_localizations:
     sdk: flutter
   webview_cookie_manager: 
