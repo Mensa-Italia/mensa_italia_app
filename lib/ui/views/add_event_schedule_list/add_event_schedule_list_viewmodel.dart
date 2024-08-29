@@ -13,6 +13,7 @@ class AddEventScheduleListViewModel extends MasterModel {
     navigationService.navigateToAddScheduleView().then((value) {
       if (value != null && value is EventScheduleModel) {
         eventSchedules.add(value);
+        eventSchedules.sort((a, b) => a.whenStart.compareTo(b.whenStart));
         rebuildUi();
       }
     });
@@ -26,6 +27,7 @@ class AddEventScheduleListViewModel extends MasterModel {
       navigationService.navigateToAddScheduleView(event: event).then((value) {
         if (value != null && value is EventScheduleModel) {
           eventSchedules[eventSchedules.indexOf(event)] = value;
+          eventSchedules.sort((a, b) => a.whenStart.compareTo(b.whenStart));
           rebuildUi();
         }
       });

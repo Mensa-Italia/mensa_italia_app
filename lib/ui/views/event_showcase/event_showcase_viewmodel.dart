@@ -1,3 +1,4 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
@@ -15,7 +16,7 @@ class EventShowcaseViewModel extends MasterModel {
   load() {
     Api().getEventSchedules(event.id).then((value) {
       eventSchedules.clear();
-      eventSchedules.addAll(value);
+      eventSchedules.addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
       rebuildUi();
     });
   }
@@ -25,8 +26,7 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty &&
-        await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );
