@@ -60,5 +60,7 @@
 	<string>We need access to your camera to allow you to take a photo and upload it to the app.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need microphone access to allow admin members to record audio during video recording.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
