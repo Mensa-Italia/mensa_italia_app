@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'calendar_linker_viewmodel.dart';
 
@@ -10,8 +11,7 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   const CalendarLinkerView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: const CupertinoNavigationBar(
         previousPageTitle: "Settings",
@@ -21,53 +21,71 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                GestureDetector(
-                  onTap: viewModel.addToCalendar,
-                  onLongPress: viewModel.copyToClipboard,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: kcPrimaryColor, width: 4),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "webcal:${viewModel.baseUrl}",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
                 Padding(
-                  padding: const EdgeInsets.all(16).copyWith(top: 0),
+                  padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
                     onPressed: viewModel.addToCalendar,
-                    child: const Text("Add to your calendar"),
+                    child: const Text("Link into your calendar"),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.all(16)
-                      .copyWith(left: 32, right: 32, top: 0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    "Using the above link, you can add the Mensa Italia calendar to your favorite calendar app. You can long press to copy it or just add it to your calendar.",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
+                if (Theme.of(context).platform != TargetPlatform.iOS)
+                  GestureDetector(
+                    onTap: viewModel.copyToClipboard,
+                    onLongPress: viewModel.copyToClipboard,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.all(16).copyWith(bottom: 0, top: 0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: kcPrimaryColor, width: 4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "https:${viewModel.baseUrl}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
+                if (Theme.of(context).platform != TargetPlatform.iOS)
+                  TextButton(
+                    onPressed: () async {
+                      if (await canLaunchUrlString("https://support.google.com/calendar/answer/37100?hl=en&co=GENIE.Platform%3DDesktop#:~:text=Use a link to add a public calendar")) {
+                        launchUrlString(
+                          "https://support.google.com/calendar/answer/37100?hl=en&co=GENIE.Platform%3DDesktop#:~:text=Use a link to add a public calendar",
+                        );
+                      }
+                    },
+                    child: Text(
+                      "Click here to watch a tutorial on how to add a subscribed calendar!",
+                      style: TextStyle(
+                        color: kcPrimaryColor,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                if (Theme.of(context).platform != TargetPlatform.iOS)
+                  Container(
+                    margin: const EdgeInsets.all(16).copyWith(left: 32, right: 32, top: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "You can click on the button to add it to your google calendar. If it dosen't work or you use a different calendar you can hold and copy the link above and use it into a subscribed calendar.",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16)
-                      .copyWith(top: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
                   child: Text("Events subscriptions"),
                 ),
                 const Divider(indent: 16, endIndent: 16),
@@ -109,6 +127,5 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   }
 
   @override
-  CalendarLinkerViewModel viewModelBuilder(BuildContext context) =>
-      CalendarLinkerViewModel();
+  CalendarLinkerViewModel viewModelBuilder(BuildContext context) => CalendarLinkerViewModel();
 }

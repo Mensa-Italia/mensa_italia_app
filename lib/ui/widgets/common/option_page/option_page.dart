@@ -15,8 +15,7 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
@@ -35,20 +34,14 @@ class OptionPage extends StackedView<OptionPageModel> {
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: kcLightGrey,
-                        backgroundImage:
-                            CachedNetworkImageProvider(viewModel.user.avatar),
+                        backgroundImage: CachedNetworkImageProvider(viewModel.user.avatar),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AutoSizeText(viewModel.user.name,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 1.2)),
+                            AutoSizeText(viewModel.user.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, height: 1.2)),
                             AutoSizeText(
                               viewModel.user.email,
                               style: const TextStyle(
@@ -69,17 +62,16 @@ class OptionPage extends StackedView<OptionPageModel> {
             const SizedBox(height: 20),
             _SettingContainer(
               children: [
-                /*_OptionTile(
+                _OptionTile(
                   title: "Calendare linker",
                   subtitle: "Mensa calendar on your phone",
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
                   color: Colors.orange,
-                ),*/
+                ),
                 _OptionTile(
                   title: "Renew Membership",
-                  trailing: DateFormat.yMMMd()
-                      .format(viewModel.user.expireMembership),
+                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
@@ -119,8 +111,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -192,8 +183,7 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
-        TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(

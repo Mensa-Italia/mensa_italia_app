@@ -315,7 +315,6 @@ class Api {
             "when_start": startDate.toIso8601String(),
             "when_end": endDate.toIso8601String(),
             "is_national": isNational,
-            "owner": pb.authStore.model.id,
             if (!isOnline) "position": positionId,
           },
           files: image == null

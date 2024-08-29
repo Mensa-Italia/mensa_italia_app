@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/model/calendar_link.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CalendarLinkerViewModel extends MasterModel {
@@ -24,26 +25,28 @@ class CalendarLinkerViewModel extends MasterModel {
   String get baseUrl => "//svc.mensa.it/ical/${calendarLink!.hash}";
 
   void addToCalendar() async {
-    if (Platform.isIOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
       if (await canLaunchUrlString("webcal:$baseUrl")) {
         launchUrlString("webcal:$baseUrl");
       }
     } else {
-      if (await canLaunchUrlString(
-          "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}")) {
-        launchUrlString(
-            "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}");
+      if (await canLaunchUrlString("https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}")) {
+        launchUrlString("https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}");
       }
+    }
+  }
+
+  String getPlatformUrl() {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+      return "webcal:$baseUrl";
+    } else {
+      return "https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}";
     }
   }
 
   void copyToClipboard() async {
     print("Copying to clipboard");
     String url = "https:$baseUrl";
-    if (Platform.isAndroid) {
-      url =
-          "https://calendar.google.com/calendar/render?cid=https:${Uri.encodeQueryComponent(baseUrl)}";
-    }
     Clipboard.setData(ClipboardData(text: url));
     Fluttertoast.showToast(
       msg: "Copied to clipboard",
@@ -66,9 +69,7 @@ class CalendarLinkerViewModel extends MasterModel {
       if (value) {
         newState.add(state);
       } else {
-        newState = newState
-          ..removeWhere(
-              (element) => element.toLowerCase() == state.toLowerCase());
+        newState = newState..removeWhere((element) => element.toLowerCase() == state.toLowerCase());
       }
       Api().changeCalendarLinkState(calendarLink!.id, newState).then((value) {
         calendarLink = value;
