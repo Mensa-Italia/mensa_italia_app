@@ -48,6 +48,7 @@ class MainApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('it'),
+        
       ],
       theme: ThemeData(
         //  platform: TargetPlatform.android,
