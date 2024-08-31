@@ -1,7 +1,4 @@
 import 'dart:typed_data';
-
-import 'package:board_datetime_picker/board_datetime_picker.dart';
-import 'package:board_datetime_picker/src/board_datetime_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -9,10 +6,8 @@ import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 class AddEventViewModel extends MasterModel {
   final formKey = GlobalKey<FormState>();
@@ -26,7 +21,7 @@ class AddEventViewModel extends MasterModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController linkController = TextEditingController();
-  BoardDateTimeMultiSelection? dateTimeOptions;
+  DateTimeRange? dateTimeOptions;
   LocationSelected? location;
   bool isNational = false;
   bool isOnline = false;
@@ -47,12 +42,11 @@ class AddEventViewModel extends MasterModel {
       descriptionController.text = event.description;
       linkController.text = event.infoLink;
 
-      dateTimeOptions = BoardDateTimeMultiSelection(
+      dateTimeOptions = DateTimeRange(
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text =
-          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -136,25 +130,13 @@ class AddEventViewModel extends MasterModel {
   }
 
   void pickDateTime() {
-    showBoardDateTimeMultiPicker(
-      context: StackedService.navigatorKey!.currentContext!,
-      startDate:
-          dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
-      endDate: dateTimeOptions?.end ??
-          DateTime.now().add(Duration(hours: 2, days: 2)),
-      pickerType: DateTimePickerType.datetime,
-      options: BoardDateTimeOptions(
-        startDayOfWeek: DateTime.monday,
-        activeColor: kcPrimaryColor,
-        foregroundColor: Colors.white,
-        pickerFormat: "dMy",
-      ),
-      useSafeArea: true,
+    pickStartEndTime(
+      start: dateTimeOptions?.start,
+      end: dateTimeOptions?.end,
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       }
     });
   }

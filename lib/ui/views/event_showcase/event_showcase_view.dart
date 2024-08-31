@@ -94,12 +94,12 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           if (viewModel.eventSchedules.isNotEmpty) ...[
-            Text("Schedule", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            Divider(),
+            const Text("Schedule", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const Divider(),
             ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 itemCount: viewModel.eventSchedules.length,
@@ -110,11 +110,11 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   return TileSchedue(eventSchedule: event, onTap: () {});
                 },
                 separatorBuilder: (context, index) {
-                  if (index != viewModel.eventSchedules.length - 1 && viewModel.eventSchedules[index].whenStart != viewModel.eventSchedules[index + 1].whenStart) {
+                  if (index != viewModel.eventSchedules.length - 1 && !DateUtils.isSameDay(viewModel.eventSchedules[index].whenStart, viewModel.eventSchedules[index + 1].whenStart)) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(height: 30),
+                        const SizedBox(height: 30),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                           child: Text(
@@ -132,11 +132,11 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   }
                   return const Divider();
                 }),
-            Divider(),
+            const Divider(),
             const SizedBox(height: 20),
           ],
-          Text("Location", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-          SizedBox(
+          const Text("Location", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(

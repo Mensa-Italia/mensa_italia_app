@@ -57,7 +57,7 @@ class MainApp extends StatelessWidget {
         Locale('it'),
       ],
       theme: ThemeData(
-        //  platform: TargetPlatform.android,
+        //platform: TargetPlatform.android,
         fontFamily: "Gotham",
         scaffoldBackgroundColor: const Color.fromRGBO(241, 245, 255, 1),
         inputDecorationTheme: InputDecorationTheme(

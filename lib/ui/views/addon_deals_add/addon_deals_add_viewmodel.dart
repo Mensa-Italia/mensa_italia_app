@@ -1,4 +1,3 @@
-import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +6,6 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:board_datetime_picker/src/board_datetime_widget.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -33,7 +31,7 @@ class AddonDealsAddViewModel extends MasterModel {
   final contactNotes = TextEditingController();
 
   String? detailID;
-  BoardDateTimeMultiSelection? dateTimeOptions;
+  DateTimeRange? dateTimeOptions;
   LocationSelected? location;
   String selectedEligibility = "active_members";
 
@@ -44,7 +42,7 @@ class AddonDealsAddViewModel extends MasterModel {
       commercialSectorController.text = deal!.commercialSector;
       locationController.text = deal!.position?.name ?? "";
       if (deal?.starting != null && deal?.ending != null) {
-        dateTimeOptions = BoardDateTimeMultiSelection(
+        dateTimeOptions = DateTimeRange(
           start: deal!.starting!,
           end: deal!.ending!,
         );
@@ -141,18 +139,9 @@ class AddonDealsAddViewModel extends MasterModel {
   }
 
   void pickDateTime() {
-    showBoardDateTimeMultiPicker(
-      context: StackedService.navigatorKey!.currentContext!,
-      startDate: dateTimeOptions?.start ?? DateTime.now().add(Duration(days: 2)),
-      endDate: dateTimeOptions?.end ?? DateTime.now().add(Duration(hours: 2, days: 2)),
-      pickerType: DateTimePickerType.datetime,
-      options: const BoardDateTimeOptions(
-        startDayOfWeek: DateTime.monday,
-        activeColor: kcPrimaryColor,
-        foregroundColor: Colors.white,
-        pickerFormat: "dMy",
-      ),
-      useSafeArea: true,
+    pickStartEndTime(
+      start: dateTimeOptions?.start,
+      end: dateTimeOptions?.end,
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;

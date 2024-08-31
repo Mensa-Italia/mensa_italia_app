@@ -14,19 +14,24 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   const MapPickerView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, MapPickerViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, MapPickerViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
       appBar: getAppBarPlatform(
         title: "Select Location",
         previousPageTitle: "Add Event",
+        searchBarActions: SearchBarActions(
+          controller: viewModel.searchController,
+          onChanged: viewModel.onSearchChanged,
+          onSubmitted: viewModel.onSearchSubmitted,
+          focusNode: viewModel.searchFocusNode,
+        ),
       ),
+      resizeToAvoidBottomInset: true,
       bottomNavigationBar: SafeArea(
         child: Container(
           margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-              .copyWith(right: 8, left: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8).copyWith(right: 8, left: 32),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(.9),
             borderRadius: const BorderRadius.all(Radius.circular(100)),
@@ -39,10 +44,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
             ],
           ),
           child: viewModel.locationName.isEmpty
-              ? const Text("Zoom in to select a location",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold))
+              ? const Text("Zoom in to select a location", textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
               : Row(
                   children: [
                     Expanded(
@@ -71,8 +73,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
           children: [
             Positioned.fill(
               child: MapLibreMap(
-                styleString:
-                    "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
+                styleString: "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
                 initialCameraPosition: const CameraPosition(
                   target: LatLng(42.715210940127285, 12.854392595268873),
                   zoom: 4,
@@ -101,6 +102,34 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
                   ),
                 ),
               ),
+            if (viewModel.searchFocusNode.hasFocus)
+              Positioned(
+                top: 10,
+                left: 10,
+                right: 10,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(.3),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red, width: 1),
+                      ),
+                      child: const Text(
+                        "The search data may not be accurate, please verify the location and move the marker to the correct location",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -108,6 +137,5 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   }
 
   @override
-  MapPickerViewModel viewModelBuilder(BuildContext context) =>
-      MapPickerViewModel();
+  MapPickerViewModel viewModelBuilder(BuildContext context) => MapPickerViewModel();
 }

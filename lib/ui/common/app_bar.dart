@@ -5,9 +5,12 @@ import 'package:stacked_services/stacked_services.dart';
 class SearchBarActions {
   final Function(String) onChanged;
   final Function(String) onSubmitted;
+
   final TextEditingController controller;
 
-  SearchBarActions({required this.onChanged, required this.controller, required this.onSubmitted});
+  FocusNode? focusNode;
+
+  SearchBarActions({required this.onChanged, required this.controller, required this.onSubmitted, this.focusNode});
 }
 
 getAppBarSliverPlatform({required String title, String? previousPageTitle, List<Widget>? trailings, Widget? leading, List<Widget>? trailingTitle, SearchBarActions? searchBarActions}) {
@@ -37,6 +40,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                   controller: searchBarActions.controller,
                   prefixIcon: const Icon(CupertinoIcons.search),
                   onSubmitted: searchBarActions.onSubmitted,
+                  focusNode: searchBarActions.focusNode,
                 ),
               ),
             ),
@@ -84,6 +88,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                           onChanged: searchBarActions.onChanged,
                           controller: searchBarActions.controller,
                           onSubmitted: searchBarActions.onSubmitted,
+                          focusNode: searchBarActions.focusNode,
                           decoration: const InputDecoration(
                             hintText: 'Search',
                             prefixIcon: Icon(Icons.search),
@@ -103,7 +108,11 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
           fontWeight: FontWeight.bold,
         ),
       ),
-      expandedHeight: getExpandedHeight(StackedService.navigatorKey!.currentContext!, hasSearchBar: searchBarActions != null, hasTrailingTitle: trailingTitle != null),
+      expandedHeight: getExpandedHeight(
+        StackedService.navigatorKey!.currentContext!,
+        hasSearchBar: searchBarActions != null,
+        hasTrailingTitle: trailingTitle != null,
+      ),
       floating: false,
       pinned: true,
       actions: [leading ?? const SizedBox(), ...(trailings ?? [])],
@@ -125,42 +134,41 @@ double getExpandedHeight(BuildContext context, {bool hasSearchBar = false, bool 
 
 getAppBarPlatform({required String title, String? previousPageTitle, List<Widget>? trailings, Widget? leading, SearchBarActions? searchBarActions}) {
   if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
-    return CupertinoNavigationBar(
-      previousPageTitle: previousPageTitle,
-      middle: (searchBarActions != null)
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                ),
-                SizedBox(
-                  height: 40,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15, top: 3),
-                    child: CupertinoSearchTextField(
-                      onChanged: searchBarActions.onChanged,
-                      controller: searchBarActions.controller,
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      onSubmitted: searchBarActions.onSubmitted,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : Text(
+    return PreferredSize(
+      preferredSize: Size.fromHeight(kToolbarHeight + (searchBarActions != null ? 50 : 0)),
+      child: Column(
+        children: [
+          CupertinoNavigationBar(
+            previousPageTitle: previousPageTitle,
+            middle: Text(
               title,
             ),
-      backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor.withOpacity(.8),
-      border: null,
-      leading: leading,
-      trailing: trailings == null
-          ? null
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: trailings,
+            backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor.withOpacity(.8),
+            border: null,
+            leading: leading,
+            trailing: trailings == null
+                ? null
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: trailings,
+                  ),
+          ),
+          if (searchBarActions != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(bottom: 10),
+              child: TextField(
+                onChanged: searchBarActions.onChanged,
+                controller: searchBarActions.controller,
+                onSubmitted: searchBarActions.onSubmitted,
+                focusNode: searchBarActions.focusNode,
+                decoration: const InputDecoration(
+                  hintText: 'Search',
+                  prefixIcon: Icon(CupertinoIcons.search),
+                ),
+              ),
             ),
+        ],
+      ),
     );
   } else {
     return AppBar(
@@ -170,6 +178,24 @@ getAppBarPlatform({required String title, String? previousPageTitle, List<Widget
           fontWeight: FontWeight.bold,
         ),
       ),
+      bottom: searchBarActions != null
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(50),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(bottom: 10),
+                child: TextField(
+                  onChanged: searchBarActions.onChanged,
+                  controller: searchBarActions.controller,
+                  onSubmitted: searchBarActions.onSubmitted,
+                  focusNode: searchBarActions.focusNode,
+                  decoration: const InputDecoration(
+                    hintText: 'Search',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+            )
+          : null,
       actions: [leading ?? SizedBox(), ...(trailings ?? [])],
       backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor,
     );
