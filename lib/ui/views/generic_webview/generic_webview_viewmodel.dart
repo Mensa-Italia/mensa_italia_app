@@ -54,7 +54,7 @@ class GenericWebviewViewModel extends MasterModel {
   WebViewController? controller;
   double wholeOpacity = 0;
   final String url;
-  bool _pageOpened = false;
+  bool _pageOpened = true;
 
   GenericWebviewViewModel({required this.url}) {
     ScraperApi().getCookieJar().then((cookieMn) {
@@ -71,9 +71,9 @@ class GenericWebviewViewModel extends MasterModel {
                 rebuildUi();
               },
               onPageFinished: (String url) async {
+                print(url);
                 try {
-                  if (url.startsWith(
-                      "https://www.cloud32.it/Associazioni/utenti/login")) {
+                  if (url.startsWith("https://www.cloud32.it/Associazioni/utenti/login")) {
                     _pageOpened = false;
                     await controller!.runJavaScript(jsForceLogin
                         .replaceAll(
@@ -87,8 +87,7 @@ class GenericWebviewViewModel extends MasterModel {
                   } else {
                     await controller!.runJavaScript(jsBeautifyPage);
                     if (!_pageOpened && url != this.url) {
-                      await controller!.runJavaScript(
-                          jsRedirectToURL.replaceAll("{url}", this.url));
+                      await controller!.runJavaScript(jsRedirectToURL.replaceAll("{url}", this.url));
                     } else {
                       _pageOpened = true;
                     }

@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mensa_italia_app/api/dio_area_interceptor.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';

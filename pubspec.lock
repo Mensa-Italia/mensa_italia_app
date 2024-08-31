@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
+  app_version_update:
+    dependency: "direct main"
+    description:
+      name: app_version_update
+      sha256: "4818511de5a3d5187370eb754d6c9d69e498ed1c725d74760206cb96439ccf21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.1"
   archive:
     dependency: transitive
     description:
