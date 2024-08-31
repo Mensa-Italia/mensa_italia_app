@@ -74,6 +74,8 @@ PODS:
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
+  - in_app_review (0.2.0):
+    - Flutter
   - MapLibre (6.5.0)
   - maplibre_gl (0.0.1):
     - Flutter
@@ -128,6 +130,7 @@ DEPENDENCIES:
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - gyro_provider (from `.symlinks/plugins/gyro_provider/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - maps_launcher (from `.symlinks/plugins/maps_launcher/ios`)
   - open_filex (from `.symlinks/plugins/open_filex/ios`)
@@ -178,6 +181,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/gyro_provider/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  in_app_review:
+    :path: ".symlinks/plugins/in_app_review/ios"
   maplibre_gl:
     :path: ".symlinks/plugins/maplibre_gl/ios"
   maps_launcher:
@@ -223,6 +228,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   gyro_provider: 1dc6ef8738f4c9e3b5359c9d20ed9c31104383aa
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
+  in_app_review: 318597b3a06c22bb46dc454d56828c85f444f99d
   MapLibre: 0ebfa9329d313cec8bf0a5ba5a336a1dc903785e
   maplibre_gl: 943a491fffb3337c1b9de57fd377206d18c16e34
   maps_launcher: 2e5b6a2d664ec6c27f82ffa81b74228d770ab203

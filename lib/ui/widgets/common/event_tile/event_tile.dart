@@ -11,12 +11,10 @@ class EventTile extends StackedView<EventTileModel> {
   final EventModel event;
   final Function() onTap;
   final Function? onLongTap;
-  const EventTile(
-      {super.key, required this.event, required this.onTap, this.onLongTap});
+  const EventTile({super.key, required this.event, required this.onTap, this.onLongTap});
 
   @override
-  Widget builder(
-      BuildContext context, EventTileModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventTileModel viewModel, Widget? child) {
     return GestureDetector(
       onTap: onTap,
       onLongPress: () {
@@ -71,6 +69,10 @@ class EventTile extends StackedView<EventTileModel> {
                       width: double.infinity,
                       imageUrl: event.image,
                       fit: BoxFit.cover,
+                      memCacheHeight: 595,
+                      memCacheWidth: 1059,
+                      maxHeightDiskCache: 595,
+                      maxWidthDiskCache: 1059,
                     ),
                   ),
                 ),
@@ -127,6 +129,10 @@ class EventTile extends StackedView<EventTileModel> {
                   child: CachedNetworkImage(
                     imageUrl: event.image,
                     fit: BoxFit.cover,
+                    memCacheHeight: 264,
+                    memCacheWidth: 1059,
+                    maxHeightDiskCache: 264,
+                    maxWidthDiskCache: 1059,
                   ),
                 ),
               ),
@@ -142,8 +148,7 @@ class EventTile extends StackedView<EventTileModel> {
                             const TextSpan(text: '\n'),
                             TextSpan(
                               text: event.position?.state ?? "Online",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.normal, fontSize: 12),
+                              style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
                             ),
                           ],
                         ),

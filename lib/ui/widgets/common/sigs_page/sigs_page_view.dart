@@ -10,7 +10,7 @@ import 'package:stacked/stacked.dart';
 import 'sigs_page_viewmodel.dart';
 
 class SigsPage extends StackedView<SigsPageModel> {
-  const SigsPage({Key? key}) : super(key: key);
+  const SigsPage({super.key});
 
   @override
   Widget builder(BuildContext context, SigsPageModel viewModel, Widget? child) {
@@ -40,16 +40,14 @@ class SigsPage extends StackedView<SigsPageModel> {
           itemBuilder: (context, index) {
             final sig = viewModel.sigs[index];
             return SigTile(
+              key: ValueKey(sig.id),
               sig: sig,
               onTap: viewModel.onTapOnSIG(sig),
-              onLongTap: (viewModel.allowControlSigs())
-                  ? viewModel.onLongTapEditSig(sig)
-                  : null,
+              onLongTap: (viewModel.allowControlSigs()) ? viewModel.onLongTapEditSig(sig) : null,
             );
           },
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

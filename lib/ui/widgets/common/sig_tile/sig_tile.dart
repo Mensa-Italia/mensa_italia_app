@@ -10,8 +10,7 @@ class SigTile extends StackedView<SigTileModel> {
   final SigModel sig;
   final void Function() onTap;
   final Function? onLongTap;
-  const SigTile(
-      {super.key, required this.sig, required this.onTap, this.onLongTap});
+  const SigTile({super.key, required this.sig, required this.onTap, this.onLongTap});
 
   @override
   Widget builder(BuildContext context, SigTileModel viewModel, Widget? child) {
@@ -65,7 +64,14 @@ class SigTile extends StackedView<SigTileModel> {
                         ),
                       ),
                     )
-                  : CachedNetworkImage(imageUrl: sig.image, fit: BoxFit.cover),
+                  : CachedNetworkImage(
+                      imageUrl: sig.image,
+                      fit: BoxFit.cover,
+                      maxWidthDiskCache: 1131,
+                      maxHeightDiskCache: 446,
+                      memCacheWidth: 1131,
+                      memCacheHeight: 446,
+                    ),
             ),
           ),
         ),

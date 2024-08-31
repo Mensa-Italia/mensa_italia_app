@@ -11,8 +11,7 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
   const AddonAreaDocumentsView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel,
-      Widget? child) {
+  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel, Widget? child) {
     return Scaffold(
       body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
@@ -41,6 +40,7 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
               itemCount: viewModel.documents.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  key: ValueKey(viewModel.documents[index].link),
                   onTap: viewModel.onTap(viewModel.documents[index]),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   dense: true,
@@ -49,7 +49,14 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
                     imageUrl: viewModel.documents[index].image,
                     width: 30,
                     height: 30,
+                    memCacheHeight: 90,
+                    memCacheWidth: 90,
+                    maxHeightDiskCache: 90,
+                    maxWidthDiskCache: 90,
+                    fit: BoxFit.cover,
                     imageBuilder: (context, imageProvider) => Container(
+                      width: 30,
+                      height: 30,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(300),
                         image: DecorationImage(
@@ -64,14 +71,12 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
               },
               separatorBuilder: (context, index) => const Divider(),
             ),
-          const SliverSafeArea(
-              sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+          const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
         ],
       ),
     );
   }
 
   @override
-  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) =>
-      AddonAreaDocumentsViewModel();
+  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) => AddonAreaDocumentsViewModel();
 }

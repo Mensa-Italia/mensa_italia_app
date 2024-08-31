@@ -26,6 +26,7 @@ class OptionPage extends StackedView<OptionPageModel> {
           children: [
             const SizedBox(height: 20),
             _SettingContainer(
+              key: ValueKey("settings:0"),
               children: [
                 GestureDetector(
                   child: Row(
@@ -34,7 +35,11 @@ class OptionPage extends StackedView<OptionPageModel> {
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: kcLightGrey,
-                        backgroundImage: CachedNetworkImageProvider(viewModel.user.avatar),
+                        backgroundImage: CachedNetworkImageProvider(
+                          viewModel.user.avatar,
+                          maxHeight: 180,
+                          maxWidth: 180,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -61,13 +66,14 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
             const SizedBox(height: 20),
             _SettingContainer(
+              key: const ValueKey("settings:1"),
               children: [
                 _OptionTile(
                   title: "Calendar linker",
                   subtitle: "Mensa calendar on your phone",
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
-                  color: Colors.orange,
+                  color: Colors.red,
                 ),
                 _OptionTile(
                   title: "Renew Membership",
@@ -86,6 +92,19 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
             const SizedBox(height: 20),
             _SettingContainer(
+              key: const ValueKey("settings:2"),
+              children: [
+                _OptionTile(
+                  title: "Leave a review",
+                  icon: EneftyIcons.star_outline,
+                  onTap: viewModel.openReview,
+                  color: Colors.orangeAccent,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _SettingContainer(
+              key: const ValueKey("settings:3"),
               children: [
                 _OptionTile(
                   title: "Privacy Policy",

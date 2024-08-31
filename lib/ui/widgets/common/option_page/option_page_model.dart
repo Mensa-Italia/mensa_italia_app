@@ -1,3 +1,4 @@
+import 'package:in_app_review/in_app_review.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
@@ -29,8 +30,7 @@ class OptionPageModel extends MasterModel {
 
   void openPrivacyPolicy() {
     navigationService.navigateToDocumentViewerView(
-      downlaodUrl:
-          "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
+      downlaodUrl: "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
       title: "Privacy Policy",
       previousPageTitle: "Settings",
     );
@@ -56,5 +56,12 @@ class OptionPageModel extends MasterModel {
 
   openCalendarLinker() {
     navigationService.navigateToCalendarLinkerView();
+  }
+
+  openReview() async {
+    final InAppReview inAppReview = InAppReview.instance;
+    inAppReview.openStoreListing(
+      appStoreId: "1524200080",
+    );
   }
 }

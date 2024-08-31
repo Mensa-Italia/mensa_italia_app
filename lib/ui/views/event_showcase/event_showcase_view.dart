@@ -63,6 +63,10 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 child: CachedNetworkImage(
                   imageUrl: event.image,
                   fit: BoxFit.cover,
+                  memCacheHeight: 554,
+                  memCacheWidth: 1059,
+                  maxHeightDiskCache: 554,
+                  maxWidthDiskCache: 1059,
                 ),
               ),
               child: Container(
@@ -80,6 +84,10 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 child: CachedNetworkImage(
                   width: double.infinity,
                   imageUrl: event.image,
+                  memCacheHeight: 554,
+                  memCacheWidth: 1059,
+                  maxHeightDiskCache: 554,
+                  maxWidthDiskCache: 1059,
                 ),
               ),
             ),
