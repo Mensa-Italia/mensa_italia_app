@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/find_locale.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import 'package:mensa_italia_app/app/app.bottomsheets.dart';
 import 'package:mensa_italia_app/app/app.dialogs.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -14,6 +16,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Intl.defaultLocale = await findSystemLocale();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (_) {}
   await setupLocator();
   setupDialogUi();
   setupBottomSheetUi();
@@ -48,7 +55,6 @@ class MainApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('it'),
-        
       ],
       theme: ThemeData(
         //  platform: TargetPlatform.android,

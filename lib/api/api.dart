@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
@@ -18,6 +22,7 @@ import 'package:http/http.dart' as http;
 class Api {
   final Dio dio = Dio(BaseOptions(baseUrl: 'https://svc.mensa.it'));
   final pb = PocketBase('https://svc.mensa.it');
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   Api._privateConstructor() {
     dio.httpClientAdapter = NativeAdapter();
@@ -27,6 +32,49 @@ class Api {
 
   factory Api() {
     return _instance;
+  }
+
+  Future<void> addDevice() async {
+    try {
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        String? token = "NOTOKEN";
+        try {
+          token = await messaging.getToken();
+        } catch (_) {}
+        if (token != null) {
+          DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+          if (Platform.isAndroid) {
+            AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+            await pb.collection('users_devices').create(
+              body: {
+                "user": pb.authStore.model.id,
+                "firebase_id": token,
+                "device_name": androidInfo.model,
+              },
+            );
+          } else if (Platform.isIOS) {
+            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+            await pb.collection('users_devices').create(
+              body: {
+                "user": pb.authStore.model.id,
+                "firebase_id": token,
+                "device_name": iosInfo.utsname.machine,
+              },
+            );
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   Future<bool> login({required String email, required String password}) async {
@@ -39,6 +87,7 @@ class Api {
       final model = RecordModel.fromJson(value.data["record"]);
       pb.authStore.save(token, model);
       return await ScraperApi().doLoginAndRetrieveMain(email, password).then((value) {
+        addDevice();
         return true;
       }).catchError((e) {
         return false;

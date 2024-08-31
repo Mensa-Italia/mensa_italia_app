@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "253044008911",
+    "firebase_url": "https://mensa-platform.firebaseio.com",
+    "project_id": "mensa-platform",
+    "storage_bucket": "mensa-platform.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253044008911:android:85a33d255b8a9e6ea694ba",
+        "android_client_info": {
+          "package_name": "it.mensa.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253044008911-1n2r7gba2us5otfbo27ntqkpq03r4aoq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-KPqku2tE3dicluGIR0rCamYBCczRY_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253044008911-1n2r7gba2us5otfbo27ntqkpq03r4aoq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -63,7 +63,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             _SettingContainer(
               children: [
                 _OptionTile(
-                  title: "Calendare linker",
+                  title: "Calendar linker",
                   subtitle: "Mensa calendar on your phone",
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
