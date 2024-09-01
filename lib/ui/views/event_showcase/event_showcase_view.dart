@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event.dart';
@@ -13,7 +12,7 @@ import 'event_showcase_viewmodel.dart';
 
 class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   final EventModel event;
-  const EventShowcaseView({Key? key, required this.event}) : super(key: key);
+  const EventShowcaseView({super.key, required this.event});
 
   @override
   Widget builder(BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {

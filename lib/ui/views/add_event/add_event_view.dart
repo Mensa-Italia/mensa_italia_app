@@ -46,7 +46,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                 borderType: BorderType.RRect,
                 radius: const Radius.circular(30),
                 strokeWidth: 3,
-                dashPattern: [3, 5],
+                dashPattern: const [3, 5],
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(30)),
                   child: AspectRatio(
@@ -197,7 +197,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                   ),
                   child: ListTile(
                     onTap: viewModel.editSchedule,
-                    title: Text("Edit schedule"),
+                    title: const Text("Edit schedule"),
                     trailing: const Icon(CupertinoIcons.chevron_forward),
                   ),
                 ),
@@ -230,7 +230,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
 
 class _SettingContainer extends StatelessWidget {
   final List<Widget> children;
-  const _SettingContainer({super.key, required this.children});
+  const _SettingContainer({required this.children});
 
   @override
   Widget build(BuildContext context) {

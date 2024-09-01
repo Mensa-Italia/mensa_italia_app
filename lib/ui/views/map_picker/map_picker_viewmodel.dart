@@ -21,7 +21,7 @@ class MapPickerViewModel extends MasterModel {
   MapLibreMapController? mapController;
   Placemark? locationToUse;
   String get locationName => locationToUse?.name ?? "";
-  LatLng locationCoordinates = LatLng(0, 0);
+  LatLng locationCoordinates = const LatLng(0, 0);
   String isSearching = "";
 
   TextEditingController searchController = TextEditingController();

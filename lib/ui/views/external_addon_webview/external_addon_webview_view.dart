@@ -8,8 +8,7 @@ import 'external_addon_webview_viewmodel.dart';
 class ExternalAddonWebviewView
     extends StackedView<ExternalAddonWebviewViewModel> {
   final String addonID;
-  const ExternalAddonWebviewView({Key? key, required this.addonID})
-      : super(key: key);
+  const ExternalAddonWebviewView({super.key, required this.addonID});
 
   @override
   Widget builder(BuildContext context, ExternalAddonWebviewViewModel viewModel,

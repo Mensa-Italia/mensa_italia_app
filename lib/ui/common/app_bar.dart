@@ -24,7 +24,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
             children: [
               Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.w900),
+                style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               const Expanded(child: SizedBox()),
               ...trailingTitle ?? [],
@@ -51,7 +51,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
       border: null,
       middle: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       alwaysShowMiddle: false,
       leading: leading,
@@ -75,7 +75,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                     trailingTitle != null
                         ? Row(
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               ...trailingTitle,
                             ],
                           )
@@ -93,7 +93,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                             hintText: 'Search',
                             prefixIcon: Icon(Icons.search),
                             isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           ),
                         ),
                       ),
@@ -174,7 +174,7 @@ getAppBarPlatform({required String title, String? previousPageTitle, List<Widget
     return AppBar(
       title: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -196,7 +196,7 @@ getAppBarPlatform({required String title, String? previousPageTitle, List<Widget
               ),
             )
           : null,
-      actions: [leading ?? SizedBox(), ...(trailings ?? [])],
+      actions: [leading ?? const SizedBox(), ...(trailings ?? [])],
       backgroundColor: Theme.of(StackedService.navigatorKey!.currentContext!).scaffoldBackgroundColor,
     );
   }

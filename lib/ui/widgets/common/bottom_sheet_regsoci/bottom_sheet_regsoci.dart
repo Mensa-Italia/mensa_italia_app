@@ -134,7 +134,7 @@ class _squareButtoon extends StatelessWidget {
   final String text;
   final Function()? onPressed;
   const _squareButtoon(
-      {super.key, required this.icon, required this.text, this.onPressed});
+      {required this.icon, required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {

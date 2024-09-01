@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event.dart';
@@ -11,7 +10,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'event_calendar_viewmodel.dart';
 
 class EventCalendarView extends StackedView<EventCalendarViewModel> {
-  const EventCalendarView({Key? key}) : super(key: key);
+  const EventCalendarView({super.key});
 
   @override
   Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
@@ -133,11 +132,11 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AspectRatio(
+                  aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: event.image,
                     fit: BoxFit.cover,
                   ),
-                  aspectRatio: 16 / 9,
                 ),
                 Container(
                   padding: const EdgeInsets.all(10),

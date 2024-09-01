@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -8,7 +7,7 @@ import 'package:stacked/stacked.dart';
 import 'addon_contacts_viewmodel.dart';
 
 class AddonContactsView extends StackedView<AddonContactsViewModel> {
-  const AddonContactsView({Key? key}) : super(key: key);
+  const AddonContactsView({super.key});
 
   @override
   Widget builder(BuildContext context, AddonContactsViewModel viewModel, Widget? child) {

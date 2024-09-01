@@ -119,20 +119,20 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
                         title: "Name",
                         content: viewModel.dealsContact!.name,
                       ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (viewModel.dealsContact!.email.isNotEmpty)
                       _DealBlock(
                         title: "Email",
                         content: viewModel.dealsContact!.email,
                       ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (viewModel.dealsContact!.phoneNumber != null &&
                         viewModel.dealsContact!.phoneNumber!.isNotEmpty)
                       _DealBlock(
                         title: "Phone",
                         content: viewModel.dealsContact!.phoneNumber,
                       ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (viewModel.dealsContact!.note != null &&
                         viewModel.dealsContact!.note!.isNotEmpty)
                       _DealBlock(

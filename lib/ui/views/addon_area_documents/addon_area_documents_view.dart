@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
@@ -8,7 +7,7 @@ import 'package:stacked/stacked.dart';
 import 'addon_area_documents_viewmodel.dart';
 
 class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
-  const AddonAreaDocumentsView({Key? key}) : super(key: key);
+  const AddonAreaDocumentsView({super.key});
 
   @override
   Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel, Widget? child) {

@@ -261,7 +261,7 @@ class ScraperApi {
 
       Response response;
       response = await dio.get(
-        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=${surnameToSearch}&s_nome=${nameToSearch}&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
+        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=$surnameToSearch&s_nome=$nameToSearch&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
         options: Options(
           headers: getHeader(),
           followRedirects: false,
@@ -297,7 +297,7 @@ class ScraperApi {
       }
 
       response = await dio.get(
-        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=${nameToSearch}&s_nome=${surnameToSearch}&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
+        "https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=$nameToSearch&s_nome=$surnameToSearch&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca&page=$page",
         options: Options(
           headers: getHeader(),
           followRedirects: false,
@@ -399,7 +399,7 @@ class ScraperApi {
         var mapEntry = MapEntry(key, value);
         return mapEntry;
       } catch (e) {
-        return MapEntry("", "");
+        return const MapEntry("", "");
       }
     }).toList());
 

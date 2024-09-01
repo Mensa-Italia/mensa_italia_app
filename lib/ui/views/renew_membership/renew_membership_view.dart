@@ -5,7 +5,7 @@ import 'package:stacked/stacked.dart';
 import 'renew_membership_viewmodel.dart';
 
 class RenewMembershipView extends StackedView<RenewMembershipViewModel> {
-  const RenewMembershipView({Key? key}) : super(key: key);
+  const RenewMembershipView({super.key});
 
   @override
   Widget builder(

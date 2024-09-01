@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enefty_icons/enefty_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/addon.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -41,7 +40,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               ),
             if (viewModel.isSearching("contacts"))
               _InternalAddonButton(
-                key: ValueKey("Internal:Contacts"),
+                key: const ValueKey("Internal:Contacts"),
                 name: "Contacts",
                 description: "Your Mensa Italia contacts, you can find any contact you need!",
                 icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
@@ -49,7 +48,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               ),
             if (viewModel.isSearching("deals"))
               _InternalAddonButton(
-                key: ValueKey("Internal:Deals"),
+                key: const ValueKey("Internal:Deals"),
                 name: "Deals",
                 description: "Deals and discounts for Mensa Italia members",
                 icon: const Icon(EneftyIcons.moneys_outline, color: kcPrimaryColor, size: 40),
@@ -57,7 +56,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               ),
             if (viewModel.isSearching("documents"))
               _InternalAddonButton(
-                key: ValueKey("Internal:Documents"),
+                key: const ValueKey("Internal:Documents"),
                 name: "Documents",
                 description: "Official documents of Mensa Italia",
                 icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
@@ -65,7 +64,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               ),
             if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
               _InternalAddonButton(
-                key: ValueKey("Internal:TestMakers"),
+                key: const ValueKey("Internal:TestMakers"),
                 name: "TestMakers",
                 description: "You see this because you're one of the test makers!",
                 icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
@@ -87,7 +86,7 @@ class AddonPage extends StackedView<AddonPageModel> {
                 key: ValueKey(addon.id),
                 addon: addon,
               );
-            }).toList(),
+            }),
           ],
         ),
         const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
@@ -102,7 +101,7 @@ class AddonPage extends StackedView<AddonPageModel> {
 class _ExternalAddonButton extends ViewModelWidget<AddonPageModel> {
   final AddonModel addon;
 
-  const _ExternalAddonButton({Key? key, required this.addon}) : super(key: key);
+  const _ExternalAddonButton({super.key, required this.addon});
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {
     return GestureDetector(
@@ -197,7 +196,7 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
   final Widget icon;
   final Function() onTap;
 
-  const _InternalAddonButton({Key? key, required this.name, required this.description, required this.icon, required this.onTap}) : super(key: key);
+  const _InternalAddonButton({super.key, required this.name, required this.description, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {

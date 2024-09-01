@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enefty_icons/enefty_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -26,7 +25,7 @@ class OptionPage extends StackedView<OptionPageModel> {
           children: [
             const SizedBox(height: 20),
             _SettingContainer(
-              key: ValueKey("settings:0"),
+              key: const ValueKey("settings:0"),
               children: [
                 GestureDetector(
                   child: Row(
@@ -147,7 +146,6 @@ class _OptionTile extends StatelessWidget {
   final Function()? onTap;
   final Color color;
   const _OptionTile({
-    super.key,
     this.title = "Logout",
     this.subtitle = "",
     this.trailing = "",

@@ -31,7 +31,7 @@ class MembershipPage extends StackedView<MembershipPageModel> {
           key: ValueKey("UserInfoTopBar"),
         ),
         RepaintBoundary(
-          key: ValueKey("MembershipCard"),
+          key: const ValueKey("MembershipCard"),
           child: _MembershipCard(),
         ),
         if (viewModel.nextEvent != null || viewModel.lastSig != null || viewModel.lastBlogPost != null) ...[
@@ -66,7 +66,7 @@ class MembershipPage extends StackedView<MembershipPageModel> {
 }
 
 class _UserInfoTopBar extends ViewModelWidget<MembershipPageModel> {
-  const _UserInfoTopBar({Key? key}) : super(key: key);
+  const _UserInfoTopBar({super.key});
 
   @override
   Widget build(BuildContext context, MembershipPageModel viewModel) {
@@ -249,7 +249,7 @@ class _MembershipCard extends ViewModelWidget<MembershipPageModel> {
 }
 
 class _highlights extends ViewModelWidget<MembershipPageModel> {
-  const _highlights({Key? key}) : super(key: key);
+  const _highlights({super.key});
 
   @override
   Widget build(BuildContext context, MembershipPageModel viewModel) {
@@ -293,7 +293,7 @@ class _highlightsCard extends StatelessWidget {
   final String link;
   final Function() onTap;
 
-  const _highlightsCard({super.key, required this.title, required this.image, required this.link, required this.onTap});
+  const _highlightsCard({required this.title, required this.image, required this.link, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +351,7 @@ class _highlightsCard extends StatelessWidget {
 }
 
 class _addons extends ViewModelWidget<MembershipPageModel> {
-  const _addons({Key? key}) : super(key: key);
+  const _addons({super.key});
 
   @override
   Widget build(BuildContext context, MembershipPageModel viewModel) {
@@ -406,11 +406,11 @@ class _addonsCard extends StatelessWidget {
   final Widget icon;
   final Function() onTap;
   final String name;
-  const _addonsCard({Key? key, required this.icon, required this.onTap, required this.name}) : super(key: key);
+  const _addonsCard({required this.icon, required this.onTap, required this.name});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width / 5.5 + MediaQuery.of(context).size.width / 80 * 2,
       child: Column(
         children: [

@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:enefty_icons/enefty_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -11,7 +10,7 @@ import 'package:stacked/stacked.dart';
 import 'map_picker_viewmodel.dart';
 
 class MapPickerView extends StackedView<MapPickerViewModel> {
-  const MapPickerView({Key? key}) : super(key: key);
+  const MapPickerView({super.key});
 
   @override
   Widget builder(BuildContext context, MapPickerViewModel viewModel, Widget? child) {

@@ -75,7 +75,7 @@ class BottomSheetAddSig extends StackedView<BottomSheetAddSigModel> {
                       borderType: BorderType.RRect,
                       radius: const Radius.circular(30),
                       strokeWidth: 3,
-                      dashPattern: [3, 5],
+                      dashPattern: const [3, 5],
                       child: ClipRRect(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(30)),

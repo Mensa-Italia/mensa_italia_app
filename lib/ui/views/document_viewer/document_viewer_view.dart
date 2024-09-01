@@ -9,11 +9,10 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   final String title;
   final String previousPageTitle;
   const DocumentViewerView(
-      {Key? key,
+      {super.key,
       required this.downlaodUrl,
       required this.title,
-      required this.previousPageTitle})
-      : super(key: key);
+      required this.previousPageTitle});
 
   @override
   Widget builder(
@@ -46,13 +45,13 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Icon(
+          Icon(
             Icons.error,
             size: 50,
             color: Colors.red,
           ),
           SizedBox(height: 20),
-          const Text(
+          Text(
             "Failed to load document, probably because this is not a PDF file. Try to get it from the web browser.",
             style: TextStyle(color: Colors.red),
             textAlign: TextAlign.center,

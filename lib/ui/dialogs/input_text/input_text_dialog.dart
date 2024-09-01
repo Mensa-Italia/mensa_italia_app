@@ -12,10 +12,10 @@ class InputTextDialog extends StackedView<InputTextDialogModel> {
   final Function(DialogResponse) completer;
 
   const InputTextDialog({
-    Key? key,
+    super.key,
     required this.request,
     required this.completer,
-  }) : super(key: key);
+  });
 
   @override
   Widget builder(

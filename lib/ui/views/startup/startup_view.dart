@@ -34,7 +34,7 @@ class StartupView extends StackedView<StartupViewModel> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(child: SizedBox()),
+                    const Expanded(child: SizedBox()),
                     Hero(
                       tag: "home_logo",
                       child: SvgPicture.asset(
@@ -43,7 +43,7 @@ class StartupView extends StackedView<StartupViewModel> {
                         height: 100,
                       ),
                     ),
-                    Expanded(child: SizedBox()),
+                    const Expanded(child: SizedBox()),
                     LoadingAnimationWidget.prograssiveDots(
                       color: Colors.white.withOpacity(.8),
                       size: 50,

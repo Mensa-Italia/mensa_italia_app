@@ -3,7 +3,7 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class RenewMembershipViewModel extends MasterModel {
-  RenewMembershipViewModel() {}
+  RenewMembershipViewModel();
 
   void goToRenewMembershipWebview() {
     navigationService.navigateToGenericWebviewView(

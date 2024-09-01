@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -9,7 +8,7 @@ import 'package:stacked/stacked.dart';
 import 'events_map_viewmodel.dart';
 
 class EventsMapView extends StackedView<EventsMapViewModel> {
-  const EventsMapView({Key? key}) : super(key: key);
+  const EventsMapView({super.key});
 
   @override
   Widget builder(BuildContext context, EventsMapViewModel viewModel, Widget? child) {

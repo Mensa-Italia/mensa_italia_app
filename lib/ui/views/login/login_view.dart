@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
@@ -9,7 +8,7 @@ import 'package:mensa_italia_app/ui/common/ui_helpers.dart';
 import 'login_viewmodel.dart';
 
 class LoginView extends StackedView<LoginViewModel> {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   Widget builder(
@@ -90,7 +89,7 @@ class LoginView extends StackedView<LoginViewModel> {
                             ),
                             Row(
                               children: [
-                                Expanded(child: SizedBox()),
+                                const Expanded(child: SizedBox()),
                                 TextButton(
                                   onPressed: viewModel.goToResetPassword,
                                   child: const Text.rich(

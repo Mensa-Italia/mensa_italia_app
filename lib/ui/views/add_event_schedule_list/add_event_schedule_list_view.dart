@@ -11,7 +11,7 @@ import 'add_event_schedule_list_viewmodel.dart';
 class AddEventScheduleListView extends StackedView<AddEventScheduleListViewModel> {
   final List<EventScheduleModel> eventSchedules;
 
-  const AddEventScheduleListView({Key? key, required this.eventSchedules}) : super(key: key);
+  const AddEventScheduleListView({super.key, required this.eventSchedules});
 
   @override
   Widget builder(BuildContext context, AddEventScheduleListViewModel viewModel, Widget? child) {
@@ -42,7 +42,7 @@ class AddEventScheduleListView extends StackedView<AddEventScheduleListViewModel
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                     child: Text(
@@ -104,20 +104,20 @@ class TileSchedue extends StatelessWidget {
 class StrikeThroughDecoration extends Decoration {
   @override
   BoxPainter createBoxPainter([VoidCallback? onChanged]) {
-    return new _StrikeThroughPainter();
+    return _StrikeThroughPainter();
   }
 }
 
 class _StrikeThroughPainter extends BoxPainter {
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    final paint = new Paint()
+    final paint = Paint()
       ..strokeWidth = 1.0
       ..color = Colors.black
       ..style = PaintingStyle.fill;
 
     final rect = offset & configuration.size!;
-    canvas.drawLine(new Offset(rect.left, rect.top + rect.height / 2), new Offset(rect.right, rect.top + rect.height / 2), paint);
+    canvas.drawLine(Offset(rect.left, rect.top + rect.height / 2), Offset(rect.right, rect.top + rect.height / 2), paint);
     canvas.restore();
   }
 }

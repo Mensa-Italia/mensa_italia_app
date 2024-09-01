@@ -9,7 +9,7 @@ import 'add_schedule_viewmodel.dart';
 
 class AddScheduleView extends StackedView<AddScheduleViewModel> {
   final EventScheduleModel? event;
-  const AddScheduleView({Key? key, this.event}) : super(key: key);
+  const AddScheduleView({super.key, this.event});
 
   @override
   Widget builder(
@@ -90,7 +90,7 @@ class AddScheduleView extends StackedView<AddScheduleViewModel> {
                           )
                         : const Text(
                             'Save',
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white),
                           ),
                   ),
                 ),

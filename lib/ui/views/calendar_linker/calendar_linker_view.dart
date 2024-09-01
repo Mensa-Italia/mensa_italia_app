@@ -42,7 +42,7 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                       ),
                       child: Text(
                         "https:${viewModel.baseUrl}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                         ),
@@ -60,7 +60,7 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                         );
                       }
                     },
-                    child: Text(
+                    child: const Text(
                       "Click here to watch a tutorial on how to add a subscribed calendar!",
                       style: TextStyle(
                         color: kcPrimaryColor,
@@ -86,14 +86,14 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
-                  child: Text("Events subscriptions"),
+                  child: const Text("Events subscriptions"),
                 ),
                 const Divider(indent: 16, endIndent: 16),
                 ListTile(
                   visualDensity: VisualDensity.compact,
                   dense: true,
-                  title: Text("National events"),
-                  subtitle: Text("Not editable"),
+                  title: const Text("National events"),
+                  subtitle: const Text("Not editable"),
                   trailing: CupertinoSwitch(
                     value: true,
                     activeColor: kcPrimaryColor.withOpacity(.5),
@@ -111,10 +111,10 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                       onChanged: viewModel.changeState(state),
                     ),
                   );
-                }).toList(),
+                }),
                 Container(
                   padding: const EdgeInsets.all(16).copyWith(top: 20),
-                  child: Text(
+                  child: const Text(
                     "The updates will be reflected in your calendar but may take some time to appear. Check the update time in the calendar app.",
                     style: TextStyle(color: Colors.black, fontSize: 14),
                     textAlign: TextAlign.center,
