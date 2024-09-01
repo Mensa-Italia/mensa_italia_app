@@ -34,6 +34,7 @@ class Api {
     return _instance;
   }
 
+  String? _notificationToken = "NOTOKEN";
   Future<void> addDevice() async {
     try {
       NotificationSettings settings = await messaging.requestPermission(
@@ -47,19 +48,18 @@ class Api {
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        String? token = "NOTOKEN";
         try {
-          token = await messaging.getToken();
+          _notificationToken = await messaging.getToken();
         } catch (_) {}
-        if (token != null) {
+        if (_notificationToken != null) {
           DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-          await removeDevice(token);
+          await removeSimilarDevice(_notificationToken ?? '');
           if (Platform.isAndroid) {
             AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
             await pb.collection('users_devices').create(
               body: {
                 "user": pb.authStore.model.id,
-                "firebase_id": token,
+                "firebase_id": _notificationToken,
                 "device_name": androidInfo.model,
               },
             );
@@ -68,7 +68,7 @@ class Api {
             await pb.collection('users_devices').create(
               body: {
                 "user": pb.authStore.model.id,
-                "firebase_id": token,
+                "firebase_id": _notificationToken,
                 "device_name": iosInfo.utsname.machine,
               },
             );
@@ -78,29 +78,48 @@ class Api {
     } catch (_) {}
   }
 
-  Future<void> removeDevice(String token) async {
+  Future<void> removeSimilarDevice(String token) async {
     try {
       await pb.collection('users_devices').getFullList(query: {
         "firebase_id": token,
       }).then((value) {
         if (value.isNotEmpty) {
           for (RecordModel record in value) {
-            if (record.data["user"] == pb.authStore.model.id && record.data["firebase_id"] == token) {
-              continue;
+            if (record.data["user"] != pb.authStore.model.id && record.data["firebase_id"] == token) {
+              pb.collection('users_devices').delete(
+                record.id,
+                body: {
+                  "id": record.id,
+                  "firebase_id": record.data["firebase_id"],
+                },
+              );
             }
-            pb.collection('users_devices').delete(
-              record.id,
-              body: {
-                "id": record.id,
-                "firebase_id": record.data["firebase_id"],
-              },
-            );
           }
         }
       });
-    } catch (e) {
-      print(e);
-    }
+    } catch (_) {}
+  }
+
+  Future<void> removeThisDevice() async {
+    try {
+      await pb.collection('users_devices').getFullList(query: {
+        "firebase_id": _notificationToken,
+      }).then((value) {
+        if (value.isNotEmpty) {
+          for (RecordModel record in value) {
+            if (record.data["user"] == pb.authStore.model.id && record.data["firebase_id"] == _notificationToken) {
+              pb.collection('users_devices').delete(
+                record.id,
+                body: {
+                  "id": record.id,
+                  "firebase_id": record.data["firebase_id"],
+                },
+              );
+            }
+          }
+        }
+      });
+    } catch (_) {}
   }
 
   Future<bool> login({required String email, required String password}) async {
