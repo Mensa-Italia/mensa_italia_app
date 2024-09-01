@@ -12,12 +12,10 @@ class MapShower extends StackedView<MapShowerModel> {
   const MapShower({super.key, required this.pointPosition});
 
   @override
-  Widget builder(
-      BuildContext context, MapShowerModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, MapShowerModel viewModel, Widget? child) {
     return AbsorbPointer(
       child: MapLibreMap(
-        styleString:
-            "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
+        styleString: "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
         initialCameraPosition: CameraPosition(
           target: pointPosition,
           zoom: 17,

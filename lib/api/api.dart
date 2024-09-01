@@ -53,6 +53,7 @@ class Api {
         } catch (_) {}
         if (token != null) {
           DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+          await removeDevice(token);
           if (Platform.isAndroid) {
             AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
             await pb.collection('users_devices').create(
@@ -75,6 +76,31 @@ class Api {
         }
       }
     } catch (_) {}
+  }
+
+  Future<void> removeDevice(String token) async {
+    try {
+      await pb.collection('users_devices').getFullList(query: {
+        "firebase_id": token,
+      }).then((value) {
+        if (value.isNotEmpty) {
+          for (RecordModel record in value) {
+            if (record.data["user"] == pb.authStore.model.id && record.data["firebase_id"] == token) {
+              continue;
+            }
+            pb.collection('users_devices').delete(
+              record.id,
+              body: {
+                "id": record.id,
+                "firebase_id": record.data["firebase_id"],
+              },
+            );
+          }
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<bool> login({required String email, required String password}) async {
