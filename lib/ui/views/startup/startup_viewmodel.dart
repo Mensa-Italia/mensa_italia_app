@@ -23,9 +23,6 @@ class StartupViewModel extends MasterModel {
   }
 
   Future runStartupLogic() async {
-    try{
-      await runVersionCheck();
-    }catch(_){}
     await ScraperApi().init();
     ScraperApi().isPasswordEmailStored().then((existsStored) async {
       if (existsStored) {
