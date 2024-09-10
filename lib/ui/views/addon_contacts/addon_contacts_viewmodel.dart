@@ -35,7 +35,7 @@ class _AddonContactsUpdates {
 }
 
 class AddonContactsViewModel extends MasterModel {
-  List<RegSociModel?> _contacts = [];
+  final List<RegSociModel?> _contacts = [];
   String nameToSearch = "";
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();

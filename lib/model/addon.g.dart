@@ -13,6 +13,7 @@ _$AddonModelImpl _$$AddonModelImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       icon: json['icon'] as String,
       version: json['version'] as String,
+      url: json['url'] as String,
     );
 
 Map<String, dynamic> _$$AddonModelImplToJson(_$AddonModelImpl instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$AddonModelImplToJson(_$AddonModelImpl instance) =>
       'description': instance.description,
       'icon': instance.icon,
       'version': instance.version,
+      'url': instance.url,
     };

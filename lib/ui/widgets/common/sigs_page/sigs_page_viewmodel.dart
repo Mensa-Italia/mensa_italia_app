@@ -37,7 +37,8 @@ class SigsPageModel extends MasterModel {
       sigs.addAll(_originalSigs);
     } else {
       sigs.clear();
-      sigs.addAll(_originalSigs.where((element) => element.name.toLowerCase().contains(value.toLowerCase().trim())));
+      sigs.addAll(_originalSigs.where((element) =>
+          element.name.toLowerCase().contains(value.toLowerCase().trim())));
     }
     rebuildUi();
   }
@@ -82,7 +83,9 @@ class SigsPageModel extends MasterModel {
       if (chip == "all") {
         sigs.addAll(_originalSigs);
       } else {
-        sigs.addAll(_originalSigs.where((element) => element.groupType.toLowerCase().contains(chip)).toList());
+        sigs.addAll(_originalSigs
+            .where((element) => element.groupType.toLowerCase().contains(chip))
+            .toList());
       }
       rebuildUi();
     };

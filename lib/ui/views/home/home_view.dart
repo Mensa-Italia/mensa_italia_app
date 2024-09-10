@@ -1,9 +1,7 @@
 import 'dart:ui';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/widgets/common/sigs_page/sigs_page_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/addon_page/addon_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_page/event_page.dart';

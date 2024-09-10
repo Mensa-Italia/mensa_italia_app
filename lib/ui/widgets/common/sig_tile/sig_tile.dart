@@ -12,7 +12,8 @@ class SigTile extends StackedView<SigTileModel> {
   final SigModel sig;
   final void Function() onTap;
   final Function? onLongTap;
-  const SigTile({super.key, required this.sig, required this.onTap, this.onLongTap});
+  const SigTile(
+      {super.key, required this.sig, required this.onTap, this.onLongTap});
 
   @override
   Widget builder(BuildContext context, SigTileModel viewModel, Widget? child) {
@@ -109,7 +110,7 @@ class SigTile extends StackedView<SigTileModel> {
 
   Widget getBasedOnType(String? type) {
     if ((type ?? "").toLowerCase().contains("sig")) {
-      return AutoSizeText(
+      return const AutoSizeText(
         "SIG",
         style: TextStyle(
           color: kcPrimaryColor,
@@ -120,17 +121,17 @@ class SigTile extends StackedView<SigTileModel> {
       );
     }
     if ((type ?? "").toLowerCase().contains("chat")) {
-      return Icon(
+      return const Icon(
         EneftyIcons.message_bold,
         color: kcPrimaryColor,
       );
     }
     if ((type ?? "").toLowerCase().contains("local")) {
-      return Icon(
+      return const Icon(
         EneftyIcons.location_bold,
         color: kcPrimaryColor,
       );
     }
-    return Icon(EneftyIcons.message_question_outline);
+    return const Icon(EneftyIcons.message_question_outline);
   }
 }

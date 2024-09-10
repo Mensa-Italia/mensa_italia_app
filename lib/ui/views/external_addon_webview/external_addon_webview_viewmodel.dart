@@ -12,13 +12,14 @@ class ExternalAddonWebviewViewModel extends MasterModel {
   WebViewController? controller;
   bool _canGoBack = true;
 
-  ExternalAddonWebviewViewModel(String addonId) {
-    load(addonId);
+  ExternalAddonWebviewViewModel(String addonId, String addonUrl) {
+    print(addonUrl);
+    load(addonId, addonUrl: addonUrl);
   }
-  load(String addonId) async {
+  load(String addonId, {required String addonUrl}) {
     Api().getAddonAccessData(addonId).then(
       (value) {
-        Uri url = Uri.parse('https://mensa-italia.github.io/mensa_app_addon/');
+        Uri url = Uri.parse(addonUrl);
         url = url.replace(queryParameters: value);
         controller = WebViewController()
           ..setJavaScriptMode(JavaScriptMode.unrestricted)

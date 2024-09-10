@@ -12,6 +12,7 @@ class AddonModel with _$AddonModel {
     required String description,
     required String icon,
     required String version,
+    required String url,
   }) = _AddonModel;
 
   factory AddonModel.fromJson(Map<String, dynamic> json) =>

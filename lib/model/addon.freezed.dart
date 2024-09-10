@@ -25,6 +25,7 @@ mixin _$AddonModel {
   String get description => throw _privateConstructorUsedError;
   String get icon => throw _privateConstructorUsedError;
   String get version => throw _privateConstructorUsedError;
+  String get url => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +44,8 @@ abstract class $AddonModelCopyWith<$Res> {
       String name,
       String description,
       String icon,
-      String version});
+      String version,
+      String url});
 }
 
 /// @nodoc
@@ -64,6 +66,7 @@ class _$AddonModelCopyWithImpl<$Res, $Val extends AddonModel>
     Object? description = null,
     Object? icon = null,
     Object? version = null,
+    Object? url = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -86,6 +89,10 @@ class _$AddonModelCopyWithImpl<$Res, $Val extends AddonModel>
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -103,7 +110,8 @@ abstract class _$$AddonModelImplCopyWith<$Res>
       String name,
       String description,
       String icon,
-      String version});
+      String version,
+      String url});
 }
 
 /// @nodoc
@@ -122,6 +130,7 @@ class __$$AddonModelImplCopyWithImpl<$Res>
     Object? description = null,
     Object? icon = null,
     Object? version = null,
+    Object? url = null,
   }) {
     return _then(_$AddonModelImpl(
       id: null == id
@@ -144,6 +153,10 @@ class __$$AddonModelImplCopyWithImpl<$Res>
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -156,7 +169,8 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
       required this.name,
       required this.description,
       required this.icon,
-      required this.version});
+      required this.version,
+      required this.url});
 
   factory _$AddonModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AddonModelImplFromJson(json);
@@ -171,10 +185,12 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
   final String icon;
   @override
   final String version;
+  @override
+  final String url;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AddonModel(id: $id, name: $name, description: $description, icon: $icon, version: $version)';
+    return 'AddonModel(id: $id, name: $name, description: $description, icon: $icon, version: $version, url: $url)';
   }
 
   @override
@@ -186,7 +202,8 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('icon', icon))
-      ..add(DiagnosticsProperty('version', version));
+      ..add(DiagnosticsProperty('version', version))
+      ..add(DiagnosticsProperty('url', url));
   }
 
   @override
@@ -199,13 +216,14 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.icon, icon) || other.icon == icon) &&
-            (identical(other.version, version) || other.version == version));
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.url, url) || other.url == url));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, name, description, icon, version);
+      Object.hash(runtimeType, id, name, description, icon, version, url);
 
   @JsonKey(ignore: true)
   @override
@@ -227,7 +245,8 @@ abstract class _AddonModel implements AddonModel {
       required final String name,
       required final String description,
       required final String icon,
-      required final String version}) = _$AddonModelImpl;
+      required final String version,
+      required final String url}) = _$AddonModelImpl;
 
   factory _AddonModel.fromJson(Map<String, dynamic> json) =
       _$AddonModelImpl.fromJson;
@@ -242,6 +261,8 @@ abstract class _AddonModel implements AddonModel {
   String get icon;
   @override
   String get version;
+  @override
+  String get url;
   @override
   @JsonKey(ignore: true)
   _$$AddonModelImplCopyWith<_$AddonModelImpl> get copyWith =>

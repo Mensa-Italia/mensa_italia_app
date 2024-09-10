@@ -231,8 +231,8 @@ class StackedRouter extends _i1.RouterBase {
       final args =
           data.getArgs<ExternalAddonWebviewViewArguments>(nullOk: false);
       return _i23.MaterialPageRoute<dynamic>(
-        builder: (context) =>
-            _i5.ExternalAddonWebviewView(key: args.key, addonID: args.addonID),
+        builder: (context) => _i5.ExternalAddonWebviewView(
+            key: args.key, addonID: args.addonID, addonURL: args.addonURL),
         settings: data,
       );
     },
@@ -380,26 +380,31 @@ class ExternalAddonWebviewViewArguments {
   const ExternalAddonWebviewViewArguments({
     this.key,
     required this.addonID,
+    required this.addonURL,
   });
 
   final _i23.Key? key;
 
   final String addonID;
 
+  final String addonURL;
+
   @override
   String toString() {
-    return '{"key": "$key", "addonID": "$addonID"}';
+    return '{"key": "$key", "addonID": "$addonID", "addonURL": "$addonURL"}';
   }
 
   @override
   bool operator ==(covariant ExternalAddonWebviewViewArguments other) {
     if (identical(this, other)) return true;
-    return other.key == key && other.addonID == addonID;
+    return other.key == key &&
+        other.addonID == addonID &&
+        other.addonURL == addonURL;
   }
 
   @override
   int get hashCode {
-    return key.hashCode ^ addonID.hashCode;
+    return key.hashCode ^ addonID.hashCode ^ addonURL.hashCode;
   }
 }
 
@@ -689,6 +694,7 @@ extension NavigatorStateExtension on _i27.NavigationService {
   Future<dynamic> navigateToExternalAddonWebviewView({
     _i23.Key? key,
     required String addonID,
+    required String addonURL,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -696,8 +702,8 @@ extension NavigatorStateExtension on _i27.NavigationService {
         transition,
   }) async {
     return navigateTo<dynamic>(Routes.externalAddonWebviewView,
-        arguments:
-            ExternalAddonWebviewViewArguments(key: key, addonID: addonID),
+        arguments: ExternalAddonWebviewViewArguments(
+            key: key, addonID: addonID, addonURL: addonURL),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -1024,6 +1030,7 @@ extension NavigatorStateExtension on _i27.NavigationService {
   Future<dynamic> replaceWithExternalAddonWebviewView({
     _i23.Key? key,
     required String addonID,
+    required String addonURL,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -1031,8 +1038,8 @@ extension NavigatorStateExtension on _i27.NavigationService {
         transition,
   }) async {
     return replaceWith<dynamic>(Routes.externalAddonWebviewView,
-        arguments:
-            ExternalAddonWebviewViewArguments(key: key, addonID: addonID),
+        arguments: ExternalAddonWebviewViewArguments(
+            key: key, addonID: addonID, addonURL: addonURL),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

@@ -5,9 +5,7 @@ import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/location.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 class EventPageModel extends MasterModel {
   ScrollController scrollController = ScrollController();
@@ -38,7 +36,9 @@ class EventPageModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+        if (element.position != null &&
+            selectedState.contains("Online") &&
+            !selectedState.contains("Nearby")) {
           return false;
         }
         if (!selectedState.contains("Nearby")) {
@@ -54,7 +54,9 @@ class EventPageModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
+          final distance = const Distance().distance(
+              LatLng(position!.latitude, position!.longitude),
+              element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -108,7 +110,13 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", "All", ...ListOfStates];
+    final UsableListOfStates = [
+      "Nearby & Online",
+      "Nearby",
+      "Online",
+      "All",
+      ...ListOfStates
+    ];
 
     cupertinoModalPicker(
       initialItem: UsableListOfStates.indexOf(selectedState),

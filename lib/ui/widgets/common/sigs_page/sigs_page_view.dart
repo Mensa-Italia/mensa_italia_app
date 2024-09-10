@@ -37,15 +37,31 @@ class SigsPage extends StackedView<SigsPageModel> {
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           sliver: SliverToBoxAdapter(
-            child: Container(
+            child: SizedBox(
               height: 50,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  Center(child: ChipWidget(label: "All", isActived: viewModel.isActived(0), onTap: viewModel.selectChip(0))),
-                  Center(child: ChipWidget(label: "Local groups", isActived: viewModel.isActived(1), onTap: viewModel.selectChip(1))),
-                  Center(child: ChipWidget(label: "SIGs", isActived: viewModel.isActived(2), onTap: viewModel.selectChip(2))),
-                  Center(child: ChipWidget(label: "Chats", isActived: viewModel.isActived(3), onTap: viewModel.selectChip(3))),
+                  Center(
+                      child: ChipWidget(
+                          label: "All",
+                          isActived: viewModel.isActived(0),
+                          onTap: viewModel.selectChip(0))),
+                  Center(
+                      child: ChipWidget(
+                          label: "Local groups",
+                          isActived: viewModel.isActived(1),
+                          onTap: viewModel.selectChip(1))),
+                  Center(
+                      child: ChipWidget(
+                          label: "SIGs",
+                          isActived: viewModel.isActived(2),
+                          onTap: viewModel.selectChip(2))),
+                  Center(
+                      child: ChipWidget(
+                          label: "Chats",
+                          isActived: viewModel.isActived(3),
+                          onTap: viewModel.selectChip(3))),
                 ],
               ),
             ),
@@ -66,11 +82,14 @@ class SigsPage extends StackedView<SigsPageModel> {
                     key: ValueKey(sig.id),
                     sig: sig,
                     onTap: viewModel.onTapOnSIG(sig),
-                    onLongTap: (viewModel.allowControlSigs()) ? viewModel.onLongTapEditSig(sig) : null,
+                    onLongTap: (viewModel.allowControlSigs())
+                        ? viewModel.onLongTapEditSig(sig)
+                        : null,
                   );
                 },
               ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -80,7 +99,11 @@ class SigsPage extends StackedView<SigsPageModel> {
 }
 
 class ChipWidget extends StatelessWidget {
-  const ChipWidget({super.key, required this.label, this.isActived = false, required this.onTap});
+  const ChipWidget(
+      {super.key,
+      required this.label,
+      this.isActived = false,
+      required this.onTap});
 
   final Function() onTap;
   final bool isActived;
@@ -97,7 +120,8 @@ class ChipWidget extends StatelessWidget {
           color: isActived ? kcMediumGrey : kcVeryLightGrey,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(label, style: TextStyle(color: isActived ? Colors.white : Colors.black)),
+        child: Text(label,
+            style: TextStyle(color: isActived ? Colors.white : Colors.black)),
       ),
     );
   }

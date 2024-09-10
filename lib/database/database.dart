@@ -1,6 +1,5 @@
 import 'package:isar/isar.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
-import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class DB {

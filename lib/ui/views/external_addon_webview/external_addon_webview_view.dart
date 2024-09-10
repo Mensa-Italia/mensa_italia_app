@@ -8,7 +8,9 @@ import 'external_addon_webview_viewmodel.dart';
 class ExternalAddonWebviewView
     extends StackedView<ExternalAddonWebviewViewModel> {
   final String addonID;
-  const ExternalAddonWebviewView({super.key, required this.addonID});
+  final String addonURL;
+  const ExternalAddonWebviewView(
+      {super.key, required this.addonID, required this.addonURL});
 
   @override
   Widget builder(BuildContext context, ExternalAddonWebviewViewModel viewModel,
@@ -32,7 +34,7 @@ class ExternalAddonWebviewView
 
   @override
   ExternalAddonWebviewViewModel viewModelBuilder(BuildContext context) =>
-      ExternalAddonWebviewViewModel(addonID);
+      ExternalAddonWebviewViewModel(addonID, addonURL);
 
   Widget iosFixer(Widget child, ExternalAddonWebviewViewModel viewModel) {
     if (!Platform.isIOS) {
