@@ -12,7 +12,8 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
   const AddonDealsAddView({super.key, this.deal});
 
   @override
-  Widget builder(BuildContext context, AddonDealsAddViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddonDealsAddViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(title: "Add Deal", previousPageTitle: "Deals"),
       body: Padding(
@@ -36,7 +37,8 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'Commercial Sector'),
+                    decoration:
+                        const InputDecoration(hintText: 'Commercial Sector'),
                     controller: viewModel.commercialSectorController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -47,7 +49,8 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'Position (Optional)'),
+                    decoration:
+                        const InputDecoration(hintText: 'Position (Optional)'),
                     controller: viewModel.locationController,
                     canRequestFocus: false,
                     enableInteractiveSelection: false,
@@ -65,13 +68,15 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'Details (Optional)'),
+                    decoration:
+                        const InputDecoration(hintText: 'Details (Optional)'),
                     controller: viewModel.detailsController,
                     maxLines: 4,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'Who is Eligible (Optional)'),
+                    decoration: const InputDecoration(
+                        hintText: 'Who is Eligible (Optional)'),
                     controller: viewModel.whoController,
                     canRequestFocus: false,
                     enableInteractiveSelection: false,
@@ -79,17 +84,20 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'How to Get (Optional)'),
+                    decoration: const InputDecoration(
+                        hintText: 'How to Get (Optional)'),
                     controller: viewModel.howToGetController,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'Link (Optional)'),
+                    decoration:
+                        const InputDecoration(hintText: 'Link (Optional)'),
                     controller: viewModel.linkController,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    decoration: const InputDecoration(hintText: 'VAT Number (Optional)'),
+                    decoration: const InputDecoration(
+                        hintText: 'VAT Number (Optional)'),
                     controller: viewModel.vatNumberController,
                   ),
                   const SizedBox(height: 24),
@@ -134,7 +142,8 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          decoration: const InputDecoration(hintText: "Email (Optional)"),
+                          decoration: const InputDecoration(
+                              hintText: "Email (Optional)"),
                           controller: viewModel.contactEmail,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -149,12 +158,14 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          decoration: const InputDecoration(hintText: "Phone (Optional)"),
+                          decoration: const InputDecoration(
+                              hintText: "Phone (Optional)"),
                           controller: viewModel.contactPhone,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          decoration: const InputDecoration(hintText: 'Notes (Optional)'),
+                          decoration: const InputDecoration(
+                              hintText: 'Notes (Optional)'),
                           controller: viewModel.contactNotes,
                           maxLines: 4,
                         ),
@@ -183,5 +194,6 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
   }
 
   @override
-  AddonDealsAddViewModel viewModelBuilder(BuildContext context) => AddonDealsAddViewModel(deal: deal);
+  AddonDealsAddViewModel viewModelBuilder(BuildContext context) =>
+      AddonDealsAddViewModel(deal: deal);
 }

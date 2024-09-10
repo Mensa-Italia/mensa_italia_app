@@ -10,7 +10,8 @@ class StartupView extends StackedView<StartupViewModel> {
   const StartupView({super.key});
 
   @override
-  Widget builder(BuildContext context, StartupViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, StartupViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -20,8 +21,8 @@ class StartupView extends StackedView<StartupViewModel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color.fromARGB(255, 252, 226, 248),
-                Color.fromARGB(255, 191, 212, 252),
+                Color(0xFFFCE2F8),
+                Color(0xFFBFD4FC),
               ],
             ),
           ),

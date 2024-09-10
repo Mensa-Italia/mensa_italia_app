@@ -5,3 +5,7 @@ targets:
         options:
           explicit_to_json: true 
           field_rename: snake
+global_options:
+  freezed:freezed:
+    runs_before:
+      - isar_generator:isar_generator

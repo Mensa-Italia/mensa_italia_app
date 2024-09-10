@@ -42,11 +42,14 @@ class SigsPage extends StackedView<SigsPageModel> {
               key: ValueKey(sig.id),
               sig: sig,
               onTap: viewModel.onTapOnSIG(sig),
-              onLongTap: (viewModel.allowControlSigs()) ? viewModel.onLongTapEditSig(sig) : null,
+              onLongTap: (viewModel.allowControlSigs())
+                  ? viewModel.onLongTapEditSig(sig)
+                  : null,
             );
           },
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

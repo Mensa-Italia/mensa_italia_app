@@ -30,7 +30,17 @@ class AddonDealsViewModel extends MasterModel {
     }
     deals = _originalDeals
         .where(
-          (element) => element.name.toLowerCase().contains(p1.toLowerCase()) || (element.details ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.howToGet ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.commercialSector).toLowerCase().contains(p1.toLowerCase()),
+          (element) =>
+              element.name.toLowerCase().contains(p1.toLowerCase()) ||
+              (element.details ?? "")
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()) ||
+              (element.howToGet ?? "")
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()) ||
+              (element.commercialSector)
+                  .toLowerCase()
+                  .contains(p1.toLowerCase()),
         )
         .toList();
     rebuildUi();
@@ -54,7 +64,9 @@ class AddonDealsViewModel extends MasterModel {
 
   onLongPress(int index) {
     return () {
-      navigationService.navigateToAddonDealsAddView(deal: deals[index]).then((value) {
+      navigationService
+          .navigateToAddonDealsAddView(deal: deals[index])
+          .then((value) {
         load();
       });
     };

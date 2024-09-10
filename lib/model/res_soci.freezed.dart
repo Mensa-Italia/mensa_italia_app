@@ -20,7 +20,7 @@ RegSociModel _$RegSociModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RegSociModel {
-  String get id => throw _privateConstructorUsedError;
+  int get uid => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
@@ -40,7 +40,7 @@ abstract class $RegSociModelCopyWith<$Res> {
       _$RegSociModelCopyWithImpl<$Res, RegSociModel>;
   @useResult
   $Res call(
-      {String id,
+      {int uid,
       String image,
       String name,
       String city,
@@ -61,7 +61,7 @@ class _$RegSociModelCopyWithImpl<$Res, $Val extends RegSociModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? uid = null,
     Object? image = null,
     Object? name = null,
     Object? city = null,
@@ -69,10 +69,10 @@ class _$RegSociModelCopyWithImpl<$Res, $Val extends RegSociModel>
     Object? linkToFullProfile = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
+      uid: null == uid
+          ? _value.uid
+          : uid // ignore: cast_nullable_to_non_nullable
+              as int,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -106,7 +106,7 @@ abstract class _$$RegSociModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
+      {int uid,
       String image,
       String name,
       String city,
@@ -125,7 +125,7 @@ class __$$RegSociModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? uid = null,
     Object? image = null,
     Object? name = null,
     Object? city = null,
@@ -133,10 +133,10 @@ class __$$RegSociModelImplCopyWithImpl<$Res>
     Object? linkToFullProfile = null,
   }) {
     return _then(_$RegSociModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
+      uid: null == uid
+          ? _value.uid
+          : uid // ignore: cast_nullable_to_non_nullable
+              as int,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -163,20 +163,21 @@ class __$$RegSociModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RegSociModelImpl implements _RegSociModel {
+class _$RegSociModelImpl extends _RegSociModel {
   const _$RegSociModelImpl(
-      {required this.id,
+      {required this.uid,
       required this.image,
       required this.name,
       required this.city,
       required this.state,
-      required this.linkToFullProfile});
+      required this.linkToFullProfile})
+      : super._();
 
   factory _$RegSociModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$RegSociModelImplFromJson(json);
 
   @override
-  final String id;
+  final int uid;
   @override
   final String image;
   @override
@@ -190,7 +191,7 @@ class _$RegSociModelImpl implements _RegSociModel {
 
   @override
   String toString() {
-    return 'RegSociModel(id: $id, image: $image, name: $name, city: $city, state: $state, linkToFullProfile: $linkToFullProfile)';
+    return 'RegSociModel(uid: $uid, image: $image, name: $name, city: $city, state: $state, linkToFullProfile: $linkToFullProfile)';
   }
 
   @override
@@ -198,7 +199,7 @@ class _$RegSociModelImpl implements _RegSociModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$RegSociModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
+            (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.city, city) || other.city == city) &&
@@ -209,8 +210,8 @@ class _$RegSociModelImpl implements _RegSociModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, image, name, city, state, linkToFullProfile);
+  int get hashCode => Object.hash(
+      runtimeType, uid, image, name, city, state, linkToFullProfile);
 
   @JsonKey(ignore: true)
   @override
@@ -226,20 +227,21 @@ class _$RegSociModelImpl implements _RegSociModel {
   }
 }
 
-abstract class _RegSociModel implements RegSociModel {
+abstract class _RegSociModel extends RegSociModel {
   const factory _RegSociModel(
-      {required final String id,
+      {required final int uid,
       required final String image,
       required final String name,
       required final String city,
       required final String state,
       required final String linkToFullProfile}) = _$RegSociModelImpl;
+  const _RegSociModel._() : super._();
 
   factory _RegSociModel.fromJson(Map<String, dynamic> json) =
       _$RegSociModelImpl.fromJson;
 
   @override
-  String get id;
+  int get uid;
   @override
   String get image;
   @override

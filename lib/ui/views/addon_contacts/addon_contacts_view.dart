@@ -23,40 +23,60 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
               controller: viewModel.searchController,
               onSubmitted: viewModel.search,
             ),
+            trailings: (viewModel.isCompleted)
+                ? null
+                : [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(.2),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const Row(
+                        children: [
+                          CircularProgressIndicator.adaptive(),
+                          SizedBox(width: 5),
+                          Text("Update", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                        ],
+                      ),
+                    )
+                  ],
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
           SliverList.separated(
-            itemCount: viewModel.contacts.length,
+            itemCount: viewModel.countMembers,
             itemBuilder: (context, index) {
-              bool firstCharIsDifferent = index == 0 || viewModel.contacts[index].name[0] != viewModel.contacts[index - 1].name[0];
+              final contact = viewModel.getElementAt(index);
+              final contactPrevious = viewModel.getElementAt(index - 1);
+              bool firstCharIsDifferent = index == 0 || contact.name[0] != contactPrevious.name[0];
               if (firstCharIsDifferent) {
                 return Column(
-                  key: ValueKey("${viewModel.contacts[index].id}:column"),
+                  key: ValueKey("${contact.id}:column"),
                   children: [
                     Padding(
-                      key: ValueKey("${viewModel.contacts[index].id}:padding"),
+                      key: ValueKey("${contact.id}:padding"),
                       padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 20),
                       child: Row(
                         children: [
                           Text(
-                            viewModel.contacts[index].name[0],
+                            contact.name[0],
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
-                    Divider(height: 0, endIndent: 20, indent: 20, key: ValueKey("${viewModel.contacts[index].id}:divider")),
+                    Divider(height: 0, endIndent: 20, indent: 20, key: ValueKey("${contact.id}:divider")),
                     _ContactsTile(
-                      key: ValueKey(viewModel.contacts[index].id),
-                      contact: viewModel.contacts[index],
+                      key: ValueKey(contact.id),
+                      contact: contact,
                       onTap: viewModel.tapOnContact(index),
                     ),
                   ],
                 );
               } else {
                 return _ContactsTile(
-                  key: ValueKey(viewModel.contacts[index].id),
-                  contact: viewModel.contacts[index],
+                  key: ValueKey(contact.id),
+                  contact: contact,
                   onTap: viewModel.tapOnContact(index),
                 );
               }

@@ -38,7 +38,8 @@ class ScraperApi {
     if (_cookieManager == null) {
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String appDocPath = appDocDir.path;
-      var cookieJar = PersistCookieJar(storage: FileStorage("$appDocPath/.cookies/"));
+      var cookieJar =
+          PersistCookieJar(storage: FileStorage("$appDocPath/.cookies/"));
       _cookieManager = CookieManager(cookieJar);
     }
     return _cookieManager!;
@@ -49,7 +50,9 @@ class ScraperApi {
     String appDocPath = appDocDir.path;
     Response headerData = await dio.head(url);
     if (headerData.headers.value("content-disposition") != null) {
-      String fileName = headerData.headers.value("content-disposition")!.split("filename=")[1];
+      String fileName = headerData.headers
+          .value("content-disposition")!
+          .split("filename=")[1];
       fileName = fileName.replaceAll('"', "");
       await dio.download(url, "$appDocPath/$fileName");
       print("$appDocPath/$fileName");
@@ -110,7 +113,8 @@ class ScraperApi {
     }
     Response response;
 
-    response = await dio.get("https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",
+    response = await dio.get(
+        "https://www.mensa.it/?call_custom_simple_rss=1&csrp_posts_per_page=20&csrp_order=DESC&csrp_cat=9&csrp_thumbnail_size=full",
         options: Options(
           headers: getHeader(),
           followRedirects: false,
@@ -123,7 +127,8 @@ class ScraperApi {
     return response.data;
   }
 
-  Future<Document?> doLoginAndRetrieveMain(String email, String password) async {
+  Future<Document?> doLoginAndRetrieveMain(
+      String email, String password) async {
     Response response;
     response = await dio.get(
       "https://www.cloud32.it/Associazioni/utenti/login?codass=170734",
@@ -141,19 +146,30 @@ class ScraperApi {
 
     document = html.parse(response.data);
 
-    if (!response.isRedirect && document.getElementsByTagName("input").where((e) => e.attributes["name"] == "_token").isNotEmpty) {
-      token = (document.getElementsByTagName("input").where((e) => e.attributes["name"] == "_token").first.attributes["value"]) ?? "";
+    if (!response.isRedirect &&
+        document
+            .getElementsByTagName("input")
+            .where((e) => e.attributes["name"] == "_token")
+            .isNotEmpty) {
+      token = (document
+              .getElementsByTagName("input")
+              .where((e) => e.attributes["name"] == "_token")
+              .first
+              .attributes["value"]) ??
+          "";
 
-      FormData formData = FormData.fromMap({"email": email, "password": password, "_token": token});
-      response = await dio.post("https://www.cloud32.it/Associazioni/utenti/login",
-          data: formData,
-          options: Options(
-            headers: getHeader(),
-            followRedirects: false,
-            validateStatus: (status) {
-              return (status ?? 0) < 500;
-            },
-          ));
+      FormData formData = FormData.fromMap(
+          {"email": email, "password": password, "_token": token});
+      response =
+          await dio.post("https://www.cloud32.it/Associazioni/utenti/login",
+              data: formData,
+              options: Options(
+                headers: getHeader(),
+                followRedirects: false,
+                validateStatus: (status) {
+                  return (status ?? 0) < 500;
+                },
+              ));
     }
 
     response = await dio.get("https://www.cloud32.it/Associazioni/utenti/home",
@@ -167,7 +183,10 @@ class ScraperApi {
 
     document = html.parse(response.data);
 
-    if (document.getElementsByTagName("img").where((e) => e.attributes["alt"] == "Foto").isNotEmpty) {
+    if (document
+        .getElementsByTagName("img")
+        .where((e) => e.attributes["alt"] == "Foto")
+        .isNotEmpty) {
       savePasswordEmail(email, password);
       return document;
     } else {
@@ -183,7 +202,8 @@ class ScraperApi {
 
   Future<bool> isPasswordEmailStored() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString("email") != null && prefs.getString("password") != null;
+    return prefs.getString("email") != null &&
+        prefs.getString("password") != null;
   }
 
   Future<String> getStoredEmail() async {
@@ -202,7 +222,8 @@ class ScraperApi {
   }
 
   //https://www.cloud32.it/Associazioni/utenti/testelab
-  Future<List<TestelabModel>> getTestelab({required int page, String? search}) async {
+  Future<List<TestelabModel>> getTestelab(
+      {required int page, String? search}) async {
     if (Memoized().has("testelab_${page}_${search ?? ""}")) {
       return Memoized().get("testelab_${page}_${search ?? ""}");
     }
@@ -221,8 +242,16 @@ class ScraperApi {
 
       Document document = html.parse(response.data);
       List<TestelabModel> testelab = [];
-      document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
-        List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+      document
+          .getElementsByClassName("table")
+          .first
+          .getElementsByTagName("tr")
+          .skip(1)
+          .forEach((element) {
+        List<String> data = element
+            .getElementsByTagName("td")
+            .map((e) => e.text.trim())
+            .toList();
         testelab.add(TestelabModel(
           id: data[0],
           fullname: data[1],
@@ -241,9 +270,10 @@ class ScraperApi {
   }
 
   //https://www.cloud32.it/Associazioni/utenti/regsocio?s_cognome=&s_nome=&s_citta=&s_provincia=&s_regione=&Ricerca=Ricerca
-  Future<List<RegSociModel>> getRegSoci({required int page, String? search}) async {
+  Future<List<RegSociModel>> getRegSoci(
+      {required int page, String? search}) async {
     if (Memoized().has("regsoci_${page}_${search ?? ""}")) {
-      return Memoized().get("regsoci_${page}_${search ?? ""}");
+      // return Memoized().get("regsoci_${page}_${search ?? ""}");
     }
     try {
       String nameToSearch = "";
@@ -273,16 +303,26 @@ class ScraperApi {
 
       Document document = html.parse(response.data);
       try {
-        document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
-          List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+        document
+            .getElementsByClassName("table")
+            .first
+            .getElementsByTagName("tr")
+            .skip(1)
+            .forEach((element) {
+          List<String> data = element
+              .getElementsByTagName("td")
+              .map((e) => e.text.trim())
+              .toList();
           if (!idsToNotRepeat.contains(data[1])) {
             testelab.add(RegSociModel(
-              id: data[1],
+              uid: int.parse(data[1]),
               name: data[2],
               city: data[4],
               state: data[5],
-              image: "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
-              linkToFullProfile: "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+              image:
+                  "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+              linkToFullProfile:
+                  "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
             ));
             idsToNotRepeat.add(data[1]);
           }
@@ -308,16 +348,26 @@ class ScraperApi {
       );
       document = html.parse(response.data);
       try {
-        document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
-          List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+        document
+            .getElementsByClassName("table")
+            .first
+            .getElementsByTagName("tr")
+            .skip(1)
+            .forEach((element) {
+          List<String> data = element
+              .getElementsByTagName("td")
+              .map((e) => e.text.trim())
+              .toList();
           if (!idsToNotRepeat.contains(data[1])) {
             testelab.add(RegSociModel(
-              id: data[1],
+              uid: int.parse(data[1]),
               name: data[2],
               city: data[4],
               state: data[5],
-              image: "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
-              linkToFullProfile: "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+              image:
+                  "https://www.cloud32.it${element.getElementsByTagName("td")[0].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+              linkToFullProfile:
+                  "https://www.cloud32.it${element.getElementsByTagName("td")[6].getElementsByTagName("a").first.attributes["href"] ?? ""}",
             ));
             idsToNotRepeat.add(data[1]);
           }
@@ -332,7 +382,8 @@ class ScraperApi {
     }
   }
 
-  Future<List<AreaDocumentModel>> getAreaDocument({required int page, String? search}) async {
+  Future<List<AreaDocumentModel>> getAreaDocument(
+      {required int page, String? search}) async {
     if (Memoized().has("areadocument_${page}_${search ?? ""}")) {
       return Memoized().get("areadocument_${page}_${search ?? ""}");
     }
@@ -351,13 +402,23 @@ class ScraperApi {
 
       Document document = html.parse(response.data);
       List<AreaDocumentModel> testelab = [];
-      document.getElementsByClassName("table").first.getElementsByTagName("tr").skip(1).forEach((element) {
-        List<String> data = element.getElementsByTagName("td").map((e) => e.text.trim()).toList();
+      document
+          .getElementsByClassName("table")
+          .first
+          .getElementsByTagName("tr")
+          .skip(1)
+          .forEach((element) {
+        List<String> data = element
+            .getElementsByTagName("td")
+            .map((e) => e.text.trim())
+            .toList();
         testelab.add(AreaDocumentModel(
           description: data[1],
-          image: "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("img").first.attributes["src"] ?? ""}",
+          image:
+              "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("img").first.attributes["src"] ?? ""}",
           dimension: data[6],
-          link: "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("a").first.attributes["href"] ?? ""}",
+          link:
+              "https://www.cloud32.it${element.getElementsByTagName("td")[4].getElementsByTagName("a").first.attributes["href"] ?? ""}",
         ));
       });
 
@@ -387,7 +448,8 @@ class ScraperApi {
 
     Document document = html.parse(response.data);
 
-    Map<String, String> data = Map.fromEntries(document.getElementsByClassName("form-group").map((e) {
+    Map<String, String> data =
+        Map.fromEntries(document.getElementsByClassName("form-group").map((e) {
       try {
         var key = e.getElementsByTagName("div").first.text.trim();
         var value = "";
@@ -428,7 +490,8 @@ class ScraperApi {
 
     for (var element in document.getElementsByTagName("a")) {
       if (element.text.trim().toLowerCase() == name) {
-        Memoized().set("myprofilesetting_$name", "https://www.cloud32.it${element.attributes["href"]}");
+        Memoized().set("myprofilesetting_$name",
+            "https://www.cloud32.it${element.attributes["href"]}");
         return "https://www.cloud32.it${element.attributes["href"]}";
       }
     }

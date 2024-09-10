@@ -38,11 +38,15 @@ class MapPickerViewModel extends MasterModel {
   }
 
   onSearchSubmitted(String p1) {
-    Dio().get("https://photon.komoot.io/api/?q=${Uri.encodeQueryComponent(p1)}&lang=de").then((value) {
+    Dio()
+        .get(
+            "https://photon.komoot.io/api/?q=${Uri.encodeQueryComponent(p1)}&lang=de")
+        .then((value) {
       mapController
           ?.moveCamera(
         CameraUpdate.newLatLngZoom(
-          LatLng(value.data["features"][0]["geometry"]["coordinates"][1], value.data["features"][0]["geometry"]["coordinates"][0]),
+          LatLng(value.data["features"][0]["geometry"]["coordinates"][1],
+              value.data["features"][0]["geometry"]["coordinates"][0]),
           15,
         ),
       )
@@ -78,14 +82,22 @@ class MapPickerViewModel extends MasterModel {
     }
     LatLngBounds partialLocation = (await mapController!.getVisibleRegion());
     List<Placemark> placemarks = await placemarkFromCoordinates(
-      (partialLocation.northeast.latitude + partialLocation.southwest.latitude) / 2,
-      (partialLocation.northeast.longitude + partialLocation.southwest.longitude) / 2,
+      (partialLocation.northeast.latitude +
+              partialLocation.southwest.latitude) /
+          2,
+      (partialLocation.northeast.longitude +
+              partialLocation.southwest.longitude) /
+          2,
     );
     Placemark place = placemarks[0];
     locationToUse = place;
     locationCoordinates = LatLng(
-      (partialLocation.northeast.latitude + partialLocation.southwest.latitude) / 2,
-      (partialLocation.northeast.longitude + partialLocation.southwest.longitude) / 2,
+      (partialLocation.northeast.latitude +
+              partialLocation.southwest.latitude) /
+          2,
+      (partialLocation.northeast.longitude +
+              partialLocation.southwest.longitude) /
+          2,
     );
 
     rebuildUi();

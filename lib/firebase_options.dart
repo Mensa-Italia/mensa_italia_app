@@ -67,4 +67,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'mensa-platform.appspot.com',
     iosBundleId: 'it.mensa.app',
   );
+
 }

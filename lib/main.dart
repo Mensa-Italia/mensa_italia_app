@@ -6,6 +6,7 @@ import 'package:mensa_italia_app/app/app.bottomsheets.dart';
 import 'package:mensa_italia_app/app/app.dialogs.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -14,7 +15,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await DB.init();
   Intl.defaultLocale = await findSystemLocale();
   try {
     await Firebase.initializeApp(
@@ -26,7 +27,8 @@ Future<void> main() async {
   setupBottomSheetUi();
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
+      options.dsn =
+          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
@@ -43,6 +45,7 @@ class MainApp extends StatelessWidget {
       initialRoute: Routes.startupView,
       onGenerateRoute: StackedRouter().onGenerateRoute,
       navigatorKey: StackedService.navigatorKey,
+      debugShowCheckedModeBanner: false,
       navigatorObservers: [
         StackedService.routeObserver,
       ],

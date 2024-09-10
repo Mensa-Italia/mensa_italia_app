@@ -9,7 +9,8 @@ class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
   const AddonTestAssistantView({super.key});
 
   @override
-  Widget builder(BuildContext context, AddonTestAssistantViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonTestAssistantViewModel viewModel,
+      Widget? child) {
     return Scaffold(
       body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
@@ -43,7 +44,8 @@ class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(viewModel.testelabs[index].fullname),
-                  subtitle: Text("${viewModel.testelabs[index].typeOfTest}\n${viewModel.testelabs[index].getAvailableModality()}"),
+                  subtitle: Text(
+                      "${viewModel.testelabs[index].typeOfTest}\n${viewModel.testelabs[index].getAvailableModality()}"),
                   trailing: Text(
                     "${viewModel.testelabs[index].status}\n${viewModel.testelabs[index].state}",
                     textAlign: TextAlign.end,
@@ -55,12 +57,14 @@ class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
                 key: ValueKey(index),
               ),
             ),
-          const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+          const SliverSafeArea(
+              sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
         ],
       ),
     );
   }
 
   @override
-  AddonTestAssistantViewModel viewModelBuilder(BuildContext context) => AddonTestAssistantViewModel();
+  AddonTestAssistantViewModel viewModelBuilder(BuildContext context) =>
+      AddonTestAssistantViewModel();
 }

@@ -24,19 +24,23 @@ class CalendarLinkerViewModel extends MasterModel {
   String get baseUrl => "//svc.mensa.it/ical/${calendarLink!.hash}";
 
   void addToCalendar() async {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+        TargetPlatform.iOS) {
       if (await canLaunchUrlString("webcal:$baseUrl")) {
         launchUrlString("webcal:$baseUrl");
       }
     } else {
-      if (await canLaunchUrlString("https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}")) {
-        launchUrlString("https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}");
+      if (await canLaunchUrlString(
+          "https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}")) {
+        launchUrlString(
+            "https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}");
       }
     }
   }
 
   String getPlatformUrl() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+        TargetPlatform.iOS) {
       return "webcal:$baseUrl";
     } else {
       return "https://calendar.google.com/calendar/render?cid=webcal:${Uri.encodeQueryComponent(baseUrl)}";
@@ -68,7 +72,9 @@ class CalendarLinkerViewModel extends MasterModel {
       if (value) {
         newState.add(state);
       } else {
-        newState = newState..removeWhere((element) => element.toLowerCase() == state.toLowerCase());
+        newState = newState
+          ..removeWhere(
+              (element) => element.toLowerCase() == state.toLowerCase());
       }
       Api().changeCalendarLinkState(calendarLink!.id, newState).then((value) {
         calendarLink = value;

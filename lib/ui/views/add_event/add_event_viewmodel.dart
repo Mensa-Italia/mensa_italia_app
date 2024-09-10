@@ -46,7 +46,8 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text =
+          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -136,7 +137,8 @@ class AddEventViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+        dateTimeEvent.text =
+            "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       }
     });
   }

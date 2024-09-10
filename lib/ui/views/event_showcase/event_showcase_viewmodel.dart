@@ -15,7 +15,8 @@ class EventShowcaseViewModel extends MasterModel {
   load() {
     Api().getEventSchedules(event.id).then((value) {
       eventSchedules.clear();
-      eventSchedules.addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
+      eventSchedules
+          .addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
       rebuildUi();
     });
   }
@@ -25,7 +26,8 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty &&
+        await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );

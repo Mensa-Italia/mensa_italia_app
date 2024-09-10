@@ -73,7 +73,8 @@ class GenericWebviewViewModel extends MasterModel {
               onPageFinished: (String url) async {
                 print(url);
                 try {
-                  if (url.startsWith("https://www.cloud32.it/Associazioni/utenti/login")) {
+                  if (url.startsWith(
+                      "https://www.cloud32.it/Associazioni/utenti/login")) {
                     _pageOpened = false;
                     await controller!.runJavaScript(jsForceLogin
                         .replaceAll(
@@ -87,7 +88,8 @@ class GenericWebviewViewModel extends MasterModel {
                   } else {
                     await controller!.runJavaScript(jsBeautifyPage);
                     if (!_pageOpened && url != this.url) {
-                      await controller!.runJavaScript(jsRedirectToURL.replaceAll("{url}", this.url));
+                      await controller!.runJavaScript(
+                          jsRedirectToURL.replaceAll("{url}", this.url));
                     } else {
                       _pageOpened = true;
                     }

@@ -6,7 +6,28 @@ part 'location.freezed.dart';
 
 part 'location.g.dart';
 
-final ListOfStates = ["Piemonte", "Valle d'Aosta", "Lombardia", "Trentino-Alto Adige", "Veneto", "Friuli-Venezia Giulia", "Liguria", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"]..sort();
+final ListOfStates = [
+  "Piemonte",
+  "Valle d'Aosta",
+  "Lombardia",
+  "Trentino-Alto Adige",
+  "Veneto",
+  "Friuli-Venezia Giulia",
+  "Liguria",
+  "Emilia-Romagna",
+  "Toscana",
+  "Umbria",
+  "Marche",
+  "Lazio",
+  "Abruzzo",
+  "Molise",
+  "Campania",
+  "Puglia",
+  "Basilicata",
+  "Calabria",
+  "Sicilia",
+  "Sardegna"
+]..sort();
 
 @freezed
 class LocationModel with _$LocationModel {
@@ -20,7 +41,8 @@ class LocationModel with _$LocationModel {
     required String state,
   }) = _LocationModel;
 
-  factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
+  factory LocationModel.fromJson(Map<String, dynamic> json) =>
+      _$LocationModelFromJson(json);
 
   LatLng toLatLng() {
     return LatLng(lat, lon);

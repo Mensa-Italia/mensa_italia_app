@@ -15,7 +15,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   const EventShowcaseView({super.key, required this.event});
 
   @override
-  Widget builder(BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: event.name,
@@ -32,7 +33,10 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             top: false,
             child: Text(
               "DETAILS",
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -46,15 +50,19 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             child: Hero(
               tag: event.image,
               transitionOnUserGestures: true,
-              flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) => AnimatedBuilder(
+              flightShuttleBuilder: (flightContext, animation, flightDirection,
+                      fromHeroContext, toHeroContext) =>
+                  AnimatedBuilder(
                 animation: animation,
                 builder: (context, child) {
                   return ClipRRect(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(30 * (animation.value)),
                       bottomRight: Radius.circular(30 * (animation.value)),
-                      topLeft: Radius.circular((30 * (animation.value)) + (10 * (1 - animation.value))),
-                      topRight: Radius.circular((30 * (animation.value)) + (10 * (1 - animation.value))),
+                      topLeft: Radius.circular((30 * (animation.value)) +
+                          (10 * (1 - animation.value))),
+                      topRight: Radius.circular((30 * (animation.value)) +
+                          (10 * (1 - animation.value))),
                     ),
                     child: child,
                   );
@@ -105,10 +113,13 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             height: 20,
           ),
           if (viewModel.eventSchedules.isNotEmpty) ...[
-            const Text("Schedule", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const Text("Schedule",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
             const Divider(),
             ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 itemCount: viewModel.eventSchedules.length,
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -117,15 +128,20 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   return TileSchedue(eventSchedule: event, onTap: () {});
                 },
                 separatorBuilder: (context, index) {
-                  if (index != viewModel.eventSchedules.length - 1 && !DateUtils.isSameDay(viewModel.eventSchedules[index].whenStart, viewModel.eventSchedules[index + 1].whenStart)) {
+                  if (index != viewModel.eventSchedules.length - 1 &&
+                      !DateUtils.isSameDay(
+                          viewModel.eventSchedules[index].whenStart,
+                          viewModel.eventSchedules[index + 1].whenStart)) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const SizedBox(height: 30),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
                           child: Text(
-                            DateFormat('EEEE, d MMMM').format(viewModel.eventSchedules[index + 1].whenStart),
+                            DateFormat('EEEE, d MMMM').format(
+                                viewModel.eventSchedules[index + 1].whenStart),
                             style: TextStyle(
                               color: Colors.grey.shade500,
                               height: 0,
@@ -142,7 +158,9 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             const Divider(),
             const SizedBox(height: 20),
           ],
-          const Text("Location", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          const Text("Location",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center),
           const SizedBox(
             height: 20,
           ),
@@ -174,5 +192,6 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   }
 
   @override
-  EventShowcaseViewModel viewModelBuilder(BuildContext context) => EventShowcaseViewModel(event: event);
+  EventShowcaseViewModel viewModelBuilder(BuildContext context) =>
+      EventShowcaseViewModel(event: event);
 }

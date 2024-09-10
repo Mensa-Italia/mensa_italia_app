@@ -46,7 +46,8 @@ class AddonDealsAddViewModel extends MasterModel {
           start: deal!.starting!,
           end: deal!.ending!,
         );
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(deal!.starting!)} - ${DateFormat("dd/MM/yyyy HH:mm").format(deal!.ending!)}";
+        dateTimeEvent.text =
+            "${DateFormat("dd/MM/yyyy HH:mm").format(deal!.starting!)} - ${DateFormat("dd/MM/yyyy HH:mm").format(deal!.ending!)}";
       }
       detailsController.text = deal!.details ?? "";
       whoController.text = deal!.who ?? "";
@@ -145,7 +146,8 @@ class AddonDealsAddViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeEvent.text =
+            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
       }
     });
   }

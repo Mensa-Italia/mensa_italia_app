@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +24,8 @@ class AddScheduleViewModel extends MasterModel {
         start: event!.whenStart,
         end: event!.whenEnd,
       );
-      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text =
+          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
 
       rebuildUi();
     }
@@ -58,7 +58,8 @@ class AddScheduleViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeEvent.text =
+            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
       }
     });
   }

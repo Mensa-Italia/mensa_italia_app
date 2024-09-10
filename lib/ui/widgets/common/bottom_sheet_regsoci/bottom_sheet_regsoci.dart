@@ -53,6 +53,15 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                   minFontSize: 0,
                   maxLines: 1,
                 ),
+                AutoSizeText(
+                  "${regSoci.id}",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  minFontSize: 0,
+                  maxLines: 1,
+                ),
                 const SizedBox(height: 50),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -8,43 +8,56 @@ class DioAreaInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    if (response.requestOptions.uri.toString().toLowerCase().contains("/Associazioni/utenti/login".toLowerCase())) {
+    final staticResponse = response.requestOptions;
+    if (!response.isRedirect) {
       return handler.next(response);
     }
-    if (response.isRedirect && response.realUri.toString().toLowerCase().contains("/Associazioni/utenti/login".toLowerCase())) {
+    final location = response.headers.value("location");
+    if (!location
+        .toString()
+        .toLowerCase()
+        .contains("Associazioni/login".toLowerCase())) {
+      return handler.next(response);
+    }
+    if (response.isRedirect &&
+        location
+            .toString()
+            .toLowerCase()
+            .contains("Associazioni/login".toLowerCase())) {
       final email = await ScraperApi().getStoredEmail();
       final password = await ScraperApi().getStoredPassword();
       final cookieJar = await ScraperApi().getCookieJar();
-      if (_dio.interceptors.where((element) => element.runtimeType == CookieManager).isEmpty) {
+      if (_dio.interceptors
+          .where((element) => element.runtimeType == CookieManager)
+          .isEmpty) {
         _dio.interceptors.add(cookieJar);
       }
-
       await cookieJar.cookieJar.deleteAll();
-
-      print("Trying to relogin");
-      Api().login(email: email, password: password).then((isLogged) {
+      return await Api()
+          .login(email: email, password: password)
+          .then((isLogged) async {
         if (isLogged) {
-          _dio.fetch(response.requestOptions).then((value) {
-            handler.next(value);
+          return await _dio.fetch(staticResponse).then((value) {
+            return handler.next(value);
           }).catchError((error) {
-            handler.reject(error);
+            return handler.reject(error);
           });
         } else {
-          handler.reject(DioException(
-            requestOptions: response.requestOptions,
+          return handler.reject(DioException(
+            requestOptions: staticResponse,
             response: response,
             error: "Auth failed",
           ));
         }
       }).catchError((error) {
-        handler.reject(DioException(
-          requestOptions: response.requestOptions,
+        return handler.reject(DioException(
+          requestOptions: staticResponse,
           response: response,
           error: error,
         ));
       });
     } else {
-      handler.next(response);
+      return handler.next(response);
     }
   }
 }

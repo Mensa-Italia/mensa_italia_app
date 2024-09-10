@@ -41,13 +41,10 @@ class BottomSheetAddSigModel extends MasterModel {
             navigationService.back();
           }
         } else {
-          if (imageBytes == null) {
-            return;
-          }
           var done = await Api().addSig(
             name: nameController.text,
             link: linkController.text,
-            image: image!,
+            image: image,
           );
           if (done) {
             navigationService.back();

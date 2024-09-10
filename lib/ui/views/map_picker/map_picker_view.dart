@@ -13,7 +13,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   const MapPickerView({super.key});
 
   @override
-  Widget builder(BuildContext context, MapPickerViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, MapPickerViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
       appBar: getAppBarPlatform(
@@ -30,7 +31,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
       bottomNavigationBar: SafeArea(
         child: Container(
           margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8).copyWith(right: 8, left: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+              .copyWith(right: 8, left: 32),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(.9),
             borderRadius: const BorderRadius.all(Radius.circular(100)),
@@ -43,7 +45,10 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
             ],
           ),
           child: viewModel.locationName.isEmpty
-              ? const Text("Zoom in to select a location", textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
+              ? const Text("Zoom in to select a location",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold))
               : Row(
                   children: [
                     Expanded(
@@ -72,7 +77,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
           children: [
             Positioned.fill(
               child: MapLibreMap(
-                styleString: "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
+                styleString:
+                    "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
                 initialCameraPosition: const CameraPosition(
                   target: LatLng(42.715210940127285, 12.854392595268873),
                   zoom: 4,
@@ -136,5 +142,6 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   }
 
   @override
-  MapPickerViewModel viewModelBuilder(BuildContext context) => MapPickerViewModel();
+  MapPickerViewModel viewModelBuilder(BuildContext context) =>
+      MapPickerViewModel();
 }
