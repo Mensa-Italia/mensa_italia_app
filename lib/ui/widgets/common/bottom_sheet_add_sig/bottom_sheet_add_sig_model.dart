@@ -10,11 +10,26 @@ class BottomSheetAddSigModel extends MasterModel {
   SigModel? sig;
   XFile? image;
 
+  //sig_facebook, sig, local, chat_whatsapp, chat_telegram, chat
+  Map<String, String> sigTypes = {
+    'sig_facebook': 'SIG Facebook',
+    'sig': 'SIG Generic',
+    'local': 'Local group',
+    'chat_whatsapp': 'Chat WhatsApp',
+    'chat_telegram': 'Chat Telegram',
+    'chat': 'Chat',
+  };
+
+  String sigType = 'sig';
+
   TextEditingController nameController = TextEditingController();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextEditingController linkController = TextEditingController();
+  TextEditingController sigTypeController = TextEditingController(
+    text: 'SIG Generic',
+  );
 
   Uint8List? imageBytes;
 
@@ -36,6 +51,7 @@ class BottomSheetAddSigModel extends MasterModel {
             name: nameController.text,
             link: linkController.text,
             image: image,
+            sigType: sigType,
           );
           if (done) {
             navigationService.back();
@@ -45,6 +61,7 @@ class BottomSheetAddSigModel extends MasterModel {
             name: nameController.text,
             link: linkController.text,
             image: image,
+            sigType: sigType,
           );
           if (done) {
             navigationService.back();
@@ -105,5 +122,15 @@ class BottomSheetAddSigModel extends MasterModel {
     linkController.dispose();
 
     super.dispose();
+  }
+
+  onTapSigType() {
+    cupertinoModalPicker(initialItem: sigTypes.keys.toList().indexOf(sigType), items: sigTypes.values.toList()).then((value) {
+      if (value != null) {
+        sigType = sigTypes.keys.toList()[sigTypes.values.toList().indexOf(value)];
+        sigTypeController.text = value;
+        rebuildUi();
+      }
+    });
   }
 }

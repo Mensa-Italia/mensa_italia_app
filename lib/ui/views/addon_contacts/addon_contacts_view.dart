@@ -26,18 +26,21 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
             trailings: (viewModel.isCompleted)
                 ? null
                 : [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(.2),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: const Row(
-                        children: [
-                          CircularProgressIndicator.adaptive(),
-                          SizedBox(width: 5),
-                          Text("Update", style: TextStyle(color: Colors.grey, fontSize: 14)),
-                        ],
+                    Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(.2),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Row(
+                          children: [
+                            CircularProgressIndicator.adaptive(),
+                            SizedBox(width: 5),
+                            Text("Update", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                          ],
+                        ),
                       ),
                     )
                   ],

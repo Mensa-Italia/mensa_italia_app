@@ -51,23 +51,9 @@ class HomeView extends StackedView<HomeViewModel> {
                     backgroundColor: Colors.transparent,
                   ),
                   BottomNavigationBarItem(
-                    icon: AutoSizeText(
-                      "SiGs",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 20,
-                          color: kcMediumGrey),
-                      minFontSize: 0,
-                    ),
+                    icon: Icon(EneftyIcons.people_outline),
                     label: "SiGs",
-                    activeIcon: AutoSizeText(
-                      "SiGs",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 20,
-                          color: kcPrimaryColor),
-                      minFontSize: 0,
-                    ),
+                    activeIcon: Icon(EneftyIcons.people_bold),
                     backgroundColor: Colors.transparent,
                   ),
                   BottomNavigationBarItem(

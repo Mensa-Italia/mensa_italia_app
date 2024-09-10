@@ -38,9 +38,7 @@ class EventPageModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null &&
-            selectedState.contains("Online") &&
-            !selectedState.contains("Nearby")) {
+        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
           return false;
         }
         if (!selectedState.contains("Nearby")) {
@@ -56,9 +54,7 @@ class EventPageModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(
-              LatLng(position!.latitude, position!.longitude),
-              element.position!.toLatLong2());
+          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -112,72 +108,17 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = [
-      "Nearby & Online",
-      "Nearby",
-      "Online",
-      "All",
-      ...ListOfStates
-    ];
-    await showCupertinoModalPopup<void>(
-      context: StackedService.navigatorKey!.currentContext!,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Spacer(),
-                  CupertinoButton(
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(
-                        color: kcPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  itemExtent: 32.0,
-                  scrollController: FixedExtentScrollController(
-                    initialItem: UsableListOfStates.indexOf(selectedState),
-                  ),
-                  onSelectedItemChanged: (int index) {
-                    selectedState = UsableListOfStates[index];
-                    rebuildUi();
-                  },
-                  children: List<Widget>.generate(
-                    UsableListOfStates.length,
-                    (int index) {
-                      return Center(
-                        child: Text(
-                          UsableListOfStates[index],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    load();
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", "All", ...ListOfStates];
+
+    cupertinoModalPicker(
+      initialItem: UsableListOfStates.indexOf(selectedState),
+      items: UsableListOfStates,
+    ).then((value) {
+      if (value != null) {
+        selectedState = value;
+        load();
+      }
+    });
   }
 
   Function() onLongTapEditEvent(EventModel event) {

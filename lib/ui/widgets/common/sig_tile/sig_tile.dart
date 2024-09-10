@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
@@ -10,8 +12,7 @@ class SigTile extends StackedView<SigTileModel> {
   final SigModel sig;
   final void Function() onTap;
   final Function? onLongTap;
-  const SigTile(
-      {super.key, required this.sig, required this.onTap, this.onLongTap});
+  const SigTile({super.key, required this.sig, required this.onTap, this.onLongTap});
 
   @override
   Widget builder(BuildContext context, SigTileModel viewModel, Widget? child) {
@@ -54,25 +55,48 @@ class SigTile extends StackedView<SigTileModel> {
                   ],
                 ),
               ),
-              child: sig.image.isEmpty
-                  ? Center(
-                      child: Text(
-                        sig.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: sig.image.isEmpty
+                        ? Center(
+                            child: Text(
+                              sig.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: sig.image,
+                            fit: BoxFit.cover,
+                            maxWidthDiskCache: 1131,
+                            maxHeightDiskCache: 446,
+                            memCacheWidth: 1131,
+                            memCacheHeight: 446,
+                          ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: kcPrimaryColor, width: 4),
+                        borderRadius: BorderRadius.circular(300),
                       ),
-                    )
-                  : CachedNetworkImage(
-                      imageUrl: sig.image,
-                      fit: BoxFit.cover,
-                      maxWidthDiskCache: 1131,
-                      maxHeightDiskCache: 446,
-                      memCacheWidth: 1131,
-                      memCacheHeight: 446,
+                      child: Center(
+                        child: getBasedOnType(sig.groupType),
+                      ),
                     ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -82,4 +106,31 @@ class SigTile extends StackedView<SigTileModel> {
 
   @override
   SigTileModel viewModelBuilder(BuildContext context) => SigTileModel();
+
+  Widget getBasedOnType(String? type) {
+    if ((type ?? "").toLowerCase().contains("sig")) {
+      return AutoSizeText(
+        "SIG",
+        style: TextStyle(
+          color: kcPrimaryColor,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+        ),
+        minFontSize: 0,
+      );
+    }
+    if ((type ?? "").toLowerCase().contains("chat")) {
+      return Icon(
+        EneftyIcons.message_bold,
+        color: kcPrimaryColor,
+      );
+    }
+    if ((type ?? "").toLowerCase().contains("local")) {
+      return Icon(
+        EneftyIcons.location_bold,
+        color: kcPrimaryColor,
+      );
+    }
+    return Icon(EneftyIcons.message_question_outline);
+  }
 }

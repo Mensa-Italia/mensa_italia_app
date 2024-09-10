@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 class SigsPageModel extends MasterModel {
   final List<SigModel> _originalSigs = [];
   final List<SigModel> sigs = [];
+  int selectedChip = 0;
 
   ScrollController scrollController = ScrollController();
 
@@ -20,6 +21,7 @@ class SigsPageModel extends MasterModel {
 
   void load() {
     Api().getSigs().then((value) {
+      selectedChip = 0;
       _originalSigs.clear();
       _originalSigs.addAll(value);
       sigs.clear();
@@ -29,13 +31,13 @@ class SigsPageModel extends MasterModel {
   }
 
   void search(String value) {
+    selectedChip = 0;
     if (value.isEmpty) {
       sigs.clear();
       sigs.addAll(_originalSigs);
     } else {
       sigs.clear();
-      sigs.addAll(_originalSigs.where((element) =>
-          element.name.toLowerCase().contains(value.toLowerCase().trim())));
+      sigs.addAll(_originalSigs.where((element) => element.name.toLowerCase().contains(value.toLowerCase().trim())));
     }
     rebuildUi();
   }
@@ -69,5 +71,24 @@ class SigsPageModel extends MasterModel {
         });
       }
     };
+  }
+
+  Function() selectChip(int index) {
+    return () {
+      selectedChip = index;
+      sigs.clear();
+      searchController.clear();
+      final String chip = ["all", "local", "sig", "chat"][index];
+      if (chip == "all") {
+        sigs.addAll(_originalSigs);
+      } else {
+        sigs.addAll(_originalSigs.where((element) => element.groupType.toLowerCase().contains(chip)).toList());
+      }
+      rebuildUi();
+    };
+  }
+
+  bool isActived(int index) {
+    return selectedChip == index;
   }
 }

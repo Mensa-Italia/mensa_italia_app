@@ -25,6 +25,7 @@ mixin _$SigModel {
   String get description => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
   String get link => throw _privateConstructorUsedError;
+  String get groupType => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -38,7 +39,12 @@ abstract class $SigModelCopyWith<$Res> {
       _$SigModelCopyWithImpl<$Res, SigModel>;
   @useResult
   $Res call(
-      {String id, String name, String description, String image, String link});
+      {String id,
+      String name,
+      String description,
+      String image,
+      String link,
+      String groupType});
 }
 
 /// @nodoc
@@ -59,6 +65,7 @@ class _$SigModelCopyWithImpl<$Res, $Val extends SigModel>
     Object? description = null,
     Object? image = null,
     Object? link = null,
+    Object? groupType = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -81,6 +88,10 @@ class _$SigModelCopyWithImpl<$Res, $Val extends SigModel>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String,
+      groupType: null == groupType
+          ? _value.groupType
+          : groupType // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -94,7 +105,12 @@ abstract class _$$SigModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id, String name, String description, String image, String link});
+      {String id,
+      String name,
+      String description,
+      String image,
+      String link,
+      String groupType});
 }
 
 /// @nodoc
@@ -113,6 +129,7 @@ class __$$SigModelImplCopyWithImpl<$Res>
     Object? description = null,
     Object? image = null,
     Object? link = null,
+    Object? groupType = null,
   }) {
     return _then(_$SigModelImpl(
       id: null == id
@@ -135,6 +152,10 @@ class __$$SigModelImplCopyWithImpl<$Res>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String,
+      groupType: null == groupType
+          ? _value.groupType
+          : groupType // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -147,7 +168,8 @@ class _$SigModelImpl implements _SigModel {
       required this.name,
       required this.description,
       required this.image,
-      required this.link});
+      required this.link,
+      required this.groupType});
 
   factory _$SigModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$SigModelImplFromJson(json);
@@ -162,10 +184,12 @@ class _$SigModelImpl implements _SigModel {
   final String image;
   @override
   final String link;
+  @override
+  final String groupType;
 
   @override
   String toString() {
-    return 'SigModel(id: $id, name: $name, description: $description, image: $image, link: $link)';
+    return 'SigModel(id: $id, name: $name, description: $description, image: $image, link: $link, groupType: $groupType)';
   }
 
   @override
@@ -178,13 +202,15 @@ class _$SigModelImpl implements _SigModel {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.image, image) || other.image == image) &&
-            (identical(other.link, link) || other.link == link));
+            (identical(other.link, link) || other.link == link) &&
+            (identical(other.groupType, groupType) ||
+                other.groupType == groupType));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, name, description, image, link);
+      Object.hash(runtimeType, id, name, description, image, link, groupType);
 
   @JsonKey(ignore: true)
   @override
@@ -206,7 +232,8 @@ abstract class _SigModel implements SigModel {
       required final String name,
       required final String description,
       required final String image,
-      required final String link}) = _$SigModelImpl;
+      required final String link,
+      required final String groupType}) = _$SigModelImpl;
 
   factory _SigModel.fromJson(Map<String, dynamic> json) =
       _$SigModelImpl.fromJson;
@@ -221,6 +248,8 @@ abstract class _SigModel implements SigModel {
   String get image;
   @override
   String get link;
+  @override
+  String get groupType;
   @override
   @JsonKey(ignore: true)
   _$$SigModelImplCopyWith<_$SigModelImpl> get copyWith =>

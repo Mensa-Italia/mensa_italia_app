@@ -13,6 +13,7 @@ _$SigModelImpl _$$SigModelImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       image: json['image'] as String,
       link: json['link'] as String,
+      groupType: json['group_type'] as String,
     );
 
 Map<String, dynamic> _$$SigModelImplToJson(_$SigModelImpl instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$SigModelImplToJson(_$SigModelImpl instance) =>
       'description': instance.description,
       'image': instance.image,
       'link': instance.link,
+      'group_type': instance.groupType,
     };

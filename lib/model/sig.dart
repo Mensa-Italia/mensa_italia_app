@@ -11,6 +11,7 @@ class SigModel with _$SigModel {
     required String description,
     required String image,
     required String link,
+    required String groupType,
   }) = _SigModel;
 
   factory SigModel.fromJson(Map<String, dynamic> json) =>

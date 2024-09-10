@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/model/user.dart';
+import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:stacked/stacked.dart';
@@ -58,8 +60,7 @@ class MasterModel extends ReactiveViewModel {
         color: Colors.transparent,
         child: SingleChildScrollView(
           controller: ModalScrollController.of(context),
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: child,
         ),
       ),
@@ -84,15 +85,13 @@ class MasterModel extends ReactiveViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<DateTimeRange?> pickStartEndTime(
-      {DateTime? start, DateTime? end}) async {
+  Future<DateTimeRange?> pickStartEndTime({DateTime? start, DateTime? end}) async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
       startInitialDate: start,
@@ -140,5 +139,67 @@ class MasterModel extends ReactiveViewModel {
     } else {
       return null;
     }
+  }
+
+  Future<String?> cupertinoModalPicker({required int initialItem, required List<String> items}) async {
+    String data = items[initialItem];
+    await showCupertinoModalPopup<void>(
+      context: StackedService.navigatorKey!.currentContext!,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Spacer(),
+                  CupertinoButton(
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        color: kcPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  itemExtent: 32.0,
+                  scrollController: FixedExtentScrollController(
+                    initialItem: initialItem,
+                  ),
+                  onSelectedItemChanged: (int index) {
+                    data = items[index];
+                  },
+                  children: List<Widget>.generate(
+                    items.length,
+                    (int index) {
+                      return Center(
+                        child: Text(
+                          items[index],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    return data;
   }
 }
