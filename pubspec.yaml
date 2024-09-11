@@ -12,7 +12,7 @@ dependencies:
   cached_network_image: ^3.4.1
   cookie_jar: ^4.0.8
   cupertino_icons: ^1.0.8
-  dio: ^5.6.0
+  dio: ^5.7.0
   dio_cookie_manager: ^3.1.1
   enefty_icons: ^1.0.7
   faker: ^2.2.0
