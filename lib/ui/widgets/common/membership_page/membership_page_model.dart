@@ -90,7 +90,8 @@ class MembershipPageModel extends MasterModel {
 
   Function() openExternalAddon(AddonModel addon) {
     return () {
-      navigationService.navigateToExternalAddonWebviewView(addonID: addon.id, addonURL: addon.url);
+      navigationService.navigateToExternalAddonWebviewView(
+          addonID: addon.id, addonURL: addon.url);
     };
   }
 

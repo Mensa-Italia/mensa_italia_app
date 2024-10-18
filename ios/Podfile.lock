@@ -8,10 +8,10 @@ PODS:
   - Firebase/Messaging (11.0.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.0.0)
-  - firebase_core (3.4.0):
+  - firebase_core (3.4.1):
     - Firebase/CoreOnly (= 11.0.0)
     - Flutter
-  - firebase_messaging (15.1.0):
+  - firebase_messaging (15.1.1):
     - Firebase/Messaging (= 11.0.0)
     - firebase_core
     - Flutter
@@ -219,8 +219,8 @@ SPEC CHECKSUMS:
   cupertino_http: 1a3a0f163c1b26e7f1a293b33d476e0fde7a64ec
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   Firebase: 9f574c08c2396885b5e7e100ed4293d956218af9
-  firebase_core: ceec591a66629daaee82d3321551692c4a871493
-  firebase_messaging: 15d8b557010f3bb7b98d0302e1c7c8fbcd244425
+  firebase_core: ba84e940cf5cbbc601095f86556560937419195c
+  firebase_messaging: c40f84e7a98da956d5262fada373b5c458edcf13
   FirebaseCore: 3cf438f431f18c12cdf2aaf64434648b63f7e383
   FirebaseCoreInternal: adefedc9a88dbe393c4884640a73ec9e8e790f8c
   FirebaseInstallations: d0a8fea5a6fa91abc661591cf57c0f0d70863e57

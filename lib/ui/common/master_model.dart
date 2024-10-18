@@ -24,7 +24,9 @@ class MasterModel extends ReactiveViewModel {
   }
 
   hasPower(String power) {
-    return user.powers.contains(power) || user.powers.contains("super");
+    return user.powers.contains(power) ||
+        user.powers.contains("${power}_helper") ||
+        user.powers.contains("super");
   }
 
   allowTestMakerAddon() {

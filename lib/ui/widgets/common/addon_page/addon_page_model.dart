@@ -133,4 +133,8 @@ class AddonPageModel extends MasterModel {
   openDeals() {
     navigationService.navigateToAddonDealsView();
   }
+
+  openTableport() {
+    navigationService.navigateToAddonStampView();
+  }
 }

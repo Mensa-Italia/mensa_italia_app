@@ -24,6 +24,7 @@ import 'package:mensa_italia_app/ui/views/addon_deals/addon_deals_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_deals_details/addon_deals_details_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_deals_add/addon_deals_add_view.dart';
 import 'package:mensa_italia_app/ui/dialogs/input_text/input_text_dialog.dart';
+import 'package:mensa_italia_app/ui/views/addon_stamp/addon_stamp_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -49,6 +50,7 @@ import 'package:mensa_italia_app/ui/dialogs/input_text/input_text_dialog.dart';
     MaterialRoute(page: AddonDealsView),
     MaterialRoute(page: AddonDealsDetailsView),
     MaterialRoute(page: AddonDealsAddView),
+    MaterialRoute(page: AddonStampView),
 // @stacked-route
   ],
   dependencies: [
