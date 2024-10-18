@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.dialogs.dart';
@@ -14,7 +15,7 @@ class LoginViewModel extends MasterModel {
     if (Validate.isEmail(value ?? "")) {
       return null;
     } else {
-      return "Please enter a valid email";
+      return "views.signin.form.field.error.email".tr();
     }
   }
 
@@ -22,7 +23,7 @@ class LoginViewModel extends MasterModel {
     if (value != null && value.isNotEmpty) {
       return null;
     } else {
-      return "Password cannot be empty";
+      return "views.signin.form.field.error.password".tr();
     }
   }
 
@@ -52,16 +53,16 @@ class LoginViewModel extends MasterModel {
         } else {
           dialogService.showCustomDialog(
             variant: DialogType.infoAlert,
-            title: "Login Failed",
-            description: "Invalid email or password",
+            title: "views.signin.result.error.invalidcredential.title".tr(),
+            description: "views.signin.result.error.invalidcredential.body".tr(),
           );
         }
       }).catchError((e) {
         setBusy(false);
         dialogService.showCustomDialog(
           variant: DialogType.infoAlert,
-          title: "Login Failed",
-          description: "An error occurred while logging in",
+          title: "views.signin.result.error.generic.title".tr(),
+          description: "views.signin.result.error.generic.body".tr(),
         );
       });
     }
@@ -69,10 +70,9 @@ class LoginViewModel extends MasterModel {
 
   void goToResetPassword() {
     navigationService.navigateToGenericWebviewView(
-      url:
-          "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
+      url: "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
       title: "Reset Password",
-      previousPageTitle: "Login",
+      previousPageTitle: "views.signin.title2".tr(),
     );
   }
 }

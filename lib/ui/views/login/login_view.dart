@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -11,8 +12,7 @@ class LoginView extends StackedView<LoginViewModel> {
   const LoginView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, LoginViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, LoginViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -46,10 +46,9 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 60),
-                      child: const Text(
-                        "Welcome to Mensa Italia,\nSign in to continue",
+                      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 60),
+                      child: Text(
+                        "views.signin.title".tr(),
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -65,8 +64,8 @@ class LoginView extends StackedView<LoginViewModel> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             TextFormField(
-                              decoration: const InputDecoration(
-                                hintText: "Email",
+                              decoration: InputDecoration(
+                                hintText: "views.signin.form.field.hint.email".tr(),
                               ),
                               autocorrect: false,
                               enableSuggestions: true,
@@ -77,8 +76,8 @@ class LoginView extends StackedView<LoginViewModel> {
                             ),
                             verticalSpaceSmall,
                             TextFormField(
-                              decoration: const InputDecoration(
-                                hintText: "Password",
+                              decoration: InputDecoration(
+                                hintText: "views.signin.form.field.hint.password".tr(),
                               ),
                               textInputAction: TextInputAction.done,
                               autocorrect: false,
@@ -92,12 +91,12 @@ class LoginView extends StackedView<LoginViewModel> {
                                 const Expanded(child: SizedBox()),
                                 TextButton(
                                   onPressed: viewModel.goToResetPassword,
-                                  child: const Text.rich(
+                                  child: Text.rich(
                                     TextSpan(
-                                      text: "Forgot password? ",
+                                      text: "views.signin.form.button.recover_password.text".tr(),
                                       children: [
                                         TextSpan(
-                                          text: "Reset",
+                                          text: "views.signin.form.button.recover_password.button".tr(),
                                           style: TextStyle(
                                             color: kcPrimaryColor,
                                             fontWeight: FontWeight.bold,
@@ -122,18 +121,16 @@ class LoginView extends StackedView<LoginViewModel> {
                                       color: Colors.white.withOpacity(.8),
                                       size: 20,
                                     )
-                                  : const Text("SIGN IN"),
+                                  : Text("views.signin.form.button.submit".tr(),),
                             ),
                           ],
                         ),
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 20)
-                          .copyWith(top: 70),
-                      child: const Text(
-                        "There is no way to signup. You must be a Mensa member to sign in into this app.",
+                      margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20).copyWith(top: 70),
+                      child: Text(
+                        "views.signin.nosignupinfo".tr(),
                         textAlign: TextAlign.center,
                       ),
                     )

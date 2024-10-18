@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/find_locale.dart';
-import 'package:intl/intl.dart';
+import 'package:mensa_italia_app/api/translation_loader.dart';
 import 'package:mensa_italia_app/app/app.bottomsheets.dart';
 import 'package:mensa_italia_app/app/app.dialogs.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
@@ -11,7 +12,6 @@ import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,12 +27,19 @@ Future<void> main() async {
   setupBottomSheetUi();
   await SentryFlutter.init(
     (options) {
-      options.dsn =
-          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
+      options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
-    appRunner: () => runApp(const MainApp()),
+    appRunner: () async => runApp(
+      EasyLocalization(
+        supportedLocales: await TranslationLoader.getLocalizationList(),
+        path: 'not required because translation are fetched from Tolgee',
+        fallbackLocale: Locale('en', 'US'),
+        assetLoader: TranslationLoader(),
+        child: const MainApp(),
+      ),
+    ),
   );
 }
 
@@ -46,17 +53,11 @@ class MainApp extends StatelessWidget {
       onGenerateRoute: StackedRouter().onGenerateRoute,
       navigatorKey: StackedService.navigatorKey,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       navigatorObservers: [
         StackedService.routeObserver,
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('it'),
       ],
       theme: ThemeData(
         //platform: TargetPlatform.android,

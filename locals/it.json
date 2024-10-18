@@ -1,0 +1,124 @@
+{
+    "addons": {
+        "contacts": {
+            "description": "I tuoi contatti Mensa Italia, puoi trovare qualsiasi contatto di cui hai bisogno!",
+            "title": "Contatti"
+        },
+        "deals": {
+            "description": "Offerte e sconti per i membri di Mensa Italia",
+            "title": "Offerte"
+        },
+        "documents": {
+            "description": "Documenti ufficiali di Mensa Italia",
+            "title": "Documenti"
+        },
+        "testmakers": {
+            "description": "Vedi questo perché sei uno dei test maker",
+            "title": "TestMakers"
+        }
+    },
+    "views": {
+        "addons": {
+            "search": {
+                "textfield": {
+                    "hint": "Cerca"
+                }
+            },
+            "subtitle": {
+                "officials": "Ufficiali",
+                "verified": "Verificati"
+            },
+            "title": "Addons"
+        },
+        "community": {
+            "chip": {
+                "all": "Tutti",
+                "chat": "Chat",
+                "localgroups": "Gruppi locali",
+                "sigs": "SIGs"
+            },
+            "search": {
+                "textfield": {
+                    "hint": "Cerca"
+                }
+            },
+            "title": "Community"
+        },
+        "events": {
+            "search": {
+                "textfield": {
+                    "hint": "Cerca"
+                }
+            },
+            "title": "Eventi"
+        },
+        "home": {
+            "hello": "Ciao!\n{name}",
+            "subtitle": {
+                "favaddons": "Addons preferiti",
+                "highlights": "In evidenza"
+            }
+        },
+        "settings": {
+            "tile": {
+                "calendar": {
+                    "description": "Calendario Mensa sul tuo telefono",
+                    "title": "Collegamento calendario"
+                },
+                "changepassword": {
+                    "title": "Cambia Password"
+                },
+                "leavereview": {
+                    "title": "Lascia una recensione"
+                },
+                "logout": {
+                    "title": "Disconnettersi"
+                },
+                "privacypolicy": {
+                    "title": "Informativa sulla privacy"
+                },
+                "renewmembership": {
+                    "title": "Rinnova l'iscrizione"
+                }
+            },
+            "title": "Impostazioni"
+        },
+        "signin": {
+            "form": {
+                "button": {
+                    "recover_password": {
+                        "button": "Reimposta",
+                        "text": "Password dimenticata?"
+                    },
+                    "submit": "ACCEDI"
+                },
+                "field": {
+                    "error": {
+                        "email": "Inserisci un'email valida",
+                        "password": "La password non può essere vuota"
+                    },
+                    "hint": {
+                        "email": "E-mail",
+                        "password": "Password"
+                    }
+                }
+            },
+            "nosignupinfo": "Non è possibile registrarsi. Devi essere un membro di Mensa per accedere a questa app.",
+            "result": {
+                "error": {
+                    "generic": {
+                        "body": "Si è verificato un errore durante l'accesso",
+                        "title": "Accesso fallito"
+                    },
+                    "invalidcredential": {
+                        "body": "Email o password non validi",
+                        "button": "Va bene",
+                        "title": "Accesso fallito"
+                    }
+                }
+            },
+            "title": "Benvenuto in Mensa Italia,\nAccedi per continuare",
+            "title2": "Accedi"
+        }
+    }
+}

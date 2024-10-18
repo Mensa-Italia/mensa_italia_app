@@ -45,7 +45,7 @@ class StartupView extends StackedView<StartupViewModel> {
                       ),
                     ),
                     const Expanded(child: SizedBox()),
-                    LoadingAnimationWidget.prograssiveDots(
+                    LoadingAnimationWidget.progressiveDots(
                       color: Colors.white.withOpacity(.8),
                       size: 50,
                     ),

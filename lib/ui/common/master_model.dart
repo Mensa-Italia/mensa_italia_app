@@ -60,8 +60,7 @@ class MasterModel extends ReactiveViewModel {
         color: Colors.transparent,
         child: SingleChildScrollView(
           controller: ModalScrollController.of(context),
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: child,
         ),
       ),
@@ -86,15 +85,13 @@ class MasterModel extends ReactiveViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<DateTimeRange?> pickStartEndTime(
-      {DateTime? start, DateTime? end}) async {
+  Future<DateTimeRange?> pickStartEndTime({DateTime? start, DateTime? end}) async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
       startInitialDate: start,
@@ -128,9 +125,12 @@ class MasterModel extends ReactiveViewModel {
       },
       transitionDuration: const Duration(milliseconds: 200),
       barrierDismissible: true,
-      selectableDayPredicate: (dateTime) {
-        if (dateTime == DateTime(2023, 2, 25)) {
-          return false;
+      startSelectableDayPredicate: (dateTime) {
+        return true;
+      },
+      endSelectableDayPredicate: (dateTime) {
+        if (start != null) {
+          return dateTime.isAfter(start);
         } else {
           return true;
         }
@@ -144,8 +144,7 @@ class MasterModel extends ReactiveViewModel {
     }
   }
 
-  Future<String?> cupertinoModalPicker(
-      {required int initialItem, required List<String> items}) async {
+  Future<String?> cupertinoModalPicker({required int initialItem, required List<String> items}) async {
     String data = items[initialItem];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
