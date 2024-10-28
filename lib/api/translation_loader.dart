@@ -16,6 +16,7 @@ class TranslationLoader extends AssetLoader {
         'zip': 'false',
         'format': 'JSON',
       });
+      print(buildUri.toString());
       return await Dio().getUri(buildUri).then((value) => value.data);
     } catch (_) {}
     return {};

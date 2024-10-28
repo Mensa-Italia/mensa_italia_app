@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
+import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_stamp_viewmodel.dart';
@@ -13,10 +15,15 @@ class AddonStampView extends StackedView<AddonStampViewModel> {
   @override
   Widget builder(BuildContext context, AddonStampViewModel viewModel, Widget? child) {
     return Scaffold(
+      appBar: getAppBarPlatform(
+        title: "addons.tableport.title".tr(),
+        previousPageTitle: "addons.tableport.details.previouspagetitle".tr(),
+      ),
       body: Center(
         child: AnimatedTableport(
           stamps: viewModel.stamps,
-          onTapAddStamp:  viewModel.addStamp,
+          onTapAddStamp: viewModel.addStamp,
+          showStamp: viewModel.showStamp,
         ),
       ),
     );
@@ -30,7 +37,8 @@ class AddonStampView extends StackedView<AddonStampViewModel> {
 class AnimatedTableport extends StatefulWidget {
   final List<StampUserModel> stamps;
   final Function onTapAddStamp;
-  const AnimatedTableport({super.key, required this.stamps, required this.onTapAddStamp});
+  final Function(StampModel stamp) showStamp;
+  const AnimatedTableport({super.key, required this.stamps, required this.onTapAddStamp, required this.showStamp});
 
   @override
   State<AnimatedTableport> createState() => _AnimatedTableportState();
@@ -159,7 +167,9 @@ class _AnimatedTableportState extends State<AnimatedTableport> with SingleTicker
                     }
                     final stamp = widget.stamps[index - 1];
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        widget.showStamp(stamp.stamp);
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).scaffoldBackgroundColor,
@@ -181,7 +191,7 @@ class _AnimatedTableportState extends State<AnimatedTableport> with SingleTicker
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(300),
                                   image: DecorationImage(
-                                    image: NetworkImage("https://svc.mensa.it/api/files/u8asmfi7hw8swae/fawbgam5zxkzu1c/image_HBH6E47LIi.png?token="),
+                                    image: NetworkImage(stamp.stamp.image),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

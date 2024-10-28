@@ -65,6 +65,7 @@ class MembershipPageModel extends MasterModel {
   }
 
   bool hasInternalAddon(String addonName) {
+    print(addonName);
     return favsAddons.contains("INTERNAL:${addonName.toLowerCase()}");
   }
 
@@ -78,6 +79,8 @@ class MembershipPageModel extends MasterModel {
         return EneftyIcons.document_cloud_outline;
       case "deals":
         return EneftyIcons.moneys_outline;
+      case "tableport":
+        return EneftyIcons.global_outline;
       default:
         return EneftyIcons.bookmark_outline;
     }
@@ -104,6 +107,8 @@ class MembershipPageModel extends MasterModel {
         case "deals":
           navigationService.navigateToAddonDealsView();
           break;
+        case "tableport":
+          navigationService.navigateToAddonStampView();
         default:
           break;
       }

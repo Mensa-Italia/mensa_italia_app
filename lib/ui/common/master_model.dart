@@ -24,9 +24,7 @@ class MasterModel extends ReactiveViewModel {
   }
 
   hasPower(String power) {
-    return user.powers.contains(power) ||
-        user.powers.contains("${power}_helper") ||
-        user.powers.contains("super");
+    return user.powers.contains(power) || user.powers.contains("${power}_helper") || user.powers.contains("super");
   }
 
   allowTestMakerAddon() {
@@ -57,6 +55,7 @@ class MasterModel extends ReactiveViewModel {
     return await showCupertinoModalBottomSheet(
       context: StackedService.navigatorKey!.currentContext!,
       backgroundColor: Colors.transparent,
+      topRadius: const Radius.circular(30),
       elevation: 0,
       builder: (context) => Material(
         color: Colors.transparent,

@@ -43,6 +43,7 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("contacts"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Contacts"),
+                id: "contacts",
                 name: "addons.contacts.title".tr(),
                 description: "addons.contacts.description".tr(),
                 icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
@@ -51,6 +52,7 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("deals"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Deals"),
+                id: "deals",
                 name: "addons.deals.title".tr(),
                 description: "addons.deals.description".tr(),
                 icon: const Icon(EneftyIcons.moneys_outline, color: kcPrimaryColor, size: 40),
@@ -59,6 +61,7 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("documents"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Documents"),
+                id: "documents",
                 name: "addons.documents.title".tr(),
                 description: "addons.documents.description".tr(),
                 icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
@@ -67,6 +70,7 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("tableport"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Tableport"),
+                id: "tableport",
                 name: "addons.tableport.title".tr(),
                 description: "addons.tableport.description".tr(),
                 icon: const Icon(EneftyIcons.global_outline, color: kcPrimaryColor, size: 40),
@@ -75,6 +79,7 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:TestMakers"),
+                id: "testmakers",
                 name: "addons.testmakers.title".tr(),
                 description: "addons.testmakers.description".tr(),
                 icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
@@ -84,7 +89,7 @@ class AddonPage extends StackedView<AddonPageModel> {
               Padding(
                 key: const ValueKey("Verified:Title"),
                 padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
-                child:  Text(
+                child: Text(
                   "views.addons.subtitle.verified".tr(),
                   style: TextStyle(
                     fontSize: 18,
@@ -201,12 +206,13 @@ class _ExternalAddonButton extends ViewModelWidget<AddonPageModel> {
 }
 
 class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
+  final String id;
   final String name;
   final String description;
   final Widget icon;
   final Function() onTap;
 
-  const _InternalAddonButton({super.key, required this.name, required this.description, required this.icon, required this.onTap});
+  const _InternalAddonButton({super.key, required this.id, required this.name, required this.description, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {
@@ -275,11 +281,11 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
             Center(
               child: IconButton(
                 icon: Icon(
-                  viewModel.getStarIconInternal(name),
+                  viewModel.getStarIconInternal(id),
                   color: Colors.grey,
                   size: 35,
                 ),
-                onPressed: () => viewModel.onStarTappedInternal(name),
+                onPressed: () => viewModel.onStarTappedInternal(id),
               ),
             ),
           ],

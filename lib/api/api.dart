@@ -13,6 +13,7 @@ import 'package:mensa_italia_app/model/deals_contact.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/sig.dart';
+import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
@@ -691,19 +692,32 @@ class Api {
         .then(
       (value) {
         return value.map((e) {
-          return StampUserModel.fromJson(e.toJson());
+          final data = e.toJson();
+          data["expand"]["stamp"]["image"] = pb.files.getUrl(e.expand["stamp"]!.first, data["expand"]["stamp"]["image"]).toString();
+          return StampUserModel.fromJson(data);
         }).toList();
       },
     );
   }
 
-  Future addStamp(String code) async {
+  Future addStamp(String id, String code) async {
     await pb.collection('stamp_users').create(
       body: {
-        "stamp": "fawbgam5zxkzu1c",
+        "stamp": id,
         "code": code,
         "user": pb.authStore.model.id,
       },
     );
+  }
+
+  Future<StampModel> getStamp(String id, String code) async {
+    return await pb.collection('stamp').getOne(id, query: {
+      "id": id,
+      "code": code,
+    }).then((value) {
+      final data = value.toJson();
+      data["image"] = pb.files.getUrl(value, data["image"]).toString();
+      return StampModel.fromJson(data);
+    });
   }
 }

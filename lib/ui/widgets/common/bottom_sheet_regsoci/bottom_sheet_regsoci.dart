@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
@@ -15,8 +16,7 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
   const BottomSheetRegsoci({super.key, required this.regSoci});
 
   @override
-  Widget builder(
-      BuildContext context, BottomSheetRegsociModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, BottomSheetRegsociModel viewModel, Widget? child) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -68,36 +68,31 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                   children: [
                     if (viewModel.hasPhoneNumbers())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.call_bold,
-                            color: Colors.black),
-                        text: "Call",
+                        icon: const Icon(EneftyIcons.call_bold, color: Colors.black),
+                        text: "addons.contacts.infos.call".tr(),
                         onPressed: viewModel.linkToPhone,
                       ),
                     if (viewModel.hasPhoneNumbers())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.message_bold,
-                            color: Colors.black),
-                        text: "Text",
+                        icon: const Icon(EneftyIcons.message_bold, color: Colors.black),
+                        text: "addons.contacts.infos.text".tr(),
                         onPressed: viewModel.linkToMessage,
                       ),
                     if (viewModel.hasEmail())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.sms_bold,
-                            color: Colors.black),
-                        text: "Email",
+                        icon: const Icon(EneftyIcons.sms_bold, color: Colors.black),
+                        text: "addons.contacts.infos.email".tr(),
                         onPressed: viewModel.linkToEmail,
                       ),
                     if (viewModel.hasWebsite())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.link_bold,
-                            color: Colors.black),
-                        text: "Website",
+                        icon: const Icon(EneftyIcons.link_bold, color: Colors.black),
+                        text: "addons.contacts.infos.website".tr(),
                         onPressed: viewModel.linkToWebsite,
                       ),
                     _squareButtoon(
-                      icon: const Icon(EneftyIcons.profile_bold,
-                          color: Colors.black),
-                      text: "Profile",
+                      icon: const Icon(EneftyIcons.profile_bold, color: Colors.black),
+                      text: "addons.contacts.infos.profile".tr(),
                       onPressed: viewModel.linkToProfile,
                     ),
                   ],
@@ -115,16 +110,14 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
     var textList = text.split(" ");
     if (textList.length == 1) {
       if (textList[0].length > 1) {
-        textList[0] = textList[0][0].toUpperCase() +
-            textList[0].substring(1).toLowerCase();
+        textList[0] = textList[0][0].toUpperCase() + textList[0].substring(1).toLowerCase();
       } else {
         textList[0] = textList[0].toUpperCase();
       }
     } else {
       for (var i = 0; i < textList.length; i++) {
         if (textList[i].length > 1) {
-          textList[i] = textList[i][0].toUpperCase() +
-              textList[i].substring(1).toLowerCase();
+          textList[i] = textList[i][0].toUpperCase() + textList[i].substring(1).toLowerCase();
         } else {
           textList[i] = textList[i].toUpperCase();
         }
@@ -134,16 +127,14 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
   }
 
   @override
-  BottomSheetRegsociModel viewModelBuilder(BuildContext context) =>
-      BottomSheetRegsociModel(regSoci: regSoci);
+  BottomSheetRegsociModel viewModelBuilder(BuildContext context) => BottomSheetRegsociModel(regSoci: regSoci);
 }
 
 class _squareButtoon extends StatelessWidget {
   final Widget icon;
   final String text;
   final Function()? onPressed;
-  const _squareButtoon(
-      {required this.icon, required this.text, this.onPressed});
+  const _squareButtoon({required this.icon, required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -167,8 +158,7 @@ class _squareButtoon extends StatelessWidget {
             Expanded(child: icon),
             AutoSizeText(
               text,
-              style: const TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               minFontSize: 0,
               maxLines: 1,
               group: _autoSizeGroup,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/deal.dart';
@@ -11,12 +12,11 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
   const AddonDealsDetailsView({super.key, required this.deal});
 
   @override
-  Widget builder(BuildContext context, AddonDealsDetailsViewModel viewModel,
-      Widget? child) {
+  Widget builder(BuildContext context, AddonDealsDetailsViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: "Details",
-        previousPageTitle: "Deals",
+        title: "addons.deals.details.title".tr(),
+        previousPageTitle: "addons.deals.details.previouspagetitle".tr(),
       ),
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -44,21 +44,21 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
             const SizedBox(height: 16),
             if (deal.details != null) ...[
               _DealBlock(
-                title: "Details",
+                title: "addons.deals.details.subblock.details.title".tr(),
                 content: deal.details,
               ),
             ],
             const SizedBox(height: 16),
             if (deal.who != null) ...[
               _DealBlock(
-                title: "Who",
+                title: "addons.deals.details.subblock.who.title".tr(),
                 content: deal.getWho(),
               ),
             ],
             const SizedBox(height: 16),
             if (deal.howToGet != null) ...[
               _DealBlock(
-                title: "How to get",
+                title: "addons.deals.details.subblock.howtoget.title".tr(),
                 content: deal.howToGet,
               ),
             ],
@@ -126,15 +126,13 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
                         content: viewModel.dealsContact!.email,
                       ),
                     const SizedBox(height: 16),
-                    if (viewModel.dealsContact!.phoneNumber != null &&
-                        viewModel.dealsContact!.phoneNumber!.isNotEmpty)
+                    if (viewModel.dealsContact!.phoneNumber != null && viewModel.dealsContact!.phoneNumber!.isNotEmpty)
                       _DealBlock(
                         title: "Phone",
                         content: viewModel.dealsContact!.phoneNumber,
                       ),
                     const SizedBox(height: 16),
-                    if (viewModel.dealsContact!.note != null &&
-                        viewModel.dealsContact!.note!.isNotEmpty)
+                    if (viewModel.dealsContact!.note != null && viewModel.dealsContact!.note!.isNotEmpty)
                       _DealBlock(
                         title: "Note",
                         content: viewModel.dealsContact!.note,
@@ -144,7 +142,9 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
               ),
             const SizedBox(height: 32),
             Text(
-              "Last update: ${DateFormat.yMMMd().format(deal.updated)}",
+              "addons.deals.details.lastupdate".tr(namedArgs: {
+                "date": DateFormat.yMMMd().format(deal.updated),
+              }),
               textAlign: TextAlign.end,
               style: const TextStyle(
                 fontSize: 14,
@@ -159,8 +159,7 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
   }
 
   @override
-  AddonDealsDetailsViewModel viewModelBuilder(BuildContext context) =>
-      AddonDealsDetailsViewModel(deal: deal);
+  AddonDealsDetailsViewModel viewModelBuilder(BuildContext context) => AddonDealsDetailsViewModel(deal: deal);
 }
 
 class _DealBlock extends StatelessWidget {

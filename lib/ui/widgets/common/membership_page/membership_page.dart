@@ -12,7 +12,7 @@ import 'package:stacked/stacked.dart';
 
 import 'membership_page_model.dart';
 
-final internalAddonsList = ["Contacts", "TestMakers", "Documents", "Deals"];
+final internalAddonsList = ["Contacts", "TestMakers", "Documents", "Tableport", "Deals"];
 
 class MembershipPage extends StackedView<MembershipPageModel> {
   const MembershipPage({super.key});
@@ -379,7 +379,7 @@ class _addons extends ViewModelWidget<MembershipPageModel> {
               ..addAll(internalAddonsList.where((element) => viewModel.hasInternalAddon(element)).map<_addonsCard>((e) {
                 return _addonsCard(
                   onTap: viewModel.openInternalAddon(e),
-                  name: e,
+                  name: "addons.${e.toLowerCase()}.title".tr(),
                   icon: Icon(
                     viewModel.getIconForInternalAddon(e),
                     color: kcPrimaryColor,
@@ -437,7 +437,7 @@ class _addonsCard extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 80),
             child: AutoSizeText(
-              "addons.${name.toLowerCase()}.title".tr(),
+              name,
               style: const TextStyle(
                 color: kcPrimaryColor,
                 fontWeight: FontWeight.bold,

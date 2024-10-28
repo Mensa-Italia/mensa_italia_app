@@ -67,6 +67,7 @@ dependencies:
   isar: any
   isar_flutter_libs: any
   easy_localization: ^3.0.7
+  mobile_scanner: ^6.0.2
   
 dev_dependencies:
   build_runner: ^2.4.13
