@@ -101,7 +101,7 @@ class _AnimatedTableportState extends State<AnimatedTableport> with SingleTicker
             child: Transform.scale(
               scale: (_animationFirst.value * 2) + 1,
               child: Transform.translate(
-                offset: Offset(_animationFirst.value * MediaQuery.of(context).size.width, _animationFirst.value * MediaQuery.of(context).size.height / 2),
+                offset: Offset(_animationFirst.value * MediaQuery.of(context).size.width, ((_animationFirst.value * (MediaQuery.of(context).size.height)) / 2)),
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
