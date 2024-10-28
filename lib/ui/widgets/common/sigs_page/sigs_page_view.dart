@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,12 @@ class SigsPage extends StackedView<SigsPageModel> {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
-          title: "Community",
+          title: "views.community.title".tr(),
           searchBarActions: SearchBarActions(
             onChanged: viewModel.search,
             controller: viewModel.searchController,
             onSubmitted: viewModel.search,
+            hintText: "views.community.search.textfield.hint".tr(),
           ),
           leading: (viewModel.allowControlSigs())
               ? CupertinoButton(
@@ -43,25 +45,33 @@ class SigsPage extends StackedView<SigsPageModel> {
                 scrollDirection: Axis.horizontal,
                 children: [
                   Center(
-                      child: ChipWidget(
-                          label: "All",
-                          isActived: viewModel.isActived(0),
-                          onTap: viewModel.selectChip(0))),
+                    child: ChipWidget(
+                      label: "views.community.chip.all".tr(),
+                      isActived: viewModel.isActived(0),
+                      onTap: viewModel.selectChip(0),
+                    ),
+                  ),
                   Center(
-                      child: ChipWidget(
-                          label: "Local groups",
-                          isActived: viewModel.isActived(1),
-                          onTap: viewModel.selectChip(1))),
+                    child: ChipWidget(
+                      label: "views.community.chip.localgroups".tr(),
+                      isActived: viewModel.isActived(1),
+                      onTap: viewModel.selectChip(1),
+                    ),
+                  ),
                   Center(
-                      child: ChipWidget(
-                          label: "SIGs",
-                          isActived: viewModel.isActived(2),
-                          onTap: viewModel.selectChip(2))),
+                    child: ChipWidget(
+                      label: "views.community.chip.sigs".tr(),
+                      isActived: viewModel.isActived(2),
+                      onTap: viewModel.selectChip(2),
+                    ),
+                  ),
                   Center(
-                      child: ChipWidget(
-                          label: "Chats",
-                          isActived: viewModel.isActived(3),
-                          onTap: viewModel.selectChip(3))),
+                    child: ChipWidget(
+                      label: "views.community.chip.chat".tr(),
+                      isActived: viewModel.isActived(3),
+                      onTap: viewModel.selectChip(3),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -69,9 +79,9 @@ class SigsPage extends StackedView<SigsPageModel> {
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         viewModel.sigs.isEmpty
-            ? const SliverToBoxAdapter(
+            ?  SliverToBoxAdapter(
                 child: Center(
-                  child: Text("No community found"),
+                  child: Text("views.community.empty".tr()),
                 ),
               )
             : SliverList.builder(
@@ -82,14 +92,11 @@ class SigsPage extends StackedView<SigsPageModel> {
                     key: ValueKey(sig.id),
                     sig: sig,
                     onTap: viewModel.onTapOnSIG(sig),
-                    onLongTap: (viewModel.allowControlSigs())
-                        ? viewModel.onLongTapEditSig(sig)
-                        : null,
+                    onLongTap: (viewModel.allowControlSigs()) ? viewModel.onLongTapEditSig(sig) : null,
                   );
                 },
               ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -99,11 +106,7 @@ class SigsPage extends StackedView<SigsPageModel> {
 }
 
 class ChipWidget extends StatelessWidget {
-  const ChipWidget(
-      {super.key,
-      required this.label,
-      this.isActived = false,
-      required this.onTap});
+  const ChipWidget({super.key, required this.label, this.isActived = false, required this.onTap});
 
   final Function() onTap;
   final bool isActived;
@@ -120,8 +123,7 @@ class ChipWidget extends StatelessWidget {
           color: isActived ? kcMediumGrey : kcVeryLightGrey,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(label,
-            style: TextStyle(color: isActived ? Colors.white : Colors.black)),
+        child: Text(label, style: TextStyle(color: isActived ? Colors.white : Colors.black)),
       ),
     );
   }

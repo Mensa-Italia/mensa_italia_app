@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/addon.dart';
@@ -17,11 +18,12 @@ class AddonPage extends StackedView<AddonPageModel> {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
-          title: "Addons",
+          title: "views.addons.title".tr(),
           searchBarActions: SearchBarActions(
             onChanged: viewModel.search,
             controller: viewModel.searchController,
             onSubmitted: viewModel.search,
+            hintText: "views.addons.search.textfield.hint".tr(),
           ),
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
@@ -31,8 +33,8 @@ class AddonPage extends StackedView<AddonPageModel> {
               Padding(
                 key: const ValueKey("Officials:Title"),
                 padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-                child: const Text(
-                  "Officials",
+                child: Text(
+                  "views.addons.subtitle.officials".tr(),
                   style: TextStyle(
                     fontSize: 18,
                   ),
@@ -41,40 +43,40 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.isSearching("contacts"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Contacts"),
-                name: "Contacts",
-                description: "Your Mensa Italia contacts, you can find any contact you need!",
+                name: "addons.contacts.title".tr(),
+                description: "addons.contacts.description".tr(),
                 icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openContacts,
               ),
             if (viewModel.isSearching("deals"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Deals"),
-                name: "Deals",
-                description: "Deals and discounts for Mensa Italia members",
+                name: "addons.deals.title".tr(),
+                description: "addons.deals.description".tr(),
                 icon: const Icon(EneftyIcons.moneys_outline, color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openDeals,
               ),
             if (viewModel.isSearching("documents"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Documents"),
-                name: "Documents",
-                description: "Official documents of Mensa Italia",
+                name: "addons.documents.title".tr(),
+                description: "addons.documents.description".tr(),
                 icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openDocuments,
               ),
             if (viewModel.isSearching("tableport"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:Tableport"),
-                name: "Tableport",
-                description: "When you go to an event, you can ask the organizer to stamp your Tableport!",
+                name: "addons.tableport.title".tr(),
+                description: "addons.tableport.description".tr(),
                 icon: const Icon(EneftyIcons.global_outline, color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openTableport,
               ),
             if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:TestMakers"),
-                name: "TestMakers",
-                description: "You see this because you're one of the test makers!",
+                name: "addons.testmakers.title".tr(),
+                description: "addons.testmakers.description".tr(),
                 icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openTestMakers,
               ),
@@ -82,8 +84,8 @@ class AddonPage extends StackedView<AddonPageModel> {
               Padding(
                 key: const ValueKey("Verified:Title"),
                 padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
-                child: const Text(
-                  "Verified",
+                child:  Text(
+                  "views.addons.subtitle.verified".tr(),
                   style: TextStyle(
                     fontSize: 18,
                   ),

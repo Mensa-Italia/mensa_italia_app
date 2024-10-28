@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,11 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, EventPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
-          title: 'Events',
+          title: "views.events.title".tr(),
           leading: (viewModel.allowControlEvents())
               ? CupertinoButton(
                   padding: EdgeInsets.zero,
@@ -51,6 +51,7 @@ class EventPage extends StackedView<EventPageModel> {
             onChanged: viewModel.search,
             controller: viewModel.searchController,
             onSubmitted: viewModel.search,
+            hintText: "views.events.search.textfield.hint".tr(),
           ),
           trailingTitle: [
             Padding(
@@ -79,7 +80,7 @@ class EventPage extends StackedView<EventPageModel> {
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         if (viewModel.events.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             child: SafeArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -92,7 +93,7 @@ class EventPage extends StackedView<EventPageModel> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'No events found',
+                    "views.events.empty".tr(),
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 20,
@@ -110,16 +111,11 @@ class EventPage extends StackedView<EventPageModel> {
               key: ValueKey(event.id),
               event: event,
               onTap: viewModel.onTapOnEvent(event),
-              onLongTap: (viewModel.allowControlEvents() &&
-                          event.owner == viewModel.user.id) ||
-                      viewModel.isSuper()
-                  ? viewModel.onLongTapEditEvent(event)
-                  : null,
+              onLongTap: (viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper() ? viewModel.onLongTapEditEvent(event) : null,
             );
           },
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

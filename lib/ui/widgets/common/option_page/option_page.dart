@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,12 +15,11 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
-          title: "Settings",
+          title: "views.settings.title".tr(),
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(
@@ -46,12 +46,15 @@ class OptionPage extends StackedView<OptionPageModel> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AutoSizeText(viewModel.user.name,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 1.2)),
+                            AutoSizeText(
+                              viewModel.user.name,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                height: 1.2,
+                              ),
+                            ),
                             AutoSizeText(
                               viewModel.user.email,
                               style: const TextStyle(
@@ -74,22 +77,21 @@ class OptionPage extends StackedView<OptionPageModel> {
               key: const ValueKey("settings:1"),
               children: [
                 _OptionTile(
-                  title: "Calendar linker",
-                  subtitle: "Mensa calendar on your phone",
+                  title: "views.settings.tile.calendar.title".tr(),
+                  subtitle: "views.settings.tile.calendar.description".tr(),
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
                   color: Colors.red,
                 ),
                 _OptionTile(
-                  title: "Renew Membership",
-                  trailing: DateFormat.yMMMd()
-                      .format(viewModel.user.expireMembership),
+                  title: "views.settings.tile.renewmembership.title".tr(),
+                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
                 ),
                 _OptionTile(
-                  title: "Change Password",
+                  title: "views.settings.tile.changepassword.title".tr(),
                   icon: EneftyIcons.lock_outline,
                   onTap: viewModel.changePassword,
                   color: Colors.blue,
@@ -101,7 +103,7 @@ class OptionPage extends StackedView<OptionPageModel> {
               key: const ValueKey("settings:2"),
               children: [
                 _OptionTile(
-                  title: "Leave a review",
+                  title: "views.settings.tile.leavereview.title".tr(),
                   icon: EneftyIcons.star_outline,
                   onTap: viewModel.openReview,
                   color: Colors.orangeAccent,
@@ -113,13 +115,13 @@ class OptionPage extends StackedView<OptionPageModel> {
               key: const ValueKey("settings:3"),
               children: [
                 _OptionTile(
-                  title: "Privacy Policy",
+                  title: "views.settings.tile.privacypolicy.title".tr(),
                   icon: EneftyIcons.security_safe_outline,
                   onTap: viewModel.openPrivacyPolicy,
                   color: Colors.green,
                 ),
                 _OptionTile(
-                  title: "Logout",
+                  title: "views.settings.tile.logout.title".tr(),
                   icon: EneftyIcons.logout_outline,
                   onTap: viewModel.logout,
                   color: Colors.red,
@@ -136,8 +138,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -208,8 +209,7 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
-        TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(

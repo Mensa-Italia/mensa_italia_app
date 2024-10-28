@@ -14,7 +14,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await DB.init();
   Intl.defaultLocale = await findSystemLocale();
   try {
