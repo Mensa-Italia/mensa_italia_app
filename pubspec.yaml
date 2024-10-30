@@ -27,7 +27,7 @@ dependencies:
   loading_animation_widget: ^1.3.0
   modal_bottom_sheet: ^3.0.0
   native_dio_adapter: ^1.3.0
-  path_provider: ^2.1.3
+  path_provider: ^2.1.5
   pocketbase: ^0.18.1
   shared_preferences: ^2.3.2
   stacked: ^3.4.0
