@@ -133,24 +133,43 @@ class EventTile extends StackedView<EventTileModel> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          text: event.name,
-                          children: [
-                            const TextSpan(text: '\n'),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text.rich(
                             TextSpan(
-                              text: event.position?.state ?? "Online",
-                              style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                              text: event.name,
+                              children: [
+                                const TextSpan(text: '\n'),
+                                TextSpan(
+                                  text: event.position?.state ?? "Online",
+                                  style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 1.1,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              height: 1.1,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Text.rich(
+                            TextSpan(
+                              text: event.position?.state != null ? (event.position?.state == "NaN" ? "International" : event.position?.state) : "Online",
+                            ),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                              height: 1.1,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
                       ),
                     ),
                     Text(
