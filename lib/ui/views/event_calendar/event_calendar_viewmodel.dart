@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mensa_italia_app/api/api.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class EventCalendarViewModel extends MasterModel {
   List<EventModel> events = [];
@@ -29,9 +29,7 @@ class EventCalendarViewModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null &&
-            selectedState.contains("Online") &&
-            !selectedState.contains("Nearby")) {
+        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
           return false;
         }
         if (element.isNational) {
@@ -46,9 +44,7 @@ class EventCalendarViewModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(
-              LatLng(position!.latitude, position!.longitude),
-              element.position!.toLatLong2());
+          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -70,44 +66,21 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events
-        .where((element) =>
-            isDateBetween(selectedDate, element.whenStart, element.whenEnd))
-        .toList();
+    return events.where((element) => isDateBetween(selectedDate, element.whenStart, element.whenEnd)).toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events
-        .where(
-            (element) => isDateBetween(day, element.whenStart, element.whenEnd))
-        .map((e) => e.name)
-        .toList();
+    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).map((e) => e.name).toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      if (event.infoLink.trim().isNotEmpty &&
-          await canLaunchUrlString(event.infoLink.trim())) {
-        launchUrlString(
-          event.infoLink.trim(),
-        );
-      } else {
-        dialogService.showDialog(
-          title: 'Not ready yet',
-          description: 'This event is being prepared, please try again later.',
-        );
-      }
+      navigationService.navigateToEventShowcaseView(event: event);
     };
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = [
-      "Nearby & Online",
-      "Nearby",
-      "Online",
-      ...ListOfStates,
-      "All"
-    ];
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", ...ListOfStates, "All"];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (BuildContext context) => Container(
@@ -171,8 +144,5 @@ class EventCalendarViewModel extends MasterModel {
 }
 
 bool isDateBetween(DateTime date, DateTime start, DateTime end) {
-  return (date.isAfter(normalizeDate(start)) &&
-          date.isBefore(normalizeDate(end))) ||
-      isSameDay(date, start) ||
-      isSameDay(date, end);
+  return (date.isAfter(normalizeDate(start)) && date.isBefore(normalizeDate(end))) || isSameDay(date, start) || isSameDay(date, end);
 }

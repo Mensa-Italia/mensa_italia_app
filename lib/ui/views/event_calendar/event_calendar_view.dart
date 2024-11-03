@@ -13,8 +13,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         previousPageTitle: "Events",
@@ -62,14 +61,10 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
                         iconAlignment: IconAlignment.end,
                         style: ButtonStyle(
                           visualDensity: VisualDensity.compact,
-                          backgroundColor:
-                              const WidgetStatePropertyAll(Colors.white),
-                          padding: const WidgetStatePropertyAll(
-                              EdgeInsets.symmetric(horizontal: 10)),
-                          side: const WidgetStatePropertyAll(
-                              BorderSide(color: Colors.black)),
-                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20))),
+                          backgroundColor: const WidgetStatePropertyAll(Colors.white),
+                          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 10)),
+                          side: const WidgetStatePropertyAll(BorderSide(color: Colors.black)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                         ),
                         child: Text(
                           viewModel.selectedState,
@@ -112,8 +107,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   }
 
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
-      EventCalendarViewModel();
+  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
 }
 
 class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
@@ -139,9 +133,13 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
               children: [
                 AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: event.image,
-                    fit: BoxFit.cover,
+                  child: Hero(
+                    tag: event.image,
+                    transitionOnUserGestures: true,
+                    child: CachedNetworkImage(
+                      imageUrl: event.image,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Container(
@@ -193,9 +191,13 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: CachedNetworkImage(
-                    imageUrl: event.image,
-                    fit: BoxFit.cover,
+                  child: Hero(
+                    tag: event.image,
+                    transitionOnUserGestures: true,
+                    child: CachedNetworkImage(
+                      imageUrl: event.image,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Container(
@@ -210,9 +212,7 @@ class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
                               const TextSpan(text: '\n'),
                               TextSpan(
                                 text: event.position?.state ?? "Online",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 12),
+                                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
                               ),
                             ],
                           ),

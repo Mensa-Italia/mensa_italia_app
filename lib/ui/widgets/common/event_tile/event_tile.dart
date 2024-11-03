@@ -139,13 +139,6 @@ class EventTile extends StackedView<EventTileModel> {
                           Text.rich(
                             TextSpan(
                               text: event.name,
-                              children: [
-                                const TextSpan(text: '\n'),
-                                TextSpan(
-                                  text: event.position?.state ?? "Online",
-                                  style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                                ),
-                              ],
                             ),
                             style: const TextStyle(
                               fontSize: 16,
