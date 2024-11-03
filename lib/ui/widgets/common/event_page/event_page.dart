@@ -20,31 +20,34 @@ class EventPage extends StackedView<EventPageModel> {
         getAppBarSliverPlatform(
           title: "views.events.title".tr(),
           leading: (viewModel.allowControlEvents())
-              ? CupertinoButton(
+              ? IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.navigateToAddEvent,
-                  child: const Icon(
+                  icon: Icon(
                     EneftyIcons.add_circle_bold,
-                    color: kcPrimaryColor,
+                    color: Theme.of(context).appBarTheme.iconTheme?.color,
                   ),
+                  iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
                 )
               : null,
           trailings: [
-            CupertinoButton(
+            IconButton(
               padding: EdgeInsets.zero,
               onPressed: viewModel.navigateToCalendar,
-              child: const Icon(
+              icon: Icon(
                 EneftyIcons.calendar_2_outline,
-                color: kcPrimaryColor,
+                color: Theme.of(context).appBarTheme.iconTheme?.color,
               ),
+              iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
             ),
-            CupertinoButton(
+            IconButton(
               padding: EdgeInsets.zero,
               onPressed: viewModel.navigateToMap,
-              child: const Icon(
+              icon: Icon(
                 EneftyIcons.map_2_outline,
-                color: kcPrimaryColor,
+                color: Theme.of(context).appBarTheme.iconTheme?.color,
               ),
+              iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
             ),
           ],
           searchBarActions: SearchBarActions(
@@ -54,27 +57,9 @@ class EventPage extends StackedView<EventPageModel> {
             hintText: "views.events.search.textfield.hint".tr(),
           ),
           trailingTitle: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15, top: 3),
-              child: TextButton.icon(
-                onPressed: viewModel.changeSearchRadius,
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.only(left: 10, right: 5),
-                ),
-                iconAlignment: IconAlignment.end,
-                label: Text(
-                  viewModel.selectedState,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 12,
-                  ),
-                ),
-                icon: const Icon(
-                  EneftyIcons.location_outline,
-                  color: Colors.black,
-                ),
-              ),
+            IconButton(
+              onPressed: viewModel.changeSearchRadius,
+              icon: Icon(EneftyIcons.filter_outline),
             ),
           ],
         ),

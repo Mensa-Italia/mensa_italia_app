@@ -21,7 +21,9 @@ StampUserModel _$StampUserModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$StampUserModel {
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated => throw _privateConstructorUsedError;
   @JsonKey(readValue: getDataFromExpanded)
   StampModel get stamp => throw _privateConstructorUsedError;
@@ -41,8 +43,8 @@ abstract class $StampUserModelCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      DateTime created,
-      DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
       @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
       String user});
 
@@ -111,8 +113,8 @@ abstract class _$$StampUserModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      DateTime created,
-      DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
       @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
       String user});
 
@@ -167,8 +169,8 @@ class __$$StampUserModelImplCopyWithImpl<$Res>
 class _$StampUserModelImpl extends _StampUserModel {
   const _$StampUserModelImpl(
       {required this.id,
-      required this.created,
-      required this.updated,
+      @JsonKey(fromJson: getDateTimeLocal) required this.created,
+      @JsonKey(fromJson: getDateTimeLocal) required this.updated,
       @JsonKey(readValue: getDataFromExpanded) required this.stamp,
       required this.user})
       : super._();
@@ -179,8 +181,10 @@ class _$StampUserModelImpl extends _StampUserModel {
   @override
   final String id;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
   @override
   @JsonKey(readValue: getDataFromExpanded)
@@ -228,8 +232,8 @@ class _$StampUserModelImpl extends _StampUserModel {
 abstract class _StampUserModel extends StampUserModel {
   const factory _StampUserModel(
       {required final String id,
-      required final DateTime created,
-      required final DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime updated,
       @JsonKey(readValue: getDataFromExpanded) required final StampModel stamp,
       required final String user}) = _$StampUserModelImpl;
   const _StampUserModel._() : super._();
@@ -240,8 +244,10 @@ abstract class _StampUserModel extends StampUserModel {
   @override
   String get id;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated;
   @override
   @JsonKey(readValue: getDataFromExpanded)

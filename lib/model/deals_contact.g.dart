@@ -13,8 +13,8 @@ _$DealsContactImpl _$$DealsContactImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String,
       phoneNumber: json['phone_number'] as String?,
       note: json['note'] as String?,
-      created: DateTime.parse(json['created'] as String),
-      updated: DateTime.parse(json['updated'] as String),
+      created: getDateTimeLocal(json['created'] as String),
+      updated: getDateTimeLocal(json['updated'] as String),
     );
 
 Map<String, dynamic> _$$DealsContactImplToJson(_$DealsContactImpl instance) =>

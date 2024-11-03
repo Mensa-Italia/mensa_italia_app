@@ -36,9 +36,7 @@ class EventPageModel extends MasterModel {
         if (element.position == null && selectedState.contains("Online")) {
           return true;
         }
-        if (element.position != null &&
-            selectedState.contains("Online") &&
-            !selectedState.contains("Nearby")) {
+        if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
           return false;
         }
         if (!selectedState.contains("Nearby")) {
@@ -54,9 +52,7 @@ class EventPageModel extends MasterModel {
           if (element.position == null) {
             return false;
           }
-          final distance = const Distance().distance(
-              LatLng(position!.latitude, position!.longitude),
-              element.position!.toLatLong2());
+          final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
           return distance < 90000;
         }
       }));
@@ -91,7 +87,9 @@ class EventPageModel extends MasterModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      navigationService.navigateToEventShowcaseView(event: event);
+      navigationService.navigateToEventShowcaseView(event: event).then((value) {
+        load();
+      });
     };
   }
 
@@ -110,13 +108,7 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = [
-      "Nearby & Online",
-      "Nearby",
-      "Online",
-      "All",
-      ...ListOfStates
-    ];
+    final UsableListOfStates = ["Nearby & Online", "Nearby", "Online", "All", ...ListOfStates];
 
     cupertinoModalPicker(
       initialItem: UsableListOfStates.indexOf(selectedState),

@@ -3,6 +3,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/location.dart';
+import 'package:mensa_italia_app/model/parser_tools.dart';
 
 part 'deal.freezed.dart';
 part 'deal.g.dart';
@@ -22,7 +23,13 @@ class DealModel with _$DealModel {
     required bool isLocal,
     String? details,
     String? who,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     DateTime? starting,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     DateTime? ending,
     String? howToGet,
     String? link,
@@ -30,7 +37,13 @@ class DealModel with _$DealModel {
     String? attachment,
     required bool isActive,
     String? vatNumber,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime created,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime updated,
   }) = _DealModel;
 

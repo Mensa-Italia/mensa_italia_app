@@ -18,20 +18,16 @@ _$DealModelImpl _$$DealModelImplFromJson(Map<String, dynamic> json) =>
       isLocal: json['is_local'] as bool,
       details: json['details'] as String?,
       who: json['who'] as String?,
-      starting: json['starting'] == null
-          ? null
-          : DateTime.parse(json['starting'] as String),
-      ending: json['ending'] == null
-          ? null
-          : DateTime.parse(json['ending'] as String),
+      starting: getDateTimeLocal(json['starting'] as String),
+      ending: getDateTimeLocal(json['ending'] as String),
       howToGet: json['how_to_get'] as String?,
       link: json['link'] as String?,
       owner: json['owner'] as String?,
       attachment: json['attachment'] as String?,
       isActive: json['is_active'] as bool,
       vatNumber: json['vat_number'] as String?,
-      created: DateTime.parse(json['created'] as String),
-      updated: DateTime.parse(json['updated'] as String),
+      created: getDateTimeLocal(json['created'] as String),
+      updated: getDateTimeLocal(json['updated'] as String),
     );
 
 Map<String, dynamic> _$$DealModelImplToJson(_$DealModelImpl instance) =>

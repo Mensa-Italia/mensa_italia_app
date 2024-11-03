@@ -105,6 +105,7 @@ class MasterModel extends ReactiveViewModel {
       endLastDate: DateTime.now().add(
         const Duration(days: 3652),
       ),
+      
       is24HourMode: true,
       isShowSeconds: false,
       minutesInterval: 5,
@@ -130,15 +131,17 @@ class MasterModel extends ReactiveViewModel {
         return true;
       },
       endSelectableDayPredicate: (dateTime) {
-        if (start != null) {
-          return dateTime.isAfter(start);
-        } else {
-          return true;
-        }
+        return true;
       },
     );
 
     if (dateTimeList != null) {
+      //set locale
+      dateTimeList[0] = dateTimeList[0].toLocal();
+
+      if (dateTimeList[0].isAfter(dateTimeList[1])) {
+        return DateTimeRange(start: dateTimeList[1], end: dateTimeList[0]);
+      }
       return DateTimeRange(start: dateTimeList[0], end: dateTimeList[1]);
     } else {
       return null;

@@ -28,7 +28,9 @@ mixin _$DealModel {
   bool get isLocal => throw _privateConstructorUsedError;
   String? get details => throw _privateConstructorUsedError;
   String? get who => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime? get starting => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime? get ending => throw _privateConstructorUsedError;
   String? get howToGet => throw _privateConstructorUsedError;
   String? get link => throw _privateConstructorUsedError;
@@ -36,7 +38,9 @@ mixin _$DealModel {
   String? get attachment => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   String? get vatNumber => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -58,16 +62,16 @@ abstract class $DealModelCopyWith<$Res> {
       bool isLocal,
       String? details,
       String? who,
-      DateTime? starting,
-      DateTime? ending,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime? starting,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime? ending,
       String? howToGet,
       String? link,
       String? owner,
       String? attachment,
       bool isActive,
       String? vatNumber,
-      DateTime created,
-      DateTime updated});
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 
   $LocationModelCopyWith<$Res>? get position;
 }
@@ -204,16 +208,16 @@ abstract class _$$DealModelImplCopyWith<$Res>
       bool isLocal,
       String? details,
       String? who,
-      DateTime? starting,
-      DateTime? ending,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime? starting,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime? ending,
       String? howToGet,
       String? link,
       String? owner,
       String? attachment,
       bool isActive,
       String? vatNumber,
-      DateTime created,
-      DateTime updated});
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 
   @override
   $LocationModelCopyWith<$Res>? get position;
@@ -332,16 +336,16 @@ class _$DealModelImpl extends _DealModel {
       required this.isLocal,
       this.details,
       this.who,
-      this.starting,
-      this.ending,
+      @JsonKey(fromJson: getDateTimeLocal) this.starting,
+      @JsonKey(fromJson: getDateTimeLocal) this.ending,
       this.howToGet,
       this.link,
       this.owner,
       this.attachment,
       required this.isActive,
       this.vatNumber,
-      required this.created,
-      required this.updated})
+      @JsonKey(fromJson: getDateTimeLocal) required this.created,
+      @JsonKey(fromJson: getDateTimeLocal) required this.updated})
       : super._();
 
   factory _$DealModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -363,8 +367,10 @@ class _$DealModelImpl extends _DealModel {
   @override
   final String? who;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime? starting;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime? ending;
   @override
   final String? howToGet;
@@ -379,8 +385,10 @@ class _$DealModelImpl extends _DealModel {
   @override
   final String? vatNumber;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
 
   @override
@@ -465,15 +473,16 @@ abstract class _DealModel extends DealModel {
       required final bool isLocal,
       final String? details,
       final String? who,
-      final DateTime? starting,
-      final DateTime? ending,
+      @JsonKey(fromJson: getDateTimeLocal) final DateTime? starting,
+      @JsonKey(fromJson: getDateTimeLocal) final DateTime? ending,
       final String? howToGet,
       final String? link,
       final String? owner,
       final String? attachment,
       required final bool isActive,
       final String? vatNumber,
-      required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal)
       required final DateTime updated}) = _$DealModelImpl;
   const _DealModel._() : super._();
 
@@ -496,8 +505,10 @@ abstract class _DealModel extends DealModel {
   @override
   String? get who;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime? get starting;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime? get ending;
   @override
   String? get howToGet;
@@ -512,8 +523,10 @@ abstract class _DealModel extends DealModel {
   @override
   String? get vatNumber;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated;
   @override
   @JsonKey(ignore: true)

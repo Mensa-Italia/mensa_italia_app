@@ -73,6 +73,9 @@ class MainApp extends StatelessWidget {
           ),
           isDense: true,
         ),
+        appBarTheme: const AppBarTheme(
+          iconTheme: IconThemeData(color: kcPrimaryColor, size: 30),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(kcPrimaryColor),

@@ -1,3 +1,4 @@
+import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -33,7 +34,6 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                 style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               const Expanded(child: SizedBox()),
-              ...trailingTitle ?? [],
             ],
           ),
           if (searchBarActions != null)
@@ -41,13 +41,20 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
               height: 40,
               child: Padding(
                 padding: const EdgeInsets.only(right: 15, top: 3),
-                child: CupertinoSearchTextField(
-                  onChanged: searchBarActions.onChanged,
-                  controller: searchBarActions.controller,
-                  prefixIcon: const Icon(CupertinoIcons.search),
-                  onSubmitted: searchBarActions.onSubmitted,
-                  focusNode: searchBarActions.focusNode,
-                  placeholder: searchBarActions.hintText,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoSearchTextField(
+                        onChanged: searchBarActions.onChanged,
+                        controller: searchBarActions.controller,
+                        prefixIcon: const Icon(CupertinoIcons.search),
+                        onSubmitted: searchBarActions.onSubmitted,
+                        focusNode: searchBarActions.focusNode,
+                        placeholder: searchBarActions.hintText,
+                      ),
+                    ),
+                    ...trailingTitle ?? [],
+                  ],
                 ),
               ),
             ),
@@ -79,29 +86,28 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                 padding: EdgeInsets.only(top: kToolbarHeight + MediaQuery.of(StackedService.navigatorKey!.currentContext!).padding.top),
                 child: Column(
                   children: [
-                    trailingTitle != null
-                        ? Row(
-                            children: [
-                              const Spacer(),
-                              ...trailingTitle,
-                            ],
-                          )
-                        : const SizedBox(),
                     if (searchBarActions != null)
                       Container(
                         padding: const EdgeInsets.only(right: 15, top: 3, left: 15),
                         height: kToolbarHeight,
-                        child: TextField(
-                          onChanged: searchBarActions.onChanged,
-                          controller: searchBarActions.controller,
-                          onSubmitted: searchBarActions.onSubmitted,
-                          focusNode: searchBarActions.focusNode,
-                          decoration: InputDecoration(
-                            hintText: searchBarActions.hintText,
-                            prefixIcon: Icon(Icons.search),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: searchBarActions.onChanged,
+                                controller: searchBarActions.controller,
+                                onSubmitted: searchBarActions.onSubmitted,
+                                focusNode: searchBarActions.focusNode,
+                                decoration: InputDecoration(
+                                  hintText: searchBarActions.hintText,
+                                  prefixIcon: Icon(Icons.search),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                ),
+                              ),
+                            ),
+                            ...trailingTitle ?? [],
+                          ],
                         ),
                       ),
                   ],

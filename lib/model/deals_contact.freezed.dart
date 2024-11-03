@@ -25,7 +25,9 @@ mixin _$DealsContact {
   String get email => throw _privateConstructorUsedError;
   String? get phoneNumber => throw _privateConstructorUsedError;
   String? get note => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,8 +48,8 @@ abstract class $DealsContactCopyWith<$Res> {
       String email,
       String? phoneNumber,
       String? note,
-      DateTime created,
-      DateTime updated});
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
 
 /// @nodoc
@@ -118,8 +120,8 @@ abstract class _$$DealsContactImplCopyWith<$Res>
       String email,
       String? phoneNumber,
       String? note,
-      DateTime created,
-      DateTime updated});
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
 
 /// @nodoc
@@ -183,8 +185,8 @@ class _$DealsContactImpl implements _DealsContact {
       required this.email,
       this.phoneNumber,
       this.note,
-      required this.created,
-      required this.updated});
+      @JsonKey(fromJson: getDateTimeLocal) required this.created,
+      @JsonKey(fromJson: getDateTimeLocal) required this.updated});
 
   factory _$DealsContactImpl.fromJson(Map<String, dynamic> json) =>
       _$$DealsContactImplFromJson(json);
@@ -200,8 +202,10 @@ class _$DealsContactImpl implements _DealsContact {
   @override
   final String? note;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
 
   @override
@@ -250,7 +254,8 @@ abstract class _DealsContact implements DealsContact {
       required final String email,
       final String? phoneNumber,
       final String? note,
-      required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal)
       required final DateTime updated}) = _$DealsContactImpl;
 
   factory _DealsContact.fromJson(Map<String, dynamic> json) =
@@ -267,8 +272,10 @@ abstract class _DealsContact implements DealsContact {
   @override
   String? get note;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated;
   @override
   @JsonKey(ignore: true)

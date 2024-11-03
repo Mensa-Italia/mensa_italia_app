@@ -9,8 +9,8 @@ part of 'stamp.dart';
 _$StampModelImpl _$$StampModelImplFromJson(Map<String, dynamic> json) =>
     _$StampModelImpl(
       id: json['id'] as String,
-      created: DateTime.parse(json['created'] as String),
-      updated: DateTime.parse(json['updated'] as String),
+      created: getDateTimeLocal(json['created'] as String),
+      updated: getDateTimeLocal(json['updated'] as String),
       description: json['description'] as String,
       image: json['image'] as String,
     );

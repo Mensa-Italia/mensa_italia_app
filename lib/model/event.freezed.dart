@@ -26,7 +26,9 @@ mixin _$EventModel {
   String get description => throw _privateConstructorUsedError;
   String get infoLink => throw _privateConstructorUsedError;
   String get bookingLink => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenStart => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenEnd => throw _privateConstructorUsedError;
   String get contact => throw _privateConstructorUsedError;
   bool get isNational => throw _privateConstructorUsedError;
@@ -53,8 +55,8 @@ abstract class $EventModelCopyWith<$Res> {
       String description,
       String infoLink,
       String bookingLink,
-      DateTime whenStart,
-      DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       String contact,
       bool isNational,
       String owner,
@@ -169,8 +171,8 @@ abstract class _$$EventModelImplCopyWith<$Res>
       String description,
       String infoLink,
       String bookingLink,
-      DateTime whenStart,
-      DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       String contact,
       bool isNational,
       String owner,
@@ -267,8 +269,8 @@ class _$EventModelImpl implements _EventModel {
       required this.description,
       required this.infoLink,
       required this.bookingLink,
-      required this.whenStart,
-      required this.whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) required this.whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) required this.whenEnd,
       required this.contact,
       required this.isNational,
       required this.owner,
@@ -290,8 +292,10 @@ class _$EventModelImpl implements _EventModel {
   @override
   final String bookingLink;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime whenStart;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime whenEnd;
   @override
   final String contact;
@@ -372,8 +376,8 @@ abstract class _EventModel implements EventModel {
       required final String description,
       required final String infoLink,
       required final String bookingLink,
-      required final DateTime whenStart,
-      required final DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenEnd,
       required final String contact,
       required final bool isNational,
       required final String owner,
@@ -396,8 +400,10 @@ abstract class _EventModel implements EventModel {
   @override
   String get bookingLink;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenStart;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenEnd;
   @override
   String get contact;

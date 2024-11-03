@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mensa_italia_app/model/parser_tools.dart';
 
 part 'deals_contact.freezed.dart';
 part 'deals_contact.g.dart';
@@ -11,7 +12,13 @@ class DealsContact with _$DealsContact {
     required String email,
     String? phoneNumber,
     String? note,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime created,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime updated,
   }) = _DealsContact;
 

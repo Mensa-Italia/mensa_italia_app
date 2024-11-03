@@ -13,7 +13,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       avatar: json['avatar'] as String,
       email: json['email'] as String,
-      expireMembership: DateTime.parse(json['expire_membership'] as String),
+      expireMembership: getDateTimeLocal(json['expire_membership'] as String),
       powers:
           (json['powers'] as List<dynamic>).map((e) => e as String).toList(),
       addons:

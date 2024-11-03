@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mensa_italia_app/model/parser_tools.dart';
 import 'package:mensa_italia_app/model/location.dart';
 
 part 'event.freezed.dart';
@@ -16,7 +17,13 @@ class EventModel with _$EventModel {
     required String description,
     required String infoLink,
     required String bookingLink,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime whenStart,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime whenEnd,
     required String contact,
     required bool isNational,
@@ -31,14 +38,3 @@ class EventModel with _$EventModel {
       _$EventModelFromJson(json);
 }
 
-getDataFromExpanded(Map<dynamic, dynamic> json, String key) {
-  try {
-    if (json[key] is String) {
-      return json["expand"][key];
-    } else {
-      return json[key];
-    }
-  } catch (_) {
-    return null;
-  }
-}

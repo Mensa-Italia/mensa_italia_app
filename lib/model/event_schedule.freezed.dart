@@ -25,7 +25,9 @@ mixin _$EventScheduleModel {
   String? get event => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenStart => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenEnd => throw _privateConstructorUsedError;
   int get maxExternalGuests => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
@@ -50,8 +52,8 @@ abstract class $EventScheduleModelCopyWith<$Res> {
       String? event,
       String description,
       String? image,
-      DateTime whenStart,
-      DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       int maxExternalGuests,
       double price,
       String infoLink,
@@ -146,8 +148,8 @@ abstract class _$$EventScheduleModelImplCopyWith<$Res>
       String? event,
       String description,
       String? image,
-      DateTime whenStart,
-      DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       int maxExternalGuests,
       double price,
       String infoLink,
@@ -235,8 +237,8 @@ class _$EventScheduleModelImpl implements _EventScheduleModel {
       this.event,
       required this.description,
       this.image,
-      required this.whenStart,
-      required this.whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) required this.whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) required this.whenEnd,
       required this.maxExternalGuests,
       required this.price,
       required this.infoLink,
@@ -256,8 +258,10 @@ class _$EventScheduleModelImpl implements _EventScheduleModel {
   @override
   final String? image;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime whenStart;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime whenEnd;
   @override
   final int maxExternalGuests;
@@ -334,8 +338,8 @@ abstract class _EventScheduleModel implements EventScheduleModel {
       final String? event,
       required final String description,
       final String? image,
-      required final DateTime whenStart,
-      required final DateTime whenEnd,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenEnd,
       required final int maxExternalGuests,
       required final double price,
       required final String infoLink,
@@ -355,8 +359,10 @@ abstract class _EventScheduleModel implements EventScheduleModel {
   @override
   String? get image;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenStart;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get whenEnd;
   @override
   int get maxExternalGuests;

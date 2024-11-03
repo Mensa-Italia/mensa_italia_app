@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mensa_italia_app/model/parser_tools.dart';
 
 part 'event_schedule.freezed.dart';
 
@@ -12,7 +13,13 @@ class EventScheduleModel with _$EventScheduleModel {
     String? event,
     required String description,
     String? image,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime whenStart,
+    @JsonKey(
+      fromJson: getDateTimeLocal,
+    )
     required DateTime whenEnd,
     required int maxExternalGuests,
     required double price,

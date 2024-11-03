@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mensa_italia_app/model/parser_tools.dart';
 
 part 'addon.freezed.dart';
 part 'addon.g.dart';

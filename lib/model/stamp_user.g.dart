@@ -9,8 +9,8 @@ part of 'stamp_user.dart';
 _$StampUserModelImpl _$$StampUserModelImplFromJson(Map<String, dynamic> json) =>
     _$StampUserModelImpl(
       id: json['id'] as String,
-      created: DateTime.parse(json['created'] as String),
-      updated: DateTime.parse(json['updated'] as String),
+      created: getDateTimeLocal(json['created'] as String),
+      updated: getDateTimeLocal(json['updated'] as String),
       stamp: StampModel.fromJson(
           getDataFromExpanded(json, 'stamp') as Map<String, dynamic>),
       user: json['user'] as String,

@@ -21,7 +21,9 @@ StampModel _$StampModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$StampModel {
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
@@ -40,8 +42,8 @@ abstract class $StampModelCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      DateTime created,
-      DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
       String description,
       String image});
 }
@@ -100,8 +102,8 @@ abstract class _$$StampModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      DateTime created,
-      DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
       String description,
       String image});
 }
@@ -153,8 +155,8 @@ class __$$StampModelImplCopyWithImpl<$Res>
 class _$StampModelImpl implements _StampModel {
   const _$StampModelImpl(
       {required this.id,
-      required this.created,
-      required this.updated,
+      @JsonKey(fromJson: getDateTimeLocal) required this.created,
+      @JsonKey(fromJson: getDateTimeLocal) required this.updated,
       required this.description,
       required this.image});
 
@@ -164,8 +166,10 @@ class _$StampModelImpl implements _StampModel {
   @override
   final String id;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
   @override
   final String description;
@@ -212,8 +216,8 @@ class _$StampModelImpl implements _StampModel {
 abstract class _StampModel implements StampModel {
   const factory _StampModel(
       {required final String id,
-      required final DateTime created,
-      required final DateTime updated,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) required final DateTime updated,
       required final String description,
       required final String image}) = _$StampModelImpl;
 
@@ -223,8 +227,10 @@ abstract class _StampModel implements StampModel {
   @override
   String get id;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get created;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get updated;
   @override
   String get description;

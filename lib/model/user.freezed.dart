@@ -25,6 +25,7 @@ mixin _$UserModel {
   String get name => throw _privateConstructorUsedError;
   String get avatar => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get expireMembership => throw _privateConstructorUsedError;
   List<String> get powers => throw _privateConstructorUsedError;
   List<String> get addons => throw _privateConstructorUsedError;
@@ -47,7 +48,7 @@ abstract class $UserModelCopyWith<$Res> {
       String name,
       String avatar,
       String email,
-      DateTime expireMembership,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime expireMembership,
       List<String> powers,
       List<String> addons,
       bool isMembershipActive});
@@ -131,7 +132,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String name,
       String avatar,
       String email,
-      DateTime expireMembership,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime expireMembership,
       List<String> powers,
       List<String> addons,
       bool isMembershipActive});
@@ -208,7 +209,7 @@ class _$UserModelImpl implements _UserModel {
       required this.name,
       required this.avatar,
       required this.email,
-      required this.expireMembership,
+      @JsonKey(fromJson: getDateTimeLocal) required this.expireMembership,
       required final List<String> powers,
       required final List<String> addons,
       required this.isMembershipActive})
@@ -229,6 +230,7 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String email;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   final DateTime expireMembership;
   final List<String> _powers;
   @override
@@ -308,6 +310,7 @@ abstract class _UserModel implements UserModel {
       required final String name,
       required final String avatar,
       required final String email,
+      @JsonKey(fromJson: getDateTimeLocal)
       required final DateTime expireMembership,
       required final List<String> powers,
       required final List<String> addons,
@@ -327,6 +330,7 @@ abstract class _UserModel implements UserModel {
   @override
   String get email;
   @override
+  @JsonKey(fromJson: getDateTimeLocal)
   DateTime get expireMembership;
   @override
   List<String> get powers;

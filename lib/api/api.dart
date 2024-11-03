@@ -212,10 +212,33 @@ class Api {
               data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
               return EventModel.fromJson(data);
             }).toList());
-      } catch (e) {
-        print(e);
-      }
+      } catch (_) {}
       return Memoized().get("all_events");
+    });
+  }
+
+  Future<EventModel> getEvent(String id) async {
+    return await pb
+        .collection('events')
+        .getOne(
+          id,
+          expand: "position",
+        )
+        .then((value) {
+      Map<String, dynamic> data = value.toJson();
+      data["image"] = pb.files.getUrl(value, value.getStringValue("image")).toString();
+      final allEvents = Memoized().get("all_events");
+      if (allEvents != null) {
+        final index = allEvents.indexWhere((element) => element.id == id);
+        if (index != -1) {
+          allEvents[index] = EventModel.fromJson(data);
+          Memoized().set("all_events", allEvents);
+        } else {
+          allEvents.add(EventModel.fromJson(data));
+          Memoized().set("all_events", allEvents);
+        }
+      }
+      return EventModel.fromJson(data);
     });
   }
 
