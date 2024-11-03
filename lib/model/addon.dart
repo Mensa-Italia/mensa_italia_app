@@ -1,6 +1,7 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mensa_italia_app/model/parser_tools.dart';
 
 part 'addon.freezed.dart';
 part 'addon.g.dart';
@@ -16,6 +17,5 @@ class AddonModel with _$AddonModel {
     required String url,
   }) = _AddonModel;
 
-  factory AddonModel.fromJson(Map<String, dynamic> json) =>
-      _$AddonModelFromJson(json);
+  factory AddonModel.fromJson(Map<String, dynamic> json) => _$AddonModelFromJson(json);
 }

@@ -1,5 +1,6 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/parser_tools.dart';
 import 'package:mensa_italia_app/model/stamp.dart';
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
@@ -31,7 +32,7 @@ class AddonDealsAddViewModel extends MasterModel {
   final contactNotes = TextEditingController();
 
   String? detailID;
-  DateTimeRange? dateTimeOptions;
+  RangeDateTimeZone? dateTimeOptions;
   LocationSelected? location;
   String selectedEligibility = "active_members";
 
@@ -42,12 +43,11 @@ class AddonDealsAddViewModel extends MasterModel {
       commercialSectorController.text = deal!.commercialSector;
       locationController.text = deal!.position?.name ?? "";
       if (deal?.starting != null && deal?.ending != null) {
-        dateTimeOptions = DateTimeRange(
+        dateTimeOptions = RangeDateTimeZone.fromDateTime(
           start: deal!.starting!,
           end: deal!.ending!,
         );
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(deal!.starting!)} - ${DateFormat("dd/MM/yyyy HH:mm").format(deal!.ending!)}";
+        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(deal!.starting!)} - ${DateFormat("dd/MM/yyyy HH:mm").format(deal!.ending!)}";
       }
       detailsController.text = deal!.details ?? "";
       whoController.text = deal!.who ?? "";
@@ -146,8 +146,7 @@ class AddonDealsAddViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions = value;
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
       }
     });
   }

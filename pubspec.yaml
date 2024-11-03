@@ -68,6 +68,8 @@ dependencies:
   isar_flutter_libs: any
   easy_localization: ^3.0.7
   mobile_scanner: ^6.0.2
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
   
 dev_dependencies:
   build_runner: ^2.4.13

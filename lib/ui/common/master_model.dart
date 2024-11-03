@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
+import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -92,7 +93,7 @@ class MasterModel extends ReactiveViewModel {
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<DateTimeRange?> pickStartEndTime({DateTime? start, DateTime? end}) async {
+  Future<RangeDateTimeZone?> pickStartEndTime({DateTime? start, DateTime? end}) async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
       startInitialDate: start,
@@ -105,7 +106,6 @@ class MasterModel extends ReactiveViewModel {
       endLastDate: DateTime.now().add(
         const Duration(days: 3652),
       ),
-      
       is24HourMode: true,
       isShowSeconds: false,
       minutesInterval: 5,
@@ -136,13 +136,10 @@ class MasterModel extends ReactiveViewModel {
     );
 
     if (dateTimeList != null) {
-      //set locale
-      dateTimeList[0] = dateTimeList[0].toLocal();
-
       if (dateTimeList[0].isAfter(dateTimeList[1])) {
-        return DateTimeRange(start: dateTimeList[1], end: dateTimeList[0]);
+        return RangeDateTimeZone.fromDateTime(start: dateTimeList[1], end: dateTimeList[0]);
       }
-      return DateTimeRange(start: dateTimeList[0], end: dateTimeList[1]);
+      return RangeDateTimeZone.fromDateTime(start: dateTimeList[0], end: dateTimeList[1]);
     } else {
       return null;
     }

@@ -6,7 +6,6 @@ import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/modal/flip_side.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
-import 'package:mensa_italia_app/ui/views/login/login_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/front_card_shine/front_card_shine.dart';
 import 'package:stacked/stacked.dart';
 

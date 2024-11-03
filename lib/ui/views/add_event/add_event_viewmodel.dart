@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
@@ -21,7 +22,7 @@ class AddEventViewModel extends MasterModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController linkController = TextEditingController();
-  DateTimeRange? dateTimeOptions;
+  RangeDateTimeZone? dateTimeOptions;
   LocationSelected? location;
   bool isNational = false;
   bool isOnline = false;
@@ -42,7 +43,7 @@ class AddEventViewModel extends MasterModel {
       descriptionController.text = event.description;
       linkController.text = event.infoLink;
 
-      dateTimeOptions = DateTimeRange(
+      dateTimeOptions = RangeDateTimeZone.fromDateTime(
         start: event.whenStart,
         end: event.whenEnd,
       );

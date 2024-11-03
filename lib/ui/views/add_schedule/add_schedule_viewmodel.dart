@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
@@ -20,7 +21,7 @@ class AddScheduleViewModel extends MasterModel {
       descriptionController.text = event!.description;
       linkController.text = event!.infoLink;
 
-      dateTimeOptions = DateTimeRange(
+      dateTimeOptions = RangeDateTimeZone.fromDateTime(
         start: event!.whenStart,
         end: event!.whenEnd,
       );
@@ -36,7 +37,7 @@ class AddScheduleViewModel extends MasterModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController linkController = TextEditingController();
-  DateTimeRange? dateTimeOptions;
+  RangeDateTimeZone? dateTimeOptions;
   LocationSelected? location;
   bool isNational = false;
   bool isOnline = false;

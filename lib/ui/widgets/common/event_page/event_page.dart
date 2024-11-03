@@ -1,9 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_tile/event_tile.dart';
 import 'package:stacked/stacked.dart';
@@ -59,7 +57,10 @@ class EventPage extends StackedView<EventPageModel> {
           trailingTitle: [
             IconButton(
               onPressed: viewModel.changeSearchRadius,
-              icon: Icon(EneftyIcons.filter_outline),
+              icon: Icon(
+                EneftyIcons.filter_outline,
+                color: Theme.of(context).appBarTheme.iconTheme?.color,
+              ),
             ),
           ],
         ),

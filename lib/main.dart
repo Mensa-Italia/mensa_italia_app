@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/find_locale.dart';
 import 'package:mensa_italia_app/api/translation_loader.dart';
 import 'package:mensa_italia_app/app/app.bottomsheets.dart';
@@ -12,12 +13,18 @@ import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
   await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await DB.init();
+  tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
+  try {
+    tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
+  } catch (_) {}
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

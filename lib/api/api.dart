@@ -20,6 +20,7 @@ import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:http/http.dart' as http;
+import 'package:timezone/timezone.dart' as tz;
 
 class Api {
   final Dio dio = Dio(BaseOptions(baseUrl: 'https://svc.mensa.it'));
@@ -200,7 +201,7 @@ class Api {
         .collection('events')
         .getFullList(
           sort: 'when_end',
-          filter: "when_end >= '${DateTime.now().toIso8601String()}'",
+          filter: "when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
           expand: "position",
         )
         .then((value) {
@@ -251,7 +252,7 @@ class Api {
         .getList(
           page: 1,
           perPage: 1,
-          filter: "(when_start >= '${DateTime.now().toIso8601String()}' && is_national=true)",
+          filter: "(when_start >= '${tz.TZDateTime.now(tz.local).toIso8601String()}' && is_national=true)",
           sort: 'when_start',
         )
         .then((value) {
@@ -360,8 +361,8 @@ class Api {
     XFile? image,
     LocationSelected? location,
     required String link,
-    required DateTime startDate,
-    required DateTime endDate,
+    required tz.TZDateTime startDate,
+    required tz.TZDateTime endDate,
     required bool isNational,
     required bool isOnline,
     List<EventScheduleModel> schedules = const [],
@@ -423,8 +424,8 @@ class Api {
     XFile? image,
     LocationSelected? location,
     required String link,
-    required DateTime startDate,
-    required DateTime endDate,
+    required tz.TZDateTime startDate,
+    required tz.TZDateTime endDate,
     required bool isNational,
     required bool isOnline,
     List<EventScheduleModel> schedules = const [],
@@ -555,7 +556,7 @@ class Api {
         .collection('deals')
         .getFullList(
           sort: 'created',
-          filter: "ending >= '${DateTime.now().toIso8601String()}'",
+          filter: "ending >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
           expand: "position",
         )
         .then((value) {
@@ -588,8 +589,8 @@ class Api {
     required String details,
     required String who,
     required String howToGet,
-    required DateTime starting,
-    required DateTime ending,
+    required tz.TZDateTime starting,
+    required tz.TZDateTime ending,
     required String link,
     required String vatNumber,
     LocationSelected? location,
@@ -643,8 +644,8 @@ class Api {
     required String details,
     required String who,
     required String howToGet,
-    required DateTime starting,
-    required DateTime ending,
+    required tz.TZDateTime starting,
+    required tz.TZDateTime ending,
     required String link,
     required String vatNumber,
     LocationSelected? location,
