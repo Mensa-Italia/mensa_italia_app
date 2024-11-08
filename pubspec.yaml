@@ -31,7 +31,7 @@ dependencies:
   pocketbase: ^0.18.1
   shared_preferences: ^2.3.2
   stacked: ^3.4.0
-  stacked_services: ^1.5.1
+  stacked_services: ^1.6.0
   stylish_bottom_bar: ^1.1.0
   super_cupertino_navigation_bar: ^2.1.2
   url_launcher: ^6.3.1
