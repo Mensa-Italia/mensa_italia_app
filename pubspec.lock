@@ -1526,10 +1526,10 @@ packages:
     dependency: "direct main"
     description:
       name: stacked_services
-      sha256: "01c5b1875d383b39dce780ee0a8ce4de99f2500d52d2e26676e787fd163e36bd"
+      sha256: a70c5c86f89a9258139ff174bf045a527099ea8552f8497ebb0b755469841bb4
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.1"
+    version: "1.6.0"
   stacked_shared:
     dependency: transitive
     description:
