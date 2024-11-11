@@ -29,7 +29,7 @@ dependencies:
   native_dio_adapter: ^1.3.0
   path_provider: ^2.1.5
   pocketbase: ^0.18.1
-  shared_preferences: ^2.3.2
+  shared_preferences: ^2.3.3
   stacked: ^3.4.0
   stacked_services: ^1.6.0
   stylish_bottom_bar: ^1.1.0
