@@ -41,7 +41,7 @@ dependencies:
   dart_rss: ^3.0.3
   image_picker: ^1.1.2
   dotted_border: ^2.1.0
-  sentry_flutter: ^8.9.0
+  sentry_flutter: ^8.10.1
   maplibre_gl: ^0.20.0
   package_info_plus: ^8.1.0
   syncfusion_flutter_pdfviewer: ^27.1.58
