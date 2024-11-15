@@ -54,7 +54,7 @@ dependencies:
   open_filex: ^4.5.0
   table_calendar: ^3.1.2
   geocoding: ^3.0.0
-  geolocator: ^13.0.1
+  geolocator: ^13.0.2
   latlong2: ^0.9.1
   fluttertoast: ^8.2.8
   maps_launcher: ^2.2.1
