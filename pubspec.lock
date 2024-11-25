@@ -1265,10 +1265,10 @@ packages:
     dependency: "direct main"
     description:
       name: pocketbase
-      sha256: "1d2958a3a7cb1e0050f425f179bd6557441fafcf740a79d5b8b80d6954149790"
+      sha256: "31599cc3b612820ae38475e600e732ef6f612e25bd1310793a34a1b549a999f5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.19.0"
   pool:
     dependency: transitive
     description:
