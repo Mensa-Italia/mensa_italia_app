@@ -32,6 +32,7 @@ mixin _$EventModel {
   DateTime get whenEnd => throw _privateConstructorUsedError;
   String get contact => throw _privateConstructorUsedError;
   bool get isNational => throw _privateConstructorUsedError;
+  bool get isSpot => throw _privateConstructorUsedError;
   String get owner => throw _privateConstructorUsedError;
   @JsonKey(readValue: getDataFromExpanded)
   LocationModel? get position => throw _privateConstructorUsedError;
@@ -59,6 +60,7 @@ abstract class $EventModelCopyWith<$Res> {
       @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       String contact,
       bool isNational,
+      bool isSpot,
       String owner,
       @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
 
@@ -88,6 +90,7 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
     Object? whenEnd = null,
     Object? contact = null,
     Object? isNational = null,
+    Object? isSpot = null,
     Object? owner = null,
     Object? position = freezed,
   }) {
@@ -132,6 +135,10 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
           ? _value.isNational
           : isNational // ignore: cast_nullable_to_non_nullable
               as bool,
+      isSpot: null == isSpot
+          ? _value.isSpot
+          : isSpot // ignore: cast_nullable_to_non_nullable
+              as bool,
       owner: null == owner
           ? _value.owner
           : owner // ignore: cast_nullable_to_non_nullable
@@ -175,6 +182,7 @@ abstract class _$$EventModelImplCopyWith<$Res>
       @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
       String contact,
       bool isNational,
+      bool isSpot,
       String owner,
       @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
 
@@ -203,6 +211,7 @@ class __$$EventModelImplCopyWithImpl<$Res>
     Object? whenEnd = null,
     Object? contact = null,
     Object? isNational = null,
+    Object? isSpot = null,
     Object? owner = null,
     Object? position = freezed,
   }) {
@@ -247,6 +256,10 @@ class __$$EventModelImplCopyWithImpl<$Res>
           ? _value.isNational
           : isNational // ignore: cast_nullable_to_non_nullable
               as bool,
+      isSpot: null == isSpot
+          ? _value.isSpot
+          : isSpot // ignore: cast_nullable_to_non_nullable
+              as bool,
       owner: null == owner
           ? _value.owner
           : owner // ignore: cast_nullable_to_non_nullable
@@ -273,6 +286,7 @@ class _$EventModelImpl implements _EventModel {
       @JsonKey(fromJson: getDateTimeLocal) required this.whenEnd,
       required this.contact,
       required this.isNational,
+      required this.isSpot,
       required this.owner,
       @JsonKey(readValue: getDataFromExpanded) required this.position});
 
@@ -302,6 +316,8 @@ class _$EventModelImpl implements _EventModel {
   @override
   final bool isNational;
   @override
+  final bool isSpot;
+  @override
   final String owner;
   @override
   @JsonKey(readValue: getDataFromExpanded)
@@ -309,7 +325,7 @@ class _$EventModelImpl implements _EventModel {
 
   @override
   String toString() {
-    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, owner: $owner, position: $position)';
+    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, isSpot: $isSpot, owner: $owner, position: $position)';
   }
 
   @override
@@ -332,6 +348,7 @@ class _$EventModelImpl implements _EventModel {
             (identical(other.contact, contact) || other.contact == contact) &&
             (identical(other.isNational, isNational) ||
                 other.isNational == isNational) &&
+            (identical(other.isSpot, isSpot) || other.isSpot == isSpot) &&
             (identical(other.owner, owner) || other.owner == owner) &&
             (identical(other.position, position) ||
                 other.position == position));
@@ -351,6 +368,7 @@ class _$EventModelImpl implements _EventModel {
       whenEnd,
       contact,
       isNational,
+      isSpot,
       owner,
       position);
 
@@ -380,6 +398,7 @@ abstract class _EventModel implements EventModel {
       @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenEnd,
       required final String contact,
       required final bool isNational,
+      required final bool isSpot,
       required final String owner,
       @JsonKey(readValue: getDataFromExpanded)
       required final LocationModel? position}) = _$EventModelImpl;
@@ -409,6 +428,8 @@ abstract class _EventModel implements EventModel {
   String get contact;
   @override
   bool get isNational;
+  @override
+  bool get isSpot;
   @override
   String get owner;
   @override

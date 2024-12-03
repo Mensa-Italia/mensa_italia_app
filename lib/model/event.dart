@@ -27,6 +27,7 @@ class EventModel with _$EventModel {
     required DateTime whenEnd,
     required String contact,
     required bool isNational,
+    required bool isSpot,
     required String owner,
     @JsonKey(
       readValue: getDataFromExpanded,
@@ -37,4 +38,3 @@ class EventModel with _$EventModel {
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);
 }
-

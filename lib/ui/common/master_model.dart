@@ -145,61 +145,76 @@ class MasterModel extends ReactiveViewModel {
     }
   }
 
-  Future<String?> cupertinoModalPicker({required int initialItem, required List<String> items}) async {
+  Future<String?> cupertinoModalPicker({required String title, required int initialItem, required List<String> items}) async {
     String data = items[initialItem];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Spacer(),
-                  CupertinoButton(
-                    child: const Text(
-                      'Done',
+      useRootNavigator: true,
+      builder: (BuildContext context) => Material(
+        color: Colors.transparent,
+        child: Container(
+          height: 216,
+          padding: const EdgeInsets.only(top: 6.0),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      title,
                       style: TextStyle(
-                        color: kcPrimaryColor,
+                        color: CupertinoColors.label.resolveFrom(context),
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  itemExtent: 32.0,
-                  scrollController: FixedExtentScrollController(
-                    initialItem: initialItem,
-                  ),
-                  onSelectedItemChanged: (int index) {
-                    data = items[index];
-                  },
-                  children: List<Widget>.generate(
-                    items.length,
-                    (int index) {
-                      return Center(
-                        child: Text(
-                          items[index],
+                    const Spacer(),
+                    CupertinoButton(
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 32.0,
+                    scrollController: FixedExtentScrollController(
+                      initialItem: initialItem,
+                    ),
+                    onSelectedItemChanged: (int index) {
+                      data = items[index];
                     },
+                    children: List<Widget>.generate(
+                      items.length,
+                      (int index) {
+                        return Center(
+                          child: Text(
+                            items[index],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

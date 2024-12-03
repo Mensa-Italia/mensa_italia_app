@@ -11,10 +11,12 @@ class EventTile extends StackedView<EventTileModel> {
   final EventModel event;
   final Function() onTap;
   final Function? onLongTap;
-  const EventTile({super.key, required this.event, required this.onTap, this.onLongTap});
+  const EventTile(
+      {super.key, required this.event, required this.onTap, this.onLongTap});
 
   @override
-  Widget builder(BuildContext context, EventTileModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventTileModel viewModel, Widget? child) {
     return GestureDetector(
       onTap: onTap,
       onLongPress: () {
@@ -92,8 +94,81 @@ class EventTile extends StackedView<EventTileModel> {
                     Text(
                       DateFormat.yMMMd().format(event.whenStart),
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else if (event.isSpot) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color(0xFF874dff).withOpacity(.4),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(5).copyWith(left: 10, right: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              text: event.name,
+                            ),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              height: 1.1,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Text.rich(
+                            TextSpan(
+                              text: event.position?.state != null
+                                  ? (event.position?.state == "NaN"
+                                      ? "International"
+                                      : event.position?.state)
+                                  : "Online",
+                            ),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                              height: 1.1,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Text(
+                      DateFormat.yMMMd().format(event.whenStart),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -131,6 +206,7 @@ class EventTile extends StackedView<EventTileModel> {
               Container(
                 padding: const EdgeInsets.all(5).copyWith(left: 10, right: 10),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
                       child: Column(
@@ -151,7 +227,11 @@ class EventTile extends StackedView<EventTileModel> {
                           ),
                           Text.rich(
                             TextSpan(
-                              text: event.position?.state != null ? (event.position?.state == "NaN" ? "International" : event.position?.state) : "Online",
+                              text: event.position?.state != null
+                                  ? (event.position?.state == "NaN"
+                                      ? "International"
+                                      : event.position?.state)
+                                  : "Online",
                             ),
                             style: const TextStyle(
                               fontWeight: FontWeight.normal,
@@ -165,10 +245,13 @@ class EventTile extends StackedView<EventTileModel> {
                         ],
                       ),
                     ),
+                    SizedBox(
+                      width: 20,
+                    ),
                     Text(
                       DateFormat.yMMMd().format(event.whenStart),
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         color: Colors.black,
                       ),
                       maxLines: 1,

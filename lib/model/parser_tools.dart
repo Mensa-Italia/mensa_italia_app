@@ -16,7 +16,6 @@ DateTime getDateTimeLocal(String value) {
   return DateTime.parse(value).toLocal();
 }
 
-
 class CustomDateTimeConverter implements JsonConverter<DateTime, String> {
   const CustomDateTimeConverter();
 

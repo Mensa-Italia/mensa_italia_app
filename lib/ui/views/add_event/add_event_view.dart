@@ -38,102 +38,104 @@ class AddEventView extends StackedView<AddEventViewModel> {
       ),
       body: ListView(
         children: [
-          GestureDetector(
-            onTap: viewModel.pickImage,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: DottedBorder(
-                borderType: BorderType.RRect,
-                radius: const Radius.circular(30),
-                strokeWidth: 3,
-                dashPattern: const [3, 5],
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  child: AspectRatio(
-                    aspectRatio: 1528 / 603,
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        image: viewModel.imageBytes != null
-                            ? DecorationImage(
-                                image: MemoryImage(viewModel.imageBytes!),
-                                fit: BoxFit.cover,
+          if (viewModel.allowControlEvents())
+            GestureDetector(
+              onTap: viewModel.pickImage,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: DottedBorder(
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(30),
+                  strokeWidth: 3,
+                  dashPattern: const [3, 5],
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                    child: AspectRatio(
+                      aspectRatio: 1528 / 603,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          image: viewModel.imageBytes != null
+                              ? DecorationImage(
+                                  image: MemoryImage(viewModel.imageBytes!),
+                                  fit: BoxFit.cover,
+                                )
+                              : event?.image != null
+                                  ? DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          event!.image),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                        ),
+                        child: !(viewModel.imageBytes != null ||
+                                event?.image != null)
+                            ? const Text(
+                                'Add Image',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               )
-                            : event?.image != null
-                                ? DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                        event!.image),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+                            : null,
                       ),
-                      child: !(viewModel.imageBytes != null ||
-                              event?.image != null)
-                          ? const Text(
-                              'Add Image',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : null,
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           Form(
             key: viewModel.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _SettingContainer(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              "Is online?",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                if (viewModel.allowControlEvents())
+                  _SettingContainer(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                "Is online?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          CupertinoSwitch(
-                            value: viewModel.isOnline,
-                            onChanged: viewModel.toggleOnline,
-                            activeColor: Colors.blue,
-                          ),
-                        ],
+                            CupertinoSwitch(
+                              value: viewModel.isOnline,
+                              onChanged: viewModel.toggleOnline,
+                              activeColor: Colors.blue,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              "Is a national event?",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                "Is a national event?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          CupertinoSwitch(
-                            value: viewModel.isNational,
-                            onChanged: viewModel.toggleNational,
-                            activeColor: Colors.blue,
-                          ),
-                        ],
+                            CupertinoSwitch(
+                              value: viewModel.isNational,
+                              onChanged: viewModel.toggleNational,
+                              activeColor: Colors.blue,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: TextFormField(

@@ -54,7 +54,8 @@ class LoginViewModel extends MasterModel {
           dialogService.showCustomDialog(
             variant: DialogType.infoAlert,
             title: "views.signin.result.error.invalidcredential.title".tr(),
-            description: "views.signin.result.error.invalidcredential.body".tr(),
+            description:
+                "views.signin.result.error.invalidcredential.body".tr(),
           );
         }
       }).catchError((e) {
@@ -70,7 +71,8 @@ class LoginViewModel extends MasterModel {
 
   void goToResetPassword() {
     navigationService.navigateToGenericWebviewView(
-      url: "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
+      url:
+          "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
       title: "Reset Password",
       previousPageTitle: "views.signin.title2".tr(),
     );

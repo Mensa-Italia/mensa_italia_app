@@ -12,7 +12,8 @@ class LoginView extends StackedView<LoginViewModel> {
   const LoginView({super.key});
 
   @override
-  Widget builder(BuildContext context, LoginViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, LoginViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -46,7 +47,8 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 60),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 60),
                       child: Text(
                         "views.signin.title".tr(),
                         style: TextStyle(
@@ -65,7 +67,8 @@ class LoginView extends StackedView<LoginViewModel> {
                           children: [
                             TextFormField(
                               decoration: InputDecoration(
-                                hintText: "views.signin.form.field.hint.email".tr(),
+                                hintText:
+                                    "views.signin.form.field.hint.email".tr(),
                               ),
                               autocorrect: false,
                               enableSuggestions: true,
@@ -77,7 +80,9 @@ class LoginView extends StackedView<LoginViewModel> {
                             verticalSpaceSmall,
                             TextFormField(
                               decoration: InputDecoration(
-                                hintText: "views.signin.form.field.hint.password".tr(),
+                                hintText:
+                                    "views.signin.form.field.hint.password"
+                                        .tr(),
                               ),
                               textInputAction: TextInputAction.done,
                               autocorrect: false,
@@ -93,10 +98,14 @@ class LoginView extends StackedView<LoginViewModel> {
                                   onPressed: viewModel.goToResetPassword,
                                   child: Text.rich(
                                     TextSpan(
-                                      text: "views.signin.form.button.recover_password.text".tr(),
+                                      text:
+                                          "views.signin.form.button.recover_password.text"
+                                              .tr(),
                                       children: [
                                         TextSpan(
-                                          text: "views.signin.form.button.recover_password.button".tr(),
+                                          text:
+                                              "views.signin.form.button.recover_password.button"
+                                                  .tr(),
                                           style: TextStyle(
                                             color: kcPrimaryColor,
                                             fontWeight: FontWeight.bold,
@@ -121,14 +130,18 @@ class LoginView extends StackedView<LoginViewModel> {
                                       color: Colors.white.withOpacity(.8),
                                       size: 20,
                                     )
-                                  : Text("views.signin.form.button.submit".tr(),),
+                                  : Text(
+                                      "views.signin.form.button.submit".tr(),
+                                    ),
                             ),
                           ],
                         ),
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20).copyWith(top: 70),
+                      margin: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 20)
+                          .copyWith(top: 70),
                       child: Text(
                         "views.signin.nosignupinfo".tr(),
                         textAlign: TextAlign.center,

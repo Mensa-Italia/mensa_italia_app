@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/widgets/common/event_tile/event_tile.dart';
 import 'package:stacked/stacked.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -13,7 +14,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({super.key});
 
   @override
-  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         previousPageTitle: "Events",
@@ -61,10 +63,14 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
                         iconAlignment: IconAlignment.end,
                         style: ButtonStyle(
                           visualDensity: VisualDensity.compact,
-                          backgroundColor: const WidgetStatePropertyAll(Colors.white),
-                          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 10)),
-                          side: const WidgetStatePropertyAll(BorderSide(color: Colors.black)),
-                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                          backgroundColor:
+                              const WidgetStatePropertyAll(Colors.white),
+                          padding: const WidgetStatePropertyAll(
+                              EdgeInsets.symmetric(horizontal: 10)),
+                          side: const WidgetStatePropertyAll(
+                              BorderSide(color: Colors.black)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20))),
                         ),
                         child: Text(
                           viewModel.selectedState,
@@ -97,7 +103,10 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
               itemCount: viewModel.selectedDateEvents().length,
               itemBuilder: (context, index) {
                 final event = viewModel.selectedDateEvents()[index];
-                return _EventTile(event: event);
+                return EventTile(
+                  event: event,
+                  onTap: viewModel.onTapOnEvent(event),
+                );
               },
             ),
           ),
@@ -107,141 +116,6 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   }
 
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
-}
-
-class _EventTile extends ViewModelWidget<EventCalendarViewModel> {
-  final EventModel event;
-
-  const _EventTile({required this.event});
-
-  @override
-  Widget build(BuildContext context, EventCalendarViewModel viewModel) {
-    if (event.isNational) {
-      return GestureDetector(
-        onTap: viewModel.onTapOnEvent(event),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: kcPrimaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Hero(
-                    tag: event.image,
-                    transitionOnUserGestures: true,
-                    child: CachedNetworkImage(
-                      imageUrl: event.image,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          event.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd().format(event.whenStart),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      return GestureDetector(
-        onTap: viewModel.onTapOnEvent(event),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
-          child: Container(
-            height: 100,
-            decoration: BoxDecoration(
-              color: kcPrimaryColor.withOpacity(.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Hero(
-                    tag: event.image,
-                    transitionOnUserGestures: true,
-                    child: CachedNetworkImage(
-                      imageUrl: event.image,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(5).copyWith(left: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text.rich(
-                          TextSpan(
-                            text: event.name,
-                            children: [
-                              const TextSpan(text: '\n'),
-                              TextSpan(
-                                text: event.position?.state ?? "Online",
-                                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.1,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd().format(event.whenStart),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  }
+  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
+      EventCalendarViewModel();
 }

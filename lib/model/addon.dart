@@ -17,5 +17,6 @@ class AddonModel with _$AddonModel {
     required String url,
   }) = _AddonModel;
 
-  factory AddonModel.fromJson(Map<String, dynamic> json) => _$AddonModelFromJson(json);
+  factory AddonModel.fromJson(Map<String, dynamic> json) =>
+      _$AddonModelFromJson(json);
 }

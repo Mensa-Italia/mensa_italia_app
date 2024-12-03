@@ -1,13 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
+import 'package:link_text/link_text.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/views/add_event_schedule_list/add_event_schedule_list_view.dart';
+import 'package:mensa_italia_app/ui/views/addon_deals/addon_deals_view.dart';
+import 'package:mensa_italia_app/ui/views/event_showcase/phone_linkifier.dart';
 import 'package:mensa_italia_app/ui/widgets/common/map_shower/map_shower.dart';
 import 'package:stacked/stacked.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'event_showcase_viewmodel.dart';
 
@@ -16,15 +22,17 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   const EventShowcaseView({super.key, required this.event});
 
   @override
-  Widget builder(BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: "Event details",
-        previousPageTitle: 'Events',
+        title: event.name,
+        previousPageTitle: "views.events.title".tr(),
         trailings: [
-          if ((viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper())
+          if ((event.owner == viewModel.user.id) || viewModel.isSuper())
             IconButton(
-              icon: Icon(EneftyIcons.edit_outline, color: Theme.of(context).appBarTheme.iconTheme?.color),
+              icon: Icon(EneftyIcons.edit_outline,
+                  color: Theme.of(context).appBarTheme.iconTheme?.color),
               onPressed: viewModel.editEvent,
               iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
             ),
@@ -32,39 +40,40 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
       ),
       extendBody: true,
       extendBodyBehindAppBar: true,
-      bottomNavigationBar: GestureDetector(
-        onTap: viewModel.openUrl,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10).copyWith(top: 20),
-          color: kcPrimaryColor,
-          child: const SafeArea(
-            top: false,
-            child: Text(
-              "DETAILS",
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
+      bottomNavigationBar: event.infoLink.isNotEmpty
+          ? GestureDetector(
+              onTap: viewModel.openUrl,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10).copyWith(top: 20),
+                color: kcPrimaryColor,
+                child: SafeArea(
+                  top: false,
+                  child: Text(
+                    "views.eventdetails.button.details".tr().toUpperCase(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            )
+          : null,
       body: ListView(
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Hero(
+          if (event.image.isNotEmpty)
+            Hero(
               tag: event.image,
               transitionOnUserGestures: true,
-              flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) => AnimatedBuilder(
+              flightShuttleBuilder: (flightContext, animation, flightDirection,
+                      fromHeroContext, toHeroContext) =>
+                  AnimatedBuilder(
                 animation: animation,
                 builder: (context, child) {
                   return ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30 * (animation.value)),
-                      bottomRight: Radius.circular(30 * (animation.value)),
-                      topLeft: Radius.circular((30 * (animation.value)) + (10 * (1 - animation.value))),
-                      topRight: Radius.circular((30 * (animation.value)) + (10 * (1 - animation.value))),
-                    ),
+                    borderRadius: BorderRadius.only(),
                     child: child,
                   );
                 },
@@ -74,16 +83,7 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 ),
               ),
               child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
+                decoration: BoxDecoration(),
                 clipBehavior: Clip.antiAlias,
                 child: CachedNetworkImage(
                   width: double.infinity,
@@ -91,25 +91,108 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 ),
               ),
             ),
-          ),
+          if (event.isSpot)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20)
+                  .copyWith(top: 10, bottom: 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0).copyWith(left: 20),
+                      child: Icon(
+                        EneftyIcons.warning_2_outline,
+                        size: 35,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0).copyWith(right: 20),
+                        child: Text(
+                          "views.eventdetails.warning.spotevent".tr(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text.rich(
+              TextSpan(
+                text: "views.eventdetails.details.title".tr(),
+                children: [],
+              ),
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+              textAlign: TextAlign.start,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              event.description,
+            child: Linkify(
+              text: event.description,
+              linkifiers: [
+                UrlLinkifier(),
+                EmailLinkifier(),
+                PhoneLinkifier(),
+              ],
+              onOpen: (link) {
+                launchUrlString(link.url);
+              },
+              linkStyle: const TextStyle(
+                color: kcPrimaryColor,
+                decoration: TextDecoration.underline,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
               style: const TextStyle(
                 fontSize: 16,
               ),
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 40,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text.rich(
+              TextSpan(
+                text: "views.eventdetails.schedule.title".tr(),
+              ),
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+              textAlign: TextAlign.start,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0).copyWith(bottom: 0, top: 10),
+            child: DateTimeStartEndBoxes(
+              start: event.whenStart,
+              end: event.whenEnd,
+            ),
           ),
           if (viewModel.eventSchedules.isNotEmpty) ...[
-            const Text("Schedule", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
             const Divider(),
             ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 itemCount: viewModel.eventSchedules.length,
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -118,15 +201,20 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   return TileSchedue(eventSchedule: event, onTap: () {});
                 },
                 separatorBuilder: (context, index) {
-                  if (index != viewModel.eventSchedules.length - 1 && !DateUtils.isSameDay(viewModel.eventSchedules[index].whenStart, viewModel.eventSchedules[index + 1].whenStart)) {
+                  if (index != viewModel.eventSchedules.length - 1 &&
+                      !DateUtils.isSameDay(
+                          viewModel.eventSchedules[index].whenStart,
+                          viewModel.eventSchedules[index + 1].whenStart)) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const SizedBox(height: 30),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
                           child: Text(
-                            DateFormat('EEEE, d MMMM').format(viewModel.eventSchedules[index + 1].whenStart),
+                            DateFormat('EEEE, d MMMM').format(
+                                viewModel.eventSchedules[index + 1].whenStart),
                             style: TextStyle(
                               color: Colors.grey.shade500,
                               height: 0,
@@ -141,39 +229,134 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   return const Divider();
                 }),
             const Divider(),
-            const SizedBox(height: 20),
           ],
-          const Text("Location", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text.rich(
+              TextSpan(
+                text: "views.eventdetails.location.title".tr(),
+                children: [
+                  TextSpan(
+                    text: "\n${event.position!.name}",
+                    style: TextStyle(
+                        color: kcPrimaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+              textAlign: TextAlign.start,
+            ),
+          ),
           const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: viewModel.openMap,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              height: 200,
+              height: 200 + MediaQuery.of(context).padding.bottom,
               clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
+              decoration: BoxDecoration(),
               child: MapShower(
                 pointPosition: event.position!.toLatLng(),
               ),
             ),
           ),
-          const SafeArea(child: SizedBox(height: 100)),
         ],
       ),
     );
   }
 
   @override
-  EventShowcaseViewModel viewModelBuilder(BuildContext context) => EventShowcaseViewModel(event: event);
+  EventShowcaseViewModel viewModelBuilder(BuildContext context) =>
+      EventShowcaseViewModel(event: event);
+}
+
+class DateTimeStartEndBoxes extends StatelessWidget {
+  final DateTime start;
+  final DateTime end;
+  const DateTimeStartEndBoxes(
+      {super.key, required this.start, required this.end});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "views.eventdetails.schedule.from".tr(),
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    TextSpan(
+                      text: "\n",
+                    ),
+                    TextSpan(
+                      text: DateFormat('HH:mm').format(start),
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: "\n",
+                    ),
+                    TextSpan(
+                      text: DateFormat('d MMMM').format(start),
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+        Icon(EneftyIcons.arrow_right_4_outline),
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "views.eventdetails.schedule.to".tr(),
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    TextSpan(
+                      text: "\n",
+                    ),
+                    TextSpan(
+                      text: DateFormat('HH:mm').format(end),
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: "\n",
+                    ),
+                    TextSpan(
+                      text: DateFormat('d MMMM').format(end),
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

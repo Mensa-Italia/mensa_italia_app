@@ -18,6 +18,7 @@ _$EventModelImpl _$$EventModelImplFromJson(Map<String, dynamic> json) =>
       whenEnd: getDateTimeLocal(json['when_end'] as String),
       contact: json['contact'] as String,
       isNational: json['is_national'] as bool,
+      isSpot: json['is_spot'] as bool,
       owner: json['owner'] as String,
       position: getDataFromExpanded(json, 'position') == null
           ? null
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$EventModelImplToJson(_$EventModelImpl instance) =>
       'when_end': instance.whenEnd.toIso8601String(),
       'contact': instance.contact,
       'is_national': instance.isNational,
+      'is_spot': instance.isSpot,
       'owner': instance.owner,
       'position': instance.position?.toJson(),
     };

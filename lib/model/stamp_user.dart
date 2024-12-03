@@ -28,7 +28,8 @@ class StampUserModel with _$StampUserModel {
     required String user,
   }) = _StampUserModel;
 
-  factory StampUserModel.fromJson(Map<String, dynamic> json) => _$StampUserModelFromJson(json);
+  factory StampUserModel.fromJson(Map<String, dynamic> json) =>
+      _$StampUserModelFromJson(json);
 
   int fastHash() {
     var hash = 0xcbf29ce484222325;

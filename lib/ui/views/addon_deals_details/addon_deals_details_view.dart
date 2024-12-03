@@ -12,7 +12,8 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
   const AddonDealsDetailsView({super.key, required this.deal});
 
   @override
-  Widget builder(BuildContext context, AddonDealsDetailsViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonDealsDetailsViewModel viewModel,
+      Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: "addons.deals.details.title".tr(),
@@ -126,13 +127,15 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
                         content: viewModel.dealsContact!.email,
                       ),
                     const SizedBox(height: 16),
-                    if (viewModel.dealsContact!.phoneNumber != null && viewModel.dealsContact!.phoneNumber!.isNotEmpty)
+                    if (viewModel.dealsContact!.phoneNumber != null &&
+                        viewModel.dealsContact!.phoneNumber!.isNotEmpty)
                       _DealBlock(
                         title: "Phone",
                         content: viewModel.dealsContact!.phoneNumber,
                       ),
                     const SizedBox(height: 16),
-                    if (viewModel.dealsContact!.note != null && viewModel.dealsContact!.note!.isNotEmpty)
+                    if (viewModel.dealsContact!.note != null &&
+                        viewModel.dealsContact!.note!.isNotEmpty)
                       _DealBlock(
                         title: "Note",
                         content: viewModel.dealsContact!.note,
@@ -159,7 +162,8 @@ class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
   }
 
   @override
-  AddonDealsDetailsViewModel viewModelBuilder(BuildContext context) => AddonDealsDetailsViewModel(deal: deal);
+  AddonDealsDetailsViewModel viewModelBuilder(BuildContext context) =>
+      AddonDealsDetailsViewModel(deal: deal);
 }
 
 class _DealBlock extends StatelessWidget {

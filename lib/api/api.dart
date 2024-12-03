@@ -218,6 +218,17 @@ class Api {
     });
   }
 
+  Future<bool> canAddEvent() async {
+    return await pb
+        .collection('events')
+        .getFullList(
+          filter: "owner = '${pb.authStore.record!.id}' && when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
+        )
+        .then((value) {
+      return value.isEmpty;
+    });
+  }
+
   Future<EventModel> getEvent(String id) async {
     return await pb
         .collection('events')
@@ -365,6 +376,7 @@ class Api {
     required tz.TZDateTime endDate,
     required bool isNational,
     required bool isOnline,
+    required bool isSpot,
     List<EventScheduleModel> schedules = const [],
   }) async {
     String? positionId;
@@ -384,7 +396,8 @@ class Api {
         "when_start": startDate.toIso8601String(),
         "when_end": endDate.toIso8601String(),
         "is_national": isNational,
-        "owner": pb.authStore.model.id,
+        "is_spot": isSpot,
+        "owner": pb.authStore.record!.id,
         if (!isOnline) "position": positionId,
       },
       files: image == null
@@ -428,6 +441,7 @@ class Api {
     required tz.TZDateTime endDate,
     required bool isNational,
     required bool isOnline,
+    required bool isSpot,
     List<EventScheduleModel> schedules = const [],
   }) async {
     String? positionId;
@@ -450,6 +464,7 @@ class Api {
             "when_start": startDate.toIso8601String(),
             "when_end": endDate.toIso8601String(),
             "is_national": isNational,
+            "is_spot": isSpot,
             if (!isOnline) "position": positionId,
           },
           files: image == null
@@ -743,5 +758,43 @@ class Api {
       data["image"] = pb.files.getUrl(value, data["image"]).toString();
       return StampModel.fromJson(data);
     });
+  }
+
+  Future<Map<String, String>> getMetadata() async {
+    if (Memoized().has("metadata")) {
+      return Memoized().get("metadata");
+    }
+    return await pb.collection('users_metadata').getFullList().then((value) {
+      final Map<String, String> res = {};
+      for (RecordModel record in value) {
+        res[record.getStringValue("key").toString()] = record.getStringValue("value").toString();
+      }
+      Memoized().set("metadata", res);
+      return res;
+    });
+  }
+
+  Future<void> setMetadata(String key, String value) async {
+    final settedMetadata = await pb.collection('users_metadata').getFullList(
+          filter: "key='$key' && user='${pb.authStore.model.id}'",
+        );
+    if (settedMetadata.isNotEmpty) {
+      await pb.collection('users_metadata').update(
+        settedMetadata.first.id,
+        body: {
+          "key": key,
+          "value": value,
+        },
+      );
+    } else {
+      await pb.collection('users_metadata').create(
+        body: {
+          "key": key,
+          "value": value,
+          "user": pb.authStore.model.id,
+        },
+      );
+    }
+    Memoized().remove("metadata");
   }
 }

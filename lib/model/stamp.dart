@@ -7,10 +7,6 @@ part 'stamp.freezed.dart';
 
 part 'stamp.g.dart';
 
-
-
-
-
 @freezed
 class StampModel with _$StampModel {
   const factory StampModel({

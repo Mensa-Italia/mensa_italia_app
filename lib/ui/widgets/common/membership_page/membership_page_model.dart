@@ -35,7 +35,11 @@ class MembershipPageModel extends MasterModel {
     SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
       if (!allowTestMakerAddon()) {
-        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
+        await prefs.setStringList(
+            "addons_fav",
+            (prefs.getStringList("addons_fav") ?? [])
+              ..removeWhere(
+                  (element) => element.startsWith("INTERNAL:testmakers")));
       }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
@@ -44,7 +48,8 @@ class MembershipPageModel extends MasterModel {
         List<String> toRemove = [];
         for (var favsAddon in favsAddons) {
           if (favsAddon.startsWith("EXTERNAL:")) {
-            if (!value.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+            if (!value
+                .any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
               toRemove.add(favsAddon);
             }
           }
@@ -88,7 +93,8 @@ class MembershipPageModel extends MasterModel {
 
   Function() openExternalAddon(AddonModel addon) {
     return () {
-      navigationService.navigateToExternalAddonWebviewView(addonID: addon.id, addonURL: addon.url);
+      navigationService.navigateToExternalAddonWebviewView(
+          addonID: addon.id, addonURL: addon.url);
     };
   }
 

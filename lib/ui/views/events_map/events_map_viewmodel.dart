@@ -56,6 +56,10 @@ class EventsMapViewModel extends MasterModel {
     await loadMarkerImage('assets/images/marker_blue.png').then((value) async {
       await mapController!.addImage('marker_cs_image_blue', value);
     });
+    await loadMarkerImage('assets/images/marker_blue_spot.png')
+        .then((value) async {
+      await mapController!.addImage('marker_cs_image_blue_spot', value);
+    });
 
     await mapController?.addSource(
       "events-source",
@@ -75,8 +79,14 @@ class EventsMapViewModel extends MasterModel {
                   "properties": {
                     "icon-image": e.isNational
                         ? "marker_cs_image"
-                        : "marker_cs_image_blue",
-                    "icon-size": e.isNational ? 0.35 : 0.25,
+                        : e.isSpot
+                            ? "marker_cs_image_blue_spot"
+                            : "marker_cs_image_blue",
+                    "icon-size": e.isNational
+                        ? 0.35
+                        : e.isSpot
+                            ? 0.20
+                            : 0.30,
                     "title": e.isNational ? e.name : "",
                     "event": e.toJson(),
                   },

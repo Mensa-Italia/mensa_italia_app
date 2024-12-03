@@ -14,7 +14,8 @@ class AddonPage extends StackedView<AddonPageModel> {
   const AddonPage({super.key});
 
   @override
-  Widget builder(BuildContext context, AddonPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddonPageModel viewModel, Widget? child) {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
@@ -32,7 +33,8 @@ class AddonPage extends StackedView<AddonPageModel> {
             if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
               Padding(
                 key: const ValueKey("Officials:Title"),
-                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20)
+                    .copyWith(top: 10),
                 child: Text(
                   "views.addons.subtitle.officials".tr(),
                   style: TextStyle(
@@ -46,7 +48,8 @@ class AddonPage extends StackedView<AddonPageModel> {
                 id: "contacts",
                 name: "addons.contacts.title".tr(),
                 description: "addons.contacts.description".tr(),
-                icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.bookmark_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openContacts,
               ),
             if (viewModel.isSearching("deals"))
@@ -55,7 +58,8 @@ class AddonPage extends StackedView<AddonPageModel> {
                 id: "deals",
                 name: "addons.deals.title".tr(),
                 description: "addons.deals.description".tr(),
-                icon: const Icon(EneftyIcons.moneys_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.moneys_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openDeals,
               ),
             if (viewModel.isSearching("documents"))
@@ -64,7 +68,8 @@ class AddonPage extends StackedView<AddonPageModel> {
                 id: "documents",
                 name: "addons.documents.title".tr(),
                 description: "addons.documents.description".tr(),
-                icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.document_cloud_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openDocuments,
               ),
             if (viewModel.isSearching("tableport"))
@@ -73,22 +78,26 @@ class AddonPage extends StackedView<AddonPageModel> {
                 id: "tableport",
                 name: "addons.tableport.title".tr(),
                 description: "addons.tableport.description".tr(),
-                icon: const Icon(EneftyIcons.global_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.global_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openTableport,
               ),
-            if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
+            if (viewModel.allowTestMakerAddon() &&
+                viewModel.isSearching("testmakers"))
               _InternalAddonButton(
                 key: const ValueKey("Internal:TestMakers"),
                 id: "testmakers",
                 name: "addons.testmakers.title".tr(),
                 description: "addons.testmakers.description".tr(),
-                icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 40),
+                icon: const Icon(EneftyIcons.teacher_outline,
+                    color: kcPrimaryColor, size: 40),
                 onTap: viewModel.openTestMakers,
               ),
             if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
               Padding(
                 key: const ValueKey("Verified:Title"),
-                padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 20)
+                    .copyWith(top: 30),
                 child: Text(
                   "views.addons.subtitle.verified".tr(),
                   style: TextStyle(
@@ -104,7 +113,8 @@ class AddonPage extends StackedView<AddonPageModel> {
             }),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -212,7 +222,13 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
   final Widget icon;
   final Function() onTap;
 
-  const _InternalAddonButton({super.key, required this.id, required this.name, required this.description, required this.icon, required this.onTap});
+  const _InternalAddonButton(
+      {super.key,
+      required this.id,
+      required this.name,
+      required this.description,
+      required this.icon,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {

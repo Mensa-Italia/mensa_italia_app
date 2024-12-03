@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +27,7 @@ class AddEventViewModel extends MasterModel {
   LocationSelected? location;
   bool isNational = false;
   bool isOnline = false;
+  bool isSpot = false;
   // END FORM DATA
 
   EventModel? eventEditing;
@@ -47,7 +49,8 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text =
+          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -87,6 +90,11 @@ class AddEventViewModel extends MasterModel {
     if (formKey.currentState!.validate() && !isBusy) {
       setBusy(true);
       try {
+        if (!allowControlEvents()) {
+          isOnline = false;
+          isNational = false;
+          isSpot = true;
+        }
         if (isEditing) {
           await Api().updateEvent(
             id: eventEditing!.id,
@@ -100,6 +108,7 @@ class AddEventViewModel extends MasterModel {
             isNational: isNational,
             isOnline: isOnline,
             schedules: eventSchedules,
+            isSpot: isSpot,
           );
         } else {
           await Api().createEvent(
@@ -113,6 +122,7 @@ class AddEventViewModel extends MasterModel {
             isNational: isNational,
             isOnline: isOnline,
             schedules: eventSchedules,
+            isSpot: isSpot,
           );
         }
         navigationService.back();
@@ -136,8 +146,22 @@ class AddEventViewModel extends MasterModel {
       end: dateTimeOptions?.end,
     ).then((value) {
       if (value != null) {
-        dateTimeOptions = value;
-        dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+        if (!allowControlEvents() &&
+            value.end.difference(value.start).inDays > 2) {
+          dialogService
+              .showDialog(
+            title: 'views.add_event_viewmodel.spot_event_error.title'.tr(),
+            description:
+                'views.add_event_viewmodel.spot_event_error.description'.tr(),
+          )
+              .then((value) {
+            pickDateTime();
+          });
+        } else {
+          dateTimeOptions = value;
+          dateTimeEvent.text =
+              "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+        }
       }
     });
   }
