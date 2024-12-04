@@ -62,7 +62,7 @@ dependencies:
   firebase_messaging: ^15.1.5
   device_info_plus: ^10.1.2
   omni_datetime_picker: ^2.0.5
-  app_version_update: ^5.0.3
+  app_version_update: ^6.0.0
   in_app_review: ^2.0.10
   isar: any
   isar_flutter_libs: any
