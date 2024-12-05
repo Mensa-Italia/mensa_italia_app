@@ -59,7 +59,7 @@ dependencies:
   fluttertoast: ^8.2.8
   maps_launcher: ^2.2.1
   firebase_core: ^3.8.0
-  firebase_messaging: ^15.1.5
+  firebase_messaging: ^15.1.6
   device_info_plus: ^10.1.2
   omni_datetime_picker: ^2.0.5
   app_version_update: ^6.0.0
