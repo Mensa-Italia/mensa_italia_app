@@ -83,7 +83,7 @@ dev_dependencies:
   stacked_generator: ^1.3.3
   freezed: ^2.5.2
   json_serializable: ^6.8.0
-  flutter_launcher_icons: ^0.14.1
+  flutter_launcher_icons: ^0.14.2
   isar_generator: any
 
 flutter_launcher_icons:
