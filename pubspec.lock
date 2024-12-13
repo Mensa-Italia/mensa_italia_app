@@ -213,10 +213,10 @@ packages:
     dependency: transitive
     description:
       name: collection
-      sha256: ee67cb0715911d28db6bf4af1026078bd6f0128b07a5f66fb2ed94ec6783c09a
+      sha256: a1ace0a119f20aabc852d165077c036cd864315bd99b7eaa10a60100341941bf
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.0"
+    version: "1.19.0"
   convert:
     dependency: transitive
     description:
@@ -969,18 +969,18 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: "3f87a60e8c63aecc975dda1ceedbc8f24de75f09e4856ea27daf8958f2f0ce05"
+      sha256: "7bb2830ebd849694d1ec25bf1f44582d6ac531a57a365a803a6034ff751d2d06"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.5"
+    version: "10.0.7"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
       name: leak_tracker_flutter_testing
-      sha256: "932549fb305594d82d7183ecd9fa93463e9914e1b67cacc34bc40906594a1806"
+      sha256: "9491a714cca3667b60b5c420da8217e6de0d1ba7a5ec322fab01758f6998f379"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "3.0.8"
   leak_tracker_testing:
     dependency: transitive
     description:
@@ -1449,7 +1449,7 @@ packages:
     dependency: transitive
     description: flutter
     source: sdk
-    version: "0.0.99"
+    version: "0.0.0"
   snap_scroll_physics:
     dependency: transitive
     description:
@@ -1534,10 +1534,10 @@ packages:
     dependency: transitive
     description:
       name: stack_trace
-      sha256: "73713990125a6d93122541237550ee3352a2d84baad52d375a4cad2eb9b7ce0b"
+      sha256: "9f47fd3630d76be3ab26f0ee06d213679aa425996925ff3feffdec504931c377"
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.1"
+    version: "1.12.0"
   stacked:
     dependency: "direct main"
     description:
@@ -1590,10 +1590,10 @@ packages:
     dependency: transitive
     description:
       name: string_scanner
-      sha256: "556692adab6cfa87322a115640c11f13cb77b3f076ddcc5d6ae3c20242bedcde"
+      sha256: "688af5ed3402a4bde5b3a6c15fd768dbf2621a614950b17f04626c431ab3c4c3"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   stylish_bottom_bar:
     dependency: "direct main"
     description:
@@ -1614,66 +1614,66 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "325f519ce4ad8edd81811c21b853d72018529e353584490824da0555156ba076"
+      sha256: b1071c698b502e7d55f91352a8b82d42f49f4c96e523d43b6fade5d5af710048
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_flutter_pdf:
     dependency: transitive
     description:
       name: syncfusion_flutter_pdf
-      sha256: da7fb9d156fafdce7099dc711c1a2dc522c48361188bd4be78520b22c99bbafd
+      sha256: bdd6b6c085fc39fbcfbf641efbf7f97d9c39b58e57accc47fca4f9db592b2294
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_flutter_pdfviewer:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_pdfviewer
-      sha256: "0d51a728a2982bdad43bb6bf39da25ca9322e4b196f5335b2aed58ff85c7a7bf"
+      sha256: edb63f83ce0e36531f7f70727106cb7949c375fe169a53a92bc66c8d4bd4e201
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_flutter_signaturepad:
     dependency: transitive
     description:
       name: syncfusion_flutter_signaturepad
-      sha256: "84990394d4af761701b11d2764de52559a1ebbd2fcc0745a3ed34b563ac5b054"
+      sha256: "114a8910f4d20bdeee03590ea272d9fbd03004e680f0058b1fec39f6aedb4531"
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_pdfviewer_macos:
     dependency: transitive
     description:
       name: syncfusion_pdfviewer_macos
-      sha256: "25ae3ce2c2ef5b6ec7eb305fdfaff6049dc7d77d667e372fcdd497cf0d872f70"
+      sha256: "9afdbf8260a3c6fbc7f3da2619e193dbb16cd5c38f93aeb3b11b8e86c4b6ae2c"
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_pdfviewer_platform_interface:
     dependency: transitive
     description:
       name: syncfusion_pdfviewer_platform_interface
-      sha256: "680f2f1fc9499214bd368209028e27b4c3060e2c9333baf692ee8e8b41a8fda9"
+      sha256: e1aeb4cc480229d8c0d030c689802f5a7b091a383db3653171582cfe28742eb9
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_pdfviewer_web:
     dependency: transitive
     description:
       name: syncfusion_pdfviewer_web
-      sha256: a2b840167434a023335f1ef8240a5f206003e3b2c33888e772150a9bc5e9662d
+      sha256: "652e9955d0f7f179bdef70895d1a1fb704eb133d38e112d838c236f9387b8325"
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   syncfusion_pdfviewer_windows:
     dependency: transitive
     description:
       name: syncfusion_pdfviewer_windows
-      sha256: "14b7ce1a86f893888e80cabf8ae4b5f62fd8aeb406868ec3c2101a2d211f10f6"
+      sha256: "75fa9c02c66cfc0f675d916f8af1072e594425771e326d8601e66acbfa1c958c"
       url: "https://pub.dev"
     source: hosted
-    version: "27.2.5"
+    version: "28.1.33"
   synchronized:
     dependency: transitive
     description:
@@ -1702,10 +1702,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "5b8a98dafc4d5c4c9c72d8b31ab2b23fc13422348d2997120294d3bac86b4ddb"
+      sha256: "664d3a9a64782fcdeb83ce9c6b39e78fd2971d4e37827b9b06c3aa1edc5e760c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.2"
+    version: "0.7.3"
   time:
     dependency: transitive
     description:
@@ -1862,10 +1862,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
+      sha256: f6be3ed8bd01289b34d679c2b62226f63c0e69f9fd2e50a6b3c1c729a961041b
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.5"
+    version: "14.3.0"
   watcher:
     dependency: transitive
     description:
