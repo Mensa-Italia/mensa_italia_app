@@ -1,7 +1,7 @@
 name: mensa_italia_app
 description: A new Flutter project.
 publish_to: "none"
-version: 20.12.41+201241
+version: 20.12.42+201242
 
 environment:
   sdk: ">=3.0.3 <4.0.0"
