@@ -148,7 +148,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
       return Color(0xFF874dff);
     }
     if (event.position?.state == "NaN") {
-      return Colors.orangeAccent;
+      return Color(0xFFeca41e);
     }
     if (event.isNational) {
       return kcPrimaryColor;

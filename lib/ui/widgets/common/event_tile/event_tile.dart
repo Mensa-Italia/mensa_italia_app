@@ -179,7 +179,7 @@ class EventTile extends StackedView<EventTileModel> {
         padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: kcPrimaryColor.withOpacity(.2),
+            color: event.position?.state == "NaN" ? Color(0xFFeca41e) : kcPrimaryColor.withOpacity(.2),
             borderRadius: BorderRadius.circular(10),
           ),
           clipBehavior: Clip.antiAlias,
