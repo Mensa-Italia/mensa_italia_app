@@ -1,4 +1,3 @@
-import 'package:expandable_widgets/expandable_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:stacked/stacked.dart';
@@ -46,23 +45,24 @@ class BottomFilter extends StackedView<BottomFilterModel> {
                 ),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: const Text(
-                    'State',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+            if (!viewModel.selectedType.toLowerCase().contains("international"))
+              Row(
+                children: [
+                  Expanded(
+                    child: const Text(
+                      'State',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
-                  onPressed: viewModel.pickState,
-                  child: Text(viewModel.selectedState),
-                ),
-              ],
-            ),
+                  TextButton(
+                    onPressed: viewModel.pickState,
+                    child: Text(viewModel.selectedState),
+                  ),
+                ],
+              ),
             if (viewModel.selectedState.toLowerCase().contains("nearby"))
               Row(
                 children: [
@@ -79,7 +79,7 @@ class BottomFilter extends StackedView<BottomFilterModel> {
                     value: viewModel.distance,
                     onChanged: viewModel.pickDistance,
                     min: 10,
-                    max: 100,
+                    max: 200,
                     divisions: 100,
                     label: "${viewModel.distance.toInt()} km",
                   ),

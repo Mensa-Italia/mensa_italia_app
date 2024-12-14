@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
-import 'package:mensa_italia_app/model/location.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:stacked_services/stacked_services.dart';
+import 'package:mensa_italia_app/ui/widgets/common/bottom_filter/bottom_filter.dart';
+import 'package:mensa_italia_app/ui/widgets/common/bottom_filter/bottom_filter_model.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class EventCalendarViewModel extends MasterModel {
@@ -15,49 +14,94 @@ class EventCalendarViewModel extends MasterModel {
   DateTime selectedDate = DateTime.now();
   String selectedState = "Nearby & Online";
   Position? position;
-
-  load() async {
-    try {
-      position ??= await determinePosition();
-    } catch (_) {}
-    Api().getEvents().then((value) {
-      events.clear();
-      events.addAll(value.where((element) {
-        if (selectedState == "All" || element.owner == user.id) {
-          return true;
-        }
-        if (element.position == null && selectedState.contains("Online")) {
-          return true;
-        }
-        if (element.position != null &&
-            selectedState.contains("Online") &&
-            !selectedState.contains("Nearby")) {
-          return false;
-        }
-        if (element.isNational) {
-          return true;
-        }
-        if (!selectedState.contains("Nearby")) {
-          return element.position?.state == selectedState;
-        }
-        if (position == null) {
-          return false;
-        } else {
-          if (element.position == null) {
-            return false;
-          }
-          final distance = const Distance().distance(
-              LatLng(position!.latitude, position!.longitude),
-              element.position!.toLatLong2());
-          return distance < 90000;
-        }
-      }));
-      rebuildUi();
-    });
-  }
+  double distance = 20;
+  String type = "All";
+  List<EventModel> _originalEvents = [];
 
   EventCalendarViewModel() {
     load();
+    FilterNotification().addListener(load);
+  }
+
+  bool matchEventType(EventModel event) {
+    if (type == "All") {
+      return true;
+    }
+    if (type == "International") {
+      return event.position?.state == "NaN";
+    }
+    if (type == "National") {
+      return event.isNational;
+    }
+    if (type == "Local") {
+      return !event.isNational && !event.isSpot;
+    }
+    if (type == "Spot") {
+      return event.isSpot;
+    }
+    return false;
+  }
+
+  bool matchState(EventModel event) {
+    if (type == "International") {
+      return event.position?.state == "NaN";
+    }
+    if (selectedState == "All") {
+      return true;
+    }
+    if (event.position == null && selectedState.contains("Online")) {
+      return true;
+    }
+    if (event.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+      return false;
+    }
+    if (!selectedState.contains("Nearby")) {
+      return event.position?.state == selectedState;
+    } else {
+      if (event.isNational) {
+        return true;
+      }
+    }
+    if (position == null) {
+      return false;
+    } else {
+      if (event.position == null) {
+        return false;
+      }
+      final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), event.position!.toLatLong2());
+      return distance < this.distance * 1000;
+    }
+  }
+
+  load() async {
+    Api().getMetadata().then((value) async {
+      selectedState = value["eventfilter_state"] ?? "Nearby & Online";
+      type = value["eventfilter_type"] ?? "All";
+      distance = double.parse((value["eventfilter_distance"] ?? "20"));
+      try {
+        position ??= await determinePosition();
+      } catch (_) {}
+      Api().getEvents().then((value) {
+        _originalEvents.clear();
+        _originalEvents.addAll(value);
+        events.clear();
+        events.addAll(value.where((element) {
+          return matchState(element) && matchEventType(element);
+        }));
+        rebuildUi();
+      });
+      events.sort(
+        (a, b) {
+          if (a.isNational && !b.isNational) {
+            return -1;
+          }
+          if (!a.isNational && b.isNational) {
+            return 1;
+          }
+          return a.whenStart.compareTo(b.whenStart);
+        },
+      );
+    });
   }
 
   bool isSelectedDay(DateTime day) {
@@ -70,18 +114,15 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events
-        .where((element) =>
-            isDateBetween(selectedDate, element.whenStart, element.whenEnd))
-        .toList();
+    return events.where((element) => isDateBetween(selectedDate, element.whenStart, element.whenEnd)).toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events
-        .where(
-            (element) => isDateBetween(day, element.whenStart, element.whenEnd))
-        .map((e) => e.name)
-        .toList();
+    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).map((e) => e.name).toList();
+  }
+
+  List<EventModel> retrieveDateEvents(DateTime day) {
+    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
@@ -91,78 +132,10 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    final UsableListOfStates = [
-      "Nearby & Online",
-      "Nearby",
-      "Online",
-      ...ListOfStates,
-      "All"
-    ];
-    await showCupertinoModalPopup<void>(
-      context: StackedService.navigatorKey!.currentContext!,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Spacer(),
-                  CupertinoButton(
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(
-                        color: kcPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  itemExtent: 32.0,
-                  scrollController: FixedExtentScrollController(
-                    initialItem: UsableListOfStates.indexOf(selectedState),
-                  ),
-                  onSelectedItemChanged: (int index) {
-                    selectedState = UsableListOfStates[index];
-                    rebuildUi();
-                  },
-                  children: List<Widget>.generate(
-                    UsableListOfStates.length,
-                    (int index) {
-                      return Center(
-                        child: Text(
-                          UsableListOfStates[index],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    load();
+    showCupertinoModalBottomSheet(context: context, builder: (context) => BottomFilter());
   }
 }
 
 bool isDateBetween(DateTime date, DateTime start, DateTime end) {
-  return (date.isAfter(normalizeDate(start)) &&
-          date.isBefore(normalizeDate(end))) ||
-      isSameDay(date, start) ||
-      isSameDay(date, end);
+  return (date.isAfter(normalizeDate(start)) && date.isBefore(normalizeDate(end))) || isSameDay(date, start) || isSameDay(date, end);
 }

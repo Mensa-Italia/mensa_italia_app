@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/model/event.dart';
@@ -14,14 +14,24 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         previousPageTitle: "Events",
         title: "Events Calendar",
+        trailings: [
+          IconButton(
+            onPressed: viewModel.changeSearchRadius,
+            icon: Icon(
+              EneftyIcons.filter_outline,
+              color: Theme.of(context).appBarTheme.iconTheme?.color,
+            ),
+            iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
+          ),
+        ],
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TableCalendar(
@@ -36,6 +46,45 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
               CalendarFormat.month: 'Month',
             },
             calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  List<EventModel> eventsToUse = viewModel.retrieveDateEvents(date);
+                  List<Color> colors = [];
+                  List<double> stops = [];
+                  for (var event in eventsToUse) {
+                    if (!colors.contains(getColorForDot(event))) {
+                      colors.add(getColorForDot(event));
+                    }
+                  }
+                  for (var i = 0; i < colors.length; i++) {
+                    stops.add(i / colors.length);
+                  }
+                  if (colors.length > 1) {
+                    return Container(
+                      width: (colors.length > 3 ? 3 : colors.length) * 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: colors,
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          stops: stops,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    );
+                  }
+                  return Container(
+                    width: (eventsToUse.length > 3 ? 3 : eventsToUse.length) * 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: colors.first,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  );
+                }
+                return null;
+              },
               selectedBuilder: (context, date, events) => Container(
                 margin: const EdgeInsets.all(4.0),
                 alignment: Alignment.center,
@@ -56,28 +105,7 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
                       Expanded(
                         child: Text(
                           DateFormat.yMMMM().format(title),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: viewModel.changeSearchRadius,
-                        iconAlignment: IconAlignment.end,
-                        style: ButtonStyle(
-                          visualDensity: VisualDensity.compact,
-                          backgroundColor:
-                              const WidgetStatePropertyAll(Colors.white),
-                          padding: const WidgetStatePropertyAll(
-                              EdgeInsets.symmetric(horizontal: 10)),
-                          side: const WidgetStatePropertyAll(
-                              BorderSide(color: Colors.black)),
-                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20))),
-                        ),
-                        child: Text(
-                          viewModel.selectedState,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 12,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
@@ -115,7 +143,19 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
     );
   }
 
+  Color getColorForDot(EventModel event) {
+    if (event.isSpot) {
+      return Color(0xFF874dff);
+    }
+    if (event.position?.state == "NaN") {
+      return Colors.orangeAccent;
+    }
+    if (event.isNational) {
+      return kcPrimaryColor;
+    }
+    return const Color.fromARGB(255, 138, 169, 230);
+  }
+
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
-      EventCalendarViewModel();
+  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
 }

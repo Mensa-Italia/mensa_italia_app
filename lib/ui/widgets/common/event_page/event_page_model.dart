@@ -5,7 +5,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
-import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_filter/bottom_filter.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_filter/bottom_filter_model.dart';
@@ -29,6 +28,56 @@ class EventPageModel extends MasterModel {
     FilterNotification().addListener(load);
   }
 
+  bool matchEventType(EventModel event) {
+    if (type == "All") {
+      return true;
+    }
+    if (type == "International") {
+      return event.position?.state == "NaN";
+    }
+    if (type == "National") {
+      return event.isNational;
+    }
+    if (type == "Local") {
+      return !event.isNational && !event.isSpot;
+    }
+    if (type == "Spot") {
+      return event.isSpot;
+    }
+    return false;
+  }
+
+  bool matchState(EventModel event) {
+    if (type == "International") {
+      return event.position?.state == "NaN";
+    }
+    if (selectedState == "All") {
+      return true;
+    }
+    if (event.position == null && selectedState.contains("Online")) {
+      return true;
+    }
+    if (event.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+      return false;
+    }
+    if (!selectedState.contains("Nearby")) {
+      return event.position?.state == selectedState;
+    } else {
+      if (event.isNational) {
+        return true;
+      }
+    }
+    if (position == null) {
+      return false;
+    } else {
+      if (event.position == null) {
+        return false;
+      }
+      final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), event.position!.toLatLong2());
+      return distance < this.distance * 1000;
+    }
+  }
+
   load() async {
     Api().getMetadata().then((value) async {
       selectedState = value["eventfilter_state"] ?? "Nearby & Online";
@@ -42,31 +91,7 @@ class EventPageModel extends MasterModel {
         _originalEvents.addAll(value);
         events.clear();
         events.addAll(value.where((element) {
-          if (selectedState == "All") {
-            return true;
-          }
-          if (element.position == null && selectedState.contains("Online")) {
-            return true;
-          }
-          if (element.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
-            return false;
-          }
-          if (!selectedState.contains("Nearby")) {
-            return element.position?.state == selectedState;
-          } else {
-            if (element.isNational) {
-              return true;
-            }
-          }
-          if (position == null) {
-            return false;
-          } else {
-            if (element.position == null) {
-              return false;
-            }
-            final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), element.position!.toLatLong2());
-            return distance < this.distance * 1000;
-          }
+          return matchState(element) && matchEventType(element);
         }));
         rebuildUi();
       });

@@ -11,12 +11,10 @@ class EventTile extends StackedView<EventTileModel> {
   final EventModel event;
   final Function() onTap;
   final Function? onLongTap;
-  const EventTile(
-      {super.key, required this.event, required this.onTap, this.onLongTap});
+  const EventTile({super.key, required this.event, required this.onTap, this.onLongTap});
 
   @override
-  Widget builder(
-      BuildContext context, EventTileModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, EventTileModel viewModel, Widget? child) {
     return GestureDetector(
       onTap: onTap,
       onLongPress: () {
@@ -143,11 +141,7 @@ class EventTile extends StackedView<EventTileModel> {
                           ),
                           Text.rich(
                             TextSpan(
-                              text: event.position?.state != null
-                                  ? (event.position?.state == "NaN"
-                                      ? "International"
-                                      : event.position?.state)
-                                  : "Online",
+                              text: event.position?.state != null ? (event.position?.state == "NaN" ? "International" : event.position?.state) : "Online",
                             ),
                             style: const TextStyle(
                               fontWeight: FontWeight.normal,
@@ -227,11 +221,7 @@ class EventTile extends StackedView<EventTileModel> {
                           ),
                           Text.rich(
                             TextSpan(
-                              text: event.position?.state != null
-                                  ? (event.position?.state == "NaN"
-                                      ? "International"
-                                      : event.position?.state)
-                                  : "Online",
+                              text: event.position?.state != null ? (event.position?.state == "NaN" ? "International" : event.position?.state) : "Online",
                             ),
                             style: const TextStyle(
                               fontWeight: FontWeight.normal,
