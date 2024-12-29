@@ -17,10 +17,9 @@ class OptionPageModel extends MasterModel {
 
   void logout() {
     Api().removeThisDevice().then((_) {
-      Api().logout().then((_) {
-        ScraperApi().logout().then((value) {
-          navigationService.replaceWith(Routes.loginView);
-        });
+      Api().logout();
+      ScraperApi().logout().then((value) {
+        navigationService.replaceWith(Routes.loginView);
       });
     });
   }
