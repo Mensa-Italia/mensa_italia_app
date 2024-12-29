@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:in_app_review/in_app_review.dart';
+import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +10,7 @@ class HomeViewModel extends MasterModel {
 
   HomeViewModel() {
     reviewApp();
+    addNotificationPreference();
   }
 
   void reviewApp() async {
@@ -26,5 +30,23 @@ class HomeViewModel extends MasterModel {
   void bottomBarTapped(int value) {
     currentIndex = value;
     rebuildUi();
+  }
+
+  void addNotificationPreference() {
+    Api().getMetadata().then((metadata) async {
+      try {
+        List<String> notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
+        if (notificationEvents.isNotEmpty) {
+          return;
+        }
+      } catch (_) {}
+      final position = await determinePosition();
+      Api().locateState(position.latitude, position.longitude).then((value) {
+        if (value == "NaN") {
+          return;
+        }
+        Api().setMetadata("notify_me_events", jsonEncode([value]));
+      });
+    });
   }
 }

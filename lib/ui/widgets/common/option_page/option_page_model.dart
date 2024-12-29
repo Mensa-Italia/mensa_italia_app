@@ -68,4 +68,8 @@ class OptionPageModel extends MasterModel {
       appStoreId: "1524200080",
     );
   }
+
+  openNotificationSettings() {
+    navigationService.navigateToNotificationManagerView();
+  }
 }

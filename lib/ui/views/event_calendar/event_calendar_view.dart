@@ -14,7 +14,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   const EventCalendarView({super.key});
 
   @override
-  Widget builder(BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         previousPageTitle: "Events",
@@ -48,7 +49,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
-                  List<EventModel> eventsToUse = viewModel.retrieveDateEvents(date);
+                  List<EventModel> eventsToUse =
+                      viewModel.retrieveDateEvents(date);
                   List<Color> colors = [];
                   List<double> stops = [];
                   for (var event in eventsToUse) {
@@ -75,7 +77,8 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
                     );
                   }
                   return Container(
-                    width: (eventsToUse.length > 3 ? 3 : eventsToUse.length) * 7,
+                    width:
+                        (eventsToUse.length > 3 ? 3 : eventsToUse.length) * 7,
                     height: 7,
                     decoration: BoxDecoration(
                       color: colors.first,
@@ -157,5 +160,6 @@ class EventCalendarView extends StackedView<EventCalendarViewModel> {
   }
 
   @override
-  EventCalendarViewModel viewModelBuilder(BuildContext context) => EventCalendarViewModel();
+  EventCalendarViewModel viewModelBuilder(BuildContext context) =>
+      EventCalendarViewModel();
 }

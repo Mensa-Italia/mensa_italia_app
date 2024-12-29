@@ -52,7 +52,9 @@ class EventCalendarViewModel extends MasterModel {
     if (event.position == null && selectedState.contains("Online")) {
       return true;
     }
-    if (event.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+    if (event.position != null &&
+        selectedState.contains("Online") &&
+        !selectedState.contains("Nearby")) {
       return false;
     }
     if (!selectedState.contains("Nearby")) {
@@ -68,7 +70,9 @@ class EventCalendarViewModel extends MasterModel {
       if (event.position == null) {
         return false;
       }
-      final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), event.position!.toLatLong2());
+      final distance = const Distance().distance(
+          LatLng(position!.latitude, position!.longitude),
+          event.position!.toLatLong2());
       return distance < this.distance * 1000;
     }
   }
@@ -114,15 +118,25 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   List<EventModel> selectedDateEvents() {
-    return events.where((element) => isDateBetween(selectedDate, element.whenStart, element.whenEnd)).toList();
+    return events
+        .where((element) =>
+            isDateBetween(selectedDate, element.whenStart, element.whenEnd))
+        .toList();
   }
 
   List retrieveEvents(DateTime day) {
-    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).map((e) => e.name).toList();
+    return events
+        .where(
+            (element) => isDateBetween(day, element.whenStart, element.whenEnd))
+        .map((e) => e.name)
+        .toList();
   }
 
   List<EventModel> retrieveDateEvents(DateTime day) {
-    return events.where((element) => isDateBetween(day, element.whenStart, element.whenEnd)).toList();
+    return events
+        .where(
+            (element) => isDateBetween(day, element.whenStart, element.whenEnd))
+        .toList();
   }
 
   Function() onTapOnEvent(EventModel event) {
@@ -132,10 +146,14 @@ class EventCalendarViewModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    showCupertinoModalBottomSheet(context: context, builder: (context) => BottomFilter());
+    showCupertinoModalBottomSheet(
+        context: context, builder: (context) => BottomFilter());
   }
 }
 
 bool isDateBetween(DateTime date, DateTime start, DateTime end) {
-  return (date.isAfter(normalizeDate(start)) && date.isBefore(normalizeDate(end))) || isSameDay(date, start) || isSameDay(date, end);
+  return (date.isAfter(normalizeDate(start)) &&
+          date.isBefore(normalizeDate(end))) ||
+      isSameDay(date, start) ||
+      isSameDay(date, end);
 }

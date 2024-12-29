@@ -57,7 +57,9 @@ class EventPageModel extends MasterModel {
     if (event.position == null && selectedState.contains("Online")) {
       return true;
     }
-    if (event.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
+    if (event.position != null &&
+        selectedState.contains("Online") &&
+        !selectedState.contains("Nearby")) {
       return false;
     }
     if (!selectedState.contains("Nearby")) {
@@ -73,7 +75,9 @@ class EventPageModel extends MasterModel {
       if (event.position == null) {
         return false;
       }
-      final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), event.position!.toLatLong2());
+      final distance = const Distance().distance(
+          LatLng(position!.latitude, position!.longitude),
+          event.position!.toLatLong2());
       return distance < this.distance * 1000;
     }
   }
@@ -162,7 +166,8 @@ class EventPageModel extends MasterModel {
   }
 
   void changeSearchRadius() async {
-    showCupertinoModalBottomSheet(context: context, builder: (context) => BottomFilter());
+    showCupertinoModalBottomSheet(
+        context: context, builder: (context) => BottomFilter());
   }
 
   Function() onLongTapEditEvent(EventModel event) {

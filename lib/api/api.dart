@@ -797,4 +797,22 @@ class Api {
     }
     Memoized().remove("metadata");
   }
+
+  Future<String> locateState(double latitude, double longitude) async {
+    return dio
+        .get("/api/position/state",
+            queryParameters: {
+              "lat": latitude,
+              "lon": longitude,
+            },
+            options: Options(
+              headers: {
+                "Authorization": pb.authStore.token,
+              },
+            ))
+        .then((value) {
+      final data = value.data;
+      return data["state"];
+    });
+  }
 }

@@ -14,7 +14,13 @@ class FilterNotification extends ChangeNotifier {
 }
 
 class BottomFilterModel extends MasterModel {
-  final usableListOfStates = ["Nearby & Online", "Nearby", "Online", "All", ...ListOfStates];
+  final usableListOfStates = [
+    "Nearby & Online",
+    "Nearby",
+    "Online",
+    "All",
+    ...ListOfStates
+  ];
   final eventTypes = ["All", "International", "National", "Local", "Spot"];
 
   String selectedState = "Nearby & Online";
@@ -65,7 +71,9 @@ class BottomFilterModel extends MasterModel {
 
   void pickDistance(double value) {
     distance = value;
-    Api().setMetadata("eventfilter_distance", distance.toString()).then((value) {
+    Api()
+        .setMetadata("eventfilter_distance", distance.toString())
+        .then((value) {
       FilterNotification().notify();
     });
     rebuildUi();

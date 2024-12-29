@@ -78,11 +78,17 @@ class OptionPage extends StackedView<OptionPageModel> {
               key: const ValueKey("settings:1"),
               children: [
                 _OptionTile(
+                  title: "views.settings.tile.notification.title".tr(),
+                  icon: EneftyIcons.notification_outline,
+                  onTap: viewModel.openNotificationSettings,
+                  color: Colors.red,
+                ),
+                _OptionTile(
                   title: "views.settings.tile.calendar.title".tr(),
                   subtitle: "views.settings.tile.calendar.description".tr(),
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
-                  color: Colors.red,
+                  color: Colors.purple,
                 ),
                 _OptionTile(
                   title: "views.settings.tile.renewmembership.title".tr(),

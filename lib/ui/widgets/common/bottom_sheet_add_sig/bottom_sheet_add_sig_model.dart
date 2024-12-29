@@ -125,9 +125,14 @@ class BottomSheetAddSigModel extends MasterModel {
   }
 
   onTapSigType() {
-    cupertinoModalPicker(title: 'Type', initialItem: sigTypes.keys.toList().indexOf(sigType), items: sigTypes.values.toList()).then((value) {
+    cupertinoModalPicker(
+            title: 'Type',
+            initialItem: sigTypes.keys.toList().indexOf(sigType),
+            items: sigTypes.values.toList())
+        .then((value) {
       if (value != null) {
-        sigType = sigTypes.keys.toList()[sigTypes.values.toList().indexOf(value)];
+        sigType =
+            sigTypes.keys.toList()[sigTypes.values.toList().indexOf(value)];
         sigTypeController.text = value;
         rebuildUi();
       }

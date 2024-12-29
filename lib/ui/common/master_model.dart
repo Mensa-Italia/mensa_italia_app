@@ -25,7 +25,9 @@ class MasterModel extends ReactiveViewModel {
   }
 
   hasPower(String power) {
-    return user.powers.contains(power) || user.powers.contains("${power}_helper") || user.powers.contains("super");
+    return user.powers.contains(power) ||
+        user.powers.contains("${power}_helper") ||
+        user.powers.contains("super");
   }
 
   allowTestMakerAddon() {
@@ -62,7 +64,8 @@ class MasterModel extends ReactiveViewModel {
         color: Colors.transparent,
         child: SingleChildScrollView(
           controller: ModalScrollController.of(context),
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: child,
         ),
       ),
@@ -87,13 +90,15 @@ class MasterModel extends ReactiveViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<RangeDateTimeZone?> pickStartEndTime({DateTime? start, DateTime? end}) async {
+  Future<RangeDateTimeZone?> pickStartEndTime(
+      {DateTime? start, DateTime? end}) async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
       startInitialDate: start,
@@ -137,15 +142,20 @@ class MasterModel extends ReactiveViewModel {
 
     if (dateTimeList != null) {
       if (dateTimeList[0].isAfter(dateTimeList[1])) {
-        return RangeDateTimeZone.fromDateTime(start: dateTimeList[1], end: dateTimeList[0]);
+        return RangeDateTimeZone.fromDateTime(
+            start: dateTimeList[1], end: dateTimeList[0]);
       }
-      return RangeDateTimeZone.fromDateTime(start: dateTimeList[0], end: dateTimeList[1]);
+      return RangeDateTimeZone.fromDateTime(
+          start: dateTimeList[0], end: dateTimeList[1]);
     } else {
       return null;
     }
   }
 
-  Future<String?> cupertinoModalPicker({required String title, required int initialItem, required List<String> items}) async {
+  Future<String?> cupertinoModalPicker(
+      {required String title,
+      required int initialItem,
+      required List<String> items}) async {
     String data = items[initialItem];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
