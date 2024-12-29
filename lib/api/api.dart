@@ -815,4 +815,9 @@ class Api {
       return data["state"];
     });
   }
+
+  logout() {
+    Memoized().clear();
+
+  }
 }

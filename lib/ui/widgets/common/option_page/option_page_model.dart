@@ -17,8 +17,10 @@ class OptionPageModel extends MasterModel {
 
   void logout() {
     Api().removeThisDevice().then((_) {
-      ScraperApi().logout().then((value) {
-        navigationService.replaceWith(Routes.loginView);
+      Api().logout().then((_) {
+        ScraperApi().logout().then((value) {
+          navigationService.replaceWith(Routes.loginView);
+        });
       });
     });
   }
@@ -33,8 +35,7 @@ class OptionPageModel extends MasterModel {
 
   void openPrivacyPolicy() {
     navigationService.navigateToDocumentViewerView(
-      downlaodUrl:
-          "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
+      downlaodUrl: "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
       title: "Privacy Policy",
       previousPageTitle: "Settings",
     );
