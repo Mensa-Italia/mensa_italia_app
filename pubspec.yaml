@@ -28,7 +28,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0
   native_dio_adapter: ^1.3.0
   path_provider: ^2.1.5
-  pocketbase: ^0.20.0
+  pocketbase: ^0.21.0
   shared_preferences: ^2.3.4
   stacked: ^3.4.4
   stacked_services: ^1.6.0
