@@ -15,8 +15,7 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
@@ -75,6 +74,25 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
             const SizedBox(height: 20),
             _SettingContainer(
+              key: const ValueKey("settings:0"),
+              children: [
+                /*_OptionTile(
+                  title: "Gestisci metodi di pagamento",
+                  icon: EneftyIcons.card_outline,
+                  onTap: viewModel.openPaymentMethodManager,
+                  color: Colors.green,
+                ),*/
+                _OptionTile(
+                  title: "views.settings.tile.renewmembership.title".tr(),
+                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  icon: EneftyIcons.coin_2_bold,
+                  onTap: viewModel.renewSubscription,
+                  color: Colors.orange,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _SettingContainer(
               key: const ValueKey("settings:1"),
               children: [
                 _OptionTile(
@@ -89,14 +107,6 @@ class OptionPage extends StackedView<OptionPageModel> {
                   icon: EneftyIcons.calendar_2_outline,
                   onTap: viewModel.openCalendarLinker,
                   color: Colors.purple,
-                ),
-                _OptionTile(
-                  title: "views.settings.tile.renewmembership.title".tr(),
-                  trailing: DateFormat.yMMMd()
-                      .format(viewModel.user.expireMembership),
-                  icon: EneftyIcons.card_outline,
-                  onTap: viewModel.renewSubscription,
-                  color: Colors.orange,
                 ),
                 _OptionTile(
                   title: "views.settings.tile.changepassword.title".tr(),
@@ -146,8 +156,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -218,8 +227,7 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
-        TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(

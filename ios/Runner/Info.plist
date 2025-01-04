@@ -79,5 +79,20 @@
 		<string>ja</string>
 		<string>pt</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Scan your card to add it automatically</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>mensa</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mensa</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

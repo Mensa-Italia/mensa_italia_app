@@ -62,6 +62,10 @@ class OptionPageModel extends MasterModel {
     navigationService.navigateToCalendarLinkerView();
   }
 
+  openPaymentMethodManager() {
+    navigationService.navigateToPaymentMethodManagerView();
+  }
+
   openReview() async {
     final InAppReview inAppReview = InAppReview.instance;
     inAppReview.openStoreListing(

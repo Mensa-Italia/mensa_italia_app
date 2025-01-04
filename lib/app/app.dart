@@ -26,6 +26,7 @@ import 'package:mensa_italia_app/ui/views/addon_deals_add/addon_deals_add_view.d
 import 'package:mensa_italia_app/ui/dialogs/input_text/input_text_dialog.dart';
 import 'package:mensa_italia_app/ui/views/addon_stamp/addon_stamp_view.dart';
 import 'package:mensa_italia_app/ui/views/notification_manager/notification_manager_view.dart';
+import 'package:mensa_italia_app/ui/views/payment_method_manager/payment_method_manager_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -53,6 +54,7 @@ import 'package:mensa_italia_app/ui/views/notification_manager/notification_mana
     MaterialRoute(page: AddonDealsAddView),
     MaterialRoute(page: AddonStampView),
     MaterialRoute(page: NotificationManagerView),
+    MaterialRoute(page: PaymentMethodManagerView),
 // @stacked-route
   ],
   dependencies: [

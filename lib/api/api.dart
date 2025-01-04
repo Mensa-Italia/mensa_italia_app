@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
@@ -12,6 +13,7 @@ import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/model/deals_contact.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
+import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
@@ -23,8 +25,16 @@ import 'package:http/http.dart' as http;
 import 'package:timezone/timezone.dart' as tz;
 
 class Api {
-  final Dio dio = Dio(BaseOptions(baseUrl: 'https://svc.mensa.it'));
-  final pb = PocketBase('https://svc.mensa.it');
+  static getBaseUrl() {
+    if (kDebugMode) {
+      return 'https://dev.svc.mensa.it';
+    } else {
+      return 'https://svc.mensa.it';
+    }
+  }
+
+  final Dio dio = Dio(BaseOptions(baseUrl: getBaseUrl()));
+  final pb = PocketBase(getBaseUrl());
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   Api._privateConstructor() {
@@ -818,6 +828,33 @@ class Api {
 
   logout() {
     Memoized().clear();
+  }
 
+  Future<dynamic> newPaymentIntent() async {
+    return await dio.post("/api/payment/method", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data;
+    });
+  }
+
+  Future<List<InternalPaymentMethod>> getPaymentMethods() async {
+    return await dio.get("/api/payment/method", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return (value.data as List).map((e) {
+        return InternalPaymentMethod.fromJson(e);
+      }).toList();
+    });
+  }
+
+  Future<dynamic> setDefaultPaymentMethod(String id) async {
+    var formData = FormData();
+    formData.fields.add(MapEntry("payment_method_id", id));
+    return await dio.post("/api/payment/default", data: formData, options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data;
+    });
+  }
+
+  Future<dynamic> getCustomer() async {
+    return await dio.get("/api/payment/customer", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data;
+    });
   }
 }

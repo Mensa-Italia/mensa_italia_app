@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/find_locale.dart';
 import 'package:mensa_italia_app/api/translation_loader.dart';
@@ -17,6 +18,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
+  Stripe.publishableKey = "pk_test_51JpXoBCplznHJvJujz50DEKnE4BWiveT2I7Z9tQ4UfMllhQjXpz0CKGh8wFExwgsnwPT6SJRpV7XmpZpNy3rPSr000UTk5w2v7";
   await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await DB.init();

@@ -35,7 +35,9 @@ class HomeViewModel extends MasterModel {
   void addNotificationPreference() {
     Api().getMetadata().then((metadata) async {
       try {
-        List<String> notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
+        List<String> notificationEvents =
+            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
+                .cast<String>();
         if (notificationEvents.isNotEmpty) {
           return;
         }

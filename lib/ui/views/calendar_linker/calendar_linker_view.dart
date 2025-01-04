@@ -12,11 +12,15 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   const CalendarLinkerView({super.key});
 
   @override
-  Widget builder(BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         previousPageTitle: "views.settings.title".tr(),
-        middle: Text('Calendar Linker', maxLines: 1,),
+        middle: Text(
+          'Calendar Linker',
+          maxLines: 1,
+        ),
       ),
       body: viewModel.calendarLink == null
           ? const Center(child: CircularProgressIndicator())
@@ -35,7 +39,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                     onLongPress: viewModel.copyToClipboard,
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.all(16).copyWith(bottom: 0, top: 0),
+                      margin:
+                          const EdgeInsets.all(16).copyWith(bottom: 0, top: 0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(color: kcPrimaryColor, width: 4),
@@ -55,7 +60,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                 if (Theme.of(context).platform != TargetPlatform.iOS)
                   TextButton(
                     onPressed: () async {
-                      if (await canLaunchUrlString("https://support.google.com/calendar/answer/37100?hl=en&co=GENIE.Platform%3DDesktop#:~:text=Use a link to add a public calendar")) {
+                      if (await canLaunchUrlString(
+                          "https://support.google.com/calendar/answer/37100?hl=en&co=GENIE.Platform%3DDesktop#:~:text=Use a link to add a public calendar")) {
                         launchUrlString(
                           "https://support.google.com/calendar/answer/37100?hl=en&co=GENIE.Platform%3DDesktop#:~:text=Use a link to add a public calendar",
                         );
@@ -72,7 +78,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                   ),
                 if (Theme.of(context).platform != TargetPlatform.iOS)
                   Container(
-                    margin: const EdgeInsets.all(16).copyWith(left: 32, right: 32, top: 20),
+                    margin: const EdgeInsets.all(16)
+                        .copyWith(left: 32, right: 32, top: 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -86,7 +93,8 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16)
+                      .copyWith(top: 16),
                   child: const Text("Events subscriptions"),
                 ),
                 const Divider(indent: 16, endIndent: 16),
@@ -128,5 +136,6 @@ class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
   }
 
   @override
-  CalendarLinkerViewModel viewModelBuilder(BuildContext context) => CalendarLinkerViewModel();
+  CalendarLinkerViewModel viewModelBuilder(BuildContext context) =>
+      CalendarLinkerViewModel();
 }
