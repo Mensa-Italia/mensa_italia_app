@@ -58,7 +58,7 @@ dependencies:
   latlong2: ^0.9.1
   fluttertoast: ^8.2.10
   maps_launcher: ^3.0.0+1
-  firebase_core: ^3.9.0
+  firebase_core: ^3.10.0
   firebase_messaging: ^15.1.6
   device_info_plus: ^10.1.2
   omni_datetime_picker: ^2.0.5
