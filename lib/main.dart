@@ -18,15 +18,13 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
-  Stripe.publishableKey = "pk_test_51JpXoBCplznHJvJujz50DEKnE4BWiveT2I7Z9tQ4UfMllhQjXpz0CKGh8wFExwgsnwPT6SJRpV7XmpZpNy3rPSr000UTk5w2v7";
   await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await DB.init();
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {
-    tz.setLocalLocation(
-        tz.getLocation(await FlutterTimezone.getLocalTimezone()));
+    tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
   } catch (_) {}
   try {
     await Firebase.initializeApp(
@@ -38,8 +36,7 @@ Future<void> main() async {
   setupBottomSheetUi();
   await SentryFlutter.init(
     (options) {
-      options.dsn =
-          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
+      options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
@@ -70,6 +67,7 @@ class MainApp extends StatelessWidget {
       locale: context.locale,
       navigatorObservers: [
         StackedService.routeObserver,
+        SentryNavigatorObserver(),
       ],
       theme: ThemeData(
         //platform: TargetPlatform.android,

@@ -24,6 +24,7 @@ mixin _$RegSociModel {
   String get image => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
+  DateTime? get birthDate => throw _privateConstructorUsedError;
   String get state => throw _privateConstructorUsedError;
   String get linkToFullProfile => throw _privateConstructorUsedError;
 
@@ -44,6 +45,7 @@ abstract class $RegSociModelCopyWith<$Res> {
       String image,
       String name,
       String city,
+      DateTime? birthDate,
       String state,
       String linkToFullProfile});
 }
@@ -65,6 +67,7 @@ class _$RegSociModelCopyWithImpl<$Res, $Val extends RegSociModel>
     Object? image = null,
     Object? name = null,
     Object? city = null,
+    Object? birthDate = freezed,
     Object? state = null,
     Object? linkToFullProfile = null,
   }) {
@@ -85,6 +88,10 @@ class _$RegSociModelCopyWithImpl<$Res, $Val extends RegSociModel>
           ? _value.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      birthDate: freezed == birthDate
+          ? _value.birthDate
+          : birthDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       state: null == state
           ? _value.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -110,6 +117,7 @@ abstract class _$$RegSociModelImplCopyWith<$Res>
       String image,
       String name,
       String city,
+      DateTime? birthDate,
       String state,
       String linkToFullProfile});
 }
@@ -129,6 +137,7 @@ class __$$RegSociModelImplCopyWithImpl<$Res>
     Object? image = null,
     Object? name = null,
     Object? city = null,
+    Object? birthDate = freezed,
     Object? state = null,
     Object? linkToFullProfile = null,
   }) {
@@ -149,6 +158,10 @@ class __$$RegSociModelImplCopyWithImpl<$Res>
           ? _value.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      birthDate: freezed == birthDate
+          ? _value.birthDate
+          : birthDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       state: null == state
           ? _value.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -169,6 +182,7 @@ class _$RegSociModelImpl extends _RegSociModel {
       required this.image,
       required this.name,
       required this.city,
+      required this.birthDate,
       required this.state,
       required this.linkToFullProfile})
       : super._();
@@ -185,13 +199,15 @@ class _$RegSociModelImpl extends _RegSociModel {
   @override
   final String city;
   @override
+  final DateTime? birthDate;
+  @override
   final String state;
   @override
   final String linkToFullProfile;
 
   @override
   String toString() {
-    return 'RegSociModel(uid: $uid, image: $image, name: $name, city: $city, state: $state, linkToFullProfile: $linkToFullProfile)';
+    return 'RegSociModel(uid: $uid, image: $image, name: $name, city: $city, birthDate: $birthDate, state: $state, linkToFullProfile: $linkToFullProfile)';
   }
 
   @override
@@ -203,6 +219,8 @@ class _$RegSociModelImpl extends _RegSociModel {
             (identical(other.image, image) || other.image == image) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.city, city) || other.city == city) &&
+            (identical(other.birthDate, birthDate) ||
+                other.birthDate == birthDate) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.linkToFullProfile, linkToFullProfile) ||
                 other.linkToFullProfile == linkToFullProfile));
@@ -211,7 +229,7 @@ class _$RegSociModelImpl extends _RegSociModel {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, uid, image, name, city, state, linkToFullProfile);
+      runtimeType, uid, image, name, city, birthDate, state, linkToFullProfile);
 
   @JsonKey(ignore: true)
   @override
@@ -233,6 +251,7 @@ abstract class _RegSociModel extends RegSociModel {
       required final String image,
       required final String name,
       required final String city,
+      required final DateTime? birthDate,
       required final String state,
       required final String linkToFullProfile}) = _$RegSociModelImpl;
   const _RegSociModel._() : super._();
@@ -248,6 +267,8 @@ abstract class _RegSociModel extends RegSociModel {
   String get name;
   @override
   String get city;
+  @override
+  DateTime? get birthDate;
   @override
   String get state;
   @override

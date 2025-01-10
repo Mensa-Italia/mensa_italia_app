@@ -14,6 +14,7 @@ class RegSociModel with _$RegSociModel {
     required String image,
     required String name,
     required String city,
+    required DateTime? birthDate,
     required String state,
     required String linkToFullProfile,
   }) = _RegSociModel;

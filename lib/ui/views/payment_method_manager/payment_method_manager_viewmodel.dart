@@ -29,7 +29,9 @@ class PaymentMethodManagerViewModel extends MasterModel {
 
   int getSelectedPaymentMethod() {
     if (customer == null) return -1;
-    return paymentMethods.indexWhere((element) => element.id == customer["invoice_settings"]["default_payment_method"]["id"]);
+    return paymentMethods.indexWhere((element) =>
+        element.id ==
+        customer["invoice_settings"]["default_payment_method"]["id"]);
   }
 
   void addPaymentMethod() {
@@ -40,6 +42,7 @@ class PaymentMethodManagerViewModel extends MasterModel {
           setupIntentClientSecret: seti["client_secret"],
           customerId: seti["customer"]["id"],
           returnURL: "mensa://stripe-redirect",
+          allowsDelayedPaymentMethods: true,
           applePay: Stripe.merchantIdentifier == null
               ? null
               : const PaymentSheetApplePay(

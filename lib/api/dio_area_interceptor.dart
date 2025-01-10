@@ -13,18 +13,29 @@ class DioAreaInterceptor extends Interceptor {
       return handler.next(response);
     }
     final location = response.headers.value("location");
-    if (!location.toString().toLowerCase().contains("Associazioni/login".toLowerCase())) {
+    if (!location
+        .toString()
+        .toLowerCase()
+        .contains("Associazioni/login".toLowerCase())) {
       return handler.next(response);
     }
-    if (response.isRedirect && location.toString().toLowerCase().contains("Associazioni/login".toLowerCase())) {
+    if (response.isRedirect &&
+        location
+            .toString()
+            .toLowerCase()
+            .contains("Associazioni/login".toLowerCase())) {
       final email = await ScraperApi().getStoredEmail();
       final password = await ScraperApi().getStoredPassword();
       final cookieJar = await ScraperApi().getCookieJar();
-      if (_dio.interceptors.where((element) => element.runtimeType == CookieManager).isEmpty) {
+      if (_dio.interceptors
+          .where((element) => element.runtimeType == CookieManager)
+          .isEmpty) {
         _dio.interceptors.add(cookieJar);
       }
       await cookieJar.cookieJar.deleteAll();
-      return await Api().login(email: email, password: password).then((isLogged) async {
+      return await Api()
+          .login(email: email, password: password)
+          .then((isLogged) async {
         if (isLogged) {
           return await _dio.fetch(staticResponse).then((value) {
             return handler.next(value);

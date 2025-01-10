@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:html/dom.dart';
+import 'package:intl/intl.dart';
 import 'package:mensa_italia_app/api/dio_area_interceptor.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/model/area_document.dart';
@@ -327,9 +328,16 @@ class ScraperApi {
               .map((e) => e.text.trim())
               .toList();
           if (!idsToNotRepeat.contains(data[1])) {
+            DateTime? birthDate;
+            try {
+              birthDate = DateFormat("dd/MM/yyyy").parse(data[3]);
+            } catch (_) {
+              birthDate = null;
+            }
             testelab.add(RegSociModel(
               uid: int.parse(data[1]),
               name: data[2],
+              birthDate: birthDate,
               city: data[4],
               state: data[5],
               image:
@@ -371,10 +379,18 @@ class ScraperApi {
               .getElementsByTagName("td")
               .map((e) => e.text.trim())
               .toList();
+          DateTime? birthDate;
+          try {
+            birthDate = DateFormat("dd/MM/yyyy").parse(data[3]);
+          } catch (_) {
+            birthDate = null;
+          }
+
           if (!idsToNotRepeat.contains(data[1])) {
             testelab.add(RegSociModel(
               uid: int.parse(data[1]),
               name: data[2],
+              birthDate: birthDate,
               city: data[4],
               state: data[5],
               image:

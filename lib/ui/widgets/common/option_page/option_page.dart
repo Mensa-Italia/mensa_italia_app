@@ -15,7 +15,8 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
@@ -76,15 +77,29 @@ class OptionPage extends StackedView<OptionPageModel> {
             _SettingContainer(
               key: const ValueKey("settings:0"),
               children: [
-                /*_OptionTile(
+                _OptionTile(
+                  title: "Fai una donazione",
+                  subtitle: "Sostieni l'associazione",
+                  icon: EneftyIcons.coin_outline,
+                  onTap: viewModel.openDonationPage,
+                  color: Colors.blue,
+                ),
+                _OptionTile(
                   title: "Gestisci metodi di pagamento",
                   icon: EneftyIcons.card_outline,
                   onTap: viewModel.openPaymentMethodManager,
                   color: Colors.green,
-                ),*/
+                ),
+                _OptionTile(
+                  title: "Le tue ricevute",
+                  icon: EneftyIcons.receipt_2_bold,
+                  onTap: viewModel.openReceipts,
+                  color: Colors.blueGrey,
+                ),
                 _OptionTile(
                   title: "views.settings.tile.renewmembership.title".tr(),
-                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  trailing: DateFormat.yMMMd()
+                      .format(viewModel.user.expireMembership),
                   icon: EneftyIcons.coin_2_bold,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
@@ -156,7 +171,8 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -227,7 +243,8 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+        TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(

@@ -17,38 +17,43 @@ const RegSociModelSchema = CollectionSchema(
   name: r'RegSociModel',
   id: -8802677570527444699,
   properties: {
-    r'city': PropertySchema(
+    r'birthDate': PropertySchema(
       id: 0,
+      name: r'birthDate',
+      type: IsarType.dateTime,
+    ),
+    r'city': PropertySchema(
+      id: 1,
       name: r'city',
       type: IsarType.string,
     ),
     r'image': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'image',
       type: IsarType.string,
     ),
     r'linkToFullProfile': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'linkToFullProfile',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'nameFullTextSearch': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'nameFullTextSearch',
       type: IsarType.stringList,
     ),
     r'state': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'state',
       type: IsarType.string,
     ),
     r'uid': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'uid',
       type: IsarType.long,
     )
@@ -108,13 +113,14 @@ void _regSociModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.city);
-  writer.writeString(offsets[1], object.image);
-  writer.writeString(offsets[2], object.linkToFullProfile);
-  writer.writeString(offsets[3], object.name);
-  writer.writeStringList(offsets[4], object.nameFullTextSearch);
-  writer.writeString(offsets[5], object.state);
-  writer.writeLong(offsets[6], object.uid);
+  writer.writeDateTime(offsets[0], object.birthDate);
+  writer.writeString(offsets[1], object.city);
+  writer.writeString(offsets[2], object.image);
+  writer.writeString(offsets[3], object.linkToFullProfile);
+  writer.writeString(offsets[4], object.name);
+  writer.writeStringList(offsets[5], object.nameFullTextSearch);
+  writer.writeString(offsets[6], object.state);
+  writer.writeLong(offsets[7], object.uid);
 }
 
 RegSociModel _regSociModelDeserialize(
@@ -124,12 +130,13 @@ RegSociModel _regSociModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = RegSociModel(
-    city: reader.readString(offsets[0]),
-    image: reader.readString(offsets[1]),
-    linkToFullProfile: reader.readString(offsets[2]),
-    name: reader.readString(offsets[3]),
-    state: reader.readString(offsets[5]),
-    uid: reader.readLong(offsets[6]),
+    birthDate: reader.readDateTimeOrNull(offsets[0]),
+    city: reader.readString(offsets[1]),
+    image: reader.readString(offsets[2]),
+    linkToFullProfile: reader.readString(offsets[3]),
+    name: reader.readString(offsets[4]),
+    state: reader.readString(offsets[6]),
+    uid: reader.readLong(offsets[7]),
   );
   return object;
 }
@@ -142,7 +149,7 @@ P _regSociModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
@@ -150,10 +157,12 @@ P _regSociModelDeserializeProp<P>(
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 5:
       return (reader.readString(offset)) as P;
+    case 5:
+      return (reader.readStringList(offset) ?? []) as P;
     case 6:
+      return (reader.readString(offset)) as P;
+    case 7:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -403,6 +412,80 @@ extension RegSociModelQueryWhere
 
 extension RegSociModelQueryFilter
     on QueryBuilder<RegSociModel, RegSociModel, QFilterCondition> {
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'birthDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'birthDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'birthDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'birthDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'birthDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      birthDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'birthDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1418,6 +1501,18 @@ extension RegSociModelQueryLinks
 
 extension RegSociModelQuerySortBy
     on QueryBuilder<RegSociModel, RegSociModel, QSortBy> {
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByBirthDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'birthDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByBirthDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'birthDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByCity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.asc);
@@ -1495,6 +1590,18 @@ extension RegSociModelQuerySortBy
 
 extension RegSociModelQuerySortThenBy
     on QueryBuilder<RegSociModel, RegSociModel, QSortThenBy> {
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByBirthDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'birthDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByBirthDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'birthDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByCity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.asc);
@@ -1584,6 +1691,12 @@ extension RegSociModelQuerySortThenBy
 
 extension RegSociModelQueryWhereDistinct
     on QueryBuilder<RegSociModel, RegSociModel, QDistinct> {
+  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByBirthDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'birthDate');
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByCity(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1642,6 +1755,12 @@ extension RegSociModelQueryProperty
     });
   }
 
+  QueryBuilder<RegSociModel, DateTime?, QQueryOperations> birthDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'birthDate');
+    });
+  }
+
   QueryBuilder<RegSociModel, String, QQueryOperations> cityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'city');
@@ -1697,6 +1816,9 @@ _$RegSociModelImpl _$$RegSociModelImplFromJson(Map<String, dynamic> json) =>
       image: json['image'] as String,
       name: json['name'] as String,
       city: json['city'] as String,
+      birthDate: json['birth_date'] == null
+          ? null
+          : DateTime.parse(json['birth_date'] as String),
       state: json['state'] as String,
       linkToFullProfile: json['link_to_full_profile'] as String,
     );
@@ -1707,6 +1829,7 @@ Map<String, dynamic> _$$RegSociModelImplToJson(_$RegSociModelImpl instance) =>
       'image': instance.image,
       'name': instance.name,
       'city': instance.city,
+      'birth_date': instance.birthDate?.toIso8601String(),
       'state': instance.state,
       'link_to_full_profile': instance.linkToFullProfile,
     };

@@ -76,3 +76,7 @@ double getResponsiveFontSize(BuildContext context,
 
   return responsiveSize;
 }
+
+String priceFormat(int price) {
+  return "${(price / 100).toStringAsFixed(2).replaceAll(".", ",")} €";
+}

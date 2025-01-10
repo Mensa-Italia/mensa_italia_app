@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -14,6 +15,7 @@ import 'package:mensa_italia_app/model/deals_contact.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
+import 'package:mensa_italia_app/model/receipt.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
@@ -857,4 +859,52 @@ class Api {
       return value.data;
     });
   }
+
+  Future<dynamic> doDonation(int amount) async {
+    var formData = FormData();
+    formData.fields.add(MapEntry("amount", amount.toString()));
+    return await dio.post("/api/payment/donate", data: formData, options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data;
+    });
+  }
+
+  Future<List<ReceiptModel>> getPaymentsReceipt() async {
+    return await pb
+        .collection('payments')
+        .getFullList(
+          sort: '-created',
+        )
+        .then((value) {
+      return value.map((e) {
+        return ReceiptModel.fromJson(e.toJson());
+      }).toList();
+    });
+  }
+
+  Future<String> getReceiptUrl(String id) async {
+    return await dio.get("/api/payment/receipt/$id", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data["url"];
+    });
+  }
+
+  Future<dynamic> getPaymentIntent(String id) async {
+    return await dio.get("/api/payment/$id", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
+      return value.data;
+    });
+  }
+
+ Future<Map<String, String>> settings() async {
+    if (Memoized().has("configs")) {
+      return Memoized().get("configs");
+    }
+    return await pb.collection('configs').getFullList().then((value) {
+      final Map<String, String> res = {};
+      for (RecordModel record in value) {
+        res[record.getStringValue("key").toString()] = record.getStringValue("value").toString();
+      }
+      Memoized().set("configs", res);
+      return res;
+    });
+  }
+
 }

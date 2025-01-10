@@ -4,8 +4,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/model/date_time_zone.dart';
+import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/widgets/common/payment_method_picker/payment_method_picker.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:stacked/stacked.dart';
@@ -52,6 +54,18 @@ class MasterModel extends ReactiveViewModel {
 
   isSuper() {
     return hasPower("super");
+  }
+
+  Future<InternalPaymentMethod?> showPickPaymentMethod(int amount) async {
+    final res = await showBeautifulBottomSheet(
+        child: PaymentMethodPicker(
+      amount: amount,
+    ));
+    if (res != null && res is InternalPaymentMethod) {
+      return res;
+    } else {
+      return null;
+    }
   }
 
   Future showBeautifulBottomSheet({required Widget child}) async {

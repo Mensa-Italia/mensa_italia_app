@@ -38,7 +38,47 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 50),
+                if (regSoci.birthDate != null)
+                  Row(
+                    children: [
+                      Expanded(child: SizedBox()),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(300),
+                        ),
+                        child: Text.rich(
+                          TextSpan(children: [
+                            WidgetSpan(
+                              child: Icon(
+                                EneftyIcons.cake_outline,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                              alignment: PlaceholderAlignment.middle,
+                            ),
+                            TextSpan(
+                              text: " ${DateFormat("dd MMMM yyyy").format(
+                                regSoci.birthDate ?? DateTime.now(),
+                              )}",
+                            ),
+                          ]),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 20),
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(regSoci.image),
