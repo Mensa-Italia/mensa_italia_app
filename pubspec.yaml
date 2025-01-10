@@ -73,7 +73,7 @@ dependencies:
   link_text: ^0.2.1
   flutter_linkify: ^6.0.0
   expandable_widgets: ^1.0.3+1
-  flutter_secure_storage: ^9.2.3
+  flutter_secure_storage: ^9.2.4
   flutter_stripe: ^11.3.0
   
 dev_dependencies:
