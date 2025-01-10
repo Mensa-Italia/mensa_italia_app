@@ -29,9 +29,7 @@ class PaymentMethodManagerViewModel extends MasterModel {
 
   int getSelectedPaymentMethod() {
     if (customer == null) return -1;
-    return paymentMethods.indexWhere((element) =>
-        element.id ==
-        customer["invoice_settings"]["default_payment_method"]["id"]);
+    return paymentMethods.indexWhere((element) => element.id == customer["invoice_settings"]["default_payment_method"]["id"]);
   }
 
   void addPaymentMethod() {
@@ -52,6 +50,7 @@ class PaymentMethodManagerViewModel extends MasterModel {
           googlePay: const PaymentSheetGooglePay(
             merchantCountryCode: "IT",
           ),
+          merchantDisplayName: "Mensa Italia",
         ),
       )
           .then((_) {

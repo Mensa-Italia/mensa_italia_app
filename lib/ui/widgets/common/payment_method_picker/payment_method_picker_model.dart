@@ -28,9 +28,7 @@ class PaymentMethodPickerModel extends MasterModel {
   InternalPaymentMethod? getMyPaymentMethod() {
     if (customer == null || listOfMethods.isEmpty) return null;
     try {
-      return listOfMethods.firstWhere((element) =>
-          element.id ==
-          customer["invoice_settings"]["default_payment_method"]["id"]);
+      return listOfMethods.firstWhere((element) => element.id == customer["invoice_settings"]["default_payment_method"]["id"]);
     } catch (e) {
       return null;
     }
@@ -54,13 +52,12 @@ class PaymentMethodPickerModel extends MasterModel {
           googlePay: const PaymentSheetGooglePay(
             merchantCountryCode: "IT",
           ),
+          merchantDisplayName: "Mensa Italia",
         ),
       )
           .then((_) {
         Stripe.instance.presentPaymentSheet().then((_) {
-          Stripe.instance
-              .retrieveSetupIntent(seti["client_secret"])
-              .then((data) {
+          Stripe.instance.retrieveSetupIntent(seti["client_secret"]).then((data) {
             Api().setDefaultPaymentMethod(data.paymentMethodId).then((_) {
               load();
             });
@@ -90,9 +87,7 @@ class PaymentMethodPickerModel extends MasterModel {
 
   void confirmPaymentMethod() {
     navigationService.back(
-      result: listOfMethods.firstWhere((element) =>
-          element.id ==
-          customer["invoice_settings"]["default_payment_method"]["id"]),
+      result: listOfMethods.firstWhere((element) => element.id == customer["invoice_settings"]["default_payment_method"]["id"]),
     );
   }
 }
