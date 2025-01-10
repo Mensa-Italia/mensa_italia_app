@@ -27,6 +27,7 @@ class StartupViewModel extends MasterModel {
     Api().settings().then((value) async {
       Stripe.publishableKey = value["stripe_key"] ?? "";
       Stripe.urlScheme = "mensa";
+      Stripe.merchantIdentifier = "merchant.it.mensa.app";
       Stripe.instance.applySettings();
 
       await ScraperApi().init();

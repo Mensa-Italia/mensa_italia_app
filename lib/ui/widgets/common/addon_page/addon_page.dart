@@ -14,8 +14,7 @@ class AddonPage extends StackedView<AddonPageModel> {
   const AddonPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, AddonPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonPageModel viewModel, Widget? child) {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
@@ -28,93 +27,114 @@ class AddonPage extends StackedView<AddonPageModel> {
           ),
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
-        SliverList.list(
-          children: [
-            if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
-              Padding(
-                key: const ValueKey("Officials:Title"),
-                padding: const EdgeInsets.symmetric(horizontal: 20)
-                    .copyWith(top: 10),
-                child: Text(
-                  "views.addons.subtitle.officials".tr(),
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
+        if (viewModel.searchText.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              key: const ValueKey("Officials:Title"),
+              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 10),
+              child: Text(
+                "views.addons.subtitle.officials".tr(),
+                style: TextStyle(
+                  fontSize: 18,
                 ),
               ),
-            if (viewModel.isSearching("contacts"))
-              _InternalAddonButton(
-                key: const ValueKey("Internal:Contacts"),
-                id: "contacts",
-                name: "addons.contacts.title".tr(),
-                description: "addons.contacts.description".tr(),
-                icon: const Icon(EneftyIcons.bookmark_outline,
-                    color: kcPrimaryColor, size: 40),
-                onTap: viewModel.openContacts,
-              ),
-            if (viewModel.isSearching("deals"))
-              _InternalAddonButton(
-                key: const ValueKey("Internal:Deals"),
-                id: "deals",
-                name: "addons.deals.title".tr(),
-                description: "addons.deals.description".tr(),
-                icon: const Icon(EneftyIcons.moneys_outline,
-                    color: kcPrimaryColor, size: 40),
-                onTap: viewModel.openDeals,
-              ),
-            if (viewModel.isSearching("documents"))
-              _InternalAddonButton(
-                key: const ValueKey("Internal:Documents"),
-                id: "documents",
-                name: "addons.documents.title".tr(),
-                description: "addons.documents.description".tr(),
-                icon: const Icon(EneftyIcons.document_cloud_outline,
-                    color: kcPrimaryColor, size: 40),
-                onTap: viewModel.openDocuments,
-              ),
-            if (viewModel.isSearching("tableport"))
-              _InternalAddonButton(
-                key: const ValueKey("Internal:Tableport"),
-                id: "tableport",
-                name: "addons.tableport.title".tr(),
-                description: "addons.tableport.description".tr(),
-                icon: const Icon(EneftyIcons.global_outline,
-                    color: kcPrimaryColor, size: 40),
-                onTap: viewModel.openTableport,
-              ),
-            if (viewModel.allowTestMakerAddon() &&
-                viewModel.isSearching("testmakers"))
-              _InternalAddonButton(
-                key: const ValueKey("Internal:TestMakers"),
-                id: "testmakers",
-                name: "addons.testmakers.title".tr(),
-                description: "addons.testmakers.description".tr(),
-                icon: const Icon(EneftyIcons.teacher_outline,
-                    color: kcPrimaryColor, size: 40),
-                onTap: viewModel.openTestMakers,
-              ),
-            if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
-              Padding(
-                key: const ValueKey("Verified:Title"),
-                padding: const EdgeInsets.symmetric(horizontal: 20)
-                    .copyWith(top: 30),
-                child: Text(
-                  "views.addons.subtitle.verified".tr(),
-                  style: TextStyle(
-                    fontSize: 18,
+            ),
+          ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 16 / 9,
+            ),
+            delegate: SliverChildListDelegate.fixed(
+              [
+                if (viewModel.isSearching("contacts"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:Contacts"),
+                    id: "contacts",
+                    name: "addons.contacts.title".tr(),
+                    description: "addons.contacts.description".tr(),
+                    icon: const Icon(EneftyIcons.bookmark_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openContacts,
                   ),
-                ),
-              ),
-            ...viewModel.addons.map((addon) {
-              return _ExternalAddonButton(
-                key: ValueKey(addon.id),
-                addon: addon,
-              );
-            }),
-          ],
+                if (viewModel.isSearching("deals"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:Deals"),
+                    id: "deals",
+                    name: "addons.deals.title".tr(),
+                    description: "addons.deals.description".tr(),
+                    icon: const Icon(EneftyIcons.moneys_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openDeals,
+                  ),
+                if (viewModel.isSearching("documents"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:Documents"),
+                    id: "documents",
+                    name: "addons.documents.title".tr(),
+                    description: "addons.documents.description".tr(),
+                    icon: const Icon(EneftyIcons.document_cloud_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openDocuments,
+                  ),
+                if (viewModel.isSearching("tableport"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:Tableport"),
+                    id: "tableport",
+                    name: "addons.tableport.title".tr(),
+                    description: "addons.tableport.description".tr(),
+                    icon: const Icon(EneftyIcons.global_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openTableport,
+                  ),
+                if (viewModel.allowTestMakerAddon() && viewModel.isSearching("testmakers"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:TestMakers"),
+                    id: "testmakers",
+                    name: "addons.testmakers.title".tr(),
+                    description: "addons.testmakers.description".tr(),
+                    icon: const Icon(EneftyIcons.teacher_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openTestMakers,
+                  ),
+              ],
+            ),
+          ),
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        if (viewModel.addons.isNotEmpty && viewModel.searchText.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              key: const ValueKey("Verified:Title"),
+              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 10, top: 30),
+              child: Text(
+                "views.addons.subtitle.verified".tr(),
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // Due colonne
+              mainAxisSpacing: 10, // Spaziatura tra le righe
+              crossAxisSpacing: 10, // Spaziatura tra le colonne
+              childAspectRatio: 16 / 9, // Proporzione larghezza/altezza
+            ),
+            delegate: SliverChildListDelegate.fixed(
+              [
+                ...viewModel.addons.map((addon) {
+                  return _ExternalAddonButton(
+                    key: ValueKey(addon.id),
+                    addon: addon,
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -129,6 +149,63 @@ class _ExternalAddonButton extends ViewModelWidget<AddonPageModel> {
   const _ExternalAddonButton({super.key, required this.addon});
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {
+    return GestureDetector(
+      onTap: () => viewModel.openAddon(addon),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(15).copyWith(bottom: 0, top: 0),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: CachedNetworkImage(
+                        imageUrl: addon.icon,
+                        fit: BoxFit.cover,
+                        color: kcPrimaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => viewModel.onStarTappedExternal(addon),
+                  icon: Icon(
+                    viewModel.getStarIconExternal(addon),
+                    color: Theme.of(context).textTheme.titleLarge!.color,
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Container(
+                alignment: Alignment.bottomLeft,
+                padding: const EdgeInsets.all(15).copyWith(top: 0, bottom: 10),
+                child: Text(
+                  addon.name,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    height: 1,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return GestureDetector(
       onTap: () => viewModel.openAddon(addon),
       child: Container(
@@ -222,16 +299,57 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
   final Widget icon;
   final Function() onTap;
 
-  const _InternalAddonButton(
-      {super.key,
-      required this.id,
-      required this.name,
-      required this.description,
-      required this.icon,
-      required this.onTap});
+  const _InternalAddonButton({super.key, required this.id, required this.name, required this.description, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context, AddonPageModel viewModel) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(15).copyWith(bottom: 0),
+                    child: icon,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => viewModel.onStarTappedInternal(id),
+                  icon: Icon(
+                    viewModel.getStarIconInternal(id),
+                    color: Theme.of(context).textTheme.titleLarge!.color,
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Container(
+                alignment: Alignment.bottomLeft,
+                padding: const EdgeInsets.all(15).copyWith(top: 0, bottom: 10),
+                child: Text(
+                  name,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    height: 1,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
     return GestureDetector(
       onTap: onTap,
       child: Container(

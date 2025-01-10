@@ -893,7 +893,7 @@ class Api {
     });
   }
 
- Future<Map<String, String>> settings() async {
+  Future<Map<String, String>> settings() async {
     if (Memoized().has("configs")) {
       return Memoized().get("configs");
     }
@@ -906,5 +906,4 @@ class Api {
       return res;
     });
   }
-
 }
