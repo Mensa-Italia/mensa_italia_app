@@ -50,7 +50,8 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeEvent.text =
+          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
       location = LocationSelected(
         locationName: event.position!.name,
         coordinates: event.position!.toLatLng(),
@@ -89,7 +90,8 @@ class AddEventViewModel extends MasterModel {
   void addEvent() async {
     if (formKey.currentState!.validate() && !isBusy) {
       setBusy(true);
-      if ((dateTimeOptions?.start ?? DateTime.now()).isBefore(DateTime.now().add(Duration(days: 1)))) {
+      if ((dateTimeOptions?.start ?? DateTime.now())
+          .isBefore(DateTime.now().add(Duration(days: 1)))) {
         dialogService
             .showDialog(
           title: 'views.add_event_viewmodel.date_error.title'.tr(),
@@ -160,18 +162,21 @@ class AddEventViewModel extends MasterModel {
       end: dateTimeOptions?.end,
     ).then((value) {
       if (value != null) {
-        if (!allowControlEvents() && value.end.difference(value.start).inDays > 2) {
+        if (!allowControlEvents() &&
+            value.end.difference(value.start).inDays > 2) {
           dialogService
               .showDialog(
             title: 'views.add_event_viewmodel.spot_event_error.title'.tr(),
-            description: 'views.add_event_viewmodel.spot_event_error.description'.tr(),
+            description:
+                'views.add_event_viewmodel.spot_event_error.description'.tr(),
           )
               .then((value) {
             pickDateTime();
           });
         } else {
           dateTimeOptions = value;
-          dateTimeEvent.text = "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+          dateTimeEvent.text =
+              "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
         }
       }
     });

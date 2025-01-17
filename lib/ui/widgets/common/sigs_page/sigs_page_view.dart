@@ -115,7 +115,7 @@ class ChipWidget extends StatelessWidget {
       this.isActived = false,
       required this.onTap});
 
-  final Function() onTap;
+  final void  Function() onTap;
   final bool isActived;
   final String label;
 

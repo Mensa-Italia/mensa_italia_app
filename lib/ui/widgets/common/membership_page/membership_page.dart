@@ -11,7 +11,7 @@ import 'package:stacked/stacked.dart';
 
 import 'membership_page_model.dart';
 
-final internalAddonsList = ["Contacts", "TestMakers", "Documents", "Tableport", "Deals"];
+final internalAddonsList = ["Contacts", "TestMakers", "Documents", "Tableport", "Deals", "Boutique"];
 
 class MembershipPage extends StackedView<MembershipPageModel> {
   const MembershipPage({super.key});

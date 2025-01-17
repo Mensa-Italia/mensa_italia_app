@@ -46,6 +46,7 @@ class ReceiptsView extends StackedView<ReceiptsViewModel> {
               itemCount: viewModel.receipts.length,
               itemBuilder: (context, index) {
                 return _receiptTile(
+                  key: ValueKey(viewModel.receipts[index].id),
                   receipt: viewModel.receipts[index],
                   onTap: viewModel.finishPayment(viewModel.receipts[index]),
                 );

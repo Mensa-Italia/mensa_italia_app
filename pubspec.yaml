@@ -75,6 +75,8 @@ dependencies:
   expandable_widgets: ^1.0.3+1
   flutter_secure_storage: ^9.2.4
   flutter_stripe: ^11.3.0
+  infinite_carousel: ^1.1.1
+  carousel_slider: ^5.0.0
   
 dev_dependencies:
   build_runner: ^2.4.13

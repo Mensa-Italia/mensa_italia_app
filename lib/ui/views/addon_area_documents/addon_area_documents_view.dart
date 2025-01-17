@@ -1,7 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
+import 'package:mensa_italia_app/ui/widgets/common/sigs_page/sigs_page_view.dart';
 import 'package:stacked/stacked.dart';
 
 import 'addon_area_documents_viewmodel.dart';
@@ -10,19 +11,40 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
   const AddonAreaDocumentsView({super.key});
 
   @override
-  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel,
-      Widget? child) {
+  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel, Widget? child) {
     return Scaffold(
       body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "Documents",
-            previousPageTitle: "Addons",
+            title: "views.addons.documents.title".tr(),
+            previousPageTitle: "addons.documents.view.previouspagetitle".tr(),
             searchBarActions: SearchBarActions(
               onChanged: viewModel.search,
               controller: viewModel.searchController,
               onSubmitted: viewModel.search,
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            sliver: SliverToBoxAdapter(
+              child: SizedBox(
+                height: 50,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  scrollDirection: Axis.horizontal,
+                  children: List.generate(viewModel.categories.length, (index) {
+                    final category = viewModel.categories[index];
+                    return Center(
+                      child: ChipWidget(
+                        label: "addons.documents.view.category.$category".tr(),
+                        isActived: viewModel.isActived(index),
+                        onTap: viewModel.selectChip(index),
+                      ),
+                    );
+                  }),
+                ),
+              ),
             ),
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
@@ -40,45 +62,23 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
               itemCount: viewModel.documents.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  key: ValueKey(viewModel.documents[index].link),
+                  key: ValueKey(viewModel.documents[index].file),
                   onTap: viewModel.onTap(viewModel.documents[index]),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   dense: true,
                   visualDensity: VisualDensity.compact,
-                  leading: CachedNetworkImage(
-                    imageUrl: viewModel.documents[index].image,
-                    width: 30,
-                    height: 30,
-                    memCacheHeight: 90,
-                    memCacheWidth: 90,
-                    maxHeightDiskCache: 90,
-                    maxWidthDiskCache: 90,
-                    fit: BoxFit.cover,
-                    imageBuilder: (context, imageProvider) => Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(300),
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  title: Text(viewModel.documents[index].description),
+                  leading: Icon(viewModel.getIconBasedOnCategory(viewModel.documents[index].category)),
+                  title: Text(viewModel.documents[index].name),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),
             ),
-          const SliverSafeArea(
-              sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+          const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
         ],
       ),
     );
   }
 
   @override
-  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) =>
-      AddonAreaDocumentsViewModel();
+  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) => AddonAreaDocumentsViewModel();
 }

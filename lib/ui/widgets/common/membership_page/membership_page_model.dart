@@ -35,11 +35,7 @@ class MembershipPageModel extends MasterModel {
     SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
       if (!allowTestMakerAddon()) {
-        await prefs.setStringList(
-            "addons_fav",
-            (prefs.getStringList("addons_fav") ?? [])
-              ..removeWhere(
-                  (element) => element.startsWith("INTERNAL:testmakers")));
+        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
       }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
@@ -48,8 +44,7 @@ class MembershipPageModel extends MasterModel {
         List<String> toRemove = [];
         for (var favsAddon in favsAddons) {
           if (favsAddon.startsWith("EXTERNAL:")) {
-            if (!value
-                .any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+            if (!value.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
               toRemove.add(favsAddon);
             }
           }
@@ -70,7 +65,6 @@ class MembershipPageModel extends MasterModel {
   }
 
   bool hasInternalAddon(String addonName) {
-    print(addonName);
     return favsAddons.contains("INTERNAL:${addonName.toLowerCase()}");
   }
 
@@ -86,6 +80,8 @@ class MembershipPageModel extends MasterModel {
         return EneftyIcons.moneys_outline;
       case "tableport":
         return EneftyIcons.global_outline;
+      case 'boutique':
+        return EneftyIcons.shop_outline;
       default:
         return EneftyIcons.bookmark_outline;
     }
@@ -93,8 +89,7 @@ class MembershipPageModel extends MasterModel {
 
   Function() openExternalAddon(AddonModel addon) {
     return () {
-      navigationService.navigateToExternalAddonWebviewView(
-          addonID: addon.id, addonURL: addon.url);
+      navigationService.navigateToExternalAddonWebviewView(addonID: addon.id, addonURL: addon.url);
     };
   }
 
@@ -115,6 +110,10 @@ class MembershipPageModel extends MasterModel {
           break;
         case "tableport":
           navigationService.navigateToAddonStampView();
+          break;
+        case 'boutique':
+          navigationService.navigateToAddonBoutiqueView();
+          break;
         default:
           break;
       }

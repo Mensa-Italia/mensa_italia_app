@@ -51,6 +51,15 @@ class AddonPage extends StackedView<AddonPageModel> {
             ),
             delegate: SliverChildListDelegate.fixed(
               [
+                if (viewModel.isSearching("boutique"))
+                  _InternalAddonButton(
+                    key: const ValueKey("Internal:Boutique"),
+                    id: "boutique",
+                    name: "addons.boutique.title".tr(),
+                    description: "addons.boutique.description".tr(),
+                    icon: const Icon(EneftyIcons.shop_outline, color: kcPrimaryColor, size: 30),
+                    onTap: viewModel.openBoutique,
+                  ),
                 if (viewModel.isSearching("contacts"))
                   _InternalAddonButton(
                     key: const ValueKey("Internal:Contacts"),
@@ -205,90 +214,6 @@ class _ExternalAddonButton extends ViewModelWidget<AddonPageModel> {
         ),
       ),
     );
-
-    return GestureDetector(
-      onTap: () => viewModel.openAddon(addon),
-      child: Container(
-        height: 100,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Material(
-              color: Colors.transparent,
-              elevation: 1,
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                width: 80,
-                height: 80,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: CachedNetworkImage(
-                    imageUrl: addon.icon,
-                    memCacheHeight: 180,
-                    memCacheWidth: 180,
-                    maxHeightDiskCache: 180,
-                    maxWidthDiskCache: 180,
-                    fit: BoxFit.cover,
-                    color: kcPrimaryColor,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                height: 80,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      addon.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: kcPrimaryColor,
-                        height: 1,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        addon.description,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: IconButton(
-                onPressed: () => viewModel.onStarTappedExternal(addon),
-                icon: Icon(
-                  viewModel.getStarIconExternal(addon),
-                  color: Colors.grey,
-                  size: 35,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -344,82 +269,6 @@ class _InternalAddonButton extends ViewModelWidget<AddonPageModel> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 100,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Material(
-              color: Colors.transparent,
-              elevation: 1,
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                width: 80,
-                height: 80,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                alignment: Alignment.center,
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: icon,
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                height: 80,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: kcPrimaryColor,
-                        height: 1,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        description,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: IconButton(
-                icon: Icon(
-                  viewModel.getStarIconInternal(id),
-                  color: Colors.grey,
-                  size: 35,
-                ),
-                onPressed: () => viewModel.onStarTappedInternal(id),
               ),
             ),
           ],

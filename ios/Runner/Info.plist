@@ -14,6 +14,19 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>it</string>
+		<string>es</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>bn</string>
+		<string>zh</string>
+		<string>hi</string>
+		<string>ja</string>
+		<string>pt</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>mensa_italia_app</string>
 	<key>CFBundlePackageType</key>
@@ -22,6 +35,19 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>mensa</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mensa</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -36,7 +62,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera to allow you to take a photo and upload it to the app.</string>
+	<string>Scan your card to add it automatically</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to provide information about the nearest Mensa Italia events.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -48,6 +74,8 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
+		<string>fetch</string>
+		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -65,34 +93,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>it</string>
-		<string>es</string>
-		<string>de</string>
-		<string>fr</string>
-		<string>bn</string>
-		<string>zh</string>
-		<string>hi</string>
-		<string>ja</string>
-		<string>pt</string>
-	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>Scan your card to add it automatically</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>mensa</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>mensa</string>
-			</array>
-		</dict>
 	</array>
 </dict>
 </plist>

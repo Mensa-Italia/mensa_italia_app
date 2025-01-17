@@ -128,8 +128,7 @@ class _tileDonation extends StatelessWidget {
   final int selectedDontaion;
   final Function(int value) onTap;
   const _tileDonation(
-      {super.key,
-      required this.donation,
+      {required this.donation,
       required this.selectedDontaion,
       required this.onTap});
 

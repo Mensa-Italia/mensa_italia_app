@@ -7,29 +7,37 @@ class PaymentMethodManagerViewModel extends MasterModel {
   final controller = CardFormEditController();
   final List<InternalPaymentMethod> paymentMethods = [];
   dynamic customer;
-  int selectedIndex = -1;
+  String selectedPM = "";
   PaymentMethodManagerViewModel() {
     load();
   }
 
   void load() {
+    setBusy(true);
     Api().getCustomer().then((value) {
       customer = value;
       Api().getPaymentMethods().then((value) {
         paymentMethods.clear();
         paymentMethods.addAll(value);
-        rebuildUi();
-        if (selectedIndex == -1) {
-          selectedIndex = getSelectedPaymentMethod();
-          rebuildUi();
+        selectedPM = getSelectedPaymentMethod();
+        if (selectedPM == "") {
+          Api().setDefaultPaymentMethod(paymentMethods[0].id).then((_) {
+            load();
+          });
+        } else {
+          setBusy(false);
         }
       });
     });
   }
 
-  int getSelectedPaymentMethod() {
-    if (customer == null) return -1;
-    return paymentMethods.indexWhere((element) => element.id == customer["invoice_settings"]["default_payment_method"]["id"]);
+  String getSelectedPaymentMethod() {
+    if (customer == null) return "";
+    try {
+      return customer["invoice_settings"]["default_payment_method"]["id"];
+    } catch (_) {
+      return "";
+    }
   }
 
   void addPaymentMethod() {
@@ -54,7 +62,7 @@ class PaymentMethodManagerViewModel extends MasterModel {
         ),
       )
           .then((_) {
-        Stripe.instance.presentPaymentSheet().then((_) {
+        Stripe.instance.presentPaymentSheet().then((options) {
           load();
         });
       });
@@ -63,10 +71,14 @@ class PaymentMethodManagerViewModel extends MasterModel {
 
   void onPaymentMethodSelected(int? p1) {
     if (p1 == null) return;
-    selectedIndex = p1;
+    selectedPM = paymentMethods[p1].id;
     rebuildUi();
-    Api().setDefaultPaymentMethod(paymentMethods[p1!].id).then((_) {
+    Api().setDefaultPaymentMethod(paymentMethods[p1].id).then((_) {
       load();
     });
+  }
+
+  bool isSelected(InternalPaymentMethod paymentMethod) {
+    return paymentMethod.id == selectedPM;
   }
 }

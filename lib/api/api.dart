@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -9,9 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/model/addon.dart';
+import 'package:mensa_italia_app/model/boutique.dart';
 import 'package:mensa_italia_app/model/calendar_link.dart';
 import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/model/deals_contact.dart';
+import 'package:mensa_italia_app/model/document.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
@@ -904,6 +905,41 @@ class Api {
       }
       Memoized().set("configs", res);
       return res;
+    });
+  }
+
+  Future<List<BoutiqueModel>> getBoutiques() async {
+    if (Memoized().has("all_boutiques")) {
+      return Memoized().get("all_boutiques");
+    }
+    return await pb.collection('boutique').getFullList(sort: 'name').then((value) {
+      Memoized().set(
+          "all_boutiques",
+          value.map((e) {
+            Map<String, dynamic> data = e.toJson();
+            data["image"] = (data["image"] as List<dynamic>).map((e2) => pb.files.getUrl(e, e2.toString()).toString()).toList();
+            return BoutiqueModel.fromJson(data);
+          }).toList());
+      return Memoized().get("all_boutiques");
+    }).catchError((e) {
+      print(e);
+      return [];
+    });
+  }
+
+  Future<List<DocumentModel>> getDocuments() async {
+    if (Memoized().has("all_documents")) {
+      //return Memoized().get("all_documents");
+    }
+    return await pb.collection('documents').getFullList(sort: '-created').then((value) {
+      Memoized().set(
+          "all_documents",
+          value.map((e) {
+            Map<String, dynamic> data = e.toJson();
+            data["file"] = pb.files.getUrl(e, e.getStringValue("file")).toString();
+            return DocumentModel.fromJson(data);
+          }).toList());
+      return Memoized().get("all_documents");
     });
   }
 }

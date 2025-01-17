@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
@@ -11,6 +12,7 @@ class HomeViewModel extends MasterModel {
   HomeViewModel() {
     reviewApp();
     addNotificationPreference();
+    setLanguageMetadata();
   }
 
   void reviewApp() async {
@@ -35,9 +37,7 @@ class HomeViewModel extends MasterModel {
   void addNotificationPreference() {
     Api().getMetadata().then((metadata) async {
       try {
-        List<String> notificationEvents =
-            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
-                .cast<String>();
+        List<String> notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
         if (notificationEvents.isNotEmpty) {
           return;
         }
@@ -50,5 +50,9 @@ class HomeViewModel extends MasterModel {
         Api().setMetadata("notify_me_events", jsonEncode([value]));
       });
     });
+  }
+
+  void setLanguageMetadata() {
+    Api().setMetadata("codes_locale", Localizations.localeOf(context).toString());
   }
 }

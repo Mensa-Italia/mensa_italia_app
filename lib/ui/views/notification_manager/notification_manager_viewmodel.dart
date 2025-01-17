@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:stacked/stacked.dart';
 
 class NotificationManagerViewModel extends MasterModel {
   List<String> notificationEvents = [];
@@ -10,14 +9,9 @@ class NotificationManagerViewModel extends MasterModel {
   NotificationManagerViewModel() {
     Api().getMetadata().then((metadata) {
       try {
-        notificationEvents =
-            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
-                .cast<String>();
-        print(notificationEvents);
+        notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
         rebuildUi();
-      } catch (err) {
-        print(err);
-      }
+      } catch (_) {}
     });
   }
   hasState(String state) {

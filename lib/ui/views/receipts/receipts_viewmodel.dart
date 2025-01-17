@@ -1,10 +1,8 @@
-import 'dart:convert';
 
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/model/receipt.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:stacked/stacked.dart';
 
 class ReceiptsViewModel extends MasterModel {
   List<ReceiptModel> receipts = [];

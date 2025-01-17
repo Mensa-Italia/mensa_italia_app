@@ -41,7 +41,7 @@ class AddonStampViewModel extends MasterModel {
 
 class _showStamp extends StatelessWidget {
   final StampModel stamp;
-  const _showStamp({super.key, required this.stamp});
+  const _showStamp({required this.stamp});
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class _showStamp extends StatelessWidget {
 }
 
 class _addStampModal extends StatefulWidget {
-  const _addStampModal({super.key});
+  const _addStampModal();
 
   @override
   State<_addStampModal> createState() => __addStampModalState();
