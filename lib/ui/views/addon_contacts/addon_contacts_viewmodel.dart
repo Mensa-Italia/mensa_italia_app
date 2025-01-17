@@ -9,19 +9,28 @@ import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_s
 class _AddonContactsUpdates {
   static bool started = false;
   static bool completed = false;
+  static List<int> downloadedList = [];
 
   static Future start() async {
     if (started) return;
     await (await ScraperApi().getCookieJar()).cookieJar.deleteAll();
     started = true;
     int threads = 10;
-    await Future.wait(List.generate(
-        threads, (index) => startRequestFlow(index + 1, window: threads)));
+    await Future.wait(List.generate(threads, (index) => startRequestFlow(index + 1, window: threads)));
     completed = true;
+    DB.isar.writeTxn(() async {
+      DB.isar.regSociModels.where().findAll().then((value) {
+        final toDeleteList = value.where((element) => !downloadedList.contains(element.uid)).toList();
+        if (toDeleteList.isNotEmpty) {
+          DB.isar.regSociModels.deleteAll(toDeleteList.map((e) => e.id).toList());
+        }
+      });
+    });
   }
 
   static Future startRequestFlow(int page, {int window = 5}) {
     return ScraperApi().getRegSoci(page: page).then((value) async {
+      downloadedList.addAll(value.map((e) => e.uid).toList());
       try {
         DB.isar.writeTxn(() async {
           await DB.isar.regSociModels.putAll(value);
@@ -131,14 +140,12 @@ class AddonContactsViewModel extends MasterModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }
