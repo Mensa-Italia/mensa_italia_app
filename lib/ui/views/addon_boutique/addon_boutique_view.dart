@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/boutique.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
+import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
 import 'package:mensa_italia_app/ui/common/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 
@@ -14,16 +15,6 @@ class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
   @override
   Widget builder(BuildContext context, AddonBoutiqueViewModel viewModel, Widget? child) {
     return Scaffold(
-      appBar: getAppBarPlatform(
-        title: "views.addons.boutique.title".tr(),
-        previousPageTitle: "views.back.button.generic".tr(),
-        searchBarActions: SearchBarActions(
-          onChanged: viewModel.search,
-          controller: viewModel.searchController,
-          onSubmitted: viewModel.search,
-          hintText: "views.addons.search.textfield.hint".tr(),
-        ),
-      ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         child: ElevatedButton(
@@ -31,17 +22,35 @@ class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
           child: Text("views.addons.boutique.order_now".tr()),
         ),
       ),
-      body: ListView.builder(
-        itemCount: viewModel.boutiques.length,
-        itemBuilder: (context, index) {
-          return _BoutiqueTile(
-            key: ValueKey(viewModel.boutiques[index].id),
-            product: viewModel.boutiques[index],
-            onTap: () {
-              viewModel.openProduct(viewModel.boutiques[index]);
-            },
-          );
-        },
+      body: getCustomScrollViewPlatform(
+        controller: viewModel.scrollController,
+        slivers: [
+          getAppBarSliverPlatform(
+            title: "views.addons.boutique.title".tr(),
+            previousPageTitle: "views.back.button.generic".tr(),
+            searchBarActions: SearchBarActions(
+              onChanged: viewModel.search,
+              controller: viewModel.searchController,
+              onSubmitted: viewModel.search,
+              hintText: "addons.contacts.search.textfield".tr(),
+            ),
+          ),
+          SliverPadding(padding: const EdgeInsets.all(5)),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return _BoutiqueTile(
+                  key: ValueKey(viewModel.boutiques[index].id),
+                  product: viewModel.boutiques[index],
+                  onTap: () {
+                    viewModel.openProduct(viewModel.boutiques[index]);
+                  },
+                );
+              },
+              childCount: viewModel.boutiques.length,
+            ),
+          ),
+        ],
       ),
     );
   }

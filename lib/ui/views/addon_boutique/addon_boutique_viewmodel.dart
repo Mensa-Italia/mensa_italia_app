@@ -6,6 +6,8 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AddonBoutiqueViewModel extends MasterModel {
+
+  ScrollController scrollController = ScrollController();
   List<BoutiqueModel> boutiques = [];
   List<BoutiqueModel> originalBoutiques = [];
 
