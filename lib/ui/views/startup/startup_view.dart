@@ -10,8 +10,7 @@ class StartupView extends StackedView<StartupViewModel> {
   const StartupView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, StartupViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, StartupViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -66,7 +65,11 @@ class StartupView extends StackedView<StartupViewModel> {
   void onViewModelReady(StartupViewModel viewModel) {
     super.onViewModelReady(viewModel);
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      viewModel.runStartupLogic();
+      viewModel.runVersionCheck().then((_) {
+        viewModel.runStartupLogic();
+      }).catchError((_) {
+        viewModel.runStartupLogic();
+      });
     });
   }
 }
