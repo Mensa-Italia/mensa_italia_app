@@ -1,4 +1,5 @@
 import 'package:app_version_update/app_version_update.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
@@ -15,8 +16,8 @@ class StartupViewModel extends MasterModel {
         await AppVersionUpdate.showAlertUpdate(
           context: context,
           appVersionResult: data,
-          title: "Aggiornamento disponibile",
-          content: "È disponibile una nuova versione dell'app Mensa Italia",
+          title: "dialog.update.title".tr(),
+          content: "dialog.update.content".tr(),
           mandatory: true,
         );
       }
