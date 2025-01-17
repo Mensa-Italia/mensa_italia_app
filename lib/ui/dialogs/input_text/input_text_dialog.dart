@@ -5,8 +5,6 @@ import 'package:stacked_services/stacked_services.dart';
 
 import 'input_text_dialog_model.dart';
 
-const double _graphicSize = 60;
-
 class InputTextDialog extends StackedView<InputTextDialogModel> {
   final DialogRequest request;
   final Function(DialogResponse) completer;
@@ -18,8 +16,7 @@ class InputTextDialog extends StackedView<InputTextDialogModel> {
   });
 
   @override
-  Widget builder(
-      BuildContext context, InputTextDialogModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, InputTextDialogModel viewModel, Widget? child) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -91,6 +88,5 @@ class InputTextDialog extends StackedView<InputTextDialogModel> {
   }
 
   @override
-  InputTextDialogModel viewModelBuilder(BuildContext context) =>
-      InputTextDialogModel(request: request);
+  InputTextDialogModel viewModelBuilder(BuildContext context) => InputTextDialogModel(request: request);
 }
