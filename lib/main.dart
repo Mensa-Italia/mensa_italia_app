@@ -23,8 +23,7 @@ Future<void> main() async {
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {
-    tz.setLocalLocation(
-        tz.getLocation(await FlutterTimezone.getLocalTimezone()));
+    tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
   } catch (_) {}
   try {
     await Firebase.initializeApp(
@@ -36,8 +35,7 @@ Future<void> main() async {
   setupBottomSheetUi();
   await SentryFlutter.init(
     (options) {
-      options.dsn =
-          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
+      options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
     },
@@ -71,7 +69,7 @@ class MainApp extends StatelessWidget {
         SentryNavigatorObserver(),
       ],
       theme: ThemeData(
-        //platform: TargetPlatform.android,
+        // platform: TargetPlatform.android,
         fontFamily: "Gotham",
         scaffoldBackgroundColor: const Color.fromRGBO(241, 245, 255, 1),
         inputDecorationTheme: InputDecorationTheme(

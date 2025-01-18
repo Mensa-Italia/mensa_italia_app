@@ -15,8 +15,7 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
@@ -92,15 +91,14 @@ class OptionPage extends StackedView<OptionPageModel> {
                 ),
                 _OptionTile(
                   title: "Le tue ricevute",
-                  icon: EneftyIcons.receipt_2_bold,
+                  icon: EneftyIcons.receipt_2_outline,
                   onTap: viewModel.openReceipts,
                   color: Colors.blueGrey,
                 ),
                 _OptionTile(
                   title: "views.settings.tile.renewmembership.title".tr(),
-                  trailing: DateFormat.yMMMd()
-                      .format(viewModel.user.expireMembership),
-                  icon: EneftyIcons.coin_2_bold,
+                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  icon: EneftyIcons.coin_2_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
                 ),
@@ -171,8 +169,7 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(
-            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -226,7 +223,9 @@ class _OptionTile extends StatelessWidget {
             ),
       leading: getPlatformIcon(),
       visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
       trailing: trailing.isEmpty
           ? null
           : Text.rich(
@@ -243,8 +242,7 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
-        TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
@@ -254,7 +252,16 @@ class _OptionTile extends StatelessWidget {
         child: Icon(icon, size: 20, color: Colors.white),
       );
     } else {
-      return Icon(icon);
+      return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: ShapeDecoration(
+          color: color,
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+          ),
+        ),
+        child: Icon(icon, size: 20, color: Colors.white),
+      );
     }
   }
 }
@@ -267,11 +274,11 @@ class _SettingContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isiOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(8).copyWith(right: 0, left: 2),
+      margin: EdgeInsets.symmetric(horizontal: isiOS ? 20 : 0),
+      padding: const EdgeInsets.all(8).copyWith(right: isiOS ? 0 : 20, left: isiOS ? 2 : 20),
       decoration: BoxDecoration(
-        color: isiOS ? Colors.white : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(isiOS ? 10 : 0),
       ),
       child: ListView.separated(
         shrinkWrap: true,
@@ -280,8 +287,8 @@ class _SettingContainer extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemBuilder: (context, index) => children[index],
         separatorBuilder: (context, index) => Divider(
-          indent: isiOS ? 50 : 0,
-          color: isiOS ? kcLightGrey.withOpacity(.2) : Colors.transparent,
+          indent: 50,
+          color: kcLightGrey.withOpacity(0.3),
         ),
       ),
     );
