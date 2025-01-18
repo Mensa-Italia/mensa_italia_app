@@ -170,7 +170,7 @@ class EventPageModel extends MasterModel {
         context: context, builder: (context) => BottomFilter());
   }
 
-  Function() onLongTapEditEvent(EventModel event) {
+  Function() onLongTapEditEvent(EventModel? event) {
     return () async {
       navigationService.navigateToAddEventView(event: event).then((value) {
         load();

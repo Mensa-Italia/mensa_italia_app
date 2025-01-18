@@ -26,6 +26,9 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openMap() {
+    if (event.position == null) {
+      return;
+    }
     MapsLauncher.launchCoordinates(event.position!.lat, event.position!.lon);
   }
 

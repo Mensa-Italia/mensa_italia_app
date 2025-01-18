@@ -86,9 +86,12 @@ class AddonAreaDocumentsViewModel extends MasterModel {
   applyFilters() {
     documents.clear();
     if (selectedCategories.isEmpty) {
-      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
+      documents.addAll(originalDocuments.where((element) =>
+          element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
     } else {
-      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase()) && selectedCategories.contains(element.category)));
+      documents.addAll(originalDocuments.where((element) =>
+          element.name.toLowerCase().contains(nameToSearch.toLowerCase()) &&
+          selectedCategories.contains(element.category)));
     }
     rebuildUi();
   }

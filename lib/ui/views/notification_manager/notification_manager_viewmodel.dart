@@ -9,7 +9,9 @@ class NotificationManagerViewModel extends MasterModel {
   NotificationManagerViewModel() {
     Api().getMetadata().then((metadata) {
       try {
-        notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
+        notificationEvents =
+            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
+                .cast<String>();
         rebuildUi();
       } catch (_) {}
     });

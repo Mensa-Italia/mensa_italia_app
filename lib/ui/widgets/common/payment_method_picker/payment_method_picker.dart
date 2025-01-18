@@ -13,7 +13,8 @@ class PaymentMethodPicker extends StackedView<PaymentMethodPickerModel> {
   const PaymentMethodPicker({super.key, this.amount = 0});
 
   @override
-  Widget builder(BuildContext context, PaymentMethodPickerModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, PaymentMethodPickerModel viewModel, Widget? child) {
     final paymentMethod = viewModel.getMyPaymentMethod();
     return Container(
       decoration: BoxDecoration(
@@ -110,7 +111,8 @@ class PaymentMethodPicker extends StackedView<PaymentMethodPickerModel> {
                         ipm: viewModel.listOfMethods[index],
                         index: index,
                         onChanged: viewModel.changePaymentMethodExec,
-                        isSelected: viewModel.listOfMethods[index].id == paymentMethod.id,
+                        isSelected: viewModel.listOfMethods[index].id ==
+                            paymentMethod.id,
                       ),
                     ),
                   ),

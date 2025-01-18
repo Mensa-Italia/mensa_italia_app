@@ -52,11 +52,13 @@ class AddEventViewModel extends MasterModel {
       );
       dateTimeEvent.text =
           "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
-      location = LocationSelected(
-        locationName: event.position!.name,
-        coordinates: event.position!.toLatLng(),
-      );
-      locationController.text = location!.locationName;
+      if (event.position != null) {
+        location = LocationSelected(
+          locationName: event.position!.name,
+          coordinates: event.position!.toLatLng(),
+        );
+        locationController.text = location!.locationName;
+      }
       isNational = event.isNational;
       isOnline = event.position == null;
     }

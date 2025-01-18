@@ -228,40 +228,42 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             const Divider(),
           ],
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Text.rich(
-              TextSpan(
-                text: "views.eventdetails.location.title".tr(),
-                children: [
-                  TextSpan(
-                    text: "\n${event.position!.name}",
-                    style: TextStyle(
-                        color: kcPrimaryColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal),
-                  ),
-                ],
-              ),
-              style: TextStyle(
-                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
-              textAlign: TextAlign.start,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          GestureDetector(
-            onTap: viewModel.openMap,
-            child: Container(
-              height: 200 + MediaQuery.of(context).padding.bottom,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(),
-              child: MapShower(
-                pointPosition: event.position!.toLatLng(),
+          if (event.position != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text.rich(
+                TextSpan(
+                  text: "views.eventdetails.location.title".tr(),
+                  children: [
+                    TextSpan(
+                      text: "\n${event.position!.name}",
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal),
+                    ),
+                  ],
+                ),
+                style: TextStyle(
+                    fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+                textAlign: TextAlign.start,
               ),
             ),
-          ),
+            const SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: viewModel.openMap,
+              child: Container(
+                height: 200 + MediaQuery.of(context).padding.bottom,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(),
+                child: MapShower(
+                  pointPosition: event.position!.toLatLng(),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -14,5 +14,6 @@ class DocumentModel with _$DocumentModel {
     required String category,
   }) = _DocumentModel;
 
-  factory DocumentModel.fromJson(Map<String, dynamic> json) => _$DocumentModelFromJson(json);
+  factory DocumentModel.fromJson(Map<String, dynamic> json) =>
+      _$DocumentModelFromJson(json);
 }

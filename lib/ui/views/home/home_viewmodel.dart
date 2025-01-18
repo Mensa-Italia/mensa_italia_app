@@ -13,6 +13,7 @@ class HomeViewModel extends MasterModel {
     reviewApp();
     addNotificationPreference();
     setLanguageMetadata();
+    showChangelog();
   }
 
   void reviewApp() async {

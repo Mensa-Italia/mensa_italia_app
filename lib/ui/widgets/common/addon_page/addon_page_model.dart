@@ -14,7 +14,8 @@ class AddonPageModel extends MasterModel {
   String searchText = "";
 
   bool isSearching(String check) {
-    return check.toLowerCase().contains(searchText.toLowerCase()) || searchText.isEmpty;
+    return check.toLowerCase().contains(searchText.toLowerCase()) ||
+        searchText.isEmpty;
   }
 
   TextEditingController searchController = TextEditingController();
@@ -25,7 +26,11 @@ class AddonPageModel extends MasterModel {
     SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
       if (!allowTestMakerAddon()) {
-        await prefs.setStringList("addons_fav", (prefs.getStringList("addons_fav") ?? [])..removeWhere((element) => element.startsWith("INTERNAL:testmakers")));
+        await prefs.setStringList(
+            "addons_fav",
+            (prefs.getStringList("addons_fav") ?? [])
+              ..removeWhere(
+                  (element) => element.startsWith("INTERNAL:testmakers")));
       }
       favsAddons.addAll(prefs.getStringList("addons_fav") ?? []);
       Api().getAddons().then((value) {
@@ -35,7 +40,8 @@ class AddonPageModel extends MasterModel {
         List<String> toRemove = [];
         for (var favsAddon in favsAddons) {
           if (favsAddon.startsWith("EXTERNAL:")) {
-            if (!_storedAddons.any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
+            if (!_storedAddons
+                .any((element) => "EXTERNAL:${element.id}" == favsAddon)) {
               toRemove.add(favsAddon);
             }
           }
@@ -52,7 +58,8 @@ class AddonPageModel extends MasterModel {
   }
 
   openAddon(AddonModel addon) {
-    navigationService.navigateToExternalAddonWebviewView(addonID: addon.id, addonURL: addon.url);
+    navigationService.navigateToExternalAddonWebviewView(
+        addonID: addon.id, addonURL: addon.url);
   }
 
   openContacts() {
@@ -66,7 +73,8 @@ class AddonPageModel extends MasterModel {
   void search(String value) {
     searchText = value;
     addons.clear();
-    addons.addAll(_storedAddons.where((element) => isSearching(element.name.toLowerCase())));
+    addons.addAll(_storedAddons
+        .where((element) => isSearching(element.name.toLowerCase())));
     rebuildUi();
   }
 
@@ -122,12 +130,16 @@ class AddonPageModel extends MasterModel {
 
   IconData getStarIconExternal(AddonModel addon) {
     final String addonID = "EXTERNAL:${addon.id}";
-    return favsAddons.contains(addonID) ? EneftyIcons.star_bold : EneftyIcons.star_outline;
+    return favsAddons.contains(addonID)
+        ? EneftyIcons.star_bold
+        : EneftyIcons.star_outline;
   }
 
   IconData getStarIconInternal(String addon) {
     final String addonID = "INTERNAL:${addon.toLowerCase()}";
-    return favsAddons.contains(addonID) ? EneftyIcons.star_bold : EneftyIcons.star_outline;
+    return favsAddons.contains(addonID)
+        ? EneftyIcons.star_bold
+        : EneftyIcons.star_outline;
   }
 
   openDeals() {

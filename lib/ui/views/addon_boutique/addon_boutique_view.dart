@@ -13,7 +13,8 @@ class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
   const AddonBoutiqueView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, AddonBoutiqueViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddonBoutiqueViewModel viewModel, Widget? child) {
     return Scaffold(
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
@@ -56,7 +57,8 @@ class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
   }
 
   @override
-  AddonBoutiqueViewModel viewModelBuilder(BuildContext context) => AddonBoutiqueViewModel();
+  AddonBoutiqueViewModel viewModelBuilder(BuildContext context) =>
+      AddonBoutiqueViewModel();
 }
 
 class _BoutiqueTile extends StatelessWidget {

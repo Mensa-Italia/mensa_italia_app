@@ -61,7 +61,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
                                   image: MemoryImage(viewModel.imageBytes!),
                                   fit: BoxFit.cover,
                                 )
-                              : event?.image != null
+                              : event?.image != null && event!.image.isNotEmpty
                                   ? DecorationImage(
                                       image: CachedNetworkImageProvider(
                                           event!.image),

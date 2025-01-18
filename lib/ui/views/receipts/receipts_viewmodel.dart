@@ -1,4 +1,3 @@
-
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/model/receipt.dart';

@@ -16,7 +16,8 @@ class InputTextDialog extends StackedView<InputTextDialogModel> {
   });
 
   @override
-  Widget builder(BuildContext context, InputTextDialogModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, InputTextDialogModel viewModel, Widget? child) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -88,5 +89,6 @@ class InputTextDialog extends StackedView<InputTextDialogModel> {
   }
 
   @override
-  InputTextDialogModel viewModelBuilder(BuildContext context) => InputTextDialogModel(request: request);
+  InputTextDialogModel viewModelBuilder(BuildContext context) =>
+      InputTextDialogModel(request: request);
 }

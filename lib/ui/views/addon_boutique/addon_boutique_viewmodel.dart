@@ -6,7 +6,6 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AddonBoutiqueViewModel extends MasterModel {
-
   ScrollController scrollController = ScrollController();
   List<BoutiqueModel> boutiques = [];
   List<BoutiqueModel> originalBoutiques = [];
@@ -29,7 +28,8 @@ class AddonBoutiqueViewModel extends MasterModel {
       boutiques.addAll(originalBoutiques);
     } else {
       boutiques.clear();
-      boutiques.addAll(originalBoutiques.where((element) => element.name.toLowerCase().contains(p1.toLowerCase())));
+      boutiques.addAll(originalBoutiques.where(
+          (element) => element.name.toLowerCase().contains(p1.toLowerCase())));
     }
     rebuildUi();
   }
