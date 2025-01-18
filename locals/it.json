@@ -1,5 +1,9 @@
 {
   "addons": {
+    "boutique": {
+      "description": "La boutique del Mensa Italia, dove potrai acquistare tanti gadget customizzati!",
+      "title": "Boutique"
+    },
     "contacts": {
       "description": "I tuoi contatti Mensa Italia, puoi trovare qualsiasi contatto di cui hai bisogno!",
       "infos": {
@@ -14,7 +18,7 @@
       },
       "title": "Contatti",
       "view": {
-        "loading": "Aggiornamento in corso",
+        "loading": "Aggiornamento",
         "previouspagetitle": "Addons",
         "title": "Contatti"
       }
@@ -48,7 +52,21 @@
     },
     "documents": {
       "description": "Documenti ufficiali di Mensa Italia",
-      "title": "Documenti"
+      "title": "Documenti",
+      "view": {
+        "category": {
+          "bilanci": "Bilanci",
+          "elezioni": "Elezioni",
+          "eventi_progetti": "Eventi e progetti",
+          "materiale_comunicazione": "Materiale comunicazione",
+          "modulistica_contratti": "Modulistica e contratti",
+          "news_pubblicazioni": "News e pubblicazioni",
+          "normativa_interna": "Normativa interna",
+          "tesoreria_contabilita": "Tesoreria e contabilità",
+          "verbali_delibere": "Verbali e delibere"
+        },
+        "previouspagetitle": "Indietro"
+      }
     },
     "tableport": {
       "addnewstamp": "Aggiungi nuovo",
@@ -58,6 +76,9 @@
         "scanqr": "Scansiona il codice QR"
       },
       "description": "Quando vai a un evento, puoi chiedere all'organizzatore di timbrare il tuo Tableport!",
+      "details": {
+        "previouspagetitle": "Addons"
+      },
       "title": "Tableport"
     },
     "testmakers": {
@@ -65,8 +86,34 @@
       "title": "TestMakers"
     }
   },
+  "dialog": {
+    "update": {
+      "content": "È disponibile una nuova versione dell'app Mensa Italia",
+      "title": "Aggiornamento disponibile"
+    }
+  },
   "views": {
+    "add_event_viewmodel": {
+      "date_error": {
+        "description": "La data di inizio selezionata deve essere almeno 24 ore da adesso. Si prega di scegliere una data successiva e riprovare.",
+        "title": "Data di inizio troppo vicina"
+      },
+      "spot_event_error": {
+        "description": "Gli eventi spot possono durare al massimo 2 giorni.",
+        "title": "Tempo massimo per eventi spot"
+      }
+    },
     "addons": {
+      "boutique": {
+        "order_now": "ORDINA",
+        "title": "Boutique"
+      },
+      "boutiqueproduct": {
+        "title": "Prodotto"
+      },
+      "documents": {
+        "title": "Documenti"
+      },
       "search": {
         "textfield": {
           "hint": "Cerca"
@@ -77,6 +124,11 @@
         "verified": "Verificati"
       },
       "title": "Addons"
+    },
+    "back": {
+      "button": {
+        "generic": "Indietro"
+      }
     },
     "community": {
       "chip": {
@@ -93,7 +145,37 @@
       },
       "title": "Community"
     },
+    "eventdetails": {
+      "button": {
+        "details": "Dettagli"
+      },
+      "details": {
+        "title": "Dettagli"
+      },
+      "location": {
+        "title": "Punto di ritrovo"
+      },
+      "organizers": {
+        "title": "Organizzatore"
+      },
+      "schedule": {
+        "from": "Da",
+        "title": "Programma",
+        "to": "A"
+      },
+      "title": "Dettagli dell'evento",
+      "warning": {
+        "spotevent": "Questo evento è organizzato indipendentemente dai membri. Mensa Italia non è responsabile per l'organizzazione, la gestione o l'esecuzione dell'evento."
+      }
+    },
     "events": {
+      "add_event": {
+        "dialog": {
+          "button": "Ok",
+          "description": "Hai già un evento programmato. Per crearne uno nuovo devi aspettare la fine di quello attuale.",
+          "title": "Solo un evento per volta"
+        }
+      },
       "empty": "Nessun evento trovato",
       "search": {
         "textfield": {
@@ -109,6 +191,33 @@
         "highlights": "In evidenza"
       }
     },
+    "make_donation": {
+      "button": {
+        "donate": "Dona"
+      },
+      "cancel": "Annulla",
+      "confirm": "Conferma",
+      "confirm_donation": "Conferma",
+      "confirm_donation_text": "Confermare la donazione di {amount}?",
+      "other_amount": "Altro importo",
+      "other_amount_hint": "Inserisci importo",
+      "title": "Donazioni"
+    },
+    "notification_manager": {
+      "kind": {
+        "events": "Eventi locali e spot"
+      },
+      "title": "Notifiche"
+    },
+    "payment_method_manager": {
+      "add_payment_method": "Aggiungi",
+      "no_payment_methods": "Non ci sono metodi di pagamento associati",
+      "title": "Metodi di pagamento"
+    },
+    "recieipt": {
+      "no_receipts": "Non hai ancora nessuna ricevuta",
+      "title": "Ricevute"
+    },
     "settings": {
       "tile": {
         "calendar": {
@@ -123,6 +232,9 @@
         },
         "logout": {
           "title": "Disconnettersi"
+        },
+        "notification": {
+          "title": "Notifiche"
         },
         "privacypolicy": {
           "title": "Informativa sulla privacy"
