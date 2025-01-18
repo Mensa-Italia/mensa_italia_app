@@ -1,6 +1,7 @@
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/event.dart';
+import 'package:mensa_italia_app/model/event_owner.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -9,8 +10,13 @@ import 'package:url_launcher/url_launcher_string.dart';
 class EventShowcaseViewModel extends MasterModel {
   EventModel event;
   final List<EventScheduleModel> eventSchedules = [];
+  List<EventOwnerModel>? owners;
   EventShowcaseViewModel({required this.event}) {
     load();
+    Api().getEventOwner(event.id).then((value) {
+      owners = value;
+      rebuildUi();
+    });
   }
 
   load() {
@@ -18,8 +24,7 @@ class EventShowcaseViewModel extends MasterModel {
       event = value;
       Api().getEventSchedules(event.id).then((value) {
         eventSchedules.clear();
-        eventSchedules
-            .addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
+        eventSchedules.addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
         rebuildUi();
       });
     });
@@ -33,8 +38,7 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty &&
-        await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );

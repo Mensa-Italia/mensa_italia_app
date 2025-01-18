@@ -1,7 +1,5 @@
-import 'package:dart_rss/domain/media/media.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
 import 'changelog_model.dart';
@@ -80,7 +78,7 @@ class _WhatsNewComponent extends StatelessWidget {
   final String title;
   final String description;
   final Color color;
-  const _WhatsNewComponent({super.key, required this.icon, required this.title, required this.description, required this.color});
+  const _WhatsNewComponent({required this.icon, required this.title, required this.description, required this.color});
 
   @override
   Widget build(BuildContext context) {
