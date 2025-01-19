@@ -38,6 +38,10 @@ Future<void> main() async {
       options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
+      options.experimental.replay.sessionSampleRate = 1.0;
+      options.experimental.replay.onErrorSampleRate = 1.0;
+      options.experimental.privacy.maskAllText = false;
+      options.experimental.privacy.maskAllImages = false;
     },
     appRunner: () async => runApp(
       EasyLocalization(

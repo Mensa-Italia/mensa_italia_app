@@ -241,14 +241,26 @@ class MasterModel extends ReactiveViewModel {
 
   void showChangelog() {
     SharedPreferences.getInstance().then((prefs) {
-      final lastVersion = prefs.getString("last_version");
+      final lastVersion = transformVersion(prefs.getString("last_version") ?? "");
       PackageInfo.fromPlatform().then((value) {
-        final version = value.version;
+        final version = transformVersion(value.version);
         if (lastVersion != version) {
           prefs.setString("last_version", version);
           showBeautifulBottomSheet(child: Changelog());
         }
       });
     });
+  }
+
+  String transformVersion(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    try {
+      List<String> parts = input.split('.');
+      return "${parts[0]}.${parts[1]}";
+    } catch (_) {
+      return input;
+    }
   }
 }
