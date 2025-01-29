@@ -1169,10 +1169,10 @@ packages:
     dependency: "direct main"
     description:
       name: mobile_scanner
-      sha256: "7b3b03146ed6ee7dabb5295d6a8876e345c64386f7e621964fd49d53d7e1a853"
+      sha256: "8b4d42bbdd5cbba78462e7074d99d413fd6ca998bceb1fa77f54423ead7014f0"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.4"
+    version: "6.0.5"
   mockito:
     dependency: "direct dev"
     description:
