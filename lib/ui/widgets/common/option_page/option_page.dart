@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -76,13 +78,14 @@ class OptionPage extends StackedView<OptionPageModel> {
             _SettingContainer(
               key: const ValueKey("settings:0"),
               children: [
-                _OptionTile(
-                  title: "Fai una donazione",
-                  subtitle: "Sostieni l'associazione",
-                  icon: EneftyIcons.coin_outline,
-                  onTap: viewModel.openDonationPage,
-                  color: Colors.blue,
-                ),
+                if (!Platform.isIOS)
+                  _OptionTile(
+                    title: "Fai una donazione",
+                    subtitle: "Sostieni l'associazione",
+                    icon: EneftyIcons.coin_outline,
+                    onTap: viewModel.openDonationPage,
+                    color: Colors.blue,
+                  ),
                 _OptionTile(
                   title: "Gestisci metodi di pagamento",
                   icon: EneftyIcons.card_outline,

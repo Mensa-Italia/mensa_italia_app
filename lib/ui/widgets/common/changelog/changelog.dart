@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -34,13 +36,15 @@ class Changelog extends StackedView<ChangelogModel> {
               ),
             ),
             SizedBox(height: 40),
-            _WhatsNewComponent(
-              icon: EneftyIcons.card_bold,
-              title: "Now you can donate!",
-              description: "With the new donation feature you can support Mensa Italia",
-              color: Colors.green,
-            ),
-            SizedBox(height: 20),
+            if (!Platform.isIOS) ...[
+              _WhatsNewComponent(
+                icon: EneftyIcons.card_bold,
+                title: "Now you can donate!",
+                description: "With the new donation feature you can support Mensa Italia",
+                color: Colors.green,
+              ),
+              SizedBox(height: 20),
+            ],
             _WhatsNewComponent(
               icon: EneftyIcons.shop_bold,
               title: "New addon: Boutique",
