@@ -43,7 +43,7 @@ dependencies:
   dotted_border: ^2.1.0
   sentry_flutter: ^8.13.2
   maplibre_gl: ^0.20.0
-  package_info_plus: ^8.2.1
+  package_info_plus: ^8.3.0
   syncfusion_flutter_pdfviewer: ^28.2.7
   flutter_localizations:
     sdk: flutter
