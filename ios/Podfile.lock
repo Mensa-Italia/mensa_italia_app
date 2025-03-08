@@ -355,7 +355,7 @@ SPEC CHECKSUMS:
   in_app_review: 5596fe56fab799e8edb3561c03d053363ab13457
   isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
   MapLibre: 0ebfa9329d313cec8bf0a5ba5a336a1dc903785e
-  maplibre_gl: 7fc8dd5a5f356891c38f227fe1647d33b9af0400
+  maplibre_gl: eab61cca6e1cfa9187249bacd3f08b51e8cd8ae9
   maps_launcher: edf829809ba9e894d70e569bab11c16352dedb45
   MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
   MLKitBarcodeScanning: 0a3064da0a7f49ac24ceb3cb46a5bc67496facd2
