@@ -135,18 +135,18 @@ class OptionPage extends StackedView<OptionPageModel> {
               ],
             ),
             const SizedBox(height: 20),
-            _SettingContainer(
-              key: const ValueKey("settings:2"),
-              children: [
-                _OptionTile(
-                  title: "views.settings.tile.leavereview.title".tr(),
-                  icon: EneftyIcons.star_outline,
-                  onTap: viewModel.openReview,
-                  color: Colors.orangeAccent,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+            //_SettingContainer(
+            //  key: const ValueKey("settings:2"),
+            //  children: [
+            //    _OptionTile(
+            //      title: "views.settings.tile.leavereview.title".tr(),
+            //      icon: EneftyIcons.star_outline,
+            //      onTap: viewModel.openReview,
+            //      color: Colors.orangeAccent,
+            //    ),
+            //  ],
+            //),
+            //const SizedBox(height: 20),
             _SettingContainer(
               key: const ValueKey("settings:3"),
               children: [

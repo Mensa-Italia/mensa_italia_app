@@ -64,7 +64,6 @@ dependencies:
   device_info_plus: ^11.3.3
   omni_datetime_picker: ^2.1.0
   app_version_update: ^6.0.0
-  in_app_review: ^2.0.10
   isar: any
   isar_flutter_libs: any
   easy_localization: ^3.0.7

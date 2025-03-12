@@ -1,4 +1,3 @@
-import 'package:in_app_review/in_app_review.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
@@ -64,13 +63,6 @@ class OptionPageModel extends MasterModel {
 
   openPaymentMethodManager() {
     navigationService.navigateToPaymentMethodManagerView();
-  }
-
-  openReview() async {
-    final InAppReview inAppReview = InAppReview.instance;
-    inAppReview.openStoreListing(
-      appStoreId: "1524200080",
-    );
   }
 
   openNotificationSettings() {
