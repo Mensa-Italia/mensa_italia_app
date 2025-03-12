@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ExternalAddonWebviewViewModel extends MasterModel {

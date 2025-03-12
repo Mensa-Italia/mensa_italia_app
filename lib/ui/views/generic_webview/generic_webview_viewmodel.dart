@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 String jsForceLogin = """
