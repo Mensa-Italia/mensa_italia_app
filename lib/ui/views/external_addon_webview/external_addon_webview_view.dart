@@ -41,6 +41,7 @@ class ExternalAddonWebviewView
       return child;
     } else {
       return GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onHorizontalDragUpdate: (details) {
           if (details.primaryDelta! > 10) {
             viewModel.onPopInvoked(true);
