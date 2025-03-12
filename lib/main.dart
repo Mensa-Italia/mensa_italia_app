@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/find_locale.dart';
@@ -11,6 +12,7 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
+import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -18,12 +20,17 @@ import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
   await WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    handleNotificationActions(message.data);
+  });
   await EasyLocalization.ensureInitialized();
   await DB.init();
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {
-    tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
+    tz.setLocalLocation(
+        tz.getLocation(await FlutterTimezone.getLocalTimezone()));
   } catch (_) {}
   try {
     await Firebase.initializeApp(
@@ -35,7 +42,8 @@ Future<void> main() async {
   setupBottomSheetUi();
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
+      options.dsn =
+          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
       options.experimental.replay.sessionSampleRate = 1.0;

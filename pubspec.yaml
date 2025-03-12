@@ -76,6 +76,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   flutter_stripe: ^11.4.0
   carousel_slider: ^5.0.0
+  gpt_markdown: ^1.0.12
+  badges: ^3.1.2
   
 dev_dependencies:
   build_runner: ^2.4.13

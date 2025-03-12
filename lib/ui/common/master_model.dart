@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.locator.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/user.dart';
@@ -30,7 +31,9 @@ class MasterModel extends ReactiveViewModel {
   }
 
   hasPower(String power) {
-    return user.powers.contains(power) || user.powers.contains("${power}_helper") || user.powers.contains("super");
+    return user.powers.contains(power) ||
+        user.powers.contains("${power}_helper") ||
+        user.powers.contains("super");
   }
 
   allowTestMakerAddon() {
@@ -79,7 +82,8 @@ class MasterModel extends ReactiveViewModel {
         color: Colors.transparent,
         child: SingleChildScrollView(
           controller: ModalScrollController.of(context),
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: child,
         ),
       ),
@@ -104,13 +108,15 @@ class MasterModel extends ReactiveViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<RangeDateTimeZone?> pickStartEndTime({DateTime? start, DateTime? end}) async {
+  Future<RangeDateTimeZone?> pickStartEndTime(
+      {DateTime? start, DateTime? end}) async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
       startInitialDate: start,
@@ -154,15 +160,20 @@ class MasterModel extends ReactiveViewModel {
 
     if (dateTimeList != null) {
       if (dateTimeList[0].isAfter(dateTimeList[1])) {
-        return RangeDateTimeZone.fromDateTime(start: dateTimeList[1], end: dateTimeList[0]);
+        return RangeDateTimeZone.fromDateTime(
+            start: dateTimeList[1], end: dateTimeList[0]);
       }
-      return RangeDateTimeZone.fromDateTime(start: dateTimeList[0], end: dateTimeList[1]);
+      return RangeDateTimeZone.fromDateTime(
+          start: dateTimeList[0], end: dateTimeList[1]);
     } else {
       return null;
     }
   }
 
-  Future<String?> cupertinoModalPicker({required String title, required int initialItem, required List<String> items}) async {
+  Future<String?> cupertinoModalPicker(
+      {required String title,
+      required int initialItem,
+      required List<String> items}) async {
     String data = items[initialItem];
     await showCupertinoModalPopup<void>(
       context: StackedService.navigatorKey!.currentContext!,
@@ -241,7 +252,8 @@ class MasterModel extends ReactiveViewModel {
 
   void showChangelog() {
     SharedPreferences.getInstance().then((prefs) {
-      final lastVersion = transformVersion(prefs.getString("last_version") ?? "");
+      final lastVersion =
+          transformVersion(prefs.getString("last_version") ?? "");
       PackageInfo.fromPlatform().then((value) {
         final version = transformVersion(value.version);
         if (lastVersion != version) {
@@ -261,6 +273,33 @@ class MasterModel extends ReactiveViewModel {
       return "${parts[0]}.${parts[1]}";
     } catch (_) {
       return input;
+    }
+  }
+}
+
+handleNotificationActions(Map<String, dynamic> data) {
+  final navigationService = locator<NavigationService>();
+  String typeOfAction = data["type"] ?? "";
+  if (typeOfAction.isNotEmpty) {
+    if (typeOfAction == "multiple_documents") {
+      navigationService.navigateToAddonAreaDocumentsView();
+    }
+    if (typeOfAction == "single_document") {
+      final String documentId = data["document_id"] ?? "";
+      if (documentId.isNotEmpty) {
+        Api().getDocument(documentId).then((document) {
+          navigationService.navigateToAddonAreaDocumentsPreviewView(
+              document: document);
+        });
+      }
+    }
+    if (typeOfAction == "event") {
+      final String eventId = data["event_id"] ?? "";
+      if (eventId.isNotEmpty) {
+        Api().getEvent(eventId).then((event) {
+          navigationService.navigateToEventShowcaseView(event: event);
+        });
+      }
     }
   }
 }

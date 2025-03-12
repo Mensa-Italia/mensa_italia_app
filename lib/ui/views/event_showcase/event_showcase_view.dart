@@ -19,7 +19,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   const EventShowcaseView({super.key, required this.event});
 
   @override
-  Widget builder(BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventShowcaseViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: event.name,
@@ -27,7 +28,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
         trailings: [
           if ((event.owner == viewModel.user.id) || viewModel.isSuper())
             IconButton(
-              icon: Icon(EneftyIcons.edit_outline, color: Theme.of(context).appBarTheme.iconTheme?.color),
+              icon: Icon(EneftyIcons.edit_outline,
+                  color: Theme.of(context).appBarTheme.iconTheme?.color),
               onPressed: viewModel.editEvent,
               iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
             ),
@@ -39,13 +41,17 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
           ? GestureDetector(
               onTap: viewModel.openUrl,
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10).copyWith(top: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10).copyWith(top: 20),
                 color: kcPrimaryColor,
                 child: SafeArea(
                   top: false,
                   child: Text(
                     "views.eventdetails.button.details".tr().toUpperCase(),
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -58,7 +64,9 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             Hero(
               tag: event.image,
               transitionOnUserGestures: true,
-              flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) => AnimatedBuilder(
+              flightShuttleBuilder: (flightContext, animation, flightDirection,
+                      fromHeroContext, toHeroContext) =>
+                  AnimatedBuilder(
                 animation: animation,
                 builder: (context, child) {
                   return ClipRRect(
@@ -82,7 +90,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
             ),
           if (event.isSpot)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10, bottom: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 20)
+                  .copyWith(top: 10, bottom: 0),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.red,
@@ -124,7 +133,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 text: "views.eventdetails.details.title".tr(),
                 children: [],
               ),
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
               textAlign: TextAlign.start,
             ),
           ),
@@ -163,7 +173,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
               TextSpan(
                 text: "views.eventdetails.schedule.title".tr(),
               ),
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
               textAlign: TextAlign.start,
             ),
           ),
@@ -177,7 +188,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
           if (viewModel.eventSchedules.isNotEmpty) ...[
             const Divider(),
             ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 itemCount: viewModel.eventSchedules.length,
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -186,15 +198,20 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   return TileSchedue(eventSchedule: event, onTap: () {});
                 },
                 separatorBuilder: (context, index) {
-                  if (index != viewModel.eventSchedules.length - 1 && !DateUtils.isSameDay(viewModel.eventSchedules[index].whenStart, viewModel.eventSchedules[index + 1].whenStart)) {
+                  if (index != viewModel.eventSchedules.length - 1 &&
+                      !DateUtils.isSameDay(
+                          viewModel.eventSchedules[index].whenStart,
+                          viewModel.eventSchedules[index + 1].whenStart)) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const SizedBox(height: 30),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
                           child: Text(
-                            DateFormat('EEEE, d MMMM').format(viewModel.eventSchedules[index + 1].whenStart),
+                            DateFormat('EEEE, d MMMM').format(
+                                viewModel.eventSchedules[index + 1].whenStart),
                             style: TextStyle(
                               color: Colors.grey.shade500,
                               height: 0,
@@ -220,11 +237,15 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   children: [
                     TextSpan(
                       text: "\n${event.position!.name}",
-                      style: TextStyle(color: kcPrimaryColor, fontSize: 14, fontWeight: FontWeight.normal),
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+                style: TextStyle(
+                    fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
                 textAlign: TextAlign.start,
               ),
             ),
@@ -251,7 +272,8 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                 TextSpan(
                   text: "views.eventdetails.organizers.title".tr(),
                 ),
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
+                style: TextStyle(
+                    fontSize: 30, fontWeight: FontWeight.bold, height: 1.1),
                 textAlign: TextAlign.start,
               ),
             ),
@@ -286,7 +308,10 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                             ),
                           ],
                         ),
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, height: 1.1),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.1),
                         textAlign: TextAlign.start,
                       ),
                     ),
@@ -302,13 +327,15 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
   }
 
   @override
-  EventShowcaseViewModel viewModelBuilder(BuildContext context) => EventShowcaseViewModel(event: event);
+  EventShowcaseViewModel viewModelBuilder(BuildContext context) =>
+      EventShowcaseViewModel(event: event);
 }
 
 class DateTimeStartEndBoxes extends StatelessWidget {
   final DateTime start;
   final DateTime end;
-  const DateTimeStartEndBoxes({super.key, required this.start, required this.end});
+  const DateTimeStartEndBoxes(
+      {super.key, required this.start, required this.end});
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +357,10 @@ class DateTimeStartEndBoxes extends StatelessWidget {
                     ),
                     TextSpan(
                       text: DateFormat('HH:mm').format(start),
-                      style: TextStyle(color: kcPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text: "\n",
@@ -363,7 +393,10 @@ class DateTimeStartEndBoxes extends StatelessWidget {
                     ),
                     TextSpan(
                       text: DateFormat('HH:mm').format(end),
-                      style: TextStyle(color: kcPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: kcPrimaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text: "\n",

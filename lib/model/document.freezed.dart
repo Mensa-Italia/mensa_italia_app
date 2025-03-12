@@ -26,6 +26,7 @@ mixin _$DocumentModel {
   String get file => throw _privateConstructorUsedError;
   String get uploadedBy => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
+  String get elaborated => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -45,7 +46,8 @@ abstract class $DocumentModelCopyWith<$Res> {
       String? description,
       String file,
       String uploadedBy,
-      String category});
+      String category,
+      String elaborated});
 }
 
 /// @nodoc
@@ -67,6 +69,7 @@ class _$DocumentModelCopyWithImpl<$Res, $Val extends DocumentModel>
     Object? file = null,
     Object? uploadedBy = null,
     Object? category = null,
+    Object? elaborated = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -93,6 +96,10 @@ class _$DocumentModelCopyWithImpl<$Res, $Val extends DocumentModel>
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
+      elaborated: null == elaborated
+          ? _value.elaborated
+          : elaborated // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -111,7 +118,8 @@ abstract class _$$DocumentModelImplCopyWith<$Res>
       String? description,
       String file,
       String uploadedBy,
-      String category});
+      String category,
+      String elaborated});
 }
 
 /// @nodoc
@@ -131,6 +139,7 @@ class __$$DocumentModelImplCopyWithImpl<$Res>
     Object? file = null,
     Object? uploadedBy = null,
     Object? category = null,
+    Object? elaborated = null,
   }) {
     return _then(_$DocumentModelImpl(
       id: null == id
@@ -157,6 +166,10 @@ class __$$DocumentModelImplCopyWithImpl<$Res>
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
+      elaborated: null == elaborated
+          ? _value.elaborated
+          : elaborated // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -170,7 +183,8 @@ class _$DocumentModelImpl implements _DocumentModel {
       required this.description,
       required this.file,
       required this.uploadedBy,
-      required this.category});
+      required this.category,
+      required this.elaborated});
 
   factory _$DocumentModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DocumentModelImplFromJson(json);
@@ -187,10 +201,12 @@ class _$DocumentModelImpl implements _DocumentModel {
   final String uploadedBy;
   @override
   final String category;
+  @override
+  final String elaborated;
 
   @override
   String toString() {
-    return 'DocumentModel(id: $id, name: $name, description: $description, file: $file, uploadedBy: $uploadedBy, category: $category)';
+    return 'DocumentModel(id: $id, name: $name, description: $description, file: $file, uploadedBy: $uploadedBy, category: $category, elaborated: $elaborated)';
   }
 
   @override
@@ -206,13 +222,15 @@ class _$DocumentModelImpl implements _DocumentModel {
             (identical(other.uploadedBy, uploadedBy) ||
                 other.uploadedBy == uploadedBy) &&
             (identical(other.category, category) ||
-                other.category == category));
+                other.category == category) &&
+            (identical(other.elaborated, elaborated) ||
+                other.elaborated == elaborated));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, name, description, file, uploadedBy, category);
+  int get hashCode => Object.hash(runtimeType, id, name, description, file,
+      uploadedBy, category, elaborated);
 
   @JsonKey(ignore: true)
   @override
@@ -235,7 +253,8 @@ abstract class _DocumentModel implements DocumentModel {
       required final String? description,
       required final String file,
       required final String uploadedBy,
-      required final String category}) = _$DocumentModelImpl;
+      required final String category,
+      required final String elaborated}) = _$DocumentModelImpl;
 
   factory _DocumentModel.fromJson(Map<String, dynamic> json) =
       _$DocumentModelImpl.fromJson;
@@ -252,6 +271,8 @@ abstract class _DocumentModel implements DocumentModel {
   String get uploadedBy;
   @override
   String get category;
+  @override
+  String get elaborated;
   @override
   @JsonKey(ignore: true)
   _$$DocumentModelImplCopyWith<_$DocumentModelImpl> get copyWith =>

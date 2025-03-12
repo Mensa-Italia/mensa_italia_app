@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -17,6 +18,7 @@ class AddonAreaDocumentsViewModel extends MasterModel {
   String nameToSearch = "";
 
   AddonAreaDocumentsViewModel() {
+    setBusy(true);
     Api().getDocuments().then((value) {
       documents.clear();
       documents.addAll(value);
@@ -24,17 +26,23 @@ class AddonAreaDocumentsViewModel extends MasterModel {
       originalDocuments.addAll(value);
       categories = originalDocuments.map((e) => e.category).toSet().toList();
       categories.sort();
-      rebuildUi();
+      setBusy(false);
     });
   }
 
   Function() onTap(DocumentModel document) {
     return () async {
-      navigationService.navigateToDocumentViewerView(
-        downlaodUrl: document.file,
-        title: "Document",
-        previousPageTitle: "Documents",
-      );
+      if (document.elaborated.isEmpty) {
+        navigationService.navigateToDocumentViewerView(
+          downlaodUrl: document.file,
+          title: "Document",
+          previousPageTitle: "views.addons.documents.title".tr(),
+        );
+      } else {
+        navigationService.navigateToAddonAreaDocumentsPreviewView(
+          document: document,
+        );
+      }
     };
   }
 
@@ -86,12 +94,9 @@ class AddonAreaDocumentsViewModel extends MasterModel {
   applyFilters() {
     documents.clear();
     if (selectedCategories.isEmpty) {
-      documents.addAll(originalDocuments.where((element) =>
-          element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
+      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
     } else {
-      documents.addAll(originalDocuments.where((element) =>
-          element.name.toLowerCase().contains(nameToSearch.toLowerCase()) &&
-          selectedCategories.contains(element.category)));
+      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase()) && selectedCategories.contains(element.category)));
     }
     rebuildUi();
   }

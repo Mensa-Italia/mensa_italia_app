@@ -34,8 +34,7 @@ class OptionPageModel extends MasterModel {
 
   void openPrivacyPolicy() {
     navigationService.navigateToDocumentViewerView(
-      downlaodUrl:
-          "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
+      downlaodUrl: "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
       title: "Privacy Policy",
       previousPageTitle: "Settings",
     );
@@ -75,7 +74,7 @@ class OptionPageModel extends MasterModel {
   }
 
   openNotificationSettings() {
-    navigationService.navigateToNotificationManagerView();
+    navigationService.navigateToNotificationViewView();
   }
 
   openDonationPage() {

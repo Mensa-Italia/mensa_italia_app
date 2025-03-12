@@ -13,9 +13,11 @@ import 'package:mensa_italia_app/model/calendar_link.dart';
 import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/model/deals_contact.dart';
 import 'package:mensa_italia_app/model/document.dart';
+import 'package:mensa_italia_app/model/document_elaborated.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_owner.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
+import 'package:mensa_italia_app/model/notification.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/receipt.dart';
 import 'package:mensa_italia_app/model/sig.dart';
@@ -292,19 +294,29 @@ class Api {
     });
   }
 
-  Future<SigModel> getLastInsertedSig() async {
-    if (Memoized().has("last_sig")) {
-      return Memoized().get("last_sig");
+  Future<SigModel> getRandomSig() async {
+    if (Memoized().has("random_sig")) {
+      return Memoized().get("random_sig");
     }
-    return await pb.collection('sigs').getList(page: 1, perPage: 1, sort: '-created').then((value) {
+    return await pb
+        .collection('sigs')
+        .getList(
+          page: 1,
+          perPage: 1,
+          sort: '@random',
+          filter: "group_type='sig' || group_type='sig_facebook'",
+        )
+        .then((value) {
       Memoized().set(
-          "last_sig",
+          "random_sig",
           value.items.map((e) {
             Map<String, dynamic> data = e.toJson();
             data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
             return SigModel.fromJson(data);
           }).first);
-      return Memoized().get("last_sig");
+      return Memoized().get("random_sig");
+    }).catchError((e) {
+      print(e);
     });
   }
 
@@ -931,7 +943,12 @@ class Api {
     if (Memoized().has("all_documents")) {
       return Memoized().get("all_documents");
     }
-    return await pb.collection('documents').getFullList(sort: '-created').then((value) {
+    return await pb
+        .collection('documents')
+        .getFullList(
+          sort: '-created',
+        )
+        .then((value) {
       Memoized().set(
           "all_documents",
           value.map((e) {
@@ -940,6 +957,24 @@ class Api {
             return DocumentModel.fromJson(data);
           }).toList());
       return Memoized().get("all_documents");
+    });
+  }
+
+  Future<DocumentElaboratedModel> getDocumentElaboratedData(String id) async {
+    if (Memoized().has("document_elaborated_$id")) {
+      return Memoized().get("document_elaborated_$id");
+    }
+    return await pb.collection('documents_elaborated').getOne(id).then((value) {
+      Memoized().set("document_elaborated_$id", DocumentElaboratedModel.fromJson(value.toJson()));
+      return Memoized().get("document_elaborated_$id");
+    });
+  }
+
+  Future<DocumentModel> getDocument(String id) async {
+    return await pb.collection('documents').getOne(id).then((value) {
+      Map<String, dynamic> data = value.toJson();
+      data["file"] = pb.files.getUrl(value, value.getStringValue("file")).toString();
+      return DocumentModel.fromJson(data);
     });
   }
 
@@ -953,5 +988,22 @@ class Api {
         return EventOwnerModel.fromJson(jsonData);
       }).toList();
     });
+  }
+
+  Future<List<NotificationModel>> getNotifications() async {
+    return await pb
+        .collection('user_notifications')
+        .getFullList(
+          sort: '-created',
+        )
+        .then((value) {
+      return value.map((e) {
+        return NotificationModel.fromJson(e.toJson());
+      }).toList();
+    });
+  }
+
+  void seeNotification(String id) {
+    pb.collection('user_notifications').update(id, body: {"seen": DateTime.now().toIso8601String()});
   }
 }

@@ -7,8 +7,7 @@ import 'package:stacked/stacked.dart';
 
 import 'notification_manager_viewmodel.dart';
 
-class NotificationManagerView
-    extends StackedView<NotificationManagerViewModel> {
+class NotificationManagerView extends StackedView<NotificationManagerViewModel> {
   const NotificationManagerView({Key? key}) : super(key: key);
 
   @override
@@ -28,8 +27,7 @@ class NotificationManagerView
         body: ListView(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
               child: Text(
                 "views.notification_manager.kind.events".tr(),
               ),

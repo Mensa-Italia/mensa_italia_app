@@ -12,8 +12,10 @@ class DocumentModel with _$DocumentModel {
     required String file,
     required String uploadedBy,
     required String category,
+    required String elaborated,
   }) = _DocumentModel;
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) =>
       _$DocumentModelFromJson(json);
 }
+

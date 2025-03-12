@@ -16,13 +16,17 @@ class _AddonContactsUpdates {
     await (await ScraperApi().getCookieJar()).cookieJar.deleteAll();
     started = true;
     int threads = 10;
-    await Future.wait(List.generate(threads, (index) => startRequestFlow(index + 1, window: threads)));
+    await Future.wait(List.generate(
+        threads, (index) => startRequestFlow(index + 1, window: threads)));
     completed = true;
     DB.isar.writeTxn(() async {
       await DB.isar.regSociModels.where().findAll().then((value) async {
-        final toDeleteList = value.where((element) => !downloadedList.contains(element.uid)).toList();
+        final toDeleteList = value
+            .where((element) => !downloadedList.contains(element.uid))
+            .toList();
         if (toDeleteList.isNotEmpty) {
-          await DB.isar.regSociModels.deleteAll(toDeleteList.map((e) => e.id).toList());
+          await DB.isar.regSociModels
+              .deleteAll(toDeleteList.map((e) => e.id).toList());
         }
       });
     });
@@ -140,12 +144,14 @@ class AddonContactsViewModel extends MasterModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(
+        List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)
+            ..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }

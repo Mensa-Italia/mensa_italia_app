@@ -14,21 +14,25 @@ class PaymentMethodManagerViewModel extends MasterModel {
 
   void load() {
     setBusy(true);
-    Api().getCustomer().then((value) {
-      customer = value;
-      Api().getPaymentMethods().then((value) {
-        paymentMethods.clear();
-        paymentMethods.addAll(value);
-        selectedPM = getSelectedPaymentMethod();
-        if (selectedPM == "") {
-          Api().setDefaultPaymentMethod(paymentMethods[0].id).then((_) {
-            load();
-          });
-        } else {
-          setBusy(false);
-        }
+    try {
+      Api().getCustomer().then((value) {
+        customer = value;
+        Api().getPaymentMethods().then((value) {
+          paymentMethods.clear();
+          paymentMethods.addAll(value);
+          selectedPM = getSelectedPaymentMethod();
+          if (selectedPM == "") {
+            Api().setDefaultPaymentMethod(paymentMethods[0].id).then((_) {
+              load();
+            });
+          } else {
+            setBusy(false);
+          }
+        });
       });
-    });
+    } catch (_) {
+      setBusy(false);
+    }
   }
 
   String getSelectedPaymentMethod() {

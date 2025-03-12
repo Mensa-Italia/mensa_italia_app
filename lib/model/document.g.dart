@@ -14,6 +14,7 @@ _$DocumentModelImpl _$$DocumentModelImplFromJson(Map<String, dynamic> json) =>
       file: json['file'] as String,
       uploadedBy: json['uploaded_by'] as String,
       category: json['category'] as String,
+      elaborated: json['elaborated'] as String,
     );
 
 Map<String, dynamic> _$$DocumentModelImplToJson(_$DocumentModelImpl instance) =>
@@ -24,4 +25,5 @@ Map<String, dynamic> _$$DocumentModelImplToJson(_$DocumentModelImpl instance) =>
       'file': instance.file,
       'uploaded_by': instance.uploadedBy,
       'category': instance.category,
+      'elaborated': instance.elaborated,
     };

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -11,15 +9,15 @@ class Changelog extends StackedView<ChangelogModel> {
 
   @override
   Widget builder(
-    BuildContext context,
-    ChangelogModel viewModel,
-    Widget? child,
-  ) {
+      BuildContext context, ChangelogModel viewModel, Widget? child) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
       ),
-      height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 50,
+      height: MediaQuery.of(context).size.height -
+          MediaQuery.of(context).padding.top -
+          MediaQuery.of(context).padding.bottom -
+          50,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,26 +34,18 @@ class Changelog extends StackedView<ChangelogModel> {
               ),
             ),
             SizedBox(height: 40),
-            if (!Platform.isIOS) ...[
-              _WhatsNewComponent(
-                icon: EneftyIcons.card_bold,
-                title: "Now you can donate!",
-                description: "With the new donation feature you can support Mensa Italia",
-                color: Colors.green,
-              ),
-              SizedBox(height: 20),
-            ],
             _WhatsNewComponent(
-              icon: EneftyIcons.shop_bold,
-              title: "New addon: Boutique",
-              description: "Buy branded items from Mensa Italia",
+              icon: EneftyIcons.star_2_bold,
+              title: "AI meet Mensa",
+              description:
+                  "An AI will now help you get the best highlights from the Mensa Italia documents, check the addon Documents!",
               color: Colors.blueAccent,
             ),
             SizedBox(height: 20),
             _WhatsNewComponent(
-              icon: EneftyIcons.document_2_bold,
-              title: "Document addon",
-              description: "Improved performance and implemented category filter",
+              icon: EneftyIcons.notification_2_bold,
+              title: "Notification",
+              description: "Now you will receive the notifications in a more organized way",
               color: Colors.pink,
             ),
             SizedBox(height: 20),
@@ -82,7 +72,11 @@ class _WhatsNewComponent extends StatelessWidget {
   final String title;
   final String description;
   final Color color;
-  const _WhatsNewComponent({required this.icon, required this.title, required this.description, required this.color});
+  const _WhatsNewComponent(
+      {required this.icon,
+      required this.title,
+      required this.description,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
