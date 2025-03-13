@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -37,6 +38,7 @@ class ExternalAddonWebviewView
       ExternalAddonWebviewViewModel(addonID, addonURL);
 
   Widget iosFixer(Widget child, ExternalAddonWebviewViewModel viewModel) {
+    return child;
     if (!Platform.isIOS) {
       return child;
     } else {

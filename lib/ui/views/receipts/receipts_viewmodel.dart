@@ -22,7 +22,7 @@ class ReceiptsViewModel extends MasterModel {
       }
       receipts.sort((a, b) => b.created.compareTo(a.created));
       rebuildUi();
-    }).then((value) {
+    }).then((value) {    
       Api().getPaymentsReceipt().then((value) {
         receipts = value;
         receipts.sort((a, b) => b.created.compareTo(a.created));

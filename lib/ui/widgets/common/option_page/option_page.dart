@@ -157,6 +157,12 @@ class OptionPage extends StackedView<OptionPageModel> {
                   color: Colors.green,
                 ),
                 _OptionTile(
+                  title: "views.settings.tile.devices.title".tr(),
+                  icon: EneftyIcons.devices_outline,
+                  onTap: viewModel.openDevices,
+                  color: Colors.blue,
+                ),
+                _OptionTile(
                   title: "views.settings.tile.logout.title".tr(),
                   icon: EneftyIcons.logout_outline,
                   onTap: viewModel.logout,

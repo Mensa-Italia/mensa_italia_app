@@ -33,6 +33,7 @@ import 'package:mensa_italia_app/ui/views/addon_boutique/addon_boutique_view.dar
 import 'package:mensa_italia_app/ui/views/addon_boutique_product/addon_boutique_product_view.dart';
 import 'package:mensa_italia_app/ui/views/addon_area_documents_preview/addon_area_documents_preview_view.dart';
 import 'package:mensa_italia_app/ui/views/notification_view/notification_view_view.dart';
+import 'package:mensa_italia_app/ui/views/devices/devices_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -67,6 +68,7 @@ import 'package:mensa_italia_app/ui/views/notification_view/notification_view_vi
     MaterialRoute(page: AddonBoutiqueProductView),
     MaterialRoute(page: AddonAreaDocumentsPreviewView),
     MaterialRoute(page: NotificationViewView),
+    MaterialRoute(page: DevicesView),
 // @stacked-route
   ],
   dependencies: [

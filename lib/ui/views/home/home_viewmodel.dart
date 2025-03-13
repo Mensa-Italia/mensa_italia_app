@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
-
 class HomeViewModel extends MasterModel {
   int currentIndex = 2;
 

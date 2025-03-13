@@ -45,7 +45,8 @@ class Changelog extends StackedView<ChangelogModel> {
             _WhatsNewComponent(
               icon: EneftyIcons.notification_2_bold,
               title: "Notification",
-              description: "Now you will receive the notifications in a more organized way",
+              description:
+                  "Now you will receive the notifications in a more organized way",
               color: Colors.pink,
             ),
             SizedBox(height: 20),

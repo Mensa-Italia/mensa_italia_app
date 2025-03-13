@@ -11,7 +11,8 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
   const AddonAreaDocumentsView({super.key});
 
   @override
-  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel,
+      Widget? child) {
     return Scaffold(
       body: getCustomScrollViewPlatform(
         controller: viewModel.scrollController,
@@ -73,18 +74,21 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   dense: true,
                   visualDensity: VisualDensity.compact,
-                  leading: Icon(viewModel.getIconBasedOnCategory(viewModel.documents[index].category)),
+                  leading: Icon(viewModel.getIconBasedOnCategory(
+                      viewModel.documents[index].category)),
                   title: Text(viewModel.documents[index].name),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),
             ),
-          const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+          const SliverSafeArea(
+              sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
         ],
       ),
     );
   }
 
   @override
-  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) => AddonAreaDocumentsViewModel();
+  AddonAreaDocumentsViewModel viewModelBuilder(BuildContext context) =>
+      AddonAreaDocumentsViewModel();
 }

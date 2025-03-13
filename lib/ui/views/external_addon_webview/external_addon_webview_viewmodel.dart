@@ -13,7 +13,6 @@ class ExternalAddonWebviewViewModel extends MasterModel {
   bool _canGoBack = true;
 
   ExternalAddonWebviewViewModel(String addonId, String addonUrl) {
-    print(addonUrl);
     load(addonId, addonUrl: addonUrl);
   }
   load(String addonId, {required String addonUrl}) {

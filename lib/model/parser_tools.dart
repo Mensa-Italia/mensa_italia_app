@@ -18,8 +18,7 @@ DateTime getDateTimeLocal(String value) {
 
 DateTime? getDateTimeLocalNullabe(String value) {
   try {
-    
-  return DateTime.parse(value).toLocal();
+    return DateTime.parse(value).toLocal();
   } catch (_) {
     return null;
   }

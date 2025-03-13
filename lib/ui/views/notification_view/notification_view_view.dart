@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/model/notification.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
@@ -54,6 +55,7 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                   title: Text(notificaiton.title),
                   subtitle: Text(notificaiton.description),
+                  tileColor: (notificaiton.seen == null) ? Theme.of(context).primaryColor.withOpacity(.1) : null,
                   leading: AspectRatio(
                     aspectRatio: 1,
                     child: Container(
@@ -62,12 +64,16 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
-                      child: Icon(EneftyIcons.ticket_outline),
+                      child: Icon(
+                        getBasedOnNotification(notificaiton),
+                      ),
                     ),
                   ),
                   onTap: () {
-                    handleNotificationActions(
+                    Api().seeNotification(notificaiton.id);
+                    handleNotificationActionsInternal(
                       notificaiton.data,
+                      notificationID: notificaiton.id,
                     );
                   },
                 );
@@ -89,6 +95,9 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
     }
     if (notificaiton.data["type"] == "multiple_documents") {
       return EneftyIcons.document_2_outline;
+    }
+    if (notificaiton.data["type"] == "account_confirmation") {
+      return EneftyIcons.security_user_outline;
     }
     return EneftyIcons.notification_outline;
   }
