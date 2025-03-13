@@ -86,6 +86,19 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                     child: Text("viewmodel.exApp.approve".tr()),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      viewModel.navigationService.back();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                    child: Text("viewmodel.exApp.cancel".tr()),
+                  ),
+                ),
               ],
             ),
           ),
