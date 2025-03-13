@@ -76,7 +76,9 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Dio().get(urlToCall).then((value) {
+                      Dio().post(urlToCall, data: {
+                        "accepted": true,
+                      }).then((value) {
                         if (notificationToRemove != null) {
                           Api().removeNotification(notificationToRemove!);
                         }
@@ -91,10 +93,14 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      if (notificationToRemove != null) {
-                        Api().removeNotification(notificationToRemove!);
-                      }
-                      viewModel.navigationService.back();
+                      Dio().post(urlToCall, data: {
+                        "accepted": false,
+                      }).then((value) {
+                        if (notificationToRemove != null) {
+                          Api().removeNotification(notificationToRemove!);
+                        }
+                        viewModel.navigationService.back();
+                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.black),
