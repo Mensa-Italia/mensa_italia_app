@@ -91,6 +91,9 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
+                      if (notificationToRemove != null) {
+                        Api().removeNotification(notificationToRemove!);
+                      }
                       viewModel.navigationService.back();
                     },
                     style: ButtonStyle(
