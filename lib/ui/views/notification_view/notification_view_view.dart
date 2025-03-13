@@ -53,8 +53,8 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                 final notificaiton = viewModel.notifications[index];
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                  title: Text(notificaiton.title),
-                  subtitle: Text(notificaiton.description),
+                  title: Text(notificaiton.title.tr(namedArgs: notificaiton.trNamedParams)),
+                  subtitle: Text(notificaiton.body.tr(namedArgs: notificaiton.trNamedParams)),
                   tileColor: (notificaiton.seen == null) ? Theme.of(context).primaryColor.withOpacity(.1) : null,
                   leading: AspectRatio(
                     aspectRatio: 1,
@@ -71,7 +71,7 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                   ),
                   onTap: () {
                     Api().seeNotification(notificaiton.id);
-                    handleNotificationActionsInternal(
+                    handleNotificationActions(
                       notificaiton.data,
                       notificationID: notificaiton.id,
                     );

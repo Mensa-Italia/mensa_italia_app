@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_italia_app/api/memoized.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
@@ -30,6 +31,7 @@ import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:http/http.dart' as http;
+import 'package:stacked_services/stacked_services.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class Api {
@@ -84,6 +86,7 @@ class Api {
                 "user": pb.authStore.model.id,
                 "firebase_id": _notificationToken,
                 "device_name": androidInfo.model,
+                "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
               },
             );
           } else if (Platform.isIOS) {
@@ -93,6 +96,7 @@ class Api {
                 "user": pb.authStore.model.id,
                 "firebase_id": _notificationToken,
                 "device_name": iosInfo.utsname.machine,
+                "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
               },
             );
           }

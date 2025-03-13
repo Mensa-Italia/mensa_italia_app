@@ -271,9 +271,12 @@ class MasterModel extends ReactiveViewModel {
   }
 }
 
-handleNotificationActionsInternal(Map<String, dynamic> data, {String? notificationID}) {
+handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
   final navigationService = locator<NavigationService>();
   String typeOfAction = data["type"] ?? "";
+  if ((notificationID??"").isNotEmpty){
+    Api().seeNotification(notificationID!);
+  }
   if (typeOfAction.isNotEmpty) {
     if (typeOfAction == "multiple_documents") {
       navigationService.navigateToAddonAreaDocumentsView();
@@ -300,40 +303,14 @@ handleNotificationActionsInternal(Map<String, dynamic> data, {String? notificati
       if (url.isNotEmpty) {
         Api().getExApp(keyAppId).then((value) {
           MasterModel.showBeautifulBottomSheetInstance(
-              child: BottomCheckIdentity(
-            urlToCall: url,
-            exApp: value,
-            notificationToRemove: notificationID,
-          ));
+            child: BottomCheckIdentity(
+              urlToCall: url,
+              exApp: value,
+              notificationToRemove: notificationID,
+            ),
+          );
         });
       }
     }
-  }
-}
-
-handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
-  final navigationService = locator<NavigationService>();
-  String typeOfAction = data["type"] ?? "";
-  if (typeOfAction.isNotEmpty) {
-    if (typeOfAction == "multiple_documents") {
-      navigationService.navigateToAddonAreaDocumentsView();
-    }
-    if (typeOfAction == "single_document") {
-      final String documentId = data["document_id"] ?? "";
-      if (documentId.isNotEmpty) {
-        Api().getDocument(documentId).then((document) {
-          navigationService.navigateToAddonAreaDocumentsPreviewView(document: document);
-        });
-      }
-    }
-    if (typeOfAction == "event") {
-      final String eventId = data["event_id"] ?? "";
-      if (eventId.isNotEmpty) {
-        Api().getEvent(eventId).then((event) {
-          navigationService.navigateToEventShowcaseView(event: event);
-        });
-      }
-    }
-    navigationService.navigateToNotificationViewView();
   }
 }

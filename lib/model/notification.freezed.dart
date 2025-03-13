@@ -21,8 +21,8 @@ NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$NotificationModel {
   String get id => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
+  String get tr => throw _privateConstructorUsedError;
+  Map<String, String> get trNamedParams => throw _privateConstructorUsedError;
   Map<String, dynamic> get data => throw _privateConstructorUsedError;
   @JsonKey(fromJson: getDateTimeLocalNullabe)
   DateTime? get seen => throw _privateConstructorUsedError;
@@ -45,8 +45,8 @@ abstract class $NotificationModelCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String title,
-      String description,
+      String tr,
+      Map<String, String> trNamedParams,
       Map<String, dynamic> data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
       @JsonKey(fromJson: getDateTimeLocal) DateTime created,
@@ -67,8 +67,8 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
   @override
   $Res call({
     Object? id = null,
-    Object? title = null,
-    Object? description = null,
+    Object? tr = null,
+    Object? trNamedParams = null,
     Object? data = null,
     Object? seen = freezed,
     Object? created = null,
@@ -79,14 +79,14 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+      tr: null == tr
+          ? _value.tr
+          : tr // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
+      trNamedParams: null == trNamedParams
+          ? _value.trNamedParams
+          : trNamedParams // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
@@ -117,8 +117,8 @@ abstract class _$$NotificationModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String title,
-      String description,
+      String tr,
+      Map<String, String> trNamedParams,
       Map<String, dynamic> data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
       @JsonKey(fromJson: getDateTimeLocal) DateTime created,
@@ -137,8 +137,8 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? title = null,
-    Object? description = null,
+    Object? tr = null,
+    Object? trNamedParams = null,
     Object? data = null,
     Object? seen = freezed,
     Object? created = null,
@@ -149,14 +149,14 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+      tr: null == tr
+          ? _value.tr
+          : tr // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
+      trNamedParams: null == trNamedParams
+          ? _value._trNamedParams
+          : trNamedParams // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
@@ -179,16 +179,18 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$NotificationModelImpl implements _NotificationModel {
+class _$NotificationModelImpl extends _NotificationModel {
   const _$NotificationModelImpl(
       {required this.id,
-      required this.title,
-      required this.description,
+      required this.tr,
+      required final Map<String, String> trNamedParams,
       required final Map<String, dynamic> data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) required this.seen,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated})
-      : _data = data;
+      : _trNamedParams = trNamedParams,
+        _data = data,
+        super._();
 
   factory _$NotificationModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationModelImplFromJson(json);
@@ -196,9 +198,15 @@ class _$NotificationModelImpl implements _NotificationModel {
   @override
   final String id;
   @override
-  final String title;
+  final String tr;
+  final Map<String, String> _trNamedParams;
   @override
-  final String description;
+  Map<String, String> get trNamedParams {
+    if (_trNamedParams is EqualUnmodifiableMapView) return _trNamedParams;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_trNamedParams);
+  }
+
   final Map<String, dynamic> _data;
   @override
   Map<String, dynamic> get data {
@@ -219,7 +227,7 @@ class _$NotificationModelImpl implements _NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, title: $title, description: $description, data: $data, seen: $seen, created: $created, updated: $updated)';
+    return 'NotificationModel(id: $id, tr: $tr, trNamedParams: $trNamedParams, data: $data, seen: $seen, created: $created, updated: $updated)';
   }
 
   @override
@@ -228,9 +236,9 @@ class _$NotificationModelImpl implements _NotificationModel {
         (other.runtimeType == runtimeType &&
             other is _$NotificationModelImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
+            (identical(other.tr, tr) || other.tr == tr) &&
+            const DeepCollectionEquality()
+                .equals(other._trNamedParams, _trNamedParams) &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.seen, seen) || other.seen == seen) &&
             (identical(other.created, created) || other.created == created) &&
@@ -239,8 +247,15 @@ class _$NotificationModelImpl implements _NotificationModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description,
-      const DeepCollectionEquality().hash(_data), seen, created, updated);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      tr,
+      const DeepCollectionEquality().hash(_trNamedParams),
+      const DeepCollectionEquality().hash(_data),
+      seen,
+      created,
+      updated);
 
   @JsonKey(ignore: true)
   @override
@@ -257,16 +272,17 @@ class _$NotificationModelImpl implements _NotificationModel {
   }
 }
 
-abstract class _NotificationModel implements NotificationModel {
+abstract class _NotificationModel extends NotificationModel {
   const factory _NotificationModel(
       {required final String id,
-      required final String title,
-      required final String description,
+      required final String tr,
+      required final Map<String, String> trNamedParams,
       required final Map<String, dynamic> data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) required final DateTime? seen,
       @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
       @JsonKey(fromJson: getDateTimeLocal)
       required final DateTime updated}) = _$NotificationModelImpl;
+  const _NotificationModel._() : super._();
 
   factory _NotificationModel.fromJson(Map<String, dynamic> json) =
       _$NotificationModelImpl.fromJson;
@@ -274,9 +290,9 @@ abstract class _NotificationModel implements NotificationModel {
   @override
   String get id;
   @override
-  String get title;
+  String get tr;
   @override
-  String get description;
+  Map<String, String> get trNamedParams;
   @override
   Map<String, dynamic> get data;
   @override

@@ -38,9 +38,7 @@ class HomeViewModel extends MasterModel {
   void addNotificationPreference() {
     Api().getMetadata().then((metadata) async {
       try {
-        List<String> notificationEvents =
-            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
-                .cast<String>();
+        List<String> notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
         if (notificationEvents.isNotEmpty) {
           return;
         }
@@ -56,13 +54,12 @@ class HomeViewModel extends MasterModel {
   }
 
   void setLanguageMetadata() {
-    Api().setMetadata(
-        "codes_locale", Localizations.localeOf(context).toString());
+    Api().setMetadata("codes_locale", Localizations.localeOf(context).toString());
   }
 
   void checkForInitialMessage() async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-    handleNotificationActions(initialMessage!.data);
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    String? internalID = initialMessage?.data["internal_id"];
+    handleNotificationActions(initialMessage!.data, notificationID: internalID);
   }
 }

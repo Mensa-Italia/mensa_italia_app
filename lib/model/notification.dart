@@ -10,10 +10,11 @@ part 'notification.g.dart';
 
 @freezed
 class NotificationModel with _$NotificationModel {
+  const NotificationModel._();
   const factory NotificationModel({
     required String id,
-    required String title,
-    required String description,
+    required String tr,
+    required Map<String, String> trNamedParams,
     required Map<String, dynamic> data,
     @JsonKey(
       fromJson: getDateTimeLocalNullabe,
@@ -29,6 +30,13 @@ class NotificationModel with _$NotificationModel {
     required DateTime updated,
   }) = _NotificationModel;
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
-      _$NotificationModelFromJson(json);
+  factory NotificationModel.fromJson(Map<String, dynamic> json) => _$NotificationModelFromJson(json);
+
+  String get title {
+    return "$tr.title";
+  }
+
+  String get body {
+    return "$tr.body";
+  }
 }
