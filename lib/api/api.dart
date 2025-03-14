@@ -112,8 +112,7 @@ class Api {
       }).then((value) {
         if (value.isNotEmpty) {
           for (RecordModel record in value) {
-            if (record.data["user"] != pb.authStore.model.id &&
-                record.data["firebase_id"] == token) {
+            if (record.data["user"] != pb.authStore.model.id && record.data["firebase_id"] == token) {
               pb.collection('users_devices').delete(
                 record.id,
                 body: {
@@ -135,8 +134,7 @@ class Api {
       }).then((value) {
         if (value.isNotEmpty) {
           for (RecordModel record in value) {
-            if (record.data["user"] == pb.authStore.model.id &&
-                record.data["firebase_id"] == _notificationToken) {
+            if (record.data["user"] == pb.authStore.model.id && record.data["firebase_id"] == _notificationToken) {
               pb.collection('users_devices').delete(
                 record.id,
                 body: {
@@ -156,15 +154,11 @@ class Api {
     formData.fields.add(MapEntry("email", email));
     formData.fields.add(MapEntry("password", password));
 
-    return await dio
-        .post("/api/cs/auth-with-area", data: formData)
-        .then((value) async {
+    return await dio.post("/api/cs/auth-with-area", data: formData).then((value) async {
       final token = value.data["token"];
       final model = RecordModel.fromJson(value.data["record"]);
       pb.authStore.save(token, model);
-      return await ScraperApi()
-          .doLoginAndRetrieveMain(email, password)
-          .then((value) {
+      return await ScraperApi().doLoginAndRetrieveMain(email, password).then((value) {
         addDevice();
         return true;
       }).catchError((e) {
@@ -176,10 +170,7 @@ class Api {
   }
 
   Future getAddonAccessData(String addonId) {
-    return dio
-        .get("/api/cs/sign-payload/$addonId",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return dio.get("/api/cs/sign-payload/$addonId", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
@@ -193,8 +184,7 @@ class Api {
           "all_sigs",
           value.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["image"] =
-                pb.files.getUrl(e, e.getStringValue("image")).toString();
+            data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
             return SigModel.fromJson(data);
           }).toList());
       return Memoized().get("all_sigs");
@@ -205,16 +195,12 @@ class Api {
     if (Memoized().has("all_addons")) {
       return Memoized().get("all_addons");
     }
-    return await pb
-        .collection('addons')
-        .getFullList(sort: 'name')
-        .then((value) {
+    return await pb.collection('addons').getFullList(sort: 'name').then((value) {
       Memoized().set(
           "all_addons",
           value.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["icon"] =
-                pb.files.getUrl(e, e.getStringValue("icon")).toString();
+            data["icon"] = pb.files.getUrl(e, e.getStringValue("icon")).toString();
             return AddonModel.fromJson(data);
           }).toList());
       return Memoized().get("all_addons");
@@ -224,10 +210,7 @@ class Api {
   UserModel? getUser() {
     try {
       Map<String, dynamic> data = (pb.authStore.model as RecordModel).toJson();
-      data["avatar"] = pb.files
-          .getUrl(
-              pb.authStore.model, pb.authStore.model.getStringValue("avatar"))
-          .toString();
+      data["avatar"] = pb.files.getUrl(pb.authStore.model, pb.authStore.model.getStringValue("avatar")).toString();
       return UserModel.fromJson(data);
     } catch (_) {
       return null;
@@ -242,8 +225,7 @@ class Api {
         .collection('events')
         .getFullList(
           sort: 'when_end',
-          filter:
-              "when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
+          filter: "when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
           expand: "position",
         )
         .then((value) {
@@ -252,8 +234,7 @@ class Api {
             "all_events",
             value.map((e) {
               Map<String, dynamic> data = e.toJson();
-              data["image"] =
-                  pb.files.getUrl(e, e.getStringValue("image")).toString();
+              data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
               return EventModel.fromJson(data);
             }).toList());
       } catch (_) {}
@@ -265,8 +246,7 @@ class Api {
     return await pb
         .collection('events')
         .getFullList(
-          filter:
-              "owner = '${pb.authStore.record!.id}' && when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
+          filter: "owner = '${pb.authStore.record!.id}' && when_end >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
         )
         .then((value) {
       return value.isEmpty;
@@ -282,8 +262,7 @@ class Api {
         )
         .then((value) {
       Map<String, dynamic> data = value.toJson();
-      data["image"] =
-          pb.files.getUrl(value, value.getStringValue("image")).toString();
+      data["image"] = pb.files.getUrl(value, value.getStringValue("image")).toString();
       final allEvents = Memoized().get("all_events");
       if (allEvents != null) {
         final index = allEvents.indexWhere((element) => element.id == id);
@@ -308,8 +287,7 @@ class Api {
         .getList(
           page: 1,
           perPage: 1,
-          filter:
-              "(when_start >= '${tz.TZDateTime.now(tz.local).toIso8601String()}' && is_national=true)",
+          filter: "(when_start >= '${tz.TZDateTime.now(tz.local).toIso8601String()}' && is_national=true)",
           sort: 'when_start',
         )
         .then((value) {
@@ -317,8 +295,7 @@ class Api {
           "first_next_event",
           value.items.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["image"] =
-                pb.files.getUrl(e, e.getStringValue("image")).toString();
+            data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
             return EventModel.fromJson(data);
           }).first);
       return Memoized().get("first_next_event");
@@ -342,8 +319,7 @@ class Api {
           "random_sig",
           value.items.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["image"] =
-                pb.files.getUrl(e, e.getStringValue("image")).toString();
+            data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
             return SigModel.fromJson(data);
           }).first);
       return Memoized().get("random_sig");
@@ -439,8 +415,7 @@ class Api {
   }) async {
     String? positionId;
     if (!isOnline) {
-      final RecordModel createPosition =
-          await pb.collection("positions").create(body: {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
         "lat": location!.coordinates.latitude,
         "lon": location.coordinates.longitude,
         "name": location.locationName,
@@ -505,8 +480,7 @@ class Api {
   }) async {
     String? positionId;
     if (!isOnline) {
-      final RecordModel createPosition =
-          await pb.collection("positions").create(body: {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
         "lat": location!.coordinates.latitude,
         "lon": location.coordinates.longitude,
         "name": location.locationName,
@@ -555,9 +529,7 @@ class Api {
           );
         } else if (schedule.id!.startsWith("DELETE:")) {
           try {
-            await pb
-                .collection('events_schedule')
-                .delete(schedule.id!.split(":").last);
+            await pb.collection('events_schedule').delete(schedule.id!.split(":").last);
           } catch (_) {}
         } else {
           await pb.collection('events_schedule').update(
@@ -586,10 +558,7 @@ class Api {
     if (Memoized().has("event_schedules_$eventId")) {
       return Memoized().get("event_schedules_$eventId");
     }
-    return await pb
-        .collection('events_schedule')
-        .getFullList(filter: "event='$eventId'")
-        .then((value) {
+    return await pb.collection('events_schedule').getFullList(filter: "event='$eventId'").then((value) {
       Memoized().set(
           "event_schedules_$eventId",
           value.map((e) {
@@ -609,23 +578,15 @@ class Api {
     if (Memoized().has("calendar_link")) {
       return Memoized().get("calendar_link");
     }
-    return await pb
-        .collection('calendar_link')
-        .getList(page: 1, perPage: 1)
-        .then((value) {
-      Memoized().set("calendar_link",
-          CalendarLinkModel.fromJson(value.items.first.toJson()));
+    return await pb.collection('calendar_link').getList(page: 1, perPage: 1).then((value) {
+      Memoized().set("calendar_link", CalendarLinkModel.fromJson(value.items.first.toJson()));
       return Memoized().get("calendar_link");
     });
   }
 
-  Future<CalendarLinkModel> changeCalendarLinkState(
-      String id, List<String> state) async {
-    return await pb
-        .collection('calendar_link')
-        .update(id, body: {"state": state}).then((value) {
-      Memoized()
-          .set("calendar_link", CalendarLinkModel.fromJson(value.toJson()));
+  Future<CalendarLinkModel> changeCalendarLinkState(String id, List<String> state) async {
+    return await pb.collection('calendar_link').update(id, body: {"state": state}).then((value) {
+      Memoized().set("calendar_link", CalendarLinkModel.fromJson(value.toJson()));
       return Memoized().get("calendar_link");
     });
   }
@@ -644,8 +605,7 @@ class Api {
         .collection('deals')
         .getFullList(
           sort: 'created',
-          filter:
-              "ending >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
+          filter: "ending >= '${tz.TZDateTime.now(tz.local).toIso8601String()}'",
           expand: "position",
         )
         .then((value) {
@@ -662,10 +622,7 @@ class Api {
     if (Memoized().has("deals_contacts_$dealId")) {
       return Memoized().get("deals_contacts_$dealId");
     }
-    return await pb
-        .collection('deals_contacts')
-        .getFullList(sort: 'created', filter: "deal='$dealId'")
-        .then((value) {
+    return await pb.collection('deals_contacts').getFullList(sort: 'created', filter: "deal='$dealId'").then((value) {
       Memoized().set(
           "deals_contacts_$dealId",
           value.map((e) {
@@ -693,8 +650,7 @@ class Api {
   }) async {
     String? positionId;
     if (location != null) {
-      final RecordModel createPosition =
-          await pb.collection("positions").create(body: {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
         "lat": location.coordinates.latitude,
         "lon": location.coordinates.longitude,
         "name": location.locationName,
@@ -750,8 +706,7 @@ class Api {
   }) async {
     String? positionId;
     if (location != null) {
-      final RecordModel createPosition =
-          await pb.collection("positions").create(body: {
+      final RecordModel createPosition = await pb.collection("positions").create(body: {
         "lat": location.coordinates.latitude,
         "lon": location.coordinates.longitude,
         "name": location.locationName,
@@ -811,10 +766,7 @@ class Api {
       (value) {
         return value.map((e) {
           final data = e.toJson();
-          data["expand"]["stamp"]["image"] = pb.files
-              .getUrl(
-                  e.expand["stamp"]!.first, data["expand"]["stamp"]["image"])
-              .toString();
+          data["expand"]["stamp"]["image"] = pb.files.getUrl(e.expand["stamp"]!.first, data["expand"]["stamp"]["image"]).toString();
           return StampUserModel.fromJson(data);
         }).toList();
       },
@@ -849,8 +801,7 @@ class Api {
     return await pb.collection('users_metadata').getFullList().then((value) {
       final Map<String, String> res = {};
       for (RecordModel record in value) {
-        res[record.getStringValue("key").toString()] =
-            record.getStringValue("value").toString();
+        res[record.getStringValue("key").toString()] = record.getStringValue("value").toString();
       }
       Memoized().set("metadata", res);
       return res;
@@ -904,19 +855,13 @@ class Api {
   }
 
   Future<dynamic> newPaymentIntent() async {
-    return await dio
-        .post("/api/payment/method",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.post("/api/payment/method", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
 
   Future<List<InternalPaymentMethod>> getPaymentMethods() async {
-    return await dio
-        .get("/api/payment/method",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.get("/api/payment/method", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return (value.data as List).map((e) {
         return InternalPaymentMethod.fromJson(e);
       }).toList();
@@ -926,20 +871,13 @@ class Api {
   Future<dynamic> setDefaultPaymentMethod(String id) async {
     var formData = FormData();
     formData.fields.add(MapEntry("payment_method_id", id));
-    return await dio
-        .post("/api/payment/default",
-            data: formData,
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.post("/api/payment/default", data: formData, options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
 
   Future<dynamic> getCustomer() async {
-    return await dio
-        .get("/api/payment/customer",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.get("/api/payment/customer", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
@@ -947,11 +885,7 @@ class Api {
   Future<dynamic> doDonation(int amount) async {
     var formData = FormData();
     formData.fields.add(MapEntry("amount", amount.toString()));
-    return await dio
-        .post("/api/payment/donate",
-            data: formData,
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.post("/api/payment/donate", data: formData, options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
@@ -970,19 +904,13 @@ class Api {
   }
 
   Future<String> getReceiptUrl(String id) async {
-    return await dio
-        .get("/api/payment/receipt/$id",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.get("/api/payment/receipt/$id", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data["url"];
     });
   }
 
   Future<dynamic> getPaymentIntent(String id) async {
-    return await dio
-        .get("/api/payment/$id",
-            options: Options(headers: {"Authorization": pb.authStore.token}))
-        .then((value) {
+    return await dio.get("/api/payment/$id", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return value.data;
     });
   }
@@ -994,8 +922,7 @@ class Api {
     return await pb.collection('configs').getFullList().then((value) {
       final Map<String, String> res = {};
       for (RecordModel record in value) {
-        res[record.getStringValue("key").toString()] =
-            record.getStringValue("value").toString();
+        res[record.getStringValue("key").toString()] = record.getStringValue("value").toString();
       }
       Memoized().set("configs", res);
       return res;
@@ -1006,17 +933,12 @@ class Api {
     if (Memoized().has("all_boutiques")) {
       return Memoized().get("all_boutiques");
     }
-    return await pb
-        .collection('boutique')
-        .getFullList(sort: 'name')
-        .then((value) {
+    return await pb.collection('boutique').getFullList(sort: 'name').then((value) {
       Memoized().set(
           "all_boutiques",
           value.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["image"] = (data["image"] as List<dynamic>)
-                .map((e2) => pb.files.getUrl(e, e2.toString()).toString())
-                .toList();
+            data["image"] = (data["image"] as List<dynamic>).map((e2) => pb.files.getUrl(e, e2.toString()).toString()).toList();
             return BoutiqueModel.fromJson(data);
           }).toList());
       return Memoized().get("all_boutiques");
@@ -1039,8 +961,7 @@ class Api {
           "all_documents",
           value.map((e) {
             Map<String, dynamic> data = e.toJson();
-            data["file"] =
-                pb.files.getUrl(e, e.getStringValue("file")).toString();
+            data["file"] = pb.files.getUrl(e, e.getStringValue("file")).toString();
             return DocumentModel.fromJson(data);
           }).toList());
       return Memoized().get("all_documents");
@@ -1052,8 +973,7 @@ class Api {
       return Memoized().get("document_elaborated_$id");
     }
     return await pb.collection('documents_elaborated').getOne(id).then((value) {
-      Memoized().set("document_elaborated_$id",
-          DocumentElaboratedModel.fromJson(value.toJson()));
+      Memoized().set("document_elaborated_$id", DocumentElaboratedModel.fromJson(value.toJson()));
       return Memoized().get("document_elaborated_$id");
     });
   }
@@ -1061,8 +981,7 @@ class Api {
   Future<DocumentModel> getDocument(String id) async {
     return await pb.collection('documents').getOne(id).then((value) {
       Map<String, dynamic> data = value.toJson();
-      data["file"] =
-          pb.files.getUrl(value, value.getStringValue("file")).toString();
+      data["file"] = pb.files.getUrl(value, value.getStringValue("file")).toString();
       return DocumentModel.fromJson(data);
     });
   }
@@ -1093,9 +1012,7 @@ class Api {
   }
 
   void seeNotification(String id) {
-    pb
-        .collection('user_notifications')
-        .update(id, body: {"seen": DateTime.now().toIso8601String()});
+    pb.collection('user_notifications').update(id, body: {"seen": DateTime.now().toIso8601String()});
   }
 
   Future<List<DeviceModel>> getDevices() async {
@@ -1120,13 +1037,51 @@ class Api {
       final jsonData = value.toJson();
       jsonData["image"] = pb.files.getUrl(value, jsonData["image"]).toString();
       return ExAppModel.fromJson(jsonData);
- 
     });
-
-
   }
 
   void removeNotification(String notificationToRemove) {
     pb.collection('user_notifications').delete(notificationToRemove);
+  }
+
+  Future addExtAppPermission(String appid, {required List<String> permToAdd}) async {
+    final externalApp = await getExternalAppPermissions(appid);
+    if (externalApp == null) {
+      await pb.collection('ex_granted_permissions').create(body: {
+        "user": pb.authStore.model.id,
+        "ex_app": appid,
+        "permissions": permToAdd.toSet().toList(),
+      });
+    } else {
+      await pb.collection('ex_granted_permissions').update(externalApp["id"], body: {
+        "permissions": ((externalApp["permissions"] as List<String>)..addAll(permToAdd)).toSet().toList(),
+      });
+    }
+  }
+
+  Future removeExtAppPermission(String appid, {required List<String> permToRemove}) async {
+    final externalApp = await getExternalAppPermissions(appid);
+    if (externalApp != null) {
+      await pb.collection('ex_granted_permissions').update(externalApp["id"], body: {
+        "permissions": ((externalApp["permissions"] as List<String>)..removeWhere((element) => permToRemove.contains(element))).toSet().toList(),
+      });
+    }
+  }
+
+  Future<Map<String, dynamic>?> getExternalAppPermissions(String appid) async {
+    try {
+      return await pb.collection('ex_granted_permissions').getFullList(query: {
+        "user": pb.authStore.model.id,
+        "ex_app": appid,
+      }).then((value) {
+        try {
+          return value.first.toJson();
+        } catch (_) {
+          return null;
+        }
+      });
+    } catch (e) {
+      return null;
+    }
   }
 }

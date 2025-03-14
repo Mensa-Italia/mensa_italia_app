@@ -76,13 +76,18 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Dio().post(urlToCall, data: {
-                        "accepted": true,
-                      }).then((value) {
-                        if (notificationToRemove != null) {
-                          Api().removeNotification(notificationToRemove!);
-                        }
-                        viewModel.navigationService.back();
+                      Api().addExtAppPermission(
+                        exApp.id!,
+                        permToAdd: ["CHECK_USER_EXISTENCE"],
+                      ).then((value) {
+                        Dio().post(urlToCall, data: {
+                          "accepted": true,
+                        }).then((value) {
+                          if (notificationToRemove != null) {
+                            Api().removeNotification(notificationToRemove!);
+                          }
+                          viewModel.navigationService.back();
+                        });
                       });
                     },
                     child: Text("viewmodel.exApp.approve".tr()),
@@ -93,13 +98,18 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Dio().post(urlToCall, data: {
-                        "accepted": false,
-                      }).then((value) {
-                        if (notificationToRemove != null) {
-                          Api().removeNotification(notificationToRemove!);
-                        }
-                        viewModel.navigationService.back();
+                      Api().removeExtAppPermission(
+                        exApp.id!,
+                        permToRemove: ["CHECK_USER_EXISTENCE"],
+                      ).then((value) {
+                        Dio().post(urlToCall, data: {
+                          "accepted": false,
+                        }).then((value) {
+                          if (notificationToRemove != null) {
+                            Api().removeNotification(notificationToRemove!);
+                          }
+                          viewModel.navigationService.back();
+                        });
                       });
                     },
                     style: ButtonStyle(
