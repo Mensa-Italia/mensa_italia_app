@@ -20,6 +20,7 @@ import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_owner.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/ex_app.dart';
+import 'package:mensa_italia_app/model/ex_granted_permissions.dart';
 import 'package:mensa_italia_app/model/notification.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/receipt.dart';
@@ -1044,8 +1045,9 @@ class Api {
     pb.collection('user_notifications').delete(notificationToRemove);
   }
 
-  Future addExtAppPermission(String appid, {required List<String> permToAdd}) async {
+  Future<void> addExtAppPermission(String appid, {required List<String> permToAdd}) async {
     final externalApp = await getExternalAppPermissions(appid);
+    print(externalApp);
     if (externalApp == null) {
       await pb.collection('ex_granted_permissions').create(body: {
         "user": pb.authStore.model.id,
@@ -1053,29 +1055,32 @@ class Api {
         "permissions": permToAdd.toSet().toList(),
       });
     } else {
-      await pb.collection('ex_granted_permissions').update(externalApp["id"], body: {
-        "permissions": ((externalApp["permissions"] as List<String>)..addAll(permToAdd)).toSet().toList(),
+      await pb.collection('ex_granted_permissions').update(externalApp.id, body: {
+        "permissions": ([
+          ...externalApp.permissions,
+          ...permToAdd,
+        ]).toSet().toList(),
       });
     }
   }
 
-  Future removeExtAppPermission(String appid, {required List<String> permToRemove}) async {
+  Future<void> removeExtAppPermission(String appid, {required List<String> permToRemove}) async {
     final externalApp = await getExternalAppPermissions(appid);
     if (externalApp != null) {
-      await pb.collection('ex_granted_permissions').update(externalApp["id"], body: {
-        "permissions": ((externalApp["permissions"] as List<String>)..removeWhere((element) => permToRemove.contains(element))).toSet().toList(),
+      await pb.collection('ex_granted_permissions').update(externalApp.id, body: {
+        "permissions": (externalApp.permissions..removeWhere((element) => permToRemove.contains(element))).toSet().toList(),
       });
     }
   }
 
-  Future<Map<String, dynamic>?> getExternalAppPermissions(String appid) async {
+  Future<ExGrantedPermissionsModel?> getExternalAppPermissions(String appid) async {
     try {
       return await pb.collection('ex_granted_permissions').getFullList(query: {
         "user": pb.authStore.model.id,
         "ex_app": appid,
       }).then((value) {
         try {
-          return value.first.toJson();
+          return ExGrantedPermissionsModel.fromJson(value.first.toJson());
         } catch (_) {
           return null;
         }

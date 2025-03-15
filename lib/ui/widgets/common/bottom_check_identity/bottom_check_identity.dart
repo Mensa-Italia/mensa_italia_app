@@ -79,7 +79,7 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                       Api().addExtAppPermission(
                         exApp.id!,
                         permToAdd: ["CHECK_USER_EXISTENCE"],
-                      ).then((value) {
+                      ).then((_) {
                         Dio().post(urlToCall, data: {
                           "accepted": true,
                         }).then((value) {
@@ -101,7 +101,7 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                       Api().removeExtAppPermission(
                         exApp.id!,
                         permToRemove: ["CHECK_USER_EXISTENCE"],
-                      ).then((value) {
+                      ).then((_) {
                         Dio().post(urlToCall, data: {
                           "accepted": false,
                         }).then((value) {
