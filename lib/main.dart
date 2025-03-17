@@ -21,10 +21,6 @@ import 'package:timezone/timezone.dart' as tz;
 Future<void> main() async {
   await WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    String? internalID = message.data["internal_id"];
-    handleNotificationActions(message.data, notificationID: internalID);
-  });
   await EasyLocalization.ensureInitialized();
   await DB.init();
   tz.initializeTimeZones();

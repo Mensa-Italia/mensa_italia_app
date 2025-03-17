@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,6 +15,7 @@ class HomeViewModel extends MasterModel {
     setLanguageMetadata();
     showChangelog();
     checkForInitialMessage();
+    listenForMessages();
   }
 
   //void reviewApp() async {
@@ -61,5 +63,19 @@ class HomeViewModel extends MasterModel {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     String? internalID = initialMessage?.data["internal_id"];
     handleNotificationActions(initialMessage!.data, notificationID: internalID);
+  }
+
+  StreamSubscription? listenForMessagesvar;
+  void listenForMessages() {
+    listenForMessagesvar = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      String? internalID = message.data["internal_id"];
+      handleNotificationActions(message.data, notificationID: internalID);
+    });
+  }
+
+  @override
+  void dispose() {
+    listenForMessagesvar?.cancel();
+    super.dispose();
   }
 }
