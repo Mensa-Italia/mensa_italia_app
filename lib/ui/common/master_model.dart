@@ -274,7 +274,7 @@ class MasterModel extends ReactiveViewModel {
 handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
   final navigationService = locator<NavigationService>();
   String typeOfAction = data["type"] ?? "";
-  if ((notificationID??"").isNotEmpty){
+  if ((notificationID ?? "").isNotEmpty) {
     Api().seeNotification(notificationID!);
   }
   if (typeOfAction.isNotEmpty) {
@@ -311,6 +311,9 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
           );
         });
       }
+    }
+    if (typeOfAction == "payment_update_status") {
+      navigationService.navigateToReceiptsView();
     }
   }
 }

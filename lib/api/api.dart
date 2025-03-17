@@ -80,27 +80,38 @@ class Api {
         if (_notificationToken != null) {
           DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
           await removeSimilarDevice(_notificationToken ?? '');
-          if (Platform.isAndroid) {
-            AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-            await pb.collection('users_devices').create(
-              body: {
-                "user": pb.authStore.model.id,
-                "firebase_id": _notificationToken,
-                "device_name": androidInfo.model,
-                "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
-              },
-            );
-          } else if (Platform.isIOS) {
-            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-            await pb.collection('users_devices').create(
-              body: {
-                "user": pb.authStore.model.id,
-                "firebase_id": _notificationToken,
-                "device_name": iosInfo.utsname.machine,
-                "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
-              },
-            );
-          }
+          getDeviceByUserAndFirebaseId(_notificationToken!).then((value) async {
+            if (value == null) {
+              if (Platform.isAndroid) {
+                AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+                await pb.collection('users_devices').create(
+                  body: {
+                    "user": pb.authStore.model.id,
+                    "firebase_id": _notificationToken,
+                    "device_name": androidInfo.model,
+                    "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
+                  },
+                );
+              } else if (Platform.isIOS) {
+                IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+                await pb.collection('users_devices').create(
+                  body: {
+                    "user": pb.authStore.model.id,
+                    "firebase_id": _notificationToken,
+                    "device_name": iosInfo.utsname.machine,
+                    "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
+                  },
+                );
+              }
+            } else {
+              await pb.collection('users_devices').update(
+                value.id,
+                body: {
+                  "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
+                }
+              );
+            }
+          });
         }
       }
     } catch (_) {}
@@ -1026,6 +1037,21 @@ class Api {
       return value.map((e) {
         return DeviceModel.fromJson(e.toJson());
       }).toList();
+    });
+  }
+
+  Future<DeviceModel?> getDeviceByUserAndFirebaseId(String id) async {
+    return await pb
+        .collection('users_devices')
+        .getList(
+          filter: "user='${pb.authStore.model.id}' && firebase_id='$id'",
+        )
+        .then((value) {
+      if (value.items.isNotEmpty) {
+        return DeviceModel.fromJson(value.items.first.toJson());
+      } else {
+        return null;
+      }
     });
   }
 

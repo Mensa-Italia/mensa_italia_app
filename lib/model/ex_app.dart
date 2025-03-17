@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 /*
 {
       "collectionId": "pbc_3118183718",

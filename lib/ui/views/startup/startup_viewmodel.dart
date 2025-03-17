@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
+import 'package:mensa_italia_app/services/notify_sse.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 
@@ -12,7 +13,7 @@ class StartupViewModel extends MasterModel {
       appleId: "1524200080",
       playStoreId: "it.mensa.app",
     ).then((data) async {
-      if (data.canUpdate!) {
+      if (data.canUpdate ?? false) {
         await AppVersionUpdate.showAlertUpdate(
           context: context,
           appVersionResult: data,
@@ -38,6 +39,7 @@ class StartupViewModel extends MasterModel {
           final password = await ScraperApi().getStoredPassword();
           Api().login(email: email, password: password).then((isLogged) {
             if (isLogged) {
+              NotifySSE().start();
               if (user.isMembershipActive) {
                 navigationService.replaceWith(Routes.homeView);
               } else {

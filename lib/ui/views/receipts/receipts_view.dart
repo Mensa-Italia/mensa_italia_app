@@ -56,8 +56,7 @@ class ReceiptsView extends StackedView<ReceiptsViewModel> {
   }
 
   @override
-  ReceiptsViewModel viewModelBuilder(BuildContext context) =>
-      ReceiptsViewModel();
+  ReceiptsViewModel viewModelBuilder(BuildContext context) => ReceiptsViewModel();
 }
 
 class _receiptTile extends StatelessWidget {
@@ -77,9 +76,7 @@ class _receiptTile extends StatelessWidget {
           onTap();
         }
       },
-      title: Text(receipt.description == null || receipt.description!.isEmpty
-          ? "Donation"
-          : receipt.description!),
+      title: Text(receipt.description == null || receipt.description!.isEmpty ? "Donation" : receipt.description!),
       subtitle: Text(paymentStatusText()),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
       leading: Container(

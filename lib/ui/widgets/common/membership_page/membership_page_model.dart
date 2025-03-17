@@ -7,8 +7,8 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/addon.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/sig.dart';
+import 'package:mensa_italia_app/services/notify_sse.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:pocketbase/pocketbase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -16,10 +16,10 @@ class MembershipPageModel extends MasterModel {
   RssItem? lastBlogPost;
   SigModel? randomoSig;
   EventModel? nextEvent;
-  int unseenNotifications = 0;
-  UnsubscribeFunc? unsubscribeFuncForNotifications;
   List<AddonModel> addons = [];
   List<String> favsAddons = [];
+
+  int get unseenNotifications => NotifySSE().unseenNotifications;
 
   MembershipPageModel() {
     ScraperApi().getBlog().then((value) {
@@ -35,15 +35,7 @@ class MembershipPageModel extends MasterModel {
       rebuildUi();
     });
 
-    Api().pb.collection("user_notifications").subscribe('*', updateUserNotificationCount).then((value) {
-      unsubscribeFuncForNotifications = value;
-    });
-    Api().pb.collection("user_notifications").getFullList(
-      filter: "seen = ''",
-    ).then((value) {
-      unseenNotifications = value.length;
-      rebuildUi();
-    });
+    NotifySSE().addListener(rebuildUi);
 
     SharedPreferences.getInstance().then((prefs) async {
       favsAddons.clear();
@@ -74,19 +66,6 @@ class MembershipPageModel extends MasterModel {
         }
         rebuildUi();
       });
-    });
-  }
-
-  void updateUserNotificationCount(RecordSubscriptionEvent e) {
-    Api()
-        .pb
-        .collection("user_notifications")
-        .getFullList(
-          filter: "seen = ''",
-        )
-        .then((value) {
-      unseenNotifications = value.length;
-      rebuildUi();
     });
   }
 
@@ -182,8 +161,8 @@ class MembershipPageModel extends MasterModel {
   }
 
   @override
-  void dispose() {
-    unsubscribeFuncForNotifications?.call();
+  void dispose() {    
+    NotifySSE().addListener(rebuildUi);
     super.dispose();
   }
 }
