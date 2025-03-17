@@ -1068,7 +1068,7 @@ class Api {
     final externalApp = await getExternalAppPermissions(appid);
     if (externalApp != null) {
       await pb.collection('ex_granted_permissions').update(externalApp.id, body: {
-        "permissions": (externalApp.permissions..removeWhere((element) => permToRemove.contains(element))).toSet().toList(),
+        "permissions": externalApp.permissions.where((element) => !permToRemove.contains(element)).toList(),
       });
     }
   }

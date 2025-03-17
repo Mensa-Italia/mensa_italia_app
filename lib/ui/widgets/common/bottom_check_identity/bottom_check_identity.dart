@@ -98,18 +98,13 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Api().removeExtAppPermission(
-                        exApp.id!,
-                        permToRemove: ["CHECK_USER_EXISTENCE"],
-                      ).then((_) {
-                        Dio().post(urlToCall, data: {
-                          "accepted": false,
-                        }).then((value) {
-                          if (notificationToRemove != null) {
-                            Api().removeNotification(notificationToRemove!);
-                          }
-                          viewModel.navigationService.back();
-                        });
+                      Dio().post(urlToCall, data: {
+                        "accepted": false,
+                      }).then((value) {
+                        if (notificationToRemove != null) {
+                          Api().removeNotification(notificationToRemove!);
+                        }
+                        viewModel.navigationService.back();
                       });
                     },
                     style: ButtonStyle(
