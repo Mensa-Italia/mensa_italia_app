@@ -29,10 +29,10 @@ packages:
     dependency: "direct main"
     description:
       name: app_version_update
-      sha256: "346bb9e6aef2c94b186b5957e154fed7a75296bd587a5ee7737a89ffdb81ca37"
+      sha256: e0bcb086515a1d9948bf3219343ea607d2a5c09bd6f280d4a5265d576b2609ae
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "6.1.2"
   archive:
     dependency: transitive
     description:
