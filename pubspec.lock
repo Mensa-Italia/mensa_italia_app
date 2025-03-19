@@ -1233,10 +1233,10 @@ packages:
     dependency: "direct main"
     description:
       name: omni_datetime_picker
-      sha256: "6e2bd22e2a0ab75ac5fe83bc8d8c2413df08afe27bc78333f5e7e4614f9ddfc3"
+      sha256: aff5d88385226ba36901e8e8a3ec70cb6bd5e71beb2eb20ed31ad1bf1a7c546b
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   open_filex:
     dependency: "direct main"
     description:
