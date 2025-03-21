@@ -1934,10 +1934,10 @@ packages:
     dependency: "direct main"
     description:
       name: validation_pro
-      sha256: fe7b8a5a19fd331cd408b8724edc273be94fb69b518d63e44a8736fb59f5033e
+      sha256: c7797d298d43ce676fccccf02af882e41e7c625caab506ce6965f3fe4c1fec0b
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "2.1.0"
   vector_graphics:
     dependency: transitive
     description:
