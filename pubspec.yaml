@@ -33,7 +33,7 @@ dependencies:
   shared_preferences: ^2.5.2
   stacked: ^3.4.4
   stacked_services: ^1.6.0
-  stylish_bottom_bar: ^1.1.0
+  stylish_bottom_bar: ^1.1.1
   super_cupertino_navigation_bar: ^2.1.2
   url_launcher: ^6.3.1
   validation_pro: ^2.1.0
