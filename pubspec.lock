@@ -1702,10 +1702,10 @@ packages:
     dependency: "direct main"
     description:
       name: stylish_bottom_bar
-      sha256: ca72557a5bd8f44caae9017eb3a73002e9189d7a9d2fac598fa55be13724f32b
+      sha256: "8bd394d51e3c1d93a3013fd35e7f77ca29f820df204d0f8580f4773fc660e750"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   super_cupertino_navigation_bar:
     dependency: "direct main"
     description:
