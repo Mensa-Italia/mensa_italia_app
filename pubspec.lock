@@ -389,10 +389,10 @@ packages:
     dependency: "direct main"
     description:
       name: enefty_icons
-      sha256: "59be0308964b2be29eb64707a1afcb991d2b27167a4b17b7ff9866aa22f9b9cc"
+      sha256: f41f49b40070e1cf61838fbcfe337e313aaa5003319276ba76e079724b9ee69a
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.8"
   equatable:
     dependency: transitive
     description:
