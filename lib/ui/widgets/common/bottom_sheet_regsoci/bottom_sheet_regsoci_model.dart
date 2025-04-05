@@ -16,8 +16,7 @@ class BottomSheetRegsociModel extends MasterModel {
   }
 
   bool hasPhoneNumbers() {
-    return deepData.containsKey("Telefono:") ||
-        deepData.containsKey("Cellulare:");
+    return deepData.containsKey("Telefono:") || deepData.containsKey("Cellulare:");
   }
 
   String getPhoneNumber() {

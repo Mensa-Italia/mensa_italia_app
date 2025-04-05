@@ -21,8 +21,7 @@ class RegSociModel with _$RegSociModel {
 
   Id get id => (uid);
 
-  factory RegSociModel.fromJson(Map<String, dynamic> json) =>
-      _$RegSociModelFromJson(json);
+  factory RegSociModel.fromJson(Map<String, dynamic> json) => _$RegSociModelFromJson(json);
 
   @Index(type: IndexType.value, caseSensitive: false)
   List<String> get nameFullTextSearch => nameToSearchCombination(name);
@@ -32,14 +31,12 @@ class RegSociModel with _$RegSociModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }
@@ -50,5 +47,18 @@ class RegSociModel with _$RegSociModel {
     generateCombinations([], listOfWords);
 
     return result;
+  }
+
+  String get firstWords {
+    final words = name.split(" ");
+    if (words.length > 1) {
+      String toOutput = "";
+      for (int i = 0; i < words.length; i++) {
+        toOutput += words[i][0].toUpperCase();
+      }
+      return toOutput;
+    } else {
+      return words[0];
+    }
   }
 }
