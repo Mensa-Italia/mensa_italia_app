@@ -64,7 +64,7 @@ dependencies:
   isar: any
   isar_flutter_libs: any
   easy_localization: ^3.0.7
-  mobile_scanner: ^6.0.8
+  mobile_scanner: ^6.0.10
   timezone: ^0.10.0
   flutter_timezone: ^4.1.0
   link_text: ^0.2.1
