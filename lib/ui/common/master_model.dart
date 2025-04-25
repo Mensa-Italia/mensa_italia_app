@@ -315,5 +315,15 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
     if (typeOfAction == "payment_update_status") {
       navigationService.navigateToReceiptsView();
     }
+    if (typeOfAction == "deal") {
+      final String dealId = data["deal_id"] ?? "";
+      if (dealId.isNotEmpty) {
+        Api().getDeal(dealId).then((deal) {
+          if (deal != null) {
+            navigationService.navigateToAddonDealsDetailsView(deal: deal);
+          }
+        });
+      }
+    }
   }
 }

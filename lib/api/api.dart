@@ -630,6 +630,23 @@ class Api {
     });
   }
 
+  Future<DealModel?> getDeal(String id) async {
+    if (Memoized().has("deal_$id")) {
+      return Memoized().get("deal_$id");
+    }
+    return await pb
+        .collection('deals')
+        .getOne(
+          id,
+          expand: "position",
+        )
+        .then((value) {
+      Memoized().set("deal_$id", DealModel.fromJson(value.toJson()));
+      return Memoized().get("deal_$id");
+    });
+  }
+
+
   Future<List<DealsContact>> getDealsContacts(String dealId) async {
     if (Memoized().has("deals_contacts_$dealId")) {
       return Memoized().get("deals_contacts_$dealId");
