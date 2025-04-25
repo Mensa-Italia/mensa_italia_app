@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:form_validator/form_validator.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
-import 'package:validation_pro/validate.dart';
 
 import 'addon_deals_add_viewmodel.dart';
 
@@ -145,16 +145,9 @@ class AddonDealsAddView extends StackedView<AddonDealsAddViewModel> {
                           decoration: const InputDecoration(
                               hintText: "Email (Optional)"),
                           controller: viewModel.contactEmail,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return null;
-                            } else {
-                              if (!Validate.isEmail(value)) {
-                                return 'Please enter a valid email';
-                              }
-                            }
-                            return null;
-                          },
+                          validator: ValidationBuilder().email(
+                            "Please enter a valid email address",
+                          ).build(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(

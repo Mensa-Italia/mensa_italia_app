@@ -693,6 +693,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.2.12"
+  form_validator:
+    dependency: "direct main"
+    description:
+      name: form_validator
+      sha256: "8cbe91b7d5260870d6fb9e23acd55d5d1d1fdf2397f0279a4931ac3c0c7bf8fb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   freezed:
     dependency: "direct dev"
     description:
@@ -1930,14 +1938,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.1"
-  validation_pro:
-    dependency: "direct main"
-    description:
-      name: validation_pro
-      sha256: c7797d298d43ce676fccccf02af882e41e7c625caab506ce6965f3fe4c1fec0b
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   vector_graphics:
     dependency: transitive
     description:
@@ -2099,5 +2099,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.7.2 <4.0.0"
+  dart: ">=3.7.0 <4.0.0"
   flutter: ">=3.29.0"

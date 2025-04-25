@@ -10,7 +10,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   maps_launcher
   sentry_flutter
   url_launcher_linux
-  validation_pro
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
