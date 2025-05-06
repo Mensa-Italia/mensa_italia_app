@@ -8,15 +8,18 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
+import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class AddEventViewModel extends MasterModel {
   final formKey = GlobalKey<FormState>();
   Uint8List? imageBytes;
   TextEditingController locationController = TextEditingController();
-  TextEditingController dateTimeEvent = TextEditingController();
+  TextEditingController dateTimeStartEvent = TextEditingController();
+  TextEditingController dateTimeEndEvent = TextEditingController();
   List<EventScheduleModel> eventSchedules = [];
 
   //FORM DATA
@@ -24,8 +27,8 @@ class AddEventViewModel extends MasterModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController linkController = TextEditingController();
-  RangeDateTimeZone? dateTimeOptions;
-  LocationSelected? location;
+  RangeDateTimeZone dateTimeOptions = RangeDateTimeZone();
+  LocationModel? location;
   bool isNational = false;
   bool isOnline = false;
   bool isSpot = false;
@@ -50,14 +53,11 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeEvent.text =
-          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+      dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+      dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       if (event.position != null) {
-        location = LocationSelected(
-          locationName: event.position!.name,
-          coordinates: event.position!.toLatLng(),
-        );
-        locationController.text = location!.locationName;
+        location = event.position;
+        locationController.text = location!.getAddress();
       }
       isNational = event.isNational;
       isOnline = event.position == null;
@@ -92,16 +92,11 @@ class AddEventViewModel extends MasterModel {
   void addEvent() async {
     if (formKey.currentState!.validate() && !isBusy) {
       setBusy(true);
-      if ((dateTimeOptions?.start ?? DateTime.now())
-          .isBefore(DateTime.now().add(Duration(days: 1)))) {
-        dialogService
-            .showDialog(
+      if (!dateTimeOptions.isValidRange()) {
+        dialogService.showDialog(
           title: 'views.add_event_viewmodel.date_error.title'.tr(),
           description: 'views.add_event_viewmodel.date_error.description'.tr(),
-        )
-            .then((value) {
-          pickDateTime();
-        });
+        );
         setBusy(false);
         return;
       }
@@ -119,8 +114,8 @@ class AddEventViewModel extends MasterModel {
             image: image,
             location: location,
             link: linkController.text,
-            startDate: dateTimeOptions!.start,
-            endDate: dateTimeOptions!.end,
+            startDate: dateTimeOptions.start!,
+            endDate: dateTimeOptions.end!,
             isNational: isNational,
             isOnline: isOnline,
             schedules: eventSchedules,
@@ -133,8 +128,8 @@ class AddEventViewModel extends MasterModel {
             image: image,
             location: location,
             link: linkController.text,
-            startDate: dateTimeOptions!.start,
-            endDate: dateTimeOptions!.end,
+            startDate: dateTimeOptions.start!,
+            endDate: dateTimeOptions.end!,
             isNational: isNational,
             isOnline: isOnline,
             schedules: eventSchedules,
@@ -150,35 +145,53 @@ class AddEventViewModel extends MasterModel {
   }
 
   void pickLocation() {
-    navigationService.navigateToMapPickerView().then((value) {
-      if (value != null && value is LocationSelected) {
+    navigationService.navigateToLocationListPickerView().then((value) {
+      if (value != null && value is LocationModel) {
         location = value;
-        locationController.text = value.locationName;
+        locationController.text = value.getAddress();
+        rebuildUi();
       }
     });
   }
 
-  void pickDateTime() {
-    pickStartEndTime(
-      start: dateTimeOptions?.start,
-      end: dateTimeOptions?.end,
+  void pickStartTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
     ).then((value) {
       if (value != null) {
-        if (!allowControlEvents() &&
-            value.end.difference(value.start).inDays > 2) {
-          dialogService
-              .showDialog(
-            title: 'views.add_event_viewmodel.spot_event_error.title'.tr(),
-            description:
-                'views.add_event_viewmodel.spot_event_error.description'.tr(),
-          )
-              .then((value) {
-            pickDateTime();
-          });
+        dateTimeOptions.setStart(value);
+        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
-          dateTimeOptions = value;
-          dateTimeEvent.text =
-              "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
+        }
+      }
+    });
+  }
+
+  void pickEndTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
+    ).then((value) {
+      if (value != null) {
+        dateTimeOptions.setEnd(value);
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        } else {
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
         }
       }
     });
@@ -227,7 +240,8 @@ class AddEventViewModel extends MasterModel {
   @override
   void dispose() {
     locationController.dispose();
-    dateTimeEvent.dispose();
+    dateTimeStartEvent.dispose();
+    dateTimeEndEvent.dispose();
     nameController.dispose();
     descriptionController.dispose();
     linkController.dispose();

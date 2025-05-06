@@ -48,7 +48,9 @@ class DevicesView extends StackedView<DevicesViewModel> {
                     ),
                   ),
                   title: Text(device.deviceName),
-                  subtitle: device.firebaseId == Api().notificationToken ? Text("views.devices.current_device".tr()) : null,
+                  subtitle: device.firebaseId == Api().notificationToken
+                      ? Text("views.devices.current_device".tr())
+                      : null,
                   trailing: device.firebaseId != Api().notificationToken
                       ? IconButton(
                           icon: const Icon(Icons.delete_outline),

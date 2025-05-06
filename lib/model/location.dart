@@ -6,28 +6,7 @@ part 'location.freezed.dart';
 
 part 'location.g.dart';
 
-final ListOfStates = [
-  "Piemonte",
-  "Valle d'Aosta",
-  "Lombardia",
-  "Trentino-Alto Adige",
-  "Veneto",
-  "Friuli-Venezia Giulia",
-  "Liguria",
-  "Emilia-Romagna",
-  "Toscana",
-  "Umbria",
-  "Marche",
-  "Lazio",
-  "Abruzzo",
-  "Molise",
-  "Campania",
-  "Puglia",
-  "Basilicata",
-  "Calabria",
-  "Sicilia",
-  "Sardegna"
-]..sort();
+final ListOfStates = ["Piemonte", "Valle d'Aosta", "Lombardia", "Trentino-Alto Adige", "Veneto", "Friuli-Venezia Giulia", "Liguria", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"]..sort();
 
 @freezed
 class LocationModel with _$LocationModel {
@@ -38,11 +17,11 @@ class LocationModel with _$LocationModel {
     required String name,
     required double lat,
     required double lon,
+    required String address,
     required String state,
   }) = _LocationModel;
 
-  factory LocationModel.fromJson(Map<String, dynamic> json) =>
-      _$LocationModelFromJson(json);
+  factory LocationModel.fromJson(Map<String, dynamic> json) => _$LocationModelFromJson(json);
 
   LatLng toLatLng() {
     return LatLng(lat, lon);
@@ -50,5 +29,13 @@ class LocationModel with _$LocationModel {
 
   latlong2.LatLng toLatLong2() {
     return latlong2.LatLng(lat, lon);
+  }
+
+  String getAddress() {
+    if (address.isNotEmpty) {
+      return address;
+    } else {
+      return name;
+    }
   }
 }

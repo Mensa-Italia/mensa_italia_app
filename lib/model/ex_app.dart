@@ -19,8 +19,7 @@ import 'package:mensa_italia_app/model/parser_tools.dart';
 part 'ex_app.freezed.dart';
 part 'ex_app.g.dart';
 
-
-@freezed 
+@freezed
 class ExAppModel with _$ExAppModel {
   factory ExAppModel({
     String? collectionId,
@@ -39,5 +38,6 @@ class ExAppModel with _$ExAppModel {
     DateTime? updated,
   }) = _ExAppModel;
 
-  factory ExAppModel.fromJson(Map<String, dynamic> json) => _$ExAppModelFromJson(json);
+  factory ExAppModel.fromJson(Map<String, dynamic> json) =>
+      _$ExAppModelFromJson(json);
 }

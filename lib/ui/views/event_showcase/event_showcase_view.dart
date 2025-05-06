@@ -236,7 +236,7 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
                   text: "views.eventdetails.location.title".tr(),
                   children: [
                     TextSpan(
-                      text: "\n${event.position!.name}",
+                      text: "\n${event.position!.getAddress()}",
                       style: TextStyle(
                           color: kcPrimaryColor,
                           fontSize: 14,

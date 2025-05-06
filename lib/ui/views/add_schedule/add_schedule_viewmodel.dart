@@ -6,12 +6,14 @@ import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class AddScheduleViewModel extends MasterModel {
   final formKey = GlobalKey<FormState>();
 
   TextEditingController locationController = TextEditingController();
-  TextEditingController dateTimeEvent = TextEditingController();
+  TextEditingController dateTimeStartEvent = TextEditingController();
+  TextEditingController dateTimeEndEvent = TextEditingController();
 
   final EventScheduleModel? event;
 
@@ -25,9 +27,8 @@ class AddScheduleViewModel extends MasterModel {
         start: event!.whenStart,
         end: event!.whenEnd,
       );
-      dateTimeEvent.text =
-          "${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions!.end)}";
-
+      dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+      dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       rebuildUi();
     }
   }
@@ -37,7 +38,7 @@ class AddScheduleViewModel extends MasterModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController linkController = TextEditingController();
-  RangeDateTimeZone? dateTimeOptions;
+  RangeDateTimeZone dateTimeOptions = RangeDateTimeZone();
   LocationSelected? location;
   bool isNational = false;
   bool isOnline = false;
@@ -52,15 +53,45 @@ class AddScheduleViewModel extends MasterModel {
     });
   }
 
-  void pickDateTime() {
-    pickStartEndTime(
-      start: dateTimeOptions?.start,
-      end: dateTimeOptions?.end,
+  void pickStartTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
     ).then((value) {
       if (value != null) {
-        dateTimeOptions = value;
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeOptions.setStart(value);
+        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        } else {
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
+        }
+      }
+    });
+  }
+
+  void pickEndTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
+    ).then((value) {
+      if (value != null) {
+        dateTimeOptions.setEnd(value);
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        } else {
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
+        }
       }
     });
   }
@@ -72,8 +103,8 @@ class AddScheduleViewModel extends MasterModel {
         id: event?.id,
         title: nameController.text,
         description: descriptionController.text,
-        whenStart: dateTimeOptions!.start,
-        whenEnd: dateTimeOptions!.end,
+        whenStart: dateTimeOptions!.start!,
+        whenEnd: dateTimeOptions!.end!,
         maxExternalGuests: 0,
         price: 0,
         infoLink: linkController.text,
@@ -89,8 +120,8 @@ class AddScheduleViewModel extends MasterModel {
       id: "DELETE:${event?.id ?? ""}",
       title: nameController.text,
       description: descriptionController.text,
-      whenStart: dateTimeOptions!.start,
-      whenEnd: dateTimeOptions!.end,
+      whenStart: dateTimeOptions!.start!,
+      whenEnd: dateTimeOptions!.end!,
       maxExternalGuests: 0,
       price: 0,
       infoLink: linkController.text,
@@ -104,7 +135,8 @@ class AddScheduleViewModel extends MasterModel {
     nameController.dispose();
     descriptionController.dispose();
     linkController.dispose();
-    dateTimeEvent.dispose();
+    dateTimeStartEvent.dispose();
+    dateTimeEndEvent.dispose();
     locationController.dispose();
     super.dispose();
   }

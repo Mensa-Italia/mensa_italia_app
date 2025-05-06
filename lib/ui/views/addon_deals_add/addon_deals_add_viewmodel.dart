@@ -5,9 +5,11 @@ import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/date_time_zone.dart';
 import 'package:mensa_italia_app/model/deal.dart';
+import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class AddonDealsAddViewModel extends MasterModel {
@@ -19,7 +21,8 @@ class AddonDealsAddViewModel extends MasterModel {
   final dealNameController = TextEditingController();
   final commercialSectorController = TextEditingController();
   TextEditingController locationController = TextEditingController();
-  TextEditingController dateTimeEvent = TextEditingController();
+  TextEditingController dateTimeStartEvent = TextEditingController();
+  TextEditingController dateTimeEndEvent = TextEditingController();
   final detailsController = TextEditingController();
   final whoController = TextEditingController();
   final howToGetController = TextEditingController();
@@ -32,8 +35,8 @@ class AddonDealsAddViewModel extends MasterModel {
   final contactNotes = TextEditingController();
 
   String? detailID;
-  RangeDateTimeZone? dateTimeOptions;
-  LocationSelected? location;
+  RangeDateTimeZone dateTimeOptions = RangeDateTimeZone();
+  LocationModel? location;
   String selectedEligibility = "active_members";
 
   AddonDealsAddViewModel({this.deal}) {
@@ -41,14 +44,15 @@ class AddonDealsAddViewModel extends MasterModel {
     if (deal != null) {
       dealNameController.text = deal!.name;
       commercialSectorController.text = deal!.commercialSector;
-      locationController.text = deal!.position?.name ?? "";
+      location = deal!.position;
+      locationController.text = deal!.position?.getAddress() ?? "";
       if (deal?.starting != null && deal?.ending != null) {
         dateTimeOptions = RangeDateTimeZone.fromDateTime(
           start: deal!.starting!,
           end: deal!.ending!,
         );
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(deal!.starting!)} - ${DateFormat("dd/MM/yyyy HH:mm").format(deal!.ending!)}";
+        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       }
       detailsController.text = deal!.details ?? "";
       whoController.text = deal!.who ?? "";
@@ -86,8 +90,8 @@ class AddonDealsAddViewModel extends MasterModel {
             detailEmail: contactEmail.text,
             detailPhone: contactPhone.text,
             detailNote: contactNotes.text,
-            starting: dateTimeOptions!.start,
-            ending: dateTimeOptions!.end,
+            starting: dateTimeOptions.start!,
+            ending: dateTimeOptions.end!,
           );
           navigationService.back();
         } else {
@@ -106,8 +110,8 @@ class AddonDealsAddViewModel extends MasterModel {
             detailEmail: contactEmail.text,
             detailPhone: contactPhone.text,
             detailNote: contactNotes.text,
-            starting: dateTimeOptions!.start,
-            ending: dateTimeOptions!.end,
+            starting: dateTimeOptions.start!,
+            ending: dateTimeOptions.end!,
           );
           navigationService.back();
         }
@@ -122,7 +126,8 @@ class AddonDealsAddViewModel extends MasterModel {
     dealNameController.dispose();
     commercialSectorController.dispose();
     locationController.dispose();
-    dateTimeEvent.dispose();
+    dateTimeStartEvent.dispose();
+    dateTimeEndEvent.dispose();
     detailsController.dispose();
     whoController.dispose();
     howToGetController.dispose();
@@ -132,26 +137,59 @@ class AddonDealsAddViewModel extends MasterModel {
   }
 
   void pickLocation() {
-    navigationService.navigateToMapPickerView().then((value) {
-      if (value != null && value is LocationSelected) {
+    navigationService.navigateToLocationListPickerView().then((value) {
+      if (value != null && value is LocationModel) {
         location = value;
-        locationController.text = value.locationName;
+        locationController.text = value.getAddress();
+        rebuildUi();
+      }
+    });
+  }
+  
+
+  void pickStartTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
+    ).then((value) {
+      if (value != null) {
+        dateTimeOptions.setStart(value);
+        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        } else {
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
+        }
       }
     });
   }
 
-  void pickDateTime() {
-    pickStartEndTime(
-      start: dateTimeOptions?.start,
-      end: dateTimeOptions?.end,
+  void pickEndTime() {
+    showOmniDateTimePicker(
+      context: context,
+      is24HourMode: true,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365 * 10),
+      ),
     ).then((value) {
       if (value != null) {
-        dateTimeOptions = value;
-        dateTimeEvent.text =
-            "${DateFormat("dd/MM/yyyy HH:mm").format(value.start)} - ${DateFormat("dd/MM/yyyy HH:mm").format(value.end)}";
+        dateTimeOptions.setEnd(value);
+        if (dateTimeOptions.isValidRange()) {
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        } else {
+          dateTimeOptions.clearEnd();
+          dateTimeEndEvent.text = "";
+        }
       }
     });
   }
+
 
   void selectEligibility() async {
     final ListOfEligibility = [

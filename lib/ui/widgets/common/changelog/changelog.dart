@@ -8,16 +8,12 @@ class Changelog extends StackedView<ChangelogModel> {
   const Changelog({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, ChangelogModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, ChangelogModel viewModel, Widget? child) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
       ),
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.top -
-          MediaQuery.of(context).padding.bottom -
-          50,
+      height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 50,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,19 +31,24 @@ class Changelog extends StackedView<ChangelogModel> {
             ),
             SizedBox(height: 40),
             _WhatsNewComponent(
-              icon: EneftyIcons.star_2_bold,
-              title: "AI meet Mensa",
-              description:
-                  "An AI will now help you get the best highlights from the Mensa Italia documents, check the addon Documents!",
+              icon: EneftyIcons.ticket_2_outline,
+              title: "Semplified event creation",
+              description: "We have simplified the event creation process, making it easier and faster to create events.",
               color: Colors.blueAccent,
             ),
             SizedBox(height: 20),
             _WhatsNewComponent(
-              icon: EneftyIcons.notification_2_bold,
-              title: "Notification",
-              description:
-                  "Now you will receive the notifications in a more organized way",
+              icon: EneftyIcons.timer_2_outline,
+              title: "DateTime input fixed",
+              description: "We have fixed the DateTime input, making it more user-friendly and reliable.",
               color: Colors.pink,
+            ),
+            SizedBox(height: 20),
+            _WhatsNewComponent(
+              icon: EneftyIcons.location_outline,
+              title: "Simplified position input",
+              description: "We have simplified the position input, making it easier to use.",
+              color: Colors.green,
             ),
             SizedBox(height: 20),
             Expanded(child: Container()),
@@ -73,11 +74,7 @@ class _WhatsNewComponent extends StatelessWidget {
   final String title;
   final String description;
   final Color color;
-  const _WhatsNewComponent(
-      {required this.icon,
-      required this.title,
-      required this.description,
-      required this.color});
+  const _WhatsNewComponent({required this.icon, required this.title, required this.description, required this.color});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:mensa_italia_app/app/app.locator.dart';
 import '../helpers/test_helpers.dart';
 
 void main() {
-  group('BottomCheckIdentityModel Tests -', () {
+  group('LocationListPickerViewModel Tests -', () {
     setUp(() => registerServices());
     tearDown(() => locator.reset());
   });

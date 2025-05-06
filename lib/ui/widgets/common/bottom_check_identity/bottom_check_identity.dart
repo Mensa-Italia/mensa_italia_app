@@ -14,10 +14,16 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
   final String? notificationToRemove;
   final String urlToCall;
   final ExAppModel exApp;
-  const BottomCheckIdentity({Key? key, required this.urlToCall, required this.exApp, this.notificationToRemove}) : super(key: key);
+  const BottomCheckIdentity(
+      {Key? key,
+      required this.urlToCall,
+      required this.exApp,
+      this.notificationToRemove})
+      : super(key: key);
 
   @override
-  Widget builder(BuildContext context, BottomCheckIdentityModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, BottomCheckIdentityModel viewModel, Widget? child) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -122,5 +128,6 @@ class BottomCheckIdentity extends StackedView<BottomCheckIdentityModel> {
   }
 
   @override
-  BottomCheckIdentityModel viewModelBuilder(BuildContext context) => BottomCheckIdentityModel();
+  BottomCheckIdentityModel viewModelBuilder(BuildContext context) =>
+      BottomCheckIdentityModel();
 }

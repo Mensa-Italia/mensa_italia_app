@@ -21,6 +21,7 @@ import 'package:mensa_italia_app/model/event_owner.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/ex_app.dart';
 import 'package:mensa_italia_app/model/ex_granted_permissions.dart';
+import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/model/notification.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/receipt.dart';
@@ -104,12 +105,9 @@ class Api {
                 );
               }
             } else {
-              await pb.collection('users_devices').update(
-                value.id,
-                body: {
-                  "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
-                }
-              );
+              await pb.collection('users_devices').update(value.id, body: {
+                "language": Localizations.localeOf(StackedService.navigatorKey!.currentContext!).toString(),
+              });
             }
           });
         }
@@ -416,7 +414,7 @@ class Api {
     required String name,
     required String description,
     XFile? image,
-    LocationSelected? location,
+    LocationModel? location,
     required String link,
     required tz.TZDateTime startDate,
     required tz.TZDateTime endDate,
@@ -427,12 +425,7 @@ class Api {
   }) async {
     String? positionId;
     if (!isOnline) {
-      final RecordModel createPosition = await pb.collection("positions").create(body: {
-        "lat": location!.coordinates.latitude,
-        "lon": location.coordinates.longitude,
-        "name": location.locationName,
-      });
-      positionId = createPosition.id;
+      positionId = location!.id;
     }
     await pb.collection('events').create(
       body: {
@@ -476,12 +469,32 @@ class Api {
     Memoized().remove("first_next_event");
   }
 
+  Future<LocationModel> createLocation({
+    required String name,
+    required String address,
+    required double latitude,
+    required double longitude,
+  }) async {
+    return await pb.collection('positions').create(
+      body: {
+        "name": name,
+        "address": address,
+        "lat": latitude,
+        "lon": longitude,
+        "saved": true,
+        "created_by": pb.authStore.model.id,
+      },
+    ).then((value) {
+      return LocationModel.fromJson(value.toJson());
+    }).catchError((e) {});
+  }
+
   Future<void> updateEvent({
     required String id,
     required String name,
     required String description,
     XFile? image,
-    LocationSelected? location,
+    LocationModel? location,
     required String link,
     required tz.TZDateTime startDate,
     required tz.TZDateTime endDate,
@@ -492,12 +505,7 @@ class Api {
   }) async {
     String? positionId;
     if (!isOnline) {
-      final RecordModel createPosition = await pb.collection("positions").create(body: {
-        "lat": location!.coordinates.latitude,
-        "lon": location.coordinates.longitude,
-        "name": location.locationName,
-      });
-      positionId = createPosition.id;
+      positionId = location!.id;
     }
     await pb
         .collection('events')
@@ -646,7 +654,6 @@ class Api {
     });
   }
 
-
   Future<List<DealsContact>> getDealsContacts(String dealId) async {
     if (Memoized().has("deals_contacts_$dealId")) {
       return Memoized().get("deals_contacts_$dealId");
@@ -671,7 +678,7 @@ class Api {
     required tz.TZDateTime ending,
     required String link,
     required String vatNumber,
-    LocationSelected? location,
+    LocationModel? location,
     required String detailName,
     required String detailEmail,
     required String detailPhone,
@@ -679,12 +686,7 @@ class Api {
   }) async {
     String? positionId;
     if (location != null) {
-      final RecordModel createPosition = await pb.collection("positions").create(body: {
-        "lat": location.coordinates.latitude,
-        "lon": location.coordinates.longitude,
-        "name": location.locationName,
-      });
-      positionId = createPosition.id;
+      positionId = location.id;
     }
     await pb.collection('deals').create(
       body: {
@@ -726,7 +728,7 @@ class Api {
     required tz.TZDateTime ending,
     required String link,
     required String vatNumber,
-    LocationSelected? location,
+    LocationModel? location,
     String? detailId,
     String? detailName,
     String? detailEmail,
@@ -735,12 +737,7 @@ class Api {
   }) async {
     String? positionId;
     if (location != null) {
-      final RecordModel createPosition = await pb.collection("positions").create(body: {
-        "lat": location.coordinates.latitude,
-        "lon": location.coordinates.longitude,
-        "name": location.locationName,
-      });
-      positionId = createPosition.id;
+      positionId = location.id;
     }
     await pb.collection('deals').update(
       id,
@@ -1131,5 +1128,21 @@ class Api {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<List<LocationModel>> getLocaitons() async {
+    return await pb.collection('positions').getFullList().then((value) {
+      return value.map((e) {
+        return LocationModel.fromJson(e.toJson());
+      }).toList();
+    });
+  }
+
+  Future<void> deleteLocation(String id) async {
+    return await pb.collection('positions').update(id, body: {
+      "saved": false,
+    }).then((value) {
+      Memoized().remove("all_locations");
+    });
   }
 }

@@ -45,6 +45,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        manifestPlaceholders = [mapsApiKey: "$System.env.MAPS_API_KEY"]
     }
     
     signingConfigs {

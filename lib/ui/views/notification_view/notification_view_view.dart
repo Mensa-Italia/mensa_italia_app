@@ -99,12 +99,12 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
     if (notificaiton.data["type"] == "account_confirmation") {
       return EneftyIcons.security_user_outline;
     }
+    if (notificaiton.data["type"] == "deal") {
+      return EneftyIcons.discount_shape_outline;
+    }
     return EneftyIcons.notification_outline;
   }
 
   @override
-  NotificationViewViewModel viewModelBuilder(
-    BuildContext context,
-  ) =>
-      NotificationViewViewModel();
+  NotificationViewViewModel viewModelBuilder(BuildContext context) => NotificationViewViewModel();
 }

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/ui/widgets/common/changelog/changelog.dart';
 import 'package:mensa_italia_app/ui/widgets/common/sigs_page/sigs_page_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/addon_page/addon_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_page/event_page.dart';
@@ -16,6 +17,7 @@ class HomeView extends StackedView<HomeViewModel> {
   @override
   Widget builder(BuildContext context, HomeViewModel viewModel, Widget? child) {
     precacheImage(const AssetImage("assets/images/backcard.jpg"), context);
+
     return Scaffold(
       extendBody: true,
       bottomNavigationBar: ClipRect(

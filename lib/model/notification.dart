@@ -30,7 +30,8 @@ class NotificationModel with _$NotificationModel {
     required DateTime updated,
   }) = _NotificationModel;
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) => _$NotificationModelFromJson(json);
+  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationModelFromJson(json);
 
   String get title {
     return "$tr.title";

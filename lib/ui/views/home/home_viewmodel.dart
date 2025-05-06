@@ -62,7 +62,9 @@ class HomeViewModel extends MasterModel {
   void checkForInitialMessage() async {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     String? internalID = initialMessage?.data["internal_id"];
-    handleNotificationActions(initialMessage!.data, notificationID: internalID);
+    try {
+      handleNotificationActions(initialMessage!.data, notificationID: internalID);
+    } catch (_) {}
   }
 
   StreamSubscription? listenForMessagesvar;

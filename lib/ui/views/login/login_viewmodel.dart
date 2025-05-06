@@ -9,7 +9,7 @@ class LoginViewModel extends MasterModel {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
-  
+
   String? saveEmail(String? value) {
     email = value ?? "";
     return null;

@@ -27,33 +27,38 @@ const RegSociModelSchema = CollectionSchema(
       name: r'city',
       type: IsarType.string,
     ),
-    r'image': PropertySchema(
+    r'firstWords': PropertySchema(
       id: 2,
+      name: r'firstWords',
+      type: IsarType.string,
+    ),
+    r'image': PropertySchema(
+      id: 3,
       name: r'image',
       type: IsarType.string,
     ),
     r'linkToFullProfile': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'linkToFullProfile',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'name',
       type: IsarType.string,
     ),
     r'nameFullTextSearch': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'nameFullTextSearch',
       type: IsarType.stringList,
     ),
     r'state': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'state',
       type: IsarType.string,
     ),
     r'uid': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'uid',
       type: IsarType.long,
     )
@@ -93,6 +98,7 @@ int _regSociModelEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.city.length * 3;
+  bytesCount += 3 + object.firstWords.length * 3;
   bytesCount += 3 + object.image.length * 3;
   bytesCount += 3 + object.linkToFullProfile.length * 3;
   bytesCount += 3 + object.name.length * 3;
@@ -115,12 +121,13 @@ void _regSociModelSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.birthDate);
   writer.writeString(offsets[1], object.city);
-  writer.writeString(offsets[2], object.image);
-  writer.writeString(offsets[3], object.linkToFullProfile);
-  writer.writeString(offsets[4], object.name);
-  writer.writeStringList(offsets[5], object.nameFullTextSearch);
-  writer.writeString(offsets[6], object.state);
-  writer.writeLong(offsets[7], object.uid);
+  writer.writeString(offsets[2], object.firstWords);
+  writer.writeString(offsets[3], object.image);
+  writer.writeString(offsets[4], object.linkToFullProfile);
+  writer.writeString(offsets[5], object.name);
+  writer.writeStringList(offsets[6], object.nameFullTextSearch);
+  writer.writeString(offsets[7], object.state);
+  writer.writeLong(offsets[8], object.uid);
 }
 
 RegSociModel _regSociModelDeserialize(
@@ -132,11 +139,11 @@ RegSociModel _regSociModelDeserialize(
   final object = RegSociModel(
     birthDate: reader.readDateTimeOrNull(offsets[0]),
     city: reader.readString(offsets[1]),
-    image: reader.readString(offsets[2]),
-    linkToFullProfile: reader.readString(offsets[3]),
-    name: reader.readString(offsets[4]),
-    state: reader.readString(offsets[6]),
-    uid: reader.readLong(offsets[7]),
+    image: reader.readString(offsets[3]),
+    linkToFullProfile: reader.readString(offsets[4]),
+    name: reader.readString(offsets[5]),
+    state: reader.readString(offsets[7]),
+    uid: reader.readLong(offsets[8]),
   );
   return object;
 }
@@ -159,10 +166,12 @@ P _regSociModelDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 6:
       return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readStringList(offset) ?? []) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -615,6 +624,142 @@ extension RegSociModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'city',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'firstWords',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'firstWords',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'firstWords',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firstWords',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+      firstWordsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'firstWords',
         value: '',
       ));
     });
@@ -1525,6 +1670,19 @@ extension RegSociModelQuerySortBy
     });
   }
 
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByFirstWords() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstWords', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
+      sortByFirstWordsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstWords', Sort.desc);
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByImage() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'image', Sort.asc);
@@ -1611,6 +1769,19 @@ extension RegSociModelQuerySortThenBy
   QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByCityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByFirstWords() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstWords', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
+      thenByFirstWordsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstWords', Sort.desc);
     });
   }
 
@@ -1704,6 +1875,13 @@ extension RegSociModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByFirstWords(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'firstWords', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByImage(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1764,6 +1942,12 @@ extension RegSociModelQueryProperty
   QueryBuilder<RegSociModel, String, QQueryOperations> cityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'city');
+    });
+  }
+
+  QueryBuilder<RegSociModel, String, QQueryOperations> firstWordsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'firstWords');
     });
   }
 

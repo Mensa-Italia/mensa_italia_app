@@ -44,7 +44,8 @@ class ReceiptsViewModel extends MasterModel {
           Stripe.instance.confirmPayment(
             paymentIntentClientSecret: value["client_secret"],
             data: PaymentMethodParams.cardFromMethodId(
-              paymentMethodData: PaymentMethodDataCardFromMethod(paymentMethodId: value2.id),
+              paymentMethodData:
+                  PaymentMethodDataCardFromMethod(paymentMethodId: value2.id),
             ),
           );
         }

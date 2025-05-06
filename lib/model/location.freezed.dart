@@ -24,6 +24,7 @@ mixin _$LocationModel {
   String get name => throw _privateConstructorUsedError;
   double get lat => throw _privateConstructorUsedError;
   double get lon => throw _privateConstructorUsedError;
+  String get address => throw _privateConstructorUsedError;
   String get state => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +39,13 @@ abstract class $LocationModelCopyWith<$Res> {
           LocationModel value, $Res Function(LocationModel) then) =
       _$LocationModelCopyWithImpl<$Res, LocationModel>;
   @useResult
-  $Res call({String id, String name, double lat, double lon, String state});
+  $Res call(
+      {String id,
+      String name,
+      double lat,
+      double lon,
+      String address,
+      String state});
 }
 
 /// @nodoc
@@ -58,6 +65,7 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
     Object? name = null,
     Object? lat = null,
     Object? lon = null,
+    Object? address = null,
     Object? state = null,
   }) {
     return _then(_value.copyWith(
@@ -77,6 +85,10 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
           ? _value.lon
           : lon // ignore: cast_nullable_to_non_nullable
               as double,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       state: null == state
           ? _value.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -93,7 +105,13 @@ abstract class _$$LocationModelImplCopyWith<$Res>
       __$$LocationModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, double lat, double lon, String state});
+  $Res call(
+      {String id,
+      String name,
+      double lat,
+      double lon,
+      String address,
+      String state});
 }
 
 /// @nodoc
@@ -111,6 +129,7 @@ class __$$LocationModelImplCopyWithImpl<$Res>
     Object? name = null,
     Object? lat = null,
     Object? lon = null,
+    Object? address = null,
     Object? state = null,
   }) {
     return _then(_$LocationModelImpl(
@@ -130,6 +149,10 @@ class __$$LocationModelImplCopyWithImpl<$Res>
           ? _value.lon
           : lon // ignore: cast_nullable_to_non_nullable
               as double,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       state: null == state
           ? _value.state
           : state // ignore: cast_nullable_to_non_nullable
@@ -146,6 +169,7 @@ class _$LocationModelImpl extends _LocationModel {
       required this.name,
       required this.lat,
       required this.lon,
+      required this.address,
       required this.state})
       : super._();
 
@@ -161,11 +185,13 @@ class _$LocationModelImpl extends _LocationModel {
   @override
   final double lon;
   @override
+  final String address;
+  @override
   final String state;
 
   @override
   String toString() {
-    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, state: $state)';
+    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, address: $address, state: $state)';
   }
 
   @override
@@ -177,12 +203,14 @@ class _$LocationModelImpl extends _LocationModel {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.lat, lat) || other.lat == lat) &&
             (identical(other.lon, lon) || other.lon == lon) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.state, state) || other.state == state));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, lat, lon, state);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, lat, lon, address, state);
 
   @JsonKey(ignore: true)
   @override
@@ -204,6 +232,7 @@ abstract class _LocationModel extends LocationModel {
       required final String name,
       required final double lat,
       required final double lon,
+      required final String address,
       required final String state}) = _$LocationModelImpl;
   const _LocationModel._() : super._();
 
@@ -218,6 +247,8 @@ abstract class _LocationModel extends LocationModel {
   double get lat;
   @override
   double get lon;
+  @override
+  String get address;
   @override
   String get state;
   @override

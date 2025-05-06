@@ -61,12 +61,24 @@ class AddScheduleView extends StackedView<AddScheduleViewModel> {
                 Padding(
                   padding: const EdgeInsets.all(20.0).copyWith(top: 0),
                   child: TextFormField(
-                    controller: viewModel.dateTimeEvent,
-                    onTap: viewModel.pickDateTime,
+                    controller: viewModel.dateTimeStartEvent,
+                    onTap: viewModel.pickStartTime,
                     canRequestFocus: false,
                     enableInteractiveSelection: false,
                     decoration: const InputDecoration(
-                      hintText: 'When',
+                      hintText: 'When start?',
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0).copyWith(top: 0),
+                  child: TextFormField(
+                    controller: viewModel.dateTimeEndEvent,
+                    onTap: viewModel.pickEndTime,
+                    canRequestFocus: false,
+                    enableInteractiveSelection: false,
+                    decoration: const InputDecoration(
+                      hintText: 'When end?',
                     ),
                   ),
                 ),
