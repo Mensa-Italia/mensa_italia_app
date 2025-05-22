@@ -24,6 +24,15 @@ class AddonContactsViewModel extends MasterModel {
           for (var element in value) {
             DB.isar.regSociDBModels.putSync(element.toDBModel());
           }
+          // get all the contacts in the database
+          List<int> idsNotInDB = [];
+          DB.isar.regSociDBModels.where().findAllSync().forEach((element) {
+            if (!value.map((e) => e.id).contains(element.id.toString())) {
+              idsNotInDB.add(element.id);
+            }
+          });
+          // delete the contacts not in the database
+          DB.isar.regSociDBModels.deleteAllSync(idsNotInDB);
         });
       }
     });
