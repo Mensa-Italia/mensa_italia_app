@@ -9,15 +9,15 @@ class BottomSheetRegsociModel extends MasterModel {
   Map<String, String> deepData = {};
 
   BottomSheetRegsociModel({required this.regSoci}) {
-    ScraperApi().getRegSocioDeepData(regSoci.linkToFullProfile).then((value) {
-      deepData = value;
-      rebuildUi();
-    });
+    deepData = regSoci.fullData.entries
+        .map((e) => MapEntry(e.key, e.value.toString()))
+        .toList()
+        .asMap()
+        .map((index, value) => MapEntry(value.key, value.value));
   }
 
   bool hasPhoneNumbers() {
-    return deepData.containsKey("Telefono:") ||
-        deepData.containsKey("Cellulare:");
+    return deepData.containsKey("Telefono:") || deepData.containsKey("Cellulare:");
   }
 
   String getPhoneNumber() {
@@ -62,7 +62,6 @@ class BottomSheetRegsociModel extends MasterModel {
     if (email.contains("mailto:")) {
       url = email;
     }
-    print(url);
     if (await canLaunchUrlString(url)) {
       await launchUrlString(url);
     } else {
@@ -89,7 +88,7 @@ class BottomSheetRegsociModel extends MasterModel {
   }
 
   linkToProfile() async {
-    String url = regSoci.linkToFullProfile;
+    String url = regSoci.fullProfileLink!;
     navigationService.back();
     navigationService.navigateToGenericWebviewView(
       url: url,

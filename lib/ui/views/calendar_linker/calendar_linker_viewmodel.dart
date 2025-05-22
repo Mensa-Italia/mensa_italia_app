@@ -48,7 +48,6 @@ class CalendarLinkerViewModel extends MasterModel {
   }
 
   void copyToClipboard() async {
-    print("Copying to clipboard");
     String url = "https:$baseUrl";
     Clipboard.setData(ClipboardData(text: url));
     Fluttertoast.showToast(

@@ -133,7 +133,6 @@ Future<Uint8List> loadMarkerImage(String image) async {
     var byteData = await rootBundle.load(image);
     return byteData.buffer.asUint8List();
   } catch (e) {
-    print(e);
     return Uint8List(0);
   }
 }

@@ -71,7 +71,6 @@ class GenericWebviewViewModel extends MasterModel {
                 rebuildUi();
               },
               onPageFinished: (String url) async {
-                print(url);
                 try {
                   if (url.startsWith(
                       "https://www.cloud32.it/Associazioni/utenti/login")) {

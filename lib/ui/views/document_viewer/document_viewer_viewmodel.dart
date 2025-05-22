@@ -10,10 +10,8 @@ class DocumentViewerViewModel extends BaseViewModel {
   final String downloadUrl;
 
   DocumentViewerViewModel({this.downloadUrl = ""}) {
-    print(downloadUrl);
     ScraperApi().getFile(downloadUrl).then((value) {
       genericFile = value;
-      print(genericFile!.path);
       rebuildUi();
     });
   }

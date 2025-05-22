@@ -18,40 +18,53 @@ class Changelog extends StackedView<ChangelogModel> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 50),
-            Center(
-              child: Text(
-                "What's new",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            Expanded(
+              child: SingleChildScrollView(
+                  child: Column(
+                children: [
+                  SizedBox(height: 50),
+                  Center(
+                    child: Text(
+                      "What's new",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: 40),
+                  _WhatsNewComponent(
+                    icon: EneftyIcons.ticket_2_outline,
+                    title: "Semplified event creation",
+                    description: "We have simplified the event creation process, making it easier and faster to create events.",
+                    color: Colors.blueAccent,
+                  ),
+                  SizedBox(height: 20),
+                  _WhatsNewComponent(
+                    icon: EneftyIcons.timer_2_outline,
+                    title: "DateTime input fixed",
+                    description: "We have fixed the DateTime input, making it more user-friendly and reliable.",
+                    color: Colors.pink,
+                  ),
+                  SizedBox(height: 20),
+                  _WhatsNewComponent(
+                    icon: EneftyIcons.people_outline,
+                    title: "Improved contacts addon",
+                    description: "We have improved the performance of the contacts addon, making it faster and more efficient.",
+                    color: Colors.green,
+                  ),
+                  SizedBox(height: 20),
+                  _WhatsNewComponent(
+                    icon: EneftyIcons.calendar_2_outline,
+                    title: "Birthday reminder",
+                    description: "We have added a birthday reminder feature, so you never forget a friend's birthday again.",
+                    color: Colors.purple,
+                  ),
+                  SizedBox(height: 20),
+                ],
+              )),
             ),
-            SizedBox(height: 40),
-            _WhatsNewComponent(
-              icon: EneftyIcons.ticket_2_outline,
-              title: "Semplified event creation",
-              description: "We have simplified the event creation process, making it easier and faster to create events.",
-              color: Colors.blueAccent,
-            ),
-            SizedBox(height: 20),
-            _WhatsNewComponent(
-              icon: EneftyIcons.timer_2_outline,
-              title: "DateTime input fixed",
-              description: "We have fixed the DateTime input, making it more user-friendly and reliable.",
-              color: Colors.pink,
-            ),
-            SizedBox(height: 20),
-            _WhatsNewComponent(
-              icon: EneftyIcons.location_outline,
-              title: "Simplified position input",
-              description: "We have simplified the position input, making it easier to use.",
-              color: Colors.green,
-            ),
-            SizedBox(height: 20),
-            Expanded(child: Container()),
             Padding(
               padding: const EdgeInsets.all(8.0).copyWith(left: 30, right: 30),
               child: ElevatedButton(

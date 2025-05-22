@@ -25,6 +25,7 @@ import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/model/notification.dart';
 import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/model/receipt.dart';
+import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
@@ -333,9 +334,7 @@ class Api {
             return SigModel.fromJson(data);
           }).first);
       return Memoized().get("random_sig");
-    }).catchError((e) {
-      print(e);
-    });
+    }).catchError((e) {});
   }
 
   Future<bool> addSig({
@@ -1087,7 +1086,6 @@ class Api {
 
   Future<void> addExtAppPermission(String appid, {required List<String> permToAdd}) async {
     final externalApp = await getExternalAppPermissions(appid);
-    print(externalApp);
     if (externalApp == null) {
       await pb.collection('ex_granted_permissions').create(body: {
         "user": pb.authStore.model.id,
@@ -1144,5 +1142,31 @@ class Api {
     }).then((value) {
       Memoized().remove("all_locations");
     });
+  }
+
+  Future<List<RegSociModel>> getRegSoci({String? filter}) async {
+    return await pb
+        .collection(
+          'members_registry',
+        )
+        .getFullList(
+          filter: filter,
+        )
+        .then((value) {
+      return value.map((e) {
+        final data = e.toJson();
+        data["image"] = pb.files.getUrl(e, e.getStringValue("image")).toString();
+        return RegSociModel.fromJson(data);
+      }).toList();
+    });
+  }
+
+  Future<List<RegSociModel>> getTodaysBirthdays() async {
+    final allRegSoci = await getRegSoci();
+    return allRegSoci.where((element) {
+      final date = element.birthdate ?? DateTime.now().subtract(const Duration(days: 300));
+      final today = DateTime.now();
+      return date.day == today.day && date.month == today.month;
+    }).toList();
   }
 }

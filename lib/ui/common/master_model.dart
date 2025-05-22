@@ -250,6 +250,7 @@ class MasterModel extends ReactiveViewModel {
       final lastVersion = transformVersion(prefs.getString("last_version") ?? "");
       PackageInfo.fromPlatform().then((value) {
         final version = transformVersion(value.version);
+        Api().setMetadata("mobile_app_version", value.version);
         if (lastVersion != version) {
           prefs.setString("last_version", version);
           showBeautifulBottomSheet(child: Changelog());

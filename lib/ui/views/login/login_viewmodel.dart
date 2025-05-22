@@ -9,6 +9,7 @@ class LoginViewModel extends MasterModel {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
+  bool passwordVisible = false;
 
   String? saveEmail(String? value) {
     email = value ?? "";
@@ -59,5 +60,10 @@ class LoginViewModel extends MasterModel {
       title: "Reset Password",
       previousPageTitle: "views.signin.title2".tr(),
     );
+  }
+
+  void togglePasswordVisibility() {
+    passwordVisible = !passwordVisible;
+    rebuildUi();
   }
 }

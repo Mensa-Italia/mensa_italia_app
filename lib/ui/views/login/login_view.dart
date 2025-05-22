@@ -13,8 +13,7 @@ class LoginView extends StackedView<LoginViewModel> {
   const LoginView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, LoginViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, LoginViewModel viewModel, Widget? child) {
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -48,8 +47,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 60),
+                      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 60),
                       child: Text(
                         "views.signin.title".tr(),
                         style: TextStyle(
@@ -68,8 +66,7 @@ class LoginView extends StackedView<LoginViewModel> {
                           children: [
                             TextFormField(
                               decoration: InputDecoration(
-                                hintText:
-                                    "views.signin.form.field.hint.email".tr(),
+                                hintText: "views.signin.form.field.hint.email".tr(),
                               ),
                               autocorrect: false,
                               enableSuggestions: true,
@@ -85,20 +82,20 @@ class LoginView extends StackedView<LoginViewModel> {
                             verticalSpaceSmall,
                             TextFormField(
                               decoration: InputDecoration(
-                                hintText:
-                                    "views.signin.form.field.hint.password"
-                                        .tr(),
+                                hintText: "views.signin.form.field.hint.password".tr(),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    viewModel.passwordVisible ? Icons.visibility : Icons.visibility_off,
+                                    color: kcPrimaryColor,
+                                  ),
+                                  onPressed: viewModel.togglePasswordVisibility,
+                                ),
                               ),
                               textInputAction: TextInputAction.done,
                               autocorrect: false,
                               enableSuggestions: false,
-                              obscureText: true,
-                              validator: ValidationBuilder()
-                                  .minLength(
-                                      3,
-                                      "views.signin.form.field.error.password"
-                                          .tr())
-                                  .build(),
+                              obscureText: !viewModel.passwordVisible,
+                              validator: ValidationBuilder().minLength(3, "views.signin.form.field.error.password".tr()).build(),
                               onSaved: viewModel.savePassword,
                             ),
                             Row(
@@ -108,14 +105,13 @@ class LoginView extends StackedView<LoginViewModel> {
                                   onPressed: viewModel.goToResetPassword,
                                   child: Text.rich(
                                     TextSpan(
-                                      text:
-                                          "views.signin.form.button.recover_password.text"
-                                              .tr(),
+                                      text: "views.signin.form.button.recover_password.text".tr(),
                                       children: [
                                         TextSpan(
-                                          text:
-                                              "views.signin.form.button.recover_password.button"
-                                                  .tr(),
+                                          text: " ",
+                                        ),
+                                        TextSpan(
+                                          text: "views.signin.form.button.recover_password.button".tr(),
                                           style: TextStyle(
                                             color: kcPrimaryColor,
                                             fontWeight: FontWeight.bold,
@@ -149,9 +145,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 20)
-                          .copyWith(top: 70),
+                      margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20).copyWith(top: 70),
                       child: Text(
                         "views.signin.nosignupinfo".tr(),
                         textAlign: TextAlign.center,

@@ -12,21 +12,13 @@ import 'package:stacked/stacked.dart';
 import 'package:badges/badges.dart' as badges;
 import 'membership_page_model.dart';
 
-final internalAddonsList = [
-  "Contacts",
-  "TestMakers",
-  "Documents",
-  "Tableport",
-  "Deals",
-  "Boutique"
-];
+final internalAddonsList = ["Contacts", "TestMakers", "Documents", "Tableport", "Deals", "Boutique"];
 
 class MembershipPage extends StackedView<MembershipPageModel> {
   const MembershipPage({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, MembershipPageModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, MembershipPageModel viewModel, Widget? child) {
     return ListView(
       padding: const EdgeInsets.all(0),
       children: [
@@ -44,15 +36,71 @@ class MembershipPage extends StackedView<MembershipPageModel> {
           key: const ValueKey("MembershipCard"),
           child: _MembershipCard(),
         ),
-        if (viewModel.nextEvent != null ||
-            viewModel.randomoSig != null ||
-            viewModel.lastBlogPost != null) ...[
+        if (viewModel.nextEvent != null || viewModel.randomoSig != null || viewModel.lastBlogPost != null) ...[
           Padding(
             padding: EdgeInsets.all(8.0),
             child: Text("views.home.subtitle.highlights".tr()),
           ),
           const _highlights(
             key: ValueKey("Highlights"),
+          ),
+        ],
+        if (viewModel.regSoci.isNotEmpty) ...[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("views.home.subtitle.birthdays".tr()),
+          ),
+          GestureDetector(
+            onTap: viewModel.openBirthday,
+            child: Container(
+              height: 60,
+              child: ListView(
+                padding: const EdgeInsets.only(left: 20),
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var regSoci in viewModel.regSoci)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 40,
+                        minWidth: 40,
+                        maxHeight: 60,
+                        minHeight: 60,
+                      ),
+                      child: OverflowBox(
+                        maxWidth: 60,
+                        minWidth: 60,
+                        maxHeight: 60,
+                        minHeight: 60,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: kcPrimaryColor.withOpacity(.4),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 3,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: CachedNetworkImageProvider(
+                                regSoci.image,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
           ),
         ],
         if (viewModel.favsAddons.isNotEmpty) ...[
@@ -74,8 +122,7 @@ class MembershipPage extends StackedView<MembershipPageModel> {
   }
 
   @override
-  MembershipPageModel viewModelBuilder(BuildContext context) =>
-      MembershipPageModel();
+  MembershipPageModel viewModelBuilder(BuildContext context) => MembershipPageModel();
 }
 
 class _UserInfoTopBar extends ViewModelWidget<MembershipPageModel> {
@@ -118,8 +165,7 @@ class _UserInfoTopBar extends ViewModelWidget<MembershipPageModel> {
                 icon: const Icon(EneftyIcons.notification_outline),
                 onPressed: viewModel.openNotifications,
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(kcPrimaryColor.withOpacity(.1)),
+                  backgroundColor: MaterialStateProperty.all(kcPrimaryColor.withOpacity(.1)),
                 ),
               ),
             ),
@@ -179,8 +225,7 @@ class _MembershipCard extends ViewModelWidget<MembershipPageModel> {
             "assets/images/backcard.jpg",
           ),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.3), BlendMode.srcATop),
+          colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.3), BlendMode.srcATop),
         ),
         boxShadow: [
           BoxShadow(
@@ -191,8 +236,7 @@ class _MembershipCard extends ViewModelWidget<MembershipPageModel> {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
+      child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
         return SizedBox(
           height: constraints.maxHeight,
           child: Column(
@@ -217,25 +261,14 @@ class _MembershipCard extends ViewModelWidget<MembershipPageModel> {
                         child: Builder(
                           builder: (_) {
                             if (nomeProfilo.isEmpty) {
-                              const Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: []);
+                              const Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: []);
                             }
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: List.generate(nomeProfilo.length, (i) {
                                 return Expanded(
-                                  child: AutoSizeText(
-                                      nomeProfilo[i].toUpperCase().trim(),
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                      textAlign: TextAlign.left,
-                                      minFontSize: 0,
-                                      maxLines: 1),
+                                  child: AutoSizeText(nomeProfilo[i].toUpperCase().trim(), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), textAlign: TextAlign.left, minFontSize: 0, maxLines: 1),
                                 );
                               }),
                             );
@@ -261,26 +294,17 @@ class _MembershipCard extends ViewModelWidget<MembershipPageModel> {
                             ),
                             Expanded(
                               child: Container(
-                                width: constraints.maxWidth -
-                                    (constraints.maxWidth * 2 / 7),
+                                width: constraints.maxWidth - (constraints.maxWidth * 2 / 7),
                                 alignment: Alignment.bottomLeft,
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: <Widget>[
-                                    AutoSizeText(ntessera,
-                                        style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                        minFontSize: 0),
+                                    AutoSizeText(ntessera, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20), minFontSize: 0),
                                     const AutoSizeText(
                                       "MENSA.IT",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                       minFontSize: 0,
                                     ),
                                   ],
@@ -347,11 +371,7 @@ class _highlightsCard extends StatelessWidget {
   final String link;
   final Function() onTap;
 
-  const _highlightsCard(
-      {required this.title,
-      required this.image,
-      required this.link,
-      required this.onTap});
+  const _highlightsCard({required this.title, required this.image, required this.link, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -445,9 +465,7 @@ class _addons extends ViewModelWidget<MembershipPageModel> {
         ),
       );
     }).toList()
-      ..addAll(internalAddonsList
-          .where((element) => viewModel.hasInternalAddon(element))
-          .map<_addonsCard>((e) {
+      ..addAll(internalAddonsList.where((element) => viewModel.hasInternalAddon(element)).map<_addonsCard>((e) {
         return _addonsCard(
           onTap: viewModel.openInternalAddon(e),
           name: "addons.${e.toLowerCase()}.title".tr(),
@@ -470,8 +488,7 @@ class _addonsCard extends StatelessWidget {
   final Widget icon;
   final Function() onTap;
   final String name;
-  const _addonsCard(
-      {required this.icon, required this.onTap, required this.name});
+  const _addonsCard({required this.icon, required this.onTap, required this.name});
 
   @override
   Widget build(BuildContext context) {

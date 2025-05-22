@@ -8,7 +8,7 @@ class DB {
   static init() async {
     final dir = await getApplicationDocumentsDirectory();
     DB._isar = await Isar.open(
-      [RegSociModelSchema],
+      [RegSociDBModelSchema],
       directory: dir.path,
     );
   }

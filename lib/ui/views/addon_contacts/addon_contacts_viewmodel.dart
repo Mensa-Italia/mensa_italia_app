@@ -1,51 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
+import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
-
-class _AddonContactsUpdates {
-  static bool started = false;
-  static bool completed = false;
-  static List<int> downloadedList = [];
-
-  static Future start() async {
-    if (started) return;
-    await (await ScraperApi().getCookieJar()).cookieJar.deleteAll();
-    started = true;
-    int threads = 10;
-    await Future.wait(List.generate(
-        threads, (index) => startRequestFlow(index + 1, window: threads)));
-    completed = true;
-    DB.isar.writeTxn(() async {
-      await DB.isar.regSociModels.where().findAll().then((value) async {
-        final toDeleteList = value
-            .where((element) => !downloadedList.contains(element.uid))
-            .toList();
-        if (toDeleteList.isNotEmpty) {
-          await DB.isar.regSociModels
-              .deleteAll(toDeleteList.map((e) => e.id).toList());
-        }
-      });
-    });
-  }
-
-  static Future startRequestFlow(int page, {int window = 5}) {
-    return ScraperApi().getRegSoci(page: page).then((value) async {
-      downloadedList.addAll(value.map((e) => e.uid).toList());
-      try {
-        DB.isar.writeTxn(() async {
-          await DB.isar.regSociModels.putAll(value);
-        });
-      } catch (_) {}
-      if (value.isNotEmpty) {
-        await startRequestFlow(page + window, window: window);
-      }
-    });
-  }
-}
 
 class AddonContactsViewModel extends MasterModel {
   final List<RegSociModel?> _contacts = [];
@@ -53,15 +13,19 @@ class AddonContactsViewModel extends MasterModel {
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
 
-  bool get isCompleted => _AddonContactsUpdates.completed;
-
   AddonContactsViewModel() {
     refresh();
-    DB.isar.regSociModels.watchLazy().listen((event) {
+    DB.isar.regSociDBModels.watchLazy().listen((event) {
       refresh();
     });
-    _AddonContactsUpdates.start().then((value) {
-      refresh();
+    Api().getRegSoci().then((value) {
+      if (value != null) {
+        DB.isar.writeTxnSync(() {
+          for (var element in value) {
+            DB.isar.regSociDBModels.putSync(element.toDBModel());
+          }
+        });
+      }
     });
   }
 
@@ -77,46 +41,58 @@ class AddonContactsViewModel extends MasterModel {
   refresh() {
     _contacts.clear();
     if (nameToSearch.trim().isEmpty) {
-      _contacts.addAll(DB.isar.regSociModels.buildQuery<RegSociModel>(
-        sortBy: [
-          const SortProperty(
-            property: "name",
-            sort: Sort.asc,
-          ),
-        ],
-      ).findAllSync());
+      _contacts.addAll(DB.isar.regSociDBModels
+          .buildQuery<RegSociDBModel>(
+            sortBy: [
+              const SortProperty(
+                property: "name",
+                sort: Sort.asc,
+              ),
+            ],
+          )
+          .findAllSync()
+          .map((e) => e.toModel())
+          .toList());
     } else {
-      _contacts.addAll(DB.isar.regSociModels.buildQuery<RegSociModel>(
-        filter: FilterGroup.or(nameToSearchCombination().map((e) {
-          return FilterCondition.startsWith(
-            property: 'nameFullTextSearch',
-            value: e.trim(),
-            caseSensitive: false,
-          );
-        }).toList()),
-        sortBy: [
-          const SortProperty(
-            property: "name",
-            sort: Sort.asc,
-          ),
-        ],
-      ).findAllSync());
+      _contacts.addAll(DB.isar.regSociDBModels
+          .buildQuery<RegSociDBModel>(
+            filter: FilterGroup.or(nameToSearchCombination().map((e) {
+              return FilterCondition.startsWith(
+                property: 'nameFullTextSearch',
+                value: e.trim(),
+                caseSensitive: false,
+              );
+            }).toList()),
+            sortBy: [
+              const SortProperty(
+                property: "name",
+                sort: Sort.asc,
+              ),
+            ],
+          )
+          .findAllSync()
+          .map((e) => e.toModel())
+          .toList());
       if (_contacts.isEmpty) {
-        _contacts.addAll(DB.isar.regSociModels.buildQuery<RegSociModel>(
-          filter: FilterGroup.or(Isar.splitWords(nameToSearch).map((e) {
-            return FilterCondition.startsWith(
-              property: 'nameFullTextSearch',
-              value: e.trim(),
-              caseSensitive: false,
-            );
-          }).toList()),
-          sortBy: [
-            const SortProperty(
-              property: "name",
-              sort: Sort.asc,
-            ),
-          ],
-        ).findAllSync());
+        _contacts.addAll(DB.isar.regSociDBModels
+            .buildQuery<RegSociDBModel>(
+              filter: FilterGroup.or(Isar.splitWords(nameToSearch).map((e) {
+                return FilterCondition.startsWith(
+                  property: 'nameFullTextSearch',
+                  value: e.trim(),
+                  caseSensitive: false,
+                );
+              }).toList()),
+              sortBy: [
+                const SortProperty(
+                  property: "name",
+                  sort: Sort.asc,
+                ),
+              ],
+            )
+            .findAllSync()
+            .map((e) => e.toModel())
+            .toList());
       }
     }
 
@@ -144,14 +120,12 @@ class AddonContactsViewModel extends MasterModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }

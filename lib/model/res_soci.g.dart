@@ -9,17 +9,17 @@ part of 'res_soci.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
-extension GetRegSociModelCollection on Isar {
-  IsarCollection<RegSociModel> get regSociModels => this.collection();
+extension GetRegSociDBModelCollection on Isar {
+  IsarCollection<RegSociDBModel> get regSociDBModels => this.collection();
 }
 
-const RegSociModelSchema = CollectionSchema(
-  name: r'RegSociModel',
-  id: -8802677570527444699,
+const RegSociDBModelSchema = CollectionSchema(
+  name: r'RegSociDBModel',
+  id: 5106881311153185436,
   properties: {
-    r'birthDate': PropertySchema(
+    r'birthdate': PropertySchema(
       id: 0,
-      name: r'birthDate',
+      name: r'birthdate',
       type: IsarType.dateTime,
     ),
     r'city': PropertySchema(
@@ -27,19 +27,19 @@ const RegSociModelSchema = CollectionSchema(
       name: r'city',
       type: IsarType.string,
     ),
-    r'firstWords': PropertySchema(
+    r'fullDataJson': PropertySchema(
       id: 2,
-      name: r'firstWords',
+      name: r'fullDataJson',
+      type: IsarType.string,
+    ),
+    r'fullProfileLink': PropertySchema(
+      id: 3,
+      name: r'fullProfileLink',
       type: IsarType.string,
     ),
     r'image': PropertySchema(
-      id: 3,
-      name: r'image',
-      type: IsarType.string,
-    ),
-    r'linkToFullProfile': PropertySchema(
       id: 4,
-      name: r'linkToFullProfile',
+      name: r'image',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
@@ -63,10 +63,10 @@ const RegSociModelSchema = CollectionSchema(
       type: IsarType.long,
     )
   },
-  estimateSize: _regSociModelEstimateSize,
-  serialize: _regSociModelSerialize,
-  deserialize: _regSociModelDeserialize,
-  deserializeProp: _regSociModelDeserializeProp,
+  estimateSize: _regSociDBModelEstimateSize,
+  serialize: _regSociDBModelSerialize,
+  deserialize: _regSociDBModelDeserialize,
+  deserializeProp: _regSociDBModelDeserializeProp,
   idName: r'id',
   indexes: {
     r'nameFullTextSearch': IndexSchema(
@@ -85,22 +85,27 @@ const RegSociModelSchema = CollectionSchema(
   },
   links: {},
   embeddedSchemas: {},
-  getId: _regSociModelGetId,
-  getLinks: _regSociModelGetLinks,
-  attach: _regSociModelAttach,
+  getId: _regSociDBModelGetId,
+  getLinks: _regSociDBModelGetLinks,
+  attach: _regSociDBModelAttach,
   version: '3.1.0+1',
 );
 
-int _regSociModelEstimateSize(
-  RegSociModel object,
+int _regSociDBModelEstimateSize(
+  RegSociDBModel object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.city.length * 3;
-  bytesCount += 3 + object.firstWords.length * 3;
+  bytesCount += 3 + object.fullDataJson.length * 3;
+  {
+    final value = object.fullProfileLink;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.image.length * 3;
-  bytesCount += 3 + object.linkToFullProfile.length * 3;
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.nameFullTextSearch.length * 3;
   {
@@ -113,34 +118,35 @@ int _regSociModelEstimateSize(
   return bytesCount;
 }
 
-void _regSociModelSerialize(
-  RegSociModel object,
+void _regSociDBModelSerialize(
+  RegSociDBModel object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.birthDate);
+  writer.writeDateTime(offsets[0], object.birthdate);
   writer.writeString(offsets[1], object.city);
-  writer.writeString(offsets[2], object.firstWords);
-  writer.writeString(offsets[3], object.image);
-  writer.writeString(offsets[4], object.linkToFullProfile);
+  writer.writeString(offsets[2], object.fullDataJson);
+  writer.writeString(offsets[3], object.fullProfileLink);
+  writer.writeString(offsets[4], object.image);
   writer.writeString(offsets[5], object.name);
   writer.writeStringList(offsets[6], object.nameFullTextSearch);
   writer.writeString(offsets[7], object.state);
   writer.writeLong(offsets[8], object.uid);
 }
 
-RegSociModel _regSociModelDeserialize(
+RegSociDBModel _regSociDBModelDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = RegSociModel(
-    birthDate: reader.readDateTimeOrNull(offsets[0]),
+  final object = RegSociDBModel(
+    birthdate: reader.readDateTimeOrNull(offsets[0]),
     city: reader.readString(offsets[1]),
-    image: reader.readString(offsets[3]),
-    linkToFullProfile: reader.readString(offsets[4]),
+    fullDataJson: reader.readString(offsets[2]),
+    fullProfileLink: reader.readStringOrNull(offsets[3]),
+    image: reader.readString(offsets[4]),
     name: reader.readString(offsets[5]),
     state: reader.readString(offsets[7]),
     uid: reader.readLong(offsets[8]),
@@ -148,7 +154,7 @@ RegSociModel _regSociModelDeserialize(
   return object;
 }
 
-P _regSociModelDeserializeProp<P>(
+P _regSociDBModelDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -162,7 +168,7 @@ P _regSociModelDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
@@ -178,26 +184,26 @@ P _regSociModelDeserializeProp<P>(
   }
 }
 
-Id _regSociModelGetId(RegSociModel object) {
+Id _regSociDBModelGetId(RegSociDBModel object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _regSociModelGetLinks(RegSociModel object) {
+List<IsarLinkBase<dynamic>> _regSociDBModelGetLinks(RegSociDBModel object) {
   return [];
 }
 
-void _regSociModelAttach(
-    IsarCollection<dynamic> col, Id id, RegSociModel object) {}
+void _regSociDBModelAttach(
+    IsarCollection<dynamic> col, Id id, RegSociDBModel object) {}
 
-extension RegSociModelQueryWhereSort
-    on QueryBuilder<RegSociModel, RegSociModel, QWhere> {
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhere> anyId() {
+extension RegSociDBModelQueryWhereSort
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QWhere> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhere>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhere>
       anyNameFullTextSearchElement() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -207,9 +213,10 @@ extension RegSociModelQueryWhereSort
   }
 }
 
-extension RegSociModelQueryWhere
-    on QueryBuilder<RegSociModel, RegSociModel, QWhereClause> {
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause> idEqualTo(Id id) {
+extension RegSociDBModelQueryWhere
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QWhereClause> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause> idEqualTo(
+      Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -218,7 +225,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause> idNotEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause> idNotEqualTo(
       Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
@@ -241,7 +248,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause> idGreaterThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause> idGreaterThan(
       Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
@@ -251,7 +258,8 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause> idLessThan(Id id,
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause> idLessThan(
+      Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -260,7 +268,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause> idBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause> idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -276,7 +284,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementEqualTo(String nameFullTextSearchElement) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
@@ -286,7 +294,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementNotEqualTo(String nameFullTextSearchElement) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
@@ -321,7 +329,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementGreaterThan(
     String nameFullTextSearchElement, {
     bool include = false,
@@ -336,7 +344,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementLessThan(
     String nameFullTextSearchElement, {
     bool include = false,
@@ -351,7 +359,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementBetween(
     String lowerNameFullTextSearchElement,
     String upperNameFullTextSearchElement, {
@@ -369,7 +377,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementStartsWith(
           String NameFullTextSearchElementPrefix) {
     return QueryBuilder.apply(this, (query) {
@@ -381,7 +389,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
@@ -391,7 +399,7 @@ extension RegSociModelQueryWhere
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterWhereClause>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterWhereClause>
       nameFullTextSearchElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
@@ -419,66 +427,66 @@ extension RegSociModelQueryWhere
   }
 }
 
-extension RegSociModelQueryFilter
-    on QueryBuilder<RegSociModel, RegSociModel, QFilterCondition> {
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateIsNull() {
+extension RegSociDBModelQueryFilter
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QFilterCondition> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'birthDate',
+        property: r'birthdate',
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateIsNotNull() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'birthDate',
+        property: r'birthdate',
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateEqualTo(DateTime? value) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateEqualTo(DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'birthDate',
+        property: r'birthdate',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateGreaterThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateGreaterThan(
     DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'birthDate',
+        property: r'birthdate',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateLessThan(
     DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'birthDate',
+        property: r'birthdate',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      birthDateBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      birthdateBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
@@ -486,7 +494,7 @@ extension RegSociModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'birthDate',
+        property: r'birthdate',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -495,7 +503,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -508,7 +517,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       cityGreaterThan(
     String value, {
     bool include = false,
@@ -524,7 +533,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -539,7 +549,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -558,7 +569,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       cityStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -572,7 +583,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityEndsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -585,9 +597,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'city',
@@ -597,9 +608,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> cityMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      cityMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'city',
@@ -609,7 +619,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       cityIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -619,7 +629,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       cityIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -629,22 +639,22 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsGreaterThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -652,15 +662,15 @@ extension RegSociModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -668,15 +678,15 @@ extension RegSociModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -685,7 +695,7 @@ extension RegSociModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'firstWords',
+        property: r'fullDataJson',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -695,77 +705,231 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsStartsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsEndsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'firstWords',
+        property: r'fullDataJson',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsIsEmpty() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      firstWordsIsNotEmpty() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullDataJsonIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'firstWords',
+        property: r'fullDataJson',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> idEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'fullProfileLink',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'fullProfileLink',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'fullProfileLink',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'fullProfileLink',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'fullProfileLink',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fullProfileLink',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      fullProfileLinkIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'fullProfileLink',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -775,7 +939,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      idGreaterThan(
     Id value, {
     bool include = false,
   }) {
@@ -788,7 +953,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> idLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      idLessThan(
     Id value, {
     bool include = false,
   }) {
@@ -801,7 +967,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> idBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition> idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -818,7 +984,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -831,7 +998,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       imageGreaterThan(
     String value, {
     bool include = false,
@@ -847,7 +1014,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -862,7 +1030,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -881,7 +1050,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       imageStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -895,7 +1064,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageEndsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -908,9 +1078,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'image',
@@ -920,9 +1089,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> imageMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      imageMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'image',
@@ -932,7 +1100,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       imageIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -942,7 +1110,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       imageIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -952,143 +1120,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'linkToFullProfile',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'linkToFullProfile',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'linkToFullProfile',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'linkToFullProfile',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
-      linkToFullProfileIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'linkToFullProfile',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1101,7 +1134,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameGreaterThan(
     String value, {
     bool include = false,
@@ -1117,7 +1150,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1132,7 +1166,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1151,7 +1186,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1165,7 +1200,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameEndsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1178,9 +1214,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'name',
@@ -1190,9 +1225,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> nameMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      nameMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'name',
@@ -1202,7 +1236,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1212,7 +1246,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1222,7 +1256,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1236,7 +1270,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementGreaterThan(
     String value, {
     bool include = false,
@@ -1252,7 +1286,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementLessThan(
     String value, {
     bool include = false,
@@ -1268,7 +1302,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementBetween(
     String lower,
     String upper, {
@@ -1288,7 +1322,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1302,7 +1336,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -1316,7 +1350,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementContains(String value,
           {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1328,7 +1362,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementMatches(String pattern,
           {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1340,7 +1374,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1350,7 +1384,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1360,7 +1394,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -1373,7 +1407,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -1386,7 +1420,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -1399,7 +1433,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchLengthLessThan(
     int length, {
     bool include = false,
@@ -1415,7 +1449,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchLengthGreaterThan(
     int length, {
     bool include = false,
@@ -1431,7 +1465,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       nameFullTextSearchLengthBetween(
     int lower,
     int upper, {
@@ -1449,7 +1483,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateEqualTo(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1462,7 +1497,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       stateGreaterThan(
     String value, {
     bool include = false,
@@ -1478,7 +1513,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1493,7 +1529,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1512,7 +1549,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       stateStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1526,7 +1563,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateEndsWith(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1539,9 +1577,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'state',
@@ -1551,9 +1588,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> stateMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      stateMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'state',
@@ -1563,7 +1599,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       stateIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1573,7 +1609,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       stateIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1583,8 +1619,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> uidEqualTo(
-      int value) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      uidEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'uid',
@@ -1593,7 +1629,7 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
       uidGreaterThan(
     int value, {
     bool include = false,
@@ -1607,7 +1643,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> uidLessThan(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      uidLessThan(
     int value, {
     bool include = false,
   }) {
@@ -1620,7 +1657,8 @@ extension RegSociModelQueryFilter
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterFilterCondition> uidBetween(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterFilterCondition>
+      uidBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -1638,352 +1676,359 @@ extension RegSociModelQueryFilter
   }
 }
 
-extension RegSociModelQueryObject
-    on QueryBuilder<RegSociModel, RegSociModel, QFilterCondition> {}
+extension RegSociDBModelQueryObject
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QFilterCondition> {}
 
-extension RegSociModelQueryLinks
-    on QueryBuilder<RegSociModel, RegSociModel, QFilterCondition> {}
+extension RegSociDBModelQueryLinks
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QFilterCondition> {}
 
-extension RegSociModelQuerySortBy
-    on QueryBuilder<RegSociModel, RegSociModel, QSortBy> {
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByBirthDate() {
+extension RegSociDBModelQuerySortBy
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QSortBy> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByBirthdate() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'birthDate', Sort.asc);
+      return query.addSortBy(r'birthdate', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByBirthDateDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      sortByBirthdateDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'birthDate', Sort.desc);
+      return query.addSortBy(r'birthdate', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByCity() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByCity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByCityDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByCityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByFirstWords() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      sortByFullDataJson() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'firstWords', Sort.asc);
+      return query.addSortBy(r'fullDataJson', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      sortByFirstWordsDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      sortByFullDataJsonDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'firstWords', Sort.desc);
+      return query.addSortBy(r'fullDataJson', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByImage() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      sortByFullProfileLink() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullProfileLink', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      sortByFullProfileLinkDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullProfileLink', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByImage() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'image', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByImageDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByImageDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'image', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      sortByLinkToFullProfile() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'linkToFullProfile', Sort.asc);
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      sortByLinkToFullProfileDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'linkToFullProfile', Sort.desc);
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByName() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByNameDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByState() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByState() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'state', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByStateDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByStateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'state', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByUid() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByUid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uid', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> sortByUidDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> sortByUidDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uid', Sort.desc);
     });
   }
 }
 
-extension RegSociModelQuerySortThenBy
-    on QueryBuilder<RegSociModel, RegSociModel, QSortThenBy> {
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByBirthDate() {
+extension RegSociDBModelQuerySortThenBy
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QSortThenBy> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByBirthdate() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'birthDate', Sort.asc);
+      return query.addSortBy(r'birthdate', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByBirthDateDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      thenByBirthdateDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'birthDate', Sort.desc);
+      return query.addSortBy(r'birthdate', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByCity() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByCity() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByCityDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByCityDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'city', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByFirstWords() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      thenByFullDataJson() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'firstWords', Sort.asc);
+      return query.addSortBy(r'fullDataJson', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      thenByFirstWordsDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      thenByFullDataJsonDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'firstWords', Sort.desc);
+      return query.addSortBy(r'fullDataJson', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenById() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      thenByFullProfileLink() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullProfileLink', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy>
+      thenByFullProfileLinkDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullProfileLink', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByImage() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByImage() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'image', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByImageDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByImageDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'image', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      thenByLinkToFullProfile() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'linkToFullProfile', Sort.asc);
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy>
-      thenByLinkToFullProfileDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'linkToFullProfile', Sort.desc);
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByName() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByNameDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByState() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByState() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'state', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByStateDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByStateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'state', Sort.desc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByUid() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByUid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uid', Sort.asc);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QAfterSortBy> thenByUidDesc() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QAfterSortBy> thenByUidDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uid', Sort.desc);
     });
   }
 }
 
-extension RegSociModelQueryWhereDistinct
-    on QueryBuilder<RegSociModel, RegSociModel, QDistinct> {
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByBirthDate() {
+extension RegSociDBModelQueryWhereDistinct
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct>
+      distinctByBirthdate() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'birthDate');
+      return query.addDistinctBy(r'birthdate');
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByCity(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> distinctByCity(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'city', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByFirstWords(
-      {bool caseSensitive = true}) {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct>
+      distinctByFullDataJson({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'firstWords', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'fullDataJson', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByImage(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct>
+      distinctByFullProfileLink({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fullProfileLink',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> distinctByImage(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'image', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct>
-      distinctByLinkToFullProfile({bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'linkToFullProfile',
-          caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByName(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct>
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct>
       distinctByNameFullTextSearch() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'nameFullTextSearch');
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByState(
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> distinctByState(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'state', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<RegSociModel, RegSociModel, QDistinct> distinctByUid() {
+  QueryBuilder<RegSociDBModel, RegSociDBModel, QDistinct> distinctByUid() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'uid');
     });
   }
 }
 
-extension RegSociModelQueryProperty
-    on QueryBuilder<RegSociModel, RegSociModel, QQueryProperty> {
-  QueryBuilder<RegSociModel, int, QQueryOperations> idProperty() {
+extension RegSociDBModelQueryProperty
+    on QueryBuilder<RegSociDBModel, RegSociDBModel, QQueryProperty> {
+  QueryBuilder<RegSociDBModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<RegSociModel, DateTime?, QQueryOperations> birthDateProperty() {
+  QueryBuilder<RegSociDBModel, DateTime?, QQueryOperations>
+      birthdateProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'birthDate');
+      return query.addPropertyName(r'birthdate');
     });
   }
 
-  QueryBuilder<RegSociModel, String, QQueryOperations> cityProperty() {
+  QueryBuilder<RegSociDBModel, String, QQueryOperations> cityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'city');
     });
   }
 
-  QueryBuilder<RegSociModel, String, QQueryOperations> firstWordsProperty() {
+  QueryBuilder<RegSociDBModel, String, QQueryOperations>
+      fullDataJsonProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'firstWords');
+      return query.addPropertyName(r'fullDataJson');
     });
   }
 
-  QueryBuilder<RegSociModel, String, QQueryOperations> imageProperty() {
+  QueryBuilder<RegSociDBModel, String?, QQueryOperations>
+      fullProfileLinkProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fullProfileLink');
+    });
+  }
+
+  QueryBuilder<RegSociDBModel, String, QQueryOperations> imageProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'image');
     });
   }
 
-  QueryBuilder<RegSociModel, String, QQueryOperations>
-      linkToFullProfileProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'linkToFullProfile');
-    });
-  }
-
-  QueryBuilder<RegSociModel, String, QQueryOperations> nameProperty() {
+  QueryBuilder<RegSociDBModel, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
     });
   }
 
-  QueryBuilder<RegSociModel, List<String>, QQueryOperations>
+  QueryBuilder<RegSociDBModel, List<String>, QQueryOperations>
       nameFullTextSearchProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'nameFullTextSearch');
     });
   }
 
-  QueryBuilder<RegSociModel, String, QQueryOperations> stateProperty() {
+  QueryBuilder<RegSociDBModel, String, QQueryOperations> stateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'state');
     });
   }
 
-  QueryBuilder<RegSociModel, int, QQueryOperations> uidProperty() {
+  QueryBuilder<RegSociDBModel, int, QQueryOperations> uidProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'uid');
     });
@@ -1996,24 +2041,49 @@ extension RegSociModelQueryProperty
 
 _$RegSociModelImpl _$$RegSociModelImplFromJson(Map<String, dynamic> json) =>
     _$RegSociModelImpl(
+      id: json['id'] as String,
+      image: json['image'] as String,
+      name: json['name'] as String,
+      city: json['city'] as String,
+      birthdate: getDateTimeLocalNullabe(json['birthdate'] as String),
+      state: json['state'] as String,
+      fullData: json['full_data'] as Map<String, dynamic>,
+      fullProfileLink: json['full_profile_link'] as String?,
+    );
+
+Map<String, dynamic> _$$RegSociModelImplToJson(_$RegSociModelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'image': instance.image,
+      'name': instance.name,
+      'city': instance.city,
+      'birthdate': instance.birthdate?.toIso8601String(),
+      'state': instance.state,
+      'full_data': instance.fullData,
+      'full_profile_link': instance.fullProfileLink,
+    };
+
+_$RegSociDBModelImpl _$$RegSociDBModelImplFromJson(Map<String, dynamic> json) =>
+    _$RegSociDBModelImpl(
       uid: (json['uid'] as num).toInt(),
       image: json['image'] as String,
       name: json['name'] as String,
       city: json['city'] as String,
-      birthDate: json['birth_date'] == null
-          ? null
-          : DateTime.parse(json['birth_date'] as String),
+      birthdate: getDateTimeLocalNullabe(json['birthdate'] as String),
       state: json['state'] as String,
-      linkToFullProfile: json['link_to_full_profile'] as String,
+      fullDataJson: json['full_data_json'] as String,
+      fullProfileLink: json['full_profile_link'] as String?,
     );
 
-Map<String, dynamic> _$$RegSociModelImplToJson(_$RegSociModelImpl instance) =>
+Map<String, dynamic> _$$RegSociDBModelImplToJson(
+        _$RegSociDBModelImpl instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'image': instance.image,
       'name': instance.name,
       'city': instance.city,
-      'birth_date': instance.birthDate?.toIso8601String(),
+      'birthdate': instance.birthdate?.toIso8601String(),
       'state': instance.state,
-      'link_to_full_profile': instance.linkToFullProfile,
+      'full_data_json': instance.fullDataJson,
+      'full_profile_link': instance.fullProfileLink,
     };

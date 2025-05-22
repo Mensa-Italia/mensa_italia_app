@@ -148,7 +148,6 @@ class __addStampModalState extends State<_addStampModal> {
         });
       });
     } catch (e) {
-      print(e);
       _subscription = controller.barcodes.listen(_handleBarcode);
       setState(() {
         state = 0;
