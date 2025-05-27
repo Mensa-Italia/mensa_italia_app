@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:mensa_italia_app/api/api.dart';
-import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';

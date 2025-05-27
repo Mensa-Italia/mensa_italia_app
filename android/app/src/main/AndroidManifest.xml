@@ -6,7 +6,7 @@
         android:label="Mensa"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="${mapsApiKey}"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCxFp5eTX30garvxqET8CEIeHuzI93gqfo"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

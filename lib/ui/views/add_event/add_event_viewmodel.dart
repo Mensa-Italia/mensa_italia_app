@@ -10,7 +10,6 @@ import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 

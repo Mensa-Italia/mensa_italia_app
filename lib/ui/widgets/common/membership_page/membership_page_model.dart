@@ -12,7 +12,6 @@ import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/services/notify_sse.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
-import 'package:mensa_italia_app/ui/widgets/common/changelog/changelog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

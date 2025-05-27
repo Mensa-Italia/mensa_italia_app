@@ -68,7 +68,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
       body: true
           ? SizedBox.expand(
               child: PlacePicker(
-                apiKey: String.fromEnvironment('MAPS_API_KEY'),
+                apiKey: Platform.isAndroid ? 'AIzaSyCxFp5eTX30garvxqET8CEIeHuzI93gqfo' : 'AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE',
                 onPlacePicked: viewModel.resultLocation,
                 searchInputConfig: const SearchInputConfig(
                   padding: EdgeInsets.symmetric(
