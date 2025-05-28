@@ -76,6 +76,7 @@ dependencies:
   gpt_markdown: ^1.0.19
   badges: ^3.1.2
   place_picker_google: ^0.0.16
+  shimmer: ^3.0.0
   
 dev_dependencies:
   build_runner: ^2.4.13

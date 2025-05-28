@@ -39,11 +39,15 @@ class MapPickerViewModel extends MasterModel {
   }
 
   onSearchSubmitted(String p1) {
-    Dio().get("https://photon.komoot.io/api/?q=${Uri.encodeQueryComponent(p1)}&lang=de").then((value) {
+    Dio()
+        .get(
+            "https://photon.komoot.io/api/?q=${Uri.encodeQueryComponent(p1)}&lang=de")
+        .then((value) {
       mapController
           ?.moveCamera(
         CameraUpdate.newLatLngZoom(
-          LatLng(value.data["features"][0]["geometry"]["coordinates"][1], value.data["features"][0]["geometry"]["coordinates"][0]),
+          LatLng(value.data["features"][0]["geometry"]["coordinates"][1],
+              value.data["features"][0]["geometry"]["coordinates"][0]),
           15,
         ),
       )
@@ -79,14 +83,22 @@ class MapPickerViewModel extends MasterModel {
     }
     LatLngBounds partialLocation = (await mapController!.getVisibleRegion());
     List<Placemark> placemarks = await placemarkFromCoordinates(
-      (partialLocation.northeast.latitude + partialLocation.southwest.latitude) / 2,
-      (partialLocation.northeast.longitude + partialLocation.southwest.longitude) / 2,
+      (partialLocation.northeast.latitude +
+              partialLocation.southwest.latitude) /
+          2,
+      (partialLocation.northeast.longitude +
+              partialLocation.southwest.longitude) /
+          2,
     );
     Placemark place = placemarks[0];
     locationToUse = place;
     locationCoordinates = LatLng(
-      (partialLocation.northeast.latitude + partialLocation.southwest.latitude) / 2,
-      (partialLocation.northeast.longitude + partialLocation.southwest.longitude) / 2,
+      (partialLocation.northeast.latitude +
+              partialLocation.southwest.latitude) /
+          2,
+      (partialLocation.northeast.longitude +
+              partialLocation.southwest.longitude) /
+          2,
     );
 
     rebuildUi();
@@ -107,7 +119,8 @@ class MapPickerViewModel extends MasterModel {
               .showCustomDialog<String, String>(
             variant: DialogType.inputText,
             title: "Set a name",
-            description: "Set a name for the location (eg. Ecomuseo, Planetarium etc.)",
+            description:
+                "Set a name for the location (eg. Ecomuseo, Planetarium etc.)",
             data: "",
           )
               .then((value2) {
@@ -131,7 +144,8 @@ class MapPickerViewModel extends MasterModel {
         .showCustomDialog<String, String>(
       variant: DialogType.inputText,
       title: "Set a name",
-      description: "Set a name for the location (eg. Ecomuseo, Planetarium etc.)",
+      description:
+          "Set a name for the location (eg. Ecomuseo, Planetarium etc.)",
       data: result.name,
     )
         .then((value2) {
@@ -139,7 +153,8 @@ class MapPickerViewModel extends MasterModel {
         final locationSelected = LocationSelected(
           locationName: value2.data!,
           locationAddress: result.formattedAddress!,
-          coordinates: LatLng(result.latLng!.latitude, result.latLng!.longitude),
+          coordinates:
+              LatLng(result.latLng!.latitude, result.latLng!.longitude),
         );
         navigationService.back(result: locationSelected);
       }

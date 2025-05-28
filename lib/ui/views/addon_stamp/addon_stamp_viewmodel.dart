@@ -87,7 +87,8 @@ class _showStamp extends StatelessWidget {
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0).copyWith(top: 0, bottom: 0),
+                    padding:
+                        const EdgeInsets.all(20.0).copyWith(top: 0, bottom: 0),
                     child: Text(
                       stamp.description,
                       style: const TextStyle(
@@ -138,7 +139,8 @@ class __addStampModalState extends State<_addStampModal> {
         state = 1;
       });
       _subscription?.cancel();
-      final valuesScanned = (barcode.barcodes.first.rawValue ?? "").split(":::");
+      final valuesScanned =
+          (barcode.barcodes.first.rawValue ?? "").split(":::");
       idStamp = valuesScanned[0];
       codeStamp = valuesScanned[1];
       Api().getStamp(idStamp, codeStamp).then((value) {
@@ -244,7 +246,8 @@ class __addStampModalState extends State<_addStampModal> {
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
-                    stamp?.description ?? ("addons.tableport.addstamp.scanqr".tr()),
+                    stamp?.description ??
+                        ("addons.tableport.addstamp.scanqr".tr()),
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

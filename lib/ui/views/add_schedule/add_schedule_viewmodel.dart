@@ -27,8 +27,10 @@ class AddScheduleViewModel extends MasterModel {
         start: event!.whenStart,
         end: event!.whenEnd,
       );
-      dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
-      dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+      dateTimeStartEvent.text =
+          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+      dateTimeEndEvent.text =
+          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       rebuildUi();
     }
   }
@@ -64,9 +66,11 @@ class AddScheduleViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions.setStart(value);
-        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeStartEvent.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -87,7 +91,8 @@ class AddScheduleViewModel extends MasterModel {
       if (value != null) {
         dateTimeOptions.setEnd(value);
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";

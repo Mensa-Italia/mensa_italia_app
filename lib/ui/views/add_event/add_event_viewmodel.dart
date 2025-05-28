@@ -10,6 +10,7 @@ import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
+import 'package:mensa_italia_app/ui/widgets/common/event_card_generator/event_card_generator.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -86,6 +87,20 @@ class AddEventViewModel extends MasterModel {
         rebuildUi();
       });
     }
+  }
+
+  void generateImage() {
+    MasterModel.showBeautifulBottomSheetInstance(
+      child: EventCardGenerator(),
+    ).then((value) {
+      if (value != null && value is Uint8List) {
+        image = XFile.fromData(value, name: "event_card.png", mimeType: "image/png");
+        image?.readAsBytes().then((bytes) {
+          imageBytes = bytes;
+          rebuildUi();
+        });
+      }
+    });
   }
 
   void addEvent() async {

@@ -128,12 +128,14 @@ class AddonContactsViewModel extends MasterModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(
+        List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)
+            ..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }

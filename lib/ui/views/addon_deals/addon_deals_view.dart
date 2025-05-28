@@ -37,7 +37,8 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: viewModel.tapAddDeal,
-                  child: const Icon(EneftyIcons.add_circle_bold, color: kcPrimaryColor),
+                  child: const Icon(EneftyIcons.add_circle_bold,
+                      color: kcPrimaryColor),
                 ),
             ],
           ),
@@ -63,7 +64,8 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
   }
 
   @override
-  AddonDealsViewModel viewModelBuilder(BuildContext context) => AddonDealsViewModel();
+  AddonDealsViewModel viewModelBuilder(BuildContext context) =>
+      AddonDealsViewModel();
 }
 
 class _DealTile extends StatelessWidget {
@@ -71,7 +73,11 @@ class _DealTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
-  const _DealTile({super.key, required this.deal, required this.onTap, required this.onLongPress});
+  const _DealTile(
+      {super.key,
+      required this.deal,
+      required this.onTap,
+      required this.onLongPress});
 
   @override
   Widget build(BuildContext context) {

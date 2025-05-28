@@ -37,11 +37,11 @@ class AddEventView extends StackedView<AddEventViewModel> {
       ),
       body: ListView(
         children: [
-          if (viewModel.allowControlEvents())
+          if (viewModel.allowControlEvents()) ...[
             GestureDetector(
               onTap: viewModel.pickImage,
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20.0).copyWith(bottom: 0),
                 child: DottedBorder(
                   borderType: BorderType.RRect,
                   radius: const Radius.circular(30),
@@ -81,6 +81,11 @@ class AddEventView extends StackedView<AddEventViewModel> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
+              child: ElevatedButton(onPressed: viewModel.generateImage, child: const Text("IA Generate Image")),
+            ),
+          ],
           Form(
             key: viewModel.formKey,
             child: Column(

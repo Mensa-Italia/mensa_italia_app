@@ -51,8 +51,10 @@ class AddonDealsAddViewModel extends MasterModel {
           start: deal!.starting!,
           end: deal!.ending!,
         );
-        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
-        dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+        dateTimeStartEvent.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeEndEvent.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       }
       detailsController.text = deal!.details ?? "";
       whoController.text = deal!.who ?? "";
@@ -145,7 +147,6 @@ class AddonDealsAddViewModel extends MasterModel {
       }
     });
   }
-  
 
   void pickStartTime() {
     showOmniDateTimePicker(
@@ -158,9 +159,11 @@ class AddonDealsAddViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions.setStart(value);
-        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeStartEvent.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -181,7 +184,8 @@ class AddonDealsAddViewModel extends MasterModel {
       if (value != null) {
         dateTimeOptions.setEnd(value);
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -189,7 +193,6 @@ class AddonDealsAddViewModel extends MasterModel {
       }
     });
   }
-
 
   void selectEligibility() async {
     final ListOfEligibility = [
