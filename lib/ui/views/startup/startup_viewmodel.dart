@@ -32,7 +32,7 @@ class StartupViewModel extends MasterModel {
       Stripe.merchantIdentifier = "merchant.it.mensa.app";
       Stripe.instance.applySettings();
 
-      await ScraperApi().init();
+      ScraperApi().init();
       ScraperApi().isPasswordEmailStored().then((existsStored) async {
         if (existsStored) {
           final email = await ScraperApi().getStoredEmail();
