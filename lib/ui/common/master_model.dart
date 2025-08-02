@@ -246,7 +246,6 @@ class MasterModel extends ReactiveViewModel {
   }
 
   void showChangelog() {
-          showBeautifulBottomSheet(child: Changelog());
     SharedPreferences.getInstance().then((prefs) {
       final lastVersion = transformVersion(prefs.getString("last_version") ?? "");
       PackageInfo.fromPlatform().then((value) {
