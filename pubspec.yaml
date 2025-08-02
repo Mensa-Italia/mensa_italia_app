@@ -41,7 +41,7 @@ dependencies:
   intl: any
   dart_rss: ^3.0.3
   image_picker: ^1.1.2
-  dotted_border: ^2.1.0
+  dotted_border: ^3.0.1
   sentry_flutter: ^8.14.2
   maplibre_gl: ^0.21.0
   package_info_plus: ^8.2.1
