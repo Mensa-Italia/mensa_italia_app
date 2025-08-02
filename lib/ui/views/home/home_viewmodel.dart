@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app_links/app_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/api/api.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class HomeViewModel extends MasterModel {
@@ -40,9 +42,7 @@ class HomeViewModel extends MasterModel {
   void addNotificationPreference() {
     Api().getMetadata().then((metadata) async {
       try {
-        List<String> notificationEvents =
-            (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>)
-                .cast<String>();
+        List<String> notificationEvents = (jsonDecode(metadata["notify_me_events"] ?? "[]") as List<dynamic>).cast<String>();
         if (notificationEvents.isNotEmpty) {
           return;
         }
@@ -58,26 +58,32 @@ class HomeViewModel extends MasterModel {
   }
 
   void setLanguageMetadata() {
-    Api().setMetadata(
-        "codes_locale", Localizations.localeOf(context).toString());
+    Api().setMetadata("codes_locale", Localizations.localeOf(context).toString());
   }
 
   void checkForInitialMessage() async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     String? internalID = initialMessage?.data["internal_id"];
     try {
-      handleNotificationActions(initialMessage!.data,
-          notificationID: internalID);
+      handleNotificationActions(initialMessage!.data, notificationID: internalID);
     } catch (_) {}
   }
 
   StreamSubscription? listenForMessagesvar;
+  StreamSubscription? appLinksSub;
   void listenForMessages() {
-    listenForMessagesvar =
-        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    listenForMessagesvar = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       String? internalID = message.data["internal_id"];
       handleNotificationActions(message.data, notificationID: internalID);
+    }); // AppLinks is singleton
+    final appLinks = AppLinks();
+    appLinksSub = appLinks.uriLinkStream.listen((uri) {      
+      if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == "links" && uri.pathSegments.length > 1 && uri.pathSegments[1] == "event") {
+        String eventId = uri.pathSegments[2];
+        Api().getEvent(eventId).then((event) {
+          navigationService.navigateToEventShowcaseView(event: event);
+        });
+      }
     });
   }
 

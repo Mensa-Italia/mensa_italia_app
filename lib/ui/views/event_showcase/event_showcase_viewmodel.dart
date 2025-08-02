@@ -5,6 +5,7 @@ import 'package:mensa_italia_app/model/event_owner.dart';
 import 'package:mensa_italia_app/model/event_schedule.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class EventShowcaseViewModel extends MasterModel {
@@ -24,8 +25,7 @@ class EventShowcaseViewModel extends MasterModel {
       event = value;
       Api().getEventSchedules(event.id).then((value) {
         eventSchedules.clear();
-        eventSchedules
-            .addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
+        eventSchedules.addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
         rebuildUi();
       });
     });
@@ -39,8 +39,7 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty &&
-        await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );
@@ -56,5 +55,13 @@ class EventShowcaseViewModel extends MasterModel {
     navigationService.navigateToAddEventView(event: event).then((value) {
       load();
     });
+  }
+
+  void shareEvent() {
+    SharePlus.instance.share(
+      ShareParams(
+        uri: Uri.parse("https://svc.mensa.it/links/event/${event.id}"),
+      ),
+    );
   }
 }

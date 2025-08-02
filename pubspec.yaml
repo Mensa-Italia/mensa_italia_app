@@ -77,6 +77,8 @@ dependencies:
   badges: ^3.1.2
   place_picker_google: ^0.0.16
   shimmer: ^3.0.0
+  app_links: ^6.4.0
+  share_plus: ^11.0.0
   
 dev_dependencies:
   build_runner: ^2.4.13
