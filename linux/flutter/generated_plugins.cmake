@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   isar_flutter_libs
   maps_launcher
   sentry_flutter
+  syncfusion_pdfviewer_linux
   url_launcher_linux
 )
 

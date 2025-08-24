@@ -43,10 +43,11 @@ class AddEventView extends StackedView<AddEventViewModel> {
               child: Padding(
                 padding: const EdgeInsets.all(20.0).copyWith(bottom: 0),
                 child: DottedBorder(
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(30),
-                  strokeWidth: 3,
-                  dashPattern: const [3, 5],
+                  options: RoundedRectDottedBorderOptions(
+                    radius: const Radius.circular(30),
+                    strokeWidth: 3,
+                    dashPattern: const [3, 5],
+                  ),
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(30)),
                     child: AspectRatio(

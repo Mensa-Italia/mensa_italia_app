@@ -1,10 +1,11 @@
 // This is a generated file; do not edit or check into version control.
 FLUTTER_ROOT=/opt/homebrew/Caskroom/flutter/3.27.1/flutter
-FLUTTER_APPLICATION_PATH=/Users/sipioteo/Developer/Coding/mensa_italia_app
+FLUTTER_APPLICATION_PATH=/Users/sipioteo/Developer/mensa_italia_app
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=20.13.25
-FLUTTER_BUILD_NUMBER=201325
+FLUTTER_BUILD_NAME=21.14.21
+FLUTTER_BUILD_NUMBER=211421
+FLUTTER_CLI_BUILD_MODE=debug
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
