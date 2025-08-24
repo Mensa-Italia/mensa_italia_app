@@ -6,6 +6,7 @@ import 'package:mensa_italia_app/objectbox.g.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
 
+
 class AddonContactsViewModel extends MasterModel {
   final List<RegSociModel?> _contacts = [];
   String nameToSearch = "";
