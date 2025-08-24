@@ -19,6 +19,11 @@
 
             <!-- Disable default Flutter deep linking -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+
+
+            <!-- Disabled Surface control -->
+            <meta-data android:name="io.flutter.embedding.android.DisableSurfaceControl" android:value="true" /> 
+
             
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
