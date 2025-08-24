@@ -8,7 +8,6 @@ import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:stacked_services/stacked_services.dart';
 

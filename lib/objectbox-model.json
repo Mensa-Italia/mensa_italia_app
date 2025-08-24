@@ -1,0 +1,74 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:4002611926849840600",
+      "lastPropertyId": "9:4477363170825892831",
+      "name": "RegSociDBModel",
+      "properties": [
+        {
+          "id": "1:6029295541143271620",
+          "name": "uid",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7041009877691192615",
+          "name": "image",
+          "type": 9
+        },
+        {
+          "id": "3:3722775203403443812",
+          "name": "name",
+          "type": 9,
+          "flags": 2048,
+          "indexId": "1:4213997006478384440"
+        },
+        {
+          "id": "4:1120690818174341728",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "5:3908210806771868456",
+          "name": "birthdate",
+          "type": 10
+        },
+        {
+          "id": "6:2273453759402818576",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "7:2455233351214942228",
+          "name": "fullDataJson",
+          "type": 9
+        },
+        {
+          "id": "8:1624457953696464271",
+          "name": "fullProfileLink",
+          "type": 9
+        },
+        {
+          "id": "9:4477363170825892831",
+          "name": "nameToSearch",
+          "type": 30
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:4002611926849840600",
+  "lastIndexId": "1:4213997006478384440",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

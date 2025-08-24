@@ -13,7 +13,6 @@ import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/firebase_options.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -26,8 +25,7 @@ Future<void> main() async {
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {
-    tz.setLocalLocation(
-        tz.getLocation(await FlutterTimezone.getLocalTimezone()));
+    tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
   } catch (_) {}
   try {
     await Firebase.initializeApp(
@@ -37,25 +35,13 @@ Future<void> main() async {
   await setupLocator();
   setupDialogUi();
   setupBottomSheetUi();
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://342c1850679ce1b9cadafb7b0e6f59aa@o4504321709309952.ingest.us.sentry.io/4507707395211264';
-      options.tracesSampleRate = 1.0;
-      options.profilesSampleRate = 1.0;
-      options.replay.sessionSampleRate = 1.0;
-      options.replay.onErrorSampleRate = 1.0;
-      options.privacy.maskAllText = false;
-      options.privacy.maskAllImages = false;
-    },
-    appRunner: () async => runApp(
-      EasyLocalization(
-        supportedLocales: await TranslationLoader.getLocalizationList(),
-        path: 'not required because translation are fetched from Tolgee',
-        fallbackLocale: Locale('en', 'US'),
-        assetLoader: TranslationLoader(),
-        child: const MainApp(),
-      ),
+  runApp(
+    EasyLocalization(
+      supportedLocales: await TranslationLoader.getLocalizationList(),
+      path: 'not required because translation are fetched from Tolgee',
+      fallbackLocale: Locale('en', 'US'),
+      assetLoader: TranslationLoader(),
+      child: const MainApp(),
     ),
   );
 }
@@ -75,7 +61,6 @@ class MainApp extends StatelessWidget {
       locale: context.locale,
       navigatorObservers: [
         StackedService.routeObserver,
-        SentryNavigatorObserver(),
       ],
       theme: ThemeData(
         // platform: TargetPlatform.android,

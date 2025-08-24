@@ -316,8 +316,10 @@ RegSociDBModel _$RegSociDBModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RegSociDBModel {
+  @Id(assignable: true)
   int get uid => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
+  @Index()
   String get name => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
   @JsonKey(fromJson: getDateTimeLocalNullabe)
@@ -325,6 +327,7 @@ mixin _$RegSociDBModel {
   String get state => throw _privateConstructorUsedError;
   String get fullDataJson => throw _privateConstructorUsedError;
   String? get fullProfileLink => throw _privateConstructorUsedError;
+  List<String> get nameToSearch => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -339,14 +342,15 @@ abstract class $RegSociDBModelCopyWith<$Res> {
       _$RegSociDBModelCopyWithImpl<$Res, RegSociDBModel>;
   @useResult
   $Res call(
-      {int uid,
+      {@Id(assignable: true) int uid,
       String image,
-      String name,
+      @Index() String name,
       String city,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? birthdate,
       String state,
       String fullDataJson,
-      String? fullProfileLink});
+      String? fullProfileLink,
+      List<String> nameToSearch});
 }
 
 /// @nodoc
@@ -370,6 +374,7 @@ class _$RegSociDBModelCopyWithImpl<$Res, $Val extends RegSociDBModel>
     Object? state = null,
     Object? fullDataJson = null,
     Object? fullProfileLink = freezed,
+    Object? nameToSearch = null,
   }) {
     return _then(_value.copyWith(
       uid: null == uid
@@ -404,6 +409,10 @@ class _$RegSociDBModelCopyWithImpl<$Res, $Val extends RegSociDBModel>
           ? _value.fullProfileLink
           : fullProfileLink // ignore: cast_nullable_to_non_nullable
               as String?,
+      nameToSearch: null == nameToSearch
+          ? _value.nameToSearch
+          : nameToSearch // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -417,14 +426,15 @@ abstract class _$$RegSociDBModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int uid,
+      {@Id(assignable: true) int uid,
       String image,
-      String name,
+      @Index() String name,
       String city,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? birthdate,
       String state,
       String fullDataJson,
-      String? fullProfileLink});
+      String? fullProfileLink,
+      List<String> nameToSearch});
 }
 
 /// @nodoc
@@ -446,6 +456,7 @@ class __$$RegSociDBModelImplCopyWithImpl<$Res>
     Object? state = null,
     Object? fullDataJson = null,
     Object? fullProfileLink = freezed,
+    Object? nameToSearch = null,
   }) {
     return _then(_$RegSociDBModelImpl(
       uid: null == uid
@@ -480,32 +491,41 @@ class __$$RegSociDBModelImplCopyWithImpl<$Res>
           ? _value.fullProfileLink
           : fullProfileLink // ignore: cast_nullable_to_non_nullable
               as String?,
+      nameToSearch: null == nameToSearch
+          ? _value._nameToSearch
+          : nameToSearch // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
+@Entity(realClass: RegSociDBModel)
 class _$RegSociDBModelImpl extends _RegSociDBModel {
   const _$RegSociDBModelImpl(
-      {required this.uid,
+      {@Id(assignable: true) required this.uid,
       required this.image,
-      required this.name,
+      @Index() required this.name,
       required this.city,
       @JsonKey(fromJson: getDateTimeLocalNullabe) required this.birthdate,
       required this.state,
       required this.fullDataJson,
-      required this.fullProfileLink})
-      : super._();
+      required this.fullProfileLink,
+      required final List<String> nameToSearch})
+      : _nameToSearch = nameToSearch,
+        super._();
 
   factory _$RegSociDBModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$RegSociDBModelImplFromJson(json);
 
   @override
+  @Id(assignable: true)
   final int uid;
   @override
   final String image;
   @override
+  @Index()
   final String name;
   @override
   final String city;
@@ -518,10 +538,17 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
   final String fullDataJson;
   @override
   final String? fullProfileLink;
+  final List<String> _nameToSearch;
+  @override
+  List<String> get nameToSearch {
+    if (_nameToSearch is EqualUnmodifiableListView) return _nameToSearch;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_nameToSearch);
+  }
 
   @override
   String toString() {
-    return 'RegSociDBModel(uid: $uid, image: $image, name: $name, city: $city, birthdate: $birthdate, state: $state, fullDataJson: $fullDataJson, fullProfileLink: $fullProfileLink)';
+    return 'RegSociDBModel(uid: $uid, image: $image, name: $name, city: $city, birthdate: $birthdate, state: $state, fullDataJson: $fullDataJson, fullProfileLink: $fullProfileLink, nameToSearch: $nameToSearch)';
   }
 
   @override
@@ -539,13 +566,24 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
             (identical(other.fullDataJson, fullDataJson) ||
                 other.fullDataJson == fullDataJson) &&
             (identical(other.fullProfileLink, fullProfileLink) ||
-                other.fullProfileLink == fullProfileLink));
+                other.fullProfileLink == fullProfileLink) &&
+            const DeepCollectionEquality()
+                .equals(other._nameToSearch, _nameToSearch));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, uid, image, name, city,
-      birthdate, state, fullDataJson, fullProfileLink);
+  int get hashCode => Object.hash(
+      runtimeType,
+      uid,
+      image,
+      name,
+      city,
+      birthdate,
+      state,
+      fullDataJson,
+      fullProfileLink,
+      const DeepCollectionEquality().hash(_nameToSearch));
 
   @JsonKey(ignore: true)
   @override
@@ -564,25 +602,28 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
 
 abstract class _RegSociDBModel extends RegSociDBModel {
   const factory _RegSociDBModel(
-      {required final int uid,
+      {@Id(assignable: true) required final int uid,
       required final String image,
-      required final String name,
+      @Index() required final String name,
       required final String city,
       @JsonKey(fromJson: getDateTimeLocalNullabe)
       required final DateTime? birthdate,
       required final String state,
       required final String fullDataJson,
-      required final String? fullProfileLink}) = _$RegSociDBModelImpl;
+      required final String? fullProfileLink,
+      required final List<String> nameToSearch}) = _$RegSociDBModelImpl;
   const _RegSociDBModel._() : super._();
 
   factory _RegSociDBModel.fromJson(Map<String, dynamic> json) =
       _$RegSociDBModelImpl.fromJson;
 
   @override
+  @Id(assignable: true)
   int get uid;
   @override
   String get image;
   @override
+  @Index()
   String get name;
   @override
   String get city;
@@ -595,6 +636,8 @@ abstract class _RegSociDBModel extends RegSociDBModel {
   String get fullDataJson;
   @override
   String? get fullProfileLink;
+  @override
+  List<String> get nameToSearch;
   @override
   @JsonKey(ignore: true)
   _$$RegSociDBModelImplCopyWith<_$RegSociDBModelImpl> get copyWith =>

@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -39,18 +36,5 @@ class ExternalAddonWebviewView
 
   Widget iosFixer(Widget child, ExternalAddonWebviewViewModel viewModel) {
     return child;
-    if (!Platform.isIOS) {
-      return child;
-    } else {
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onHorizontalDragUpdate: (details) {
-          if (details.primaryDelta! > 10) {
-            viewModel.onPopInvoked(true);
-          }
-        },
-        child: child,
-      );
-    }
   }
 }

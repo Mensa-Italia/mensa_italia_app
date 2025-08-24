@@ -28,7 +28,7 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
         trailings: [
           IconButton(
             icon: Icon(
-              Theme.of(context!).platform == TargetPlatform.iOS ? CupertinoIcons.share_up : Icons.share,
+              Theme.of(context).platform == TargetPlatform.iOS ? CupertinoIcons.share_up : Icons.share,
               color: Theme.of(context).appBarTheme.iconTheme?.color,
             ),
             onPressed: viewModel.shareEvent,

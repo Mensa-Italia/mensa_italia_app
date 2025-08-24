@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
+import 'package:mensa_italia_app/objectbox.g.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
 
@@ -11,29 +11,29 @@ class AddonContactsViewModel extends MasterModel {
   String nameToSearch = "";
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
+  final regSociBox = DB.store.box<RegSociDBModel>();
 
   AddonContactsViewModel() {
-    refresh();
-    DB.isar.regSociDBModels.watchLazy().listen((event) {
+    regSociBox.query().watch(triggerImmediately: true).listen((event) {
       refresh();
     });
     Api().getRegSoci().then((value) {
-      if (value != null) {
-        DB.isar.writeTxnSync(() {
-          for (var element in value) {
-            DB.isar.regSociDBModels.putSync(element.toDBModel());
+      void addToDb(Store store, List<RegSociModel> models) {
+        final tempBox = store.box<RegSociDBModel>();
+        tempBox.putMany(models.map((e) => e.toDBModel()).toList());
+
+        List<int> idsNotInDB = [];
+        final allInDb = tempBox.getAll();
+        for (var element in allInDb) {
+          if (!models.map((e) => e.toDBModel().uid).contains(element.uid)) {
+            idsNotInDB.add(element.uid);
           }
-          // get all the contacts in the database
-          List<int> idsNotInDB = [];
-          DB.isar.regSociDBModels.where().findAllSync().forEach((element) {
-            if (!value.map((e) => e.id).contains(element.id.toString())) {
-              idsNotInDB.add(element.id);
-            }
-          });
-          // delete the contacts not in the database
-          DB.isar.regSociDBModels.deleteAllSync(idsNotInDB);
-        });
+        }
+
+        tempBox.removeMany(idsNotInDB);
       }
+
+      DB.store.runInTransactionAsync(TxMode.write, addToDb, value);
     });
   }
 
@@ -47,64 +47,24 @@ class AddonContactsViewModel extends MasterModel {
   }
 
   refresh() {
+    final value = regSociBox.query(buildQuery()).order(RegSociDBModel_.name).build().find();
     _contacts.clear();
-    if (nameToSearch.trim().isEmpty) {
-      _contacts.addAll(DB.isar.regSociDBModels
-          .buildQuery<RegSociDBModel>(
-            sortBy: [
-              const SortProperty(
-                property: "name",
-                sort: Sort.asc,
-              ),
-            ],
-          )
-          .findAllSync()
-          .map((e) => e.toModel())
-          .toList());
-    } else {
-      _contacts.addAll(DB.isar.regSociDBModels
-          .buildQuery<RegSociDBModel>(
-            filter: FilterGroup.or(nameToSearchCombination().map((e) {
-              return FilterCondition.startsWith(
-                property: 'nameFullTextSearch',
-                value: e.trim(),
-                caseSensitive: false,
-              );
-            }).toList()),
-            sortBy: [
-              const SortProperty(
-                property: "name",
-                sort: Sort.asc,
-              ),
-            ],
-          )
-          .findAllSync()
-          .map((e) => e.toModel())
-          .toList());
-      if (_contacts.isEmpty) {
-        _contacts.addAll(DB.isar.regSociDBModels
-            .buildQuery<RegSociDBModel>(
-              filter: FilterGroup.or(Isar.splitWords(nameToSearch).map((e) {
-                return FilterCondition.startsWith(
-                  property: 'nameFullTextSearch',
-                  value: e.trim(),
-                  caseSensitive: false,
-                );
-              }).toList()),
-              sortBy: [
-                const SortProperty(
-                  property: "name",
-                  sort: Sort.asc,
-                ),
-              ],
-            )
-            .findAllSync()
-            .map((e) => e.toModel())
-            .toList());
+    _contacts.addAll(value.map((e) => e.toModel()).toList());
+    rebuildUi();
+  }
+
+  Condition<RegSociDBModel>? buildQuery() {
+    Condition<RegSociDBModel>? query;
+    if (nameToSearch.isNotEmpty) {
+      final allWords = nameToSearchCombination();
+      print(allWords);
+      query = RegSociDBModel_.name.contains(nameToSearch, caseSensitive: false);
+
+      for (var word in allWords) {
+        query = query!.or(RegSociDBModel_.name.contains(word, caseSensitive: false));
       }
     }
-
-    rebuildUi();
+    return query;
   }
 
   Function() tapOnContact(int index) {
@@ -124,18 +84,16 @@ class AddonContactsViewModel extends MasterModel {
   }
 
   List<String> nameToSearchCombination() {
-    final listOfWords = Isar.splitWords(nameToSearch);
+    final listOfWords = nameToSearch.trim().split(" ");
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }

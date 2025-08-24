@@ -1,13 +1,8 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/model/location.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
-import 'package:place_picker_google/place_picker_google.dart';
-import 'package:stacked/stacked.dart';
 
 class LocationListPickerViewModel extends MasterModel {
   List<LocationModel> locations = [];

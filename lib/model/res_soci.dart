@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:isar/isar.dart';
 import 'package:mensa_italia_app/model/parser_tools.dart';
+import 'package:objectbox/objectbox.dart';
 
 part 'res_soci.freezed.dart';
 part 'res_soci.g.dart';
@@ -37,6 +37,7 @@ class RegSociModel with _$RegSociModel {
       state: state,
       fullDataJson: jsonEncode(fullData),
       fullProfileLink: fullProfileLink,
+      nameToSearch: nameToSearchCombination(name),
     );
   }
 
@@ -52,47 +53,19 @@ class RegSociModel with _$RegSociModel {
       return words[0];
     }
   }
-}
 
-@freezed
-@Collection(ignore: {'copyWith'})
-class RegSociDBModel with _$RegSociDBModel {
-  const RegSociDBModel._();
-  const factory RegSociDBModel({
-    required int uid,
-    required String image,
-    required String name,
-    required String city,
-    @JsonKey(
-      fromJson: getDateTimeLocalNullabe,
-    )
-    required DateTime? birthdate,
-    required String state,
-    required String fullDataJson,
-    required String? fullProfileLink,
-  }) = _RegSociDBModel;
 
-  Id get id => (uid);
-
-  factory RegSociDBModel.fromJson(Map<String, dynamic> json) =>
-      _$RegSociDBModelFromJson(json);
-
-  @Index(type: IndexType.value, caseSensitive: false)
-  List<String> get nameFullTextSearch => nameToSearchCombination(name);
-
-  List<String> nameToSearchCombination(String nameToSearch) {
-    final listOfWords = Isar.splitWords(nameToSearch);
+  static List<String> nameToSearchCombination(String nameToDo) {
+    final listOfWords = nameToDo.trim().split(" ");
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }
@@ -104,6 +77,32 @@ class RegSociDBModel with _$RegSociDBModel {
 
     return result;
   }
+}
+
+@freezed
+class RegSociDBModel with _$RegSociDBModel {
+  const RegSociDBModel._();
+
+  @Entity(realClass: RegSociDBModel)
+  const factory RegSociDBModel({
+    @Id(assignable: true) required int uid,
+    required String image,
+    @Index() required String name,
+    required String city,
+    @JsonKey(
+      fromJson: getDateTimeLocalNullabe,
+    )
+    required DateTime? birthdate,
+    required String state,
+    required String fullDataJson,
+    required String? fullProfileLink,
+    required List<String> nameToSearch,
+  }) = _RegSociDBModel;
+
+
+  factory RegSociDBModel.fromJson(Map<String, dynamic> json) =>
+      _$RegSociDBModelFromJson(json);
+
 
   RegSociModel toModel() {
     return RegSociModel(
@@ -125,4 +124,6 @@ class RegSociDBModel with _$RegSociDBModel {
       return {};
     }
   }
+
+
 }
