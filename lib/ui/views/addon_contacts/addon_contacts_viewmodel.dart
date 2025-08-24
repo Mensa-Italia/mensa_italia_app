@@ -17,7 +17,6 @@ class AddonContactsViewModel extends MasterModel {
     regSociBox.query().watch(triggerImmediately: true).listen((event) {
       refresh();
     });
-    regSociBox.removeAll();
     if (regSociBox.isEmpty()) {
       setBusy(true);
     }
