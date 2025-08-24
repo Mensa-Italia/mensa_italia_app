@@ -69,7 +69,7 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(9, 4477363170825892831),
             name: 'nameToSearch',
-            type: 30,
+            type: 9,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -147,8 +147,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final fullProfileLinkOffset = object.fullProfileLink == null
               ? null
               : fbb.writeString(object.fullProfileLink!);
-          final nameToSearchOffset = fbb.writeList(
-              object.nameToSearch.map(fbb.writeString).toList(growable: false));
+          final nameToSearchOffset = fbb.writeString(object.nameToSearch);
           fbb.startTable(10);
           fbb.addInt64(0, object.uid);
           fbb.addOffset(1, imageOffset);
@@ -186,10 +185,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final fullProfileLinkParam =
               const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 18);
-          final nameToSearchParam = const fb.ListReader<String>(
-                  fb.StringReader(asciiOptimization: true),
-                  lazy: false)
-              .vTableGet(buffer, rootOffset, 20, []);
+          final nameToSearchParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 20, '');
           final object = RegSociDBModel(
               uid: uidParam,
               image: imageParam,
@@ -244,5 +242,5 @@ class RegSociDBModel_ {
 
   /// See [RegSociDBModel.nameToSearch].
   static final nameToSearch =
-      obx.QueryStringVectorProperty<RegSociDBModel>(_entities[0].properties[8]);
+      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[8]);
 }

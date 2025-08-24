@@ -50,6 +50,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
                         onSubmitted: searchBarActions.onSubmitted,
                         focusNode: searchBarActions.focusNode,
                         placeholder: searchBarActions.hintText,
+                        autocorrect: false,
                       ),
                     ),
                     ...trailingTitle ?? [],

@@ -37,7 +37,7 @@ class RegSociModel with _$RegSociModel {
       state: state,
       fullDataJson: jsonEncode(fullData),
       fullProfileLink: fullProfileLink,
-      nameToSearch: nameToSearchCombination(name),
+      nameToSearch: nameToSearchCombination(name).join(" . "),
     );
   }
 
@@ -96,7 +96,7 @@ class RegSociDBModel with _$RegSociDBModel {
     required String state,
     required String fullDataJson,
     required String? fullProfileLink,
-    required List<String> nameToSearch,
+    required String nameToSearch,
   }) = _RegSociDBModel;
 
 

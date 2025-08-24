@@ -40,9 +40,7 @@ _$RegSociDBModelImpl _$$RegSociDBModelImplFromJson(Map<String, dynamic> json) =>
       state: json['state'] as String,
       fullDataJson: json['full_data_json'] as String,
       fullProfileLink: json['full_profile_link'] as String?,
-      nameToSearch: (json['name_to_search'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      nameToSearch: json['name_to_search'] as String,
     );
 
 Map<String, dynamic> _$$RegSociDBModelImplToJson(

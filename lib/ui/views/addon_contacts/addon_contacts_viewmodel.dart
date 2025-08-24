@@ -17,6 +17,10 @@ class AddonContactsViewModel extends MasterModel {
     regSociBox.query().watch(triggerImmediately: true).listen((event) {
       refresh();
     });
+    regSociBox.removeAll();
+    if (regSociBox.isEmpty()) {
+      setBusy(true);
+    }
     Api().getRegSoci().then((value) {
       void addToDb(Store store, List<RegSociModel> models) {
         final tempBox = store.box<RegSociDBModel>();
@@ -24,8 +28,9 @@ class AddonContactsViewModel extends MasterModel {
 
         List<int> idsNotInDB = [];
         final allInDb = tempBox.getAll();
+        List<int> myModelIds = models.map((e) => e.toDBModel().uid).toList();
         for (var element in allInDb) {
-          if (!models.map((e) => e.toDBModel().uid).contains(element.uid)) {
+          if (!myModelIds.contains(element.uid)) {
             idsNotInDB.add(element.uid);
           }
         }
@@ -33,7 +38,9 @@ class AddonContactsViewModel extends MasterModel {
         tempBox.removeMany(idsNotInDB);
       }
 
-      DB.store.runInTransactionAsync(TxMode.write, addToDb, value);
+      DB.store.runInTransactionAsync(TxMode.write, addToDb, value).then((_) {
+        setBusy(false);
+      });
     });
   }
 
@@ -57,11 +64,10 @@ class AddonContactsViewModel extends MasterModel {
     Condition<RegSociDBModel>? query;
     if (nameToSearch.isNotEmpty) {
       final allWords = nameToSearchCombination();
-      print(allWords);
-      query = RegSociDBModel_.name.contains(nameToSearch, caseSensitive: false);
+      query = RegSociDBModel_.nameToSearch.contains(nameToSearch, caseSensitive: false);
 
       for (var word in allWords) {
-        query = query!.or(RegSociDBModel_.name.contains(word, caseSensitive: false));
+        query = query!.or(RegSociDBModel_.nameToSearch.contains(word, caseSensitive: false));
       }
     }
     return query;

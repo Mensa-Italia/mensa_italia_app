@@ -327,7 +327,7 @@ mixin _$RegSociDBModel {
   String get state => throw _privateConstructorUsedError;
   String get fullDataJson => throw _privateConstructorUsedError;
   String? get fullProfileLink => throw _privateConstructorUsedError;
-  List<String> get nameToSearch => throw _privateConstructorUsedError;
+  String get nameToSearch => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -350,7 +350,7 @@ abstract class $RegSociDBModelCopyWith<$Res> {
       String state,
       String fullDataJson,
       String? fullProfileLink,
-      List<String> nameToSearch});
+      String nameToSearch});
 }
 
 /// @nodoc
@@ -412,7 +412,7 @@ class _$RegSociDBModelCopyWithImpl<$Res, $Val extends RegSociDBModel>
       nameToSearch: null == nameToSearch
           ? _value.nameToSearch
           : nameToSearch // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as String,
     ) as $Val);
   }
 }
@@ -434,7 +434,7 @@ abstract class _$$RegSociDBModelImplCopyWith<$Res>
       String state,
       String fullDataJson,
       String? fullProfileLink,
-      List<String> nameToSearch});
+      String nameToSearch});
 }
 
 /// @nodoc
@@ -492,9 +492,9 @@ class __$$RegSociDBModelImplCopyWithImpl<$Res>
           : fullProfileLink // ignore: cast_nullable_to_non_nullable
               as String?,
       nameToSearch: null == nameToSearch
-          ? _value._nameToSearch
+          ? _value.nameToSearch
           : nameToSearch // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as String,
     ));
   }
 }
@@ -512,9 +512,8 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
       required this.state,
       required this.fullDataJson,
       required this.fullProfileLink,
-      required final List<String> nameToSearch})
-      : _nameToSearch = nameToSearch,
-        super._();
+      required this.nameToSearch})
+      : super._();
 
   factory _$RegSociDBModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$RegSociDBModelImplFromJson(json);
@@ -538,13 +537,8 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
   final String fullDataJson;
   @override
   final String? fullProfileLink;
-  final List<String> _nameToSearch;
   @override
-  List<String> get nameToSearch {
-    if (_nameToSearch is EqualUnmodifiableListView) return _nameToSearch;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_nameToSearch);
-  }
+  final String nameToSearch;
 
   @override
   String toString() {
@@ -567,23 +561,14 @@ class _$RegSociDBModelImpl extends _RegSociDBModel {
                 other.fullDataJson == fullDataJson) &&
             (identical(other.fullProfileLink, fullProfileLink) ||
                 other.fullProfileLink == fullProfileLink) &&
-            const DeepCollectionEquality()
-                .equals(other._nameToSearch, _nameToSearch));
+            (identical(other.nameToSearch, nameToSearch) ||
+                other.nameToSearch == nameToSearch));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      uid,
-      image,
-      name,
-      city,
-      birthdate,
-      state,
-      fullDataJson,
-      fullProfileLink,
-      const DeepCollectionEquality().hash(_nameToSearch));
+  int get hashCode => Object.hash(runtimeType, uid, image, name, city,
+      birthdate, state, fullDataJson, fullProfileLink, nameToSearch);
 
   @JsonKey(ignore: true)
   @override
@@ -611,7 +596,7 @@ abstract class _RegSociDBModel extends RegSociDBModel {
       required final String state,
       required final String fullDataJson,
       required final String? fullProfileLink,
-      required final List<String> nameToSearch}) = _$RegSociDBModelImpl;
+      required final String nameToSearch}) = _$RegSociDBModelImpl;
   const _RegSociDBModel._() : super._();
 
   factory _RegSociDBModel.fromJson(Map<String, dynamic> json) =
@@ -637,7 +622,7 @@ abstract class _RegSociDBModel extends RegSociDBModel {
   @override
   String? get fullProfileLink;
   @override
-  List<String> get nameToSearch;
+  String get nameToSearch;
   @override
   @JsonKey(ignore: true)
   _$$RegSociDBModelImplCopyWith<_$RegSociDBModelImpl> get copyWith =>
