@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId = "it.mensa.app"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
