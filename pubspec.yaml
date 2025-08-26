@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   dio: ^5.8.0+1
   dio_cookie_manager: ^3.2.0
-  enefty_icons: ^1.0.7
+  enefty_icons: ^1.0.8
   faker: ^2.2.0
   flutter:
     sdk: flutter
