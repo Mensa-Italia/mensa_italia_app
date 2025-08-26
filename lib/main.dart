@@ -11,6 +11,7 @@ import 'package:mensa_italia_app/app/app.locator.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/database/database.dart';
 import 'package:mensa_italia_app/firebase_options.dart';
+import 'package:mensa_italia_app/services/maps_api_header.dart';
 import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await EasyLocalization.ensureInitialized();
   await DB.init();
+  await MapsApiHeader.init();
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {

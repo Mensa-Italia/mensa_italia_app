@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:mensa_italia_app/services/maps_api_header.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:place_picker_google/place_picker_google.dart';
 import 'package:stacked/stacked.dart';
@@ -16,8 +17,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   const MapPickerView({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, MapPickerViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, MapPickerViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBody: true,
       appBar: getAppBarPlatform(
@@ -30,8 +30,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
           : SafeArea(
               child: Container(
                 margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-                    .copyWith(right: 8, left: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8).copyWith(right: 8, left: 32),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(.9),
                   borderRadius: const BorderRadius.all(Radius.circular(100)),
@@ -44,10 +43,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
                   ],
                 ),
                 child: viewModel.locationName.isEmpty
-                    ? const Text("Zoom in to select a location",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold))
+                    ? const Text("Zoom in to select a location", textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
                     : Row(
                         children: [
                           Expanded(
@@ -73,9 +69,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
       body: true
           ? SizedBox.expand(
               child: PlacePicker(
-                apiKey: Platform.isAndroid
-                    ? 'AIzaSyCxFp5eTX30garvxqET8CEIeHuzI93gqfo'
-                    : 'AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE',
+                apiKey: Platform.isAndroid ? 'AIzaSyCxFp5eTX30garvxqET8CEIeHuzI93gqfo' : 'AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE',
+                mapsApiHeaders: MapsApiHeader().headers,
                 onPlacePicked: viewModel.resultLocation,
                 searchInputConfig: const SearchInputConfig(
                   padding: EdgeInsets.symmetric(
@@ -89,12 +84,9 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
                 ),
                 localizationConfig: LocalizationConfig.init(
                   languageCode: Platform.localeName,
-                  selectActionLocation:
-                      "viewModel.locationMapPicker.selectActionLocation".tr(),
-                  unnamedLocation:
-                      "viewModel.locationMapPicker.unnamedLocation".tr(),
-                  noResultsFound:
-                      "viewModel.locationMapPicker.noResultsFound".tr(),
+                  selectActionLocation: "viewModel.locationMapPicker.selectActionLocation".tr(),
+                  unnamedLocation: "viewModel.locationMapPicker.unnamedLocation".tr(),
+                  noResultsFound: "viewModel.locationMapPicker.noResultsFound".tr(),
                   findingPlace: "viewModel.locationMapPicker.findingPlace".tr(),
                   nearBy: "viewModel.locationMapPicker.nearBy".tr(),
                 ),
@@ -108,8 +100,7 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
                 children: [
                   Positioned.fill(
                     child: MapLibreMap(
-                      styleString:
-                          "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
+                      styleString: "https://api.maptiler.com/maps/basic-v2/style.json?key=7u4KZex2hU8HDKij7YWx",
                       initialCameraPosition: const CameraPosition(
                         target: LatLng(42.715210940127285, 12.854392595268873),
                         zoom: 4,
@@ -173,6 +164,5 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
   }
 
   @override
-  MapPickerViewModel viewModelBuilder(BuildContext context) =>
-      MapPickerViewModel();
+  MapPickerViewModel viewModelBuilder(BuildContext context) => MapPickerViewModel();
 }
