@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class OptionPageModel extends MasterModel {
   String version = "20.00.00";
@@ -33,8 +37,7 @@ class OptionPageModel extends MasterModel {
 
   void openPrivacyPolicy() {
     navigationService.navigateToDocumentViewerView(
-      downlaodUrl:
-          "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
+      downlaodUrl: "https://www.mensa.it/wp-content/uploads/2018/04/Informativa-Privacy-Mensa-Italia_Ver._Mar-2018.pdf",
       title: "Privacy Policy",
       previousPageTitle: "Settings",
     );
@@ -71,6 +74,20 @@ class OptionPageModel extends MasterModel {
   }
 
   openDonationPage() {
+    if (Platform.isIOS) {
+      Api().settings().then((settings) async {
+        if (settings["donation_link_on_ios"] == "false") {
+          navigationService.navigateToMakeDonationView();
+          return;
+        }
+        Uri url = Uri.parse(settings["donation_stripe_link"] ?? "https://www.mensa.it/sostienici/");
+        url = url.replace(queryParameters: {
+          "locked_prefilled_email": user.email,
+        });
+        launchUrl(url);
+      });
+      return;
+    }
     navigationService.navigateToMakeDonationView();
   }
 

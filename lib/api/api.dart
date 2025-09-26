@@ -943,7 +943,7 @@ class Api {
 
   Future<Map<String, String>> settings() async {
     if (Memoized().has("configs")) {
-      return Memoized().get("configs");
+      //return Memoized().get("configs");
     }
     return await pb.collection('configs').getFullList().then((value) {
       final Map<String, String> res = {};

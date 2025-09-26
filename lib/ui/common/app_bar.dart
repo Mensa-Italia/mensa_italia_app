@@ -72,6 +72,7 @@ getAppBarSliverPlatform({required String title, String? previousPageTitle, List<
       trailing: trailings == null
           ? null
           : Material(
+              color: Colors.transparent,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,

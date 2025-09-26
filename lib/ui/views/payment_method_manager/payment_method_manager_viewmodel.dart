@@ -22,9 +22,13 @@ class PaymentMethodManagerViewModel extends MasterModel {
           paymentMethods.addAll(value);
           selectedPM = getSelectedPaymentMethod();
           if (selectedPM == "") {
-            Api().setDefaultPaymentMethod(paymentMethods[0].id).then((_) {
-              load();
-            });
+            if (paymentMethods.isNotEmpty) {
+              Api().setDefaultPaymentMethod(paymentMethods[0].id).then((_) {
+                load();
+              });
+            } else {
+              setBusy(false);
+            }
           } else {
             setBusy(false);
           }
@@ -68,7 +72,7 @@ class PaymentMethodManagerViewModel extends MasterModel {
           .then((_) {
         Stripe.instance.presentPaymentSheet().then((options) {
           load();
-        });
+        }).catchError((e) {});
       });
     });
   }
