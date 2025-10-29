@@ -173,6 +173,11 @@ class Api {
       asyncLogin(email: email, password: password);
       return true;
     }).catchError((e) {
+      if (e is DioException) {
+        if (e.response?.statusCode == 503 && e.response?.statusMessage == "Unable to connect to area32" && pb.authStore.isValid) {
+          return true;
+        }
+      }
       return false;
     });
   }
