@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,103 +9,61 @@ part of 'device.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-DeviceModel _$DeviceModelFromJson(Map<String, dynamic> json) {
-  return _DeviceModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$DeviceModel {
-  String get id => throw _privateConstructorUsedError;
-  String get user => throw _privateConstructorUsedError;
-  String get deviceName => throw _privateConstructorUsedError;
-  String get firebaseId => throw _privateConstructorUsedError;
+  String get id;
+  String get user;
+  String get deviceName;
+  String get firebaseId;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created => throw _privateConstructorUsedError;
+  DateTime get created;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated => throw _privateConstructorUsedError;
+  DateTime get updated;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $DeviceModelCopyWith<DeviceModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DeviceModelCopyWith<$Res> {
-  factory $DeviceModelCopyWith(
-          DeviceModel value, $Res Function(DeviceModel) then) =
-      _$DeviceModelCopyWithImpl<$Res, DeviceModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String user,
-      String deviceName,
-      String firebaseId,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
-}
-
-/// @nodoc
-class _$DeviceModelCopyWithImpl<$Res, $Val extends DeviceModel>
-    implements $DeviceModelCopyWith<$Res> {
-  _$DeviceModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of DeviceModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $DeviceModelCopyWith<DeviceModel> get copyWith =>
+      _$DeviceModelCopyWithImpl<DeviceModel>(this as DeviceModel, _$identity);
+
+  /// Serializes this DeviceModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? user = null,
-    Object? deviceName = null,
-    Object? firebaseId = null,
-    Object? created = null,
-    Object? updated = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      user: null == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as String,
-      deviceName: null == deviceName
-          ? _value.deviceName
-          : deviceName // ignore: cast_nullable_to_non_nullable
-              as String,
-      firebaseId: null == firebaseId
-          ? _value.firebaseId
-          : firebaseId // ignore: cast_nullable_to_non_nullable
-              as String,
-      created: null == created
-          ? _value.created
-          : created // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updated: null == updated
-          ? _value.updated
-          : updated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DeviceModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.deviceName, deviceName) ||
+                other.deviceName == deviceName) &&
+            (identical(other.firebaseId, firebaseId) ||
+                other.firebaseId == firebaseId) &&
+            (identical(other.created, created) || other.created == created) &&
+            (identical(other.updated, updated) || other.updated == updated));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, user, deviceName, firebaseId, created, updated);
+
+  @override
+  String toString() {
+    return 'DeviceModel(id: $id, user: $user, deviceName: $deviceName, firebaseId: $firebaseId, created: $created, updated: $updated)';
   }
 }
 
 /// @nodoc
-abstract class _$$DeviceModelImplCopyWith<$Res>
-    implements $DeviceModelCopyWith<$Res> {
-  factory _$$DeviceModelImplCopyWith(
-          _$DeviceModelImpl value, $Res Function(_$DeviceModelImpl) then) =
-      __$$DeviceModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $DeviceModelCopyWith<$Res> {
+  factory $DeviceModelCopyWith(
+          DeviceModel value, $Res Function(DeviceModel) _then) =
+      _$DeviceModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -117,13 +75,14 @@ abstract class _$$DeviceModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$DeviceModelImplCopyWithImpl<$Res>
-    extends _$DeviceModelCopyWithImpl<$Res, _$DeviceModelImpl>
-    implements _$$DeviceModelImplCopyWith<$Res> {
-  __$$DeviceModelImplCopyWithImpl(
-      _$DeviceModelImpl _value, $Res Function(_$DeviceModelImpl) _then)
-      : super(_value, _then);
+class _$DeviceModelCopyWithImpl<$Res> implements $DeviceModelCopyWith<$Res> {
+  _$DeviceModelCopyWithImpl(this._self, this._then);
 
+  final DeviceModel _self;
+  final $Res Function(DeviceModel) _then;
+
+  /// Create a copy of DeviceModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -134,48 +93,228 @@ class __$$DeviceModelImplCopyWithImpl<$Res>
     Object? created = null,
     Object? updated = null,
   }) {
-    return _then(_$DeviceModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       user: null == user
-          ? _value.user
+          ? _self.user
           : user // ignore: cast_nullable_to_non_nullable
               as String,
       deviceName: null == deviceName
-          ? _value.deviceName
+          ? _self.deviceName
           : deviceName // ignore: cast_nullable_to_non_nullable
               as String,
       firebaseId: null == firebaseId
-          ? _value.firebaseId
+          ? _self.firebaseId
           : firebaseId // ignore: cast_nullable_to_non_nullable
               as String,
       created: null == created
-          ? _value.created
+          ? _self.created
           : created // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updated: null == updated
-          ? _value.updated
+          ? _self.updated
           : updated // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DeviceModel].
+extension DeviceModelPatterns on DeviceModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DeviceModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DeviceModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DeviceModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String user,
+            String deviceName,
+            String firebaseId,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel() when $default != null:
+        return $default(_that.id, _that.user, _that.deviceName,
+            _that.firebaseId, _that.created, _that.updated);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String user,
+            String deviceName,
+            String firebaseId,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel():
+        return $default(_that.id, _that.user, _that.deviceName,
+            _that.firebaseId, _that.created, _that.updated);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String user,
+            String deviceName,
+            String firebaseId,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DeviceModel() when $default != null:
+        return $default(_that.id, _that.user, _that.deviceName,
+            _that.firebaseId, _that.created, _that.updated);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$DeviceModelImpl implements _DeviceModel {
-  const _$DeviceModelImpl(
+class _DeviceModel implements DeviceModel {
+  const _DeviceModel(
       {required this.id,
       required this.user,
       required this.deviceName,
       required this.firebaseId,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated});
-
-  factory _$DeviceModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DeviceModelImplFromJson(json);
+  factory _DeviceModel.fromJson(Map<String, dynamic> json) =>
+      _$DeviceModelFromJson(json);
 
   @override
   final String id;
@@ -192,16 +331,26 @@ class _$DeviceModelImpl implements _DeviceModel {
   @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
 
+  /// Create a copy of DeviceModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DeviceModel(id: $id, user: $user, deviceName: $deviceName, firebaseId: $firebaseId, created: $created, updated: $updated)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DeviceModelCopyWith<_DeviceModel> get copyWith =>
+      __$DeviceModelCopyWithImpl<_DeviceModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DeviceModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DeviceModelImpl &&
+            other is _DeviceModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.deviceName, deviceName) ||
@@ -212,54 +361,80 @@ class _$DeviceModelImpl implements _DeviceModel {
             (identical(other.updated, updated) || other.updated == updated));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, id, user, deviceName, firebaseId, created, updated);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DeviceModelImplCopyWith<_$DeviceModelImpl> get copyWith =>
-      __$$DeviceModelImplCopyWithImpl<_$DeviceModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DeviceModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'DeviceModel(id: $id, user: $user, deviceName: $deviceName, firebaseId: $firebaseId, created: $created, updated: $updated)';
   }
 }
 
-abstract class _DeviceModel implements DeviceModel {
-  const factory _DeviceModel(
-      {required final String id,
-      required final String user,
-      required final String deviceName,
-      required final String firebaseId,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal)
-      required final DateTime updated}) = _$DeviceModelImpl;
-
-  factory _DeviceModel.fromJson(Map<String, dynamic> json) =
-      _$DeviceModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$DeviceModelCopyWith<$Res>
+    implements $DeviceModelCopyWith<$Res> {
+  factory _$DeviceModelCopyWith(
+          _DeviceModel value, $Res Function(_DeviceModel) _then) =
+      __$DeviceModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get user;
-  @override
-  String get deviceName;
-  @override
-  String get firebaseId;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated;
-  @override
-  @JsonKey(ignore: true)
-  _$$DeviceModelImplCopyWith<_$DeviceModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call(
+      {String id,
+      String user,
+      String deviceName,
+      String firebaseId,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
+
+/// @nodoc
+class __$DeviceModelCopyWithImpl<$Res> implements _$DeviceModelCopyWith<$Res> {
+  __$DeviceModelCopyWithImpl(this._self, this._then);
+
+  final _DeviceModel _self;
+  final $Res Function(_DeviceModel) _then;
+
+  /// Create a copy of DeviceModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? user = null,
+    Object? deviceName = null,
+    Object? firebaseId = null,
+    Object? created = null,
+    Object? updated = null,
+  }) {
+    return _then(_DeviceModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      user: null == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as String,
+      deviceName: null == deviceName
+          ? _self.deviceName
+          : deviceName // ignore: cast_nullable_to_non_nullable
+              as String,
+      firebaseId: null == firebaseId
+          ? _self.firebaseId
+          : firebaseId // ignore: cast_nullable_to_non_nullable
+              as String,
+      created: null == created
+          ? _self.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updated: null == updated
+          ? _self.updated
+          : updated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+// dart format on

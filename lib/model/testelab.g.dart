@@ -6,8 +6,8 @@ part of 'testelab.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TestelabModelImpl _$$TestelabModelImplFromJson(Map<String, dynamic> json) =>
-    _$TestelabModelImpl(
+_TestelabModel _$TestelabModelFromJson(Map<String, dynamic> json) =>
+    _TestelabModel(
       id: json['id'] as String,
       fullname: json['fullname'] as String,
       typeOfTest: json['type_of_test'] as String,
@@ -16,7 +16,7 @@ _$TestelabModelImpl _$$TestelabModelImplFromJson(Map<String, dynamic> json) =>
       state: json['state'] as String,
     );
 
-Map<String, dynamic> _$$TestelabModelImplToJson(_$TestelabModelImpl instance) =>
+Map<String, dynamic> _$TestelabModelToJson(_TestelabModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'fullname': instance.fullname,

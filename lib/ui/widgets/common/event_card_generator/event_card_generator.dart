@@ -58,7 +58,8 @@ class EventCardGenerator extends StackedView<EventCardGeneratorModel> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
                                   image: DecorationImage(
-                                    image: MemoryImage(viewModel.generatedImage!),
+                                    image:
+                                        MemoryImage(viewModel.generatedImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -76,7 +77,8 @@ class EventCardGenerator extends StackedView<EventCardGeneratorModel> {
                                     ),
                                   );
                                 },
-                                progressIndicatorBuilder: (context, url, downloadProgress) {
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) {
                                   return Shimmer.fromColors(
                                     baseColor: Colors.grey[100]!,
                                     highlightColor: Colors.grey[400]!,
@@ -91,7 +93,9 @@ class EventCardGenerator extends StackedView<EventCardGeneratorModel> {
                                 errorWidget: (context, url, error) {
                                   return Container(
                                     color: Colors.grey[300],
-                                    child: const Center(child: Text("Immagine non disponibile")),
+                                    child: const Center(
+                                        child:
+                                            Text("Immagine non disponibile")),
                                   );
                                 }),
                   ),
@@ -161,7 +165,9 @@ class EventCardGenerator extends StackedView<EventCardGeneratorModel> {
                             onPressed: viewModel.generate,
                             child: const Text("GENERATE"),
                           ),
-                        if (viewModel.imageUrl.toString() != "https://svc.mensa.it/static/event_card_template.png" && !viewModel.isBusy) ...[
+                        if (viewModel.imageUrl.toString() !=
+                                "https://svc.mensa.it/static/event_card_template.png" &&
+                            !viewModel.isBusy) ...[
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: viewModel.sendBack,
@@ -182,5 +188,6 @@ class EventCardGenerator extends StackedView<EventCardGeneratorModel> {
   }
 
   @override
-  EventCardGeneratorModel viewModelBuilder(BuildContext context) => EventCardGeneratorModel();
+  EventCardGeneratorModel viewModelBuilder(BuildContext context) =>
+      EventCardGeneratorModel();
 }

@@ -14,8 +14,7 @@ class NotifySSE extends ChangeNotifier {
 
   List<NotificationModel> get notifications => _data;
 
-  int get unseenNotifications =>
-      _data.where((element) => (element.seen == null)).length;
+  int get unseenNotifications => _data.where((element) => (element.seen == null)).length;
 
   void start() {
     Api().pb.collection("user_notifications").subscribe("*", (e) {

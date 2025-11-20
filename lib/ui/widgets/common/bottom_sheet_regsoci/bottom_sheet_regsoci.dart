@@ -6,7 +6,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/res_soci.dart';
-import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:stacked/stacked.dart';
 
 import 'bottom_sheet_regsoci_model.dart';

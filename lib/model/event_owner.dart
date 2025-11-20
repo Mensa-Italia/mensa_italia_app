@@ -4,7 +4,7 @@ part 'event_owner.freezed.dart';
 part 'event_owner.g.dart';
 
 @freezed
-class EventOwnerModel with _$EventOwnerModel {
+abstract class EventOwnerModel with _$EventOwnerModel {
   const factory EventOwnerModel({
     required String id,
     required String name,

@@ -6,8 +6,8 @@ part of 'stamp_user.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$StampUserModelImpl _$$StampUserModelImplFromJson(Map<String, dynamic> json) =>
-    _$StampUserModelImpl(
+_StampUserModel _$StampUserModelFromJson(Map<String, dynamic> json) =>
+    _StampUserModel(
       id: json['id'] as String,
       created: getDateTimeLocal(json['created'] as String),
       updated: getDateTimeLocal(json['updated'] as String),
@@ -16,8 +16,7 @@ _$StampUserModelImpl _$$StampUserModelImplFromJson(Map<String, dynamic> json) =>
       user: json['user'] as String,
     );
 
-Map<String, dynamic> _$$StampUserModelImplToJson(
-        _$StampUserModelImpl instance) =>
+Map<String, dynamic> _$StampUserModelToJson(_StampUserModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'created': instance.created.toIso8601String(),

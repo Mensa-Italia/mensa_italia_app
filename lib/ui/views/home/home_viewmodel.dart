@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/services/tickets_see%20.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class HomeViewModel extends MasterModel {
@@ -13,11 +14,13 @@ class HomeViewModel extends MasterModel {
 
   HomeViewModel() {
     //reviewApp();
+    TicketSSE().start();
     addNotificationPreference();
     setLanguageMetadata();
     showChangelog();
     checkForInitialMessage();
     listenForMessages();
+    TicketSSE().addListener(rebuildUi);
   }
 
   //void reviewApp() async {
@@ -77,7 +80,7 @@ class HomeViewModel extends MasterModel {
       handleNotificationActions(message.data, notificationID: internalID);
     }); // AppLinks is singleton
     final appLinks = AppLinks();
-    appLinksSub = appLinks.uriLinkStream.listen((uri) {      
+    appLinksSub = appLinks.uriLinkStream.listen((uri) {
       if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == "links" && uri.pathSegments.length > 1 && uri.pathSegments[1] == "event") {
         String eventId = uri.pathSegments[2];
         Api().getEvent(eventId).then((event) {
@@ -90,6 +93,7 @@ class HomeViewModel extends MasterModel {
   @override
   void dispose() {
     listenForMessagesvar?.cancel();
+    TicketSSE().removeListener(rebuildUi);
     super.dispose();
   }
 }

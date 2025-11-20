@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,37 +9,59 @@ part of 'stamp_user.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-StampUserModel _$StampUserModelFromJson(Map<String, dynamic> json) {
-  return _StampUserModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$StampUserModel {
-  String get id => throw _privateConstructorUsedError;
+  String get id;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created => throw _privateConstructorUsedError;
+  DateTime get created;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated => throw _privateConstructorUsedError;
+  DateTime get updated;
   @JsonKey(readValue: getDataFromExpanded)
-  StampModel get stamp => throw _privateConstructorUsedError;
-  String get user => throw _privateConstructorUsedError;
+  StampModel get stamp;
+  String get user;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $StampUserModelCopyWith<StampUserModel> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$StampUserModelCopyWithImpl<StampUserModel>(
+          this as StampUserModel, _$identity);
+
+  /// Serializes this StampUserModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is StampUserModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.created, created) || other.created == created) &&
+            (identical(other.updated, updated) || other.updated == updated) &&
+            (identical(other.stamp, stamp) || other.stamp == stamp) &&
+            (identical(other.user, user) || other.user == user));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, created, updated, stamp, user);
+
+  @override
+  String toString() {
+    return 'StampUserModel(id: $id, created: $created, updated: $updated, stamp: $stamp, user: $user)';
+  }
 }
 
 /// @nodoc
-abstract class $StampUserModelCopyWith<$Res> {
+abstract mixin class $StampUserModelCopyWith<$Res> {
   factory $StampUserModelCopyWith(
-          StampUserModel value, $Res Function(StampUserModel) then) =
-      _$StampUserModelCopyWithImpl<$Res, StampUserModel>;
+          StampUserModel value, $Res Function(StampUserModel) _then) =
+      _$StampUserModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -52,15 +74,15 @@ abstract class $StampUserModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$StampUserModelCopyWithImpl<$Res, $Val extends StampUserModel>
+class _$StampUserModelCopyWithImpl<$Res>
     implements $StampUserModelCopyWith<$Res> {
-  _$StampUserModelCopyWithImpl(this._value, this._then);
+  _$StampUserModelCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final StampUserModel _self;
+  final $Res Function(StampUserModel) _then;
 
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -70,113 +92,231 @@ class _$StampUserModelCopyWithImpl<$Res, $Val extends StampUserModel>
     Object? stamp = null,
     Object? user = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       created: null == created
-          ? _value.created
+          ? _self.created
           : created // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updated: null == updated
-          ? _value.updated
+          ? _self.updated
           : updated // ignore: cast_nullable_to_non_nullable
               as DateTime,
       stamp: null == stamp
-          ? _value.stamp
+          ? _self.stamp
           : stamp // ignore: cast_nullable_to_non_nullable
               as StampModel,
       user: null == user
-          ? _value.user
+          ? _self.user
           : user // ignore: cast_nullable_to_non_nullable
               as String,
-    ) as $Val);
+    ));
   }
 
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $StampModelCopyWith<$Res> get stamp {
-    return $StampModelCopyWith<$Res>(_value.stamp, (value) {
-      return _then(_value.copyWith(stamp: value) as $Val);
+    return $StampModelCopyWith<$Res>(_self.stamp, (value) {
+      return _then(_self.copyWith(stamp: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$StampUserModelImplCopyWith<$Res>
-    implements $StampUserModelCopyWith<$Res> {
-  factory _$$StampUserModelImplCopyWith(_$StampUserModelImpl value,
-          $Res Function(_$StampUserModelImpl) then) =
-      __$$StampUserModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
-      @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
-      String user});
+/// Adds pattern-matching-related methods to [StampUserModel].
+extension StampUserModelPatterns on StampUserModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $StampModelCopyWith<$Res> get stamp;
-}
-
-/// @nodoc
-class __$$StampUserModelImplCopyWithImpl<$Res>
-    extends _$StampUserModelCopyWithImpl<$Res, _$StampUserModelImpl>
-    implements _$$StampUserModelImplCopyWith<$Res> {
-  __$$StampUserModelImplCopyWithImpl(
-      _$StampUserModelImpl _value, $Res Function(_$StampUserModelImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? created = null,
-    Object? updated = null,
-    Object? stamp = null,
-    Object? user = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_StampUserModel value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$StampUserModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      created: null == created
-          ? _value.created
-          : created // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updated: null == updated
-          ? _value.updated
-          : updated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      stamp: null == stamp
-          ? _value.stamp
-          : stamp // ignore: cast_nullable_to_non_nullable
-              as StampModel,
-      user: null == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_StampUserModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_StampUserModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
+            @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
+            String user)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel() when $default != null:
+        return $default(
+            _that.id, _that.created, _that.updated, _that.stamp, _that.user);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
+            @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
+            String user)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel():
+        return $default(
+            _that.id, _that.created, _that.updated, _that.stamp, _that.user);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
+            @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
+            String user)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StampUserModel() when $default != null:
+        return $default(
+            _that.id, _that.created, _that.updated, _that.stamp, _that.user);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$StampUserModelImpl extends _StampUserModel {
-  const _$StampUserModelImpl(
+class _StampUserModel extends StampUserModel {
+  const _StampUserModel(
       {required this.id,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated,
       @JsonKey(readValue: getDataFromExpanded) required this.stamp,
       required this.user})
       : super._();
-
-  factory _$StampUserModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$StampUserModelImplFromJson(json);
+  factory _StampUserModel.fromJson(Map<String, dynamic> json) =>
+      _$StampUserModelFromJson(json);
 
   @override
   final String id;
@@ -192,16 +332,26 @@ class _$StampUserModelImpl extends _StampUserModel {
   @override
   final String user;
 
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'StampUserModel(id: $id, created: $created, updated: $updated, stamp: $stamp, user: $user)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$StampUserModelCopyWith<_StampUserModel> get copyWith =>
+      __$StampUserModelCopyWithImpl<_StampUserModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$StampUserModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$StampUserModelImpl &&
+            other is _StampUserModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.created, created) || other.created == created) &&
             (identical(other.updated, updated) || other.updated == updated) &&
@@ -209,53 +359,88 @@ class _$StampUserModelImpl extends _StampUserModel {
             (identical(other.user, user) || other.user == user));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, id, created, updated, stamp, user);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$StampUserModelImplCopyWith<_$StampUserModelImpl> get copyWith =>
-      __$$StampUserModelImplCopyWithImpl<_$StampUserModelImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$StampUserModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'StampUserModel(id: $id, created: $created, updated: $updated, stamp: $stamp, user: $user)';
   }
 }
 
-abstract class _StampUserModel extends StampUserModel {
-  const factory _StampUserModel(
-      {required final String id,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime updated,
-      @JsonKey(readValue: getDataFromExpanded) required final StampModel stamp,
-      required final String user}) = _$StampUserModelImpl;
-  const _StampUserModel._() : super._();
+/// @nodoc
+abstract mixin class _$StampUserModelCopyWith<$Res>
+    implements $StampUserModelCopyWith<$Res> {
+  factory _$StampUserModelCopyWith(
+          _StampUserModel value, $Res Function(_StampUserModel) _then) =
+      __$StampUserModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated,
+      @JsonKey(readValue: getDataFromExpanded) StampModel stamp,
+      String user});
 
-  factory _StampUserModel.fromJson(Map<String, dynamic> json) =
-      _$StampUserModelImpl.fromJson;
-
   @override
-  String get id;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated;
-  @override
-  @JsonKey(readValue: getDataFromExpanded)
-  StampModel get stamp;
-  @override
-  String get user;
-  @override
-  @JsonKey(ignore: true)
-  _$$StampUserModelImplCopyWith<_$StampUserModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  $StampModelCopyWith<$Res> get stamp;
 }
+
+/// @nodoc
+class __$StampUserModelCopyWithImpl<$Res>
+    implements _$StampUserModelCopyWith<$Res> {
+  __$StampUserModelCopyWithImpl(this._self, this._then);
+
+  final _StampUserModel _self;
+  final $Res Function(_StampUserModel) _then;
+
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? created = null,
+    Object? updated = null,
+    Object? stamp = null,
+    Object? user = null,
+  }) {
+    return _then(_StampUserModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      created: null == created
+          ? _self.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updated: null == updated
+          ? _self.updated
+          : updated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      stamp: null == stamp
+          ? _self.stamp
+          : stamp // ignore: cast_nullable_to_non_nullable
+              as StampModel,
+      user: null == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+
+  /// Create a copy of StampUserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $StampModelCopyWith<$Res> get stamp {
+    return $StampModelCopyWith<$Res>(_self.stamp, (value) {
+      return _then(_self.copyWith(stamp: value));
+    });
+  }
+}
+
+// dart format on

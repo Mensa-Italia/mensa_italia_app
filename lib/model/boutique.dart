@@ -25,7 +25,7 @@ part 'boutique.freezed.dart';
 part 'boutique.g.dart';
 
 @freezed
-class BoutiqueModel with _$BoutiqueModel {
+abstract class BoutiqueModel with _$BoutiqueModel {
   const BoutiqueModel._();
   factory BoutiqueModel({
     required String id,

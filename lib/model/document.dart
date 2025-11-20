@@ -4,7 +4,7 @@ part 'document.freezed.dart';
 part 'document.g.dart';
 
 @freezed
-class DocumentModel with _$DocumentModel {
+abstract class DocumentModel with _$DocumentModel {
   const factory DocumentModel({
     required String id,
     required String name,

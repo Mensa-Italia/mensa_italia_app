@@ -6,9 +6,8 @@ part of 'event_schedule.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EventScheduleModelImpl _$$EventScheduleModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$EventScheduleModelImpl(
+_EventScheduleModel _$EventScheduleModelFromJson(Map<String, dynamic> json) =>
+    _EventScheduleModel(
       id: json['id'] as String?,
       title: json['title'] as String,
       event: json['event'] as String?,
@@ -22,8 +21,7 @@ _$EventScheduleModelImpl _$$EventScheduleModelImplFromJson(
       isSubscriptable: json['is_subscriptable'] as bool,
     );
 
-Map<String, dynamic> _$$EventScheduleModelImplToJson(
-        _$EventScheduleModelImpl instance) =>
+Map<String, dynamic> _$EventScheduleModelToJson(_EventScheduleModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,

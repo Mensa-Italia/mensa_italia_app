@@ -18,7 +18,7 @@ part 'device.freezed.dart';
 part 'device.g.dart';
 
 @freezed
-class DeviceModel with _$DeviceModel {
+abstract class DeviceModel with _$DeviceModel {
   const factory DeviceModel({
     required String id,
     required String user,

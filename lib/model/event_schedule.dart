@@ -8,7 +8,7 @@ part 'event_schedule.freezed.dart';
 part 'event_schedule.g.dart';
 
 @freezed
-class EventScheduleModel with _$EventScheduleModel {
+abstract class EventScheduleModel with _$EventScheduleModel {
   const factory EventScheduleModel({
     String? id,
     required String title,

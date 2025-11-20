@@ -8,7 +8,7 @@ part 'stamp.freezed.dart';
 part 'stamp.g.dart';
 
 @freezed
-class StampModel with _$StampModel {
+abstract class StampModel with _$StampModel {
   const factory StampModel({
     required String id,
     @JsonKey(

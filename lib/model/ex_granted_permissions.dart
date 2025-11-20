@@ -22,7 +22,7 @@ part 'ex_granted_permissions.freezed.dart';
 part 'ex_granted_permissions.g.dart';
 
 @freezed
-class ExGrantedPermissionsModel with _$ExGrantedPermissionsModel {
+abstract class ExGrantedPermissionsModel with _$ExGrantedPermissionsModel {
   const ExGrantedPermissionsModel._();
 
   const factory ExGrantedPermissionsModel({

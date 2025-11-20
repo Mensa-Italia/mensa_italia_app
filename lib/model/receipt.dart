@@ -9,7 +9,7 @@ part 'receipt.freezed.dart';
 part 'receipt.g.dart';
 
 @freezed
-class ReceiptModel with _$ReceiptModel {
+abstract class ReceiptModel with _$ReceiptModel {
   const factory ReceiptModel({
     required String id,
     required String? description,

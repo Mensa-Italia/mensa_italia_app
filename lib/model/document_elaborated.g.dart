@@ -6,16 +6,16 @@ part of 'document_elaborated.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DocumentElaboratedModelImpl _$$DocumentElaboratedModelImplFromJson(
+_DocumentElaboratedModel _$DocumentElaboratedModelFromJson(
         Map<String, dynamic> json) =>
-    _$DocumentElaboratedModelImpl(
+    _DocumentElaboratedModel(
       id: json['id'] as String,
       document: json['document'] as String,
       iaResume: json['ia_resume'] as String,
     );
 
-Map<String, dynamic> _$$DocumentElaboratedModelImplToJson(
-        _$DocumentElaboratedModelImpl instance) =>
+Map<String, dynamic> _$DocumentElaboratedModelToJson(
+        _DocumentElaboratedModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'document': instance.document,

@@ -2,11 +2,15 @@ import 'dart:ui';
 
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_italia_app/app/app.router.dart';
+import 'package:mensa_italia_app/services/tickets_see%20.dart';
+import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:mensa_italia_app/ui/widgets/common/sigs_page/sigs_page_view.dart';
 import 'package:mensa_italia_app/ui/widgets/common/addon_page/addon_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/event_page/event_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/membership_page/membership_page.dart';
 import 'package:mensa_italia_app/ui/widgets/common/option_page/option_page.dart';
+import 'package:pulsing_border/pulsing_border.dart';
 import 'package:stacked/stacked.dart';
 import 'home_viewmodel.dart';
 
@@ -19,6 +23,27 @@ class HomeView extends StackedView<HomeViewModel> {
 
     return Scaffold(
       extendBody: true,
+      floatingActionButton: (TicketSSE().tickets.isNotEmpty)
+          ? PulsingBorder(
+              color: Colors.purple,
+              borderRadius: 300,
+              spreadRadius: 20,
+              blurRadius: 0,
+              pulseDuration: const Duration(milliseconds: 1000),
+              pulseDelay: const Duration(milliseconds: 200),
+              child: FloatingActionButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(300),
+                ),
+                onPressed: () {
+                  viewModel.navigationService.navigateToTicketsView();
+                },
+                backgroundColor: Colors.purple,
+                foregroundColor: Colors.white,
+                child: const Icon(EneftyIcons.ticket_2_outline),
+              ),
+            )
+          : null,
       bottomNavigationBar: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),

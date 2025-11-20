@@ -9,13 +9,13 @@ part 'notification.freezed.dart';
 part 'notification.g.dart';
 
 @freezed
-class NotificationModel with _$NotificationModel {
+abstract class NotificationModel with _$NotificationModel {
   const NotificationModel._();
   const factory NotificationModel({
     required String id,
     required String tr,
     required Map<String, String> trNamedParams,
-    required Map<String, dynamic> data,
+     Map<String, dynamic>? data,
     @JsonKey(
       fromJson: getDateTimeLocalNullabe,
     )

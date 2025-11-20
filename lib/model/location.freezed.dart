@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,101 +9,58 @@ part of 'location.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-LocationModel _$LocationModelFromJson(Map<String, dynamic> json) {
-  return _LocationModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$LocationModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  double get lat => throw _privateConstructorUsedError;
-  double get lon => throw _privateConstructorUsedError;
-  String get address => throw _privateConstructorUsedError;
-  String get state => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  double get lat;
+  double get lon;
+  String get address;
+  String get state;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $LocationModelCopyWith<LocationModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LocationModelCopyWith<$Res> {
-  factory $LocationModelCopyWith(
-          LocationModel value, $Res Function(LocationModel) then) =
-      _$LocationModelCopyWithImpl<$Res, LocationModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      double lat,
-      double lon,
-      String address,
-      String state});
-}
-
-/// @nodoc
-class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
-    implements $LocationModelCopyWith<$Res> {
-  _$LocationModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of LocationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $LocationModelCopyWith<LocationModel> get copyWith =>
+      _$LocationModelCopyWithImpl<LocationModel>(
+          this as LocationModel, _$identity);
+
+  /// Serializes this LocationModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? lat = null,
-    Object? lon = null,
-    Object? address = null,
-    Object? state = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      lat: null == lat
-          ? _value.lat
-          : lat // ignore: cast_nullable_to_non_nullable
-              as double,
-      lon: null == lon
-          ? _value.lon
-          : lon // ignore: cast_nullable_to_non_nullable
-              as double,
-      address: null == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String,
-      state: null == state
-          ? _value.state
-          : state // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is LocationModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.lat, lat) || other.lat == lat) &&
+            (identical(other.lon, lon) || other.lon == lon) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.state, state) || other.state == state));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, lat, lon, address, state);
+
+  @override
+  String toString() {
+    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, address: $address, state: $state)';
   }
 }
 
 /// @nodoc
-abstract class _$$LocationModelImplCopyWith<$Res>
-    implements $LocationModelCopyWith<$Res> {
-  factory _$$LocationModelImplCopyWith(
-          _$LocationModelImpl value, $Res Function(_$LocationModelImpl) then) =
-      __$$LocationModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $LocationModelCopyWith<$Res> {
+  factory $LocationModelCopyWith(
+          LocationModel value, $Res Function(LocationModel) _then) =
+      _$LocationModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -115,13 +72,15 @@ abstract class _$$LocationModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$LocationModelImplCopyWithImpl<$Res>
-    extends _$LocationModelCopyWithImpl<$Res, _$LocationModelImpl>
-    implements _$$LocationModelImplCopyWith<$Res> {
-  __$$LocationModelImplCopyWithImpl(
-      _$LocationModelImpl _value, $Res Function(_$LocationModelImpl) _then)
-      : super(_value, _then);
+class _$LocationModelCopyWithImpl<$Res>
+    implements $LocationModelCopyWith<$Res> {
+  _$LocationModelCopyWithImpl(this._self, this._then);
 
+  final LocationModel _self;
+  final $Res Function(LocationModel) _then;
+
+  /// Create a copy of LocationModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -132,39 +91,205 @@ class __$$LocationModelImplCopyWithImpl<$Res>
     Object? address = null,
     Object? state = null,
   }) {
-    return _then(_$LocationModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       lat: null == lat
-          ? _value.lat
+          ? _self.lat
           : lat // ignore: cast_nullable_to_non_nullable
               as double,
       lon: null == lon
-          ? _value.lon
+          ? _self.lon
           : lon // ignore: cast_nullable_to_non_nullable
               as double,
       address: null == address
-          ? _value.address
+          ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String,
       state: null == state
-          ? _value.state
+          ? _self.state
           : state // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [LocationModel].
+extension LocationModelPatterns on LocationModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_LocationModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_LocationModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_LocationModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String name, double lat, double lon,
+            String address, String state)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel() when $default != null:
+        return $default(_that.id, _that.name, _that.lat, _that.lon,
+            _that.address, _that.state);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String name, double lat, double lon,
+            String address, String state)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel():
+        return $default(_that.id, _that.name, _that.lat, _that.lon,
+            _that.address, _that.state);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String name, double lat, double lon,
+            String address, String state)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LocationModel() when $default != null:
+        return $default(_that.id, _that.name, _that.lat, _that.lon,
+            _that.address, _that.state);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$LocationModelImpl extends _LocationModel {
-  const _$LocationModelImpl(
+class _LocationModel extends LocationModel {
+  const _LocationModel(
       {required this.id,
       required this.name,
       required this.lat,
@@ -172,9 +297,8 @@ class _$LocationModelImpl extends _LocationModel {
       required this.address,
       required this.state})
       : super._();
-
-  factory _$LocationModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$LocationModelImplFromJson(json);
+  factory _LocationModel.fromJson(Map<String, dynamic> json) =>
+      _$LocationModelFromJson(json);
 
   @override
   final String id;
@@ -189,16 +313,26 @@ class _$LocationModelImpl extends _LocationModel {
   @override
   final String state;
 
+  /// Create a copy of LocationModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, address: $address, state: $state)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$LocationModelCopyWith<_LocationModel> get copyWith =>
+      __$LocationModelCopyWithImpl<_LocationModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$LocationModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LocationModelImpl &&
+            other is _LocationModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.lat, lat) || other.lat == lat) &&
@@ -207,52 +341,81 @@ class _$LocationModelImpl extends _LocationModel {
             (identical(other.state, state) || other.state == state));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, id, name, lat, lon, address, state);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$LocationModelImplCopyWith<_$LocationModelImpl> get copyWith =>
-      __$$LocationModelImplCopyWithImpl<_$LocationModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$LocationModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'LocationModel(id: $id, name: $name, lat: $lat, lon: $lon, address: $address, state: $state)';
   }
 }
 
-abstract class _LocationModel extends LocationModel {
-  const factory _LocationModel(
-      {required final String id,
-      required final String name,
-      required final double lat,
-      required final double lon,
-      required final String address,
-      required final String state}) = _$LocationModelImpl;
-  const _LocationModel._() : super._();
-
-  factory _LocationModel.fromJson(Map<String, dynamic> json) =
-      _$LocationModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$LocationModelCopyWith<$Res>
+    implements $LocationModelCopyWith<$Res> {
+  factory _$LocationModelCopyWith(
+          _LocationModel value, $Res Function(_LocationModel) _then) =
+      __$LocationModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get name;
-  @override
-  double get lat;
-  @override
-  double get lon;
-  @override
-  String get address;
-  @override
-  String get state;
-  @override
-  @JsonKey(ignore: true)
-  _$$LocationModelImplCopyWith<_$LocationModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      double lat,
+      double lon,
+      String address,
+      String state});
 }
+
+/// @nodoc
+class __$LocationModelCopyWithImpl<$Res>
+    implements _$LocationModelCopyWith<$Res> {
+  __$LocationModelCopyWithImpl(this._self, this._then);
+
+  final _LocationModel _self;
+  final $Res Function(_LocationModel) _then;
+
+  /// Create a copy of LocationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? lat = null,
+    Object? lon = null,
+    Object? address = null,
+    Object? state = null,
+  }) {
+    return _then(_LocationModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      lat: null == lat
+          ? _self.lat
+          : lat // ignore: cast_nullable_to_non_nullable
+              as double,
+      lon: null == lon
+          ? _self.lon
+          : lon // ignore: cast_nullable_to_non_nullable
+              as double,
+      address: null == address
+          ? _self.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
+      state: null == state
+          ? _self.state
+          : state // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

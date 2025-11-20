@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,191 +9,336 @@ part of 'notification.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) {
-  return _NotificationModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$NotificationModel {
-  String get id => throw _privateConstructorUsedError;
-  String get tr => throw _privateConstructorUsedError;
-  Map<String, String> get trNamedParams => throw _privateConstructorUsedError;
-  Map<String, dynamic> get data => throw _privateConstructorUsedError;
+  String get id;
+  String get tr;
+  Map<String, String> get trNamedParams;
+  Map<String, dynamic>? get data;
   @JsonKey(fromJson: getDateTimeLocalNullabe)
-  DateTime? get seen => throw _privateConstructorUsedError;
+  DateTime? get seen;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created => throw _privateConstructorUsedError;
+  DateTime get created;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated => throw _privateConstructorUsedError;
+  DateTime get updated;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $NotificationModelCopyWith<NotificationModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $NotificationModelCopyWith<$Res> {
-  factory $NotificationModelCopyWith(
-          NotificationModel value, $Res Function(NotificationModel) then) =
-      _$NotificationModelCopyWithImpl<$Res, NotificationModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String tr,
-      Map<String, String> trNamedParams,
-      Map<String, dynamic> data,
-      @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
-}
-
-/// @nodoc
-class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
-    implements $NotificationModelCopyWith<$Res> {
-  _$NotificationModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $NotificationModelCopyWith<NotificationModel> get copyWith =>
+      _$NotificationModelCopyWithImpl<NotificationModel>(
+          this as NotificationModel, _$identity);
+
+  /// Serializes this NotificationModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? tr = null,
-    Object? trNamedParams = null,
-    Object? data = null,
-    Object? seen = freezed,
-    Object? created = null,
-    Object? updated = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      tr: null == tr
-          ? _value.tr
-          : tr // ignore: cast_nullable_to_non_nullable
-              as String,
-      trNamedParams: null == trNamedParams
-          ? _value.trNamedParams
-          : trNamedParams // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-      seen: freezed == seen
-          ? _value.seen
-          : seen // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      created: null == created
-          ? _value.created
-          : created // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updated: null == updated
-          ? _value.updated
-          : updated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is NotificationModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.tr, tr) || other.tr == tr) &&
+            const DeepCollectionEquality()
+                .equals(other.trNamedParams, trNamedParams) &&
+            const DeepCollectionEquality().equals(other.data, data) &&
+            (identical(other.seen, seen) || other.seen == seen) &&
+            (identical(other.created, created) || other.created == created) &&
+            (identical(other.updated, updated) || other.updated == updated));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      tr,
+      const DeepCollectionEquality().hash(trNamedParams),
+      const DeepCollectionEquality().hash(data),
+      seen,
+      created,
+      updated);
+
+  @override
+  String toString() {
+    return 'NotificationModel(id: $id, tr: $tr, trNamedParams: $trNamedParams, data: $data, seen: $seen, created: $created, updated: $updated)';
   }
 }
 
 /// @nodoc
-abstract class _$$NotificationModelImplCopyWith<$Res>
-    implements $NotificationModelCopyWith<$Res> {
-  factory _$$NotificationModelImplCopyWith(_$NotificationModelImpl value,
-          $Res Function(_$NotificationModelImpl) then) =
-      __$$NotificationModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $NotificationModelCopyWith<$Res> {
+  factory $NotificationModelCopyWith(
+          NotificationModel value, $Res Function(NotificationModel) _then) =
+      _$NotificationModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
       String tr,
       Map<String, String> trNamedParams,
-      Map<String, dynamic> data,
+      Map<String, dynamic>? data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
       @JsonKey(fromJson: getDateTimeLocal) DateTime created,
       @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
 
 /// @nodoc
-class __$$NotificationModelImplCopyWithImpl<$Res>
-    extends _$NotificationModelCopyWithImpl<$Res, _$NotificationModelImpl>
-    implements _$$NotificationModelImplCopyWith<$Res> {
-  __$$NotificationModelImplCopyWithImpl(_$NotificationModelImpl _value,
-      $Res Function(_$NotificationModelImpl) _then)
-      : super(_value, _then);
+class _$NotificationModelCopyWithImpl<$Res>
+    implements $NotificationModelCopyWith<$Res> {
+  _$NotificationModelCopyWithImpl(this._self, this._then);
 
+  final NotificationModel _self;
+  final $Res Function(NotificationModel) _then;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
     Object? tr = null,
     Object? trNamedParams = null,
-    Object? data = null,
+    Object? data = freezed,
     Object? seen = freezed,
     Object? created = null,
     Object? updated = null,
   }) {
-    return _then(_$NotificationModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       tr: null == tr
-          ? _value.tr
+          ? _self.tr
           : tr // ignore: cast_nullable_to_non_nullable
               as String,
       trNamedParams: null == trNamedParams
-          ? _value._trNamedParams
+          ? _self.trNamedParams
           : trNamedParams // ignore: cast_nullable_to_non_nullable
               as Map<String, String>,
-      data: null == data
-          ? _value._data
+      data: freezed == data
+          ? _self.data
           : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
+              as Map<String, dynamic>?,
       seen: freezed == seen
-          ? _value.seen
+          ? _self.seen
           : seen // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       created: null == created
-          ? _value.created
+          ? _self.created
           : created // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updated: null == updated
-          ? _value.updated
+          ? _self.updated
           : updated // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [NotificationModel].
+extension NotificationModelPatterns on NotificationModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_NotificationModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_NotificationModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_NotificationModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String tr,
+            Map<String, String> trNamedParams,
+            Map<String, dynamic>? data,
+            @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that.id, _that.tr, _that.trNamedParams, _that.data,
+            _that.seen, _that.created, _that.updated);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String tr,
+            Map<String, String> trNamedParams,
+            Map<String, dynamic>? data,
+            @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel():
+        return $default(_that.id, _that.tr, _that.trNamedParams, _that.data,
+            _that.seen, _that.created, _that.updated);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String tr,
+            Map<String, String> trNamedParams,
+            Map<String, dynamic>? data,
+            @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationModel() when $default != null:
+        return $default(_that.id, _that.tr, _that.trNamedParams, _that.data,
+            _that.seen, _that.created, _that.updated);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$NotificationModelImpl extends _NotificationModel {
-  const _$NotificationModelImpl(
+class _NotificationModel extends NotificationModel {
+  const _NotificationModel(
       {required this.id,
       required this.tr,
       required final Map<String, String> trNamedParams,
-      required final Map<String, dynamic> data,
+      final Map<String, dynamic>? data,
       @JsonKey(fromJson: getDateTimeLocalNullabe) required this.seen,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated})
       : _trNamedParams = trNamedParams,
         _data = data,
         super._();
-
-  factory _$NotificationModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$NotificationModelImplFromJson(json);
+  factory _NotificationModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationModelFromJson(json);
 
   @override
   final String id;
@@ -207,12 +352,14 @@ class _$NotificationModelImpl extends _NotificationModel {
     return EqualUnmodifiableMapView(_trNamedParams);
   }
 
-  final Map<String, dynamic> _data;
+  final Map<String, dynamic>? _data;
   @override
-  Map<String, dynamic> get data {
+  Map<String, dynamic>? get data {
+    final value = _data;
+    if (value == null) return null;
     if (_data is EqualUnmodifiableMapView) return _data;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_data);
+    return EqualUnmodifiableMapView(value);
   }
 
   @override
@@ -225,16 +372,26 @@ class _$NotificationModelImpl extends _NotificationModel {
   @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
 
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'NotificationModel(id: $id, tr: $tr, trNamedParams: $trNamedParams, data: $data, seen: $seen, created: $created, updated: $updated)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$NotificationModelCopyWith<_NotificationModel> get copyWith =>
+      __$NotificationModelCopyWithImpl<_NotificationModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$NotificationModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$NotificationModelImpl &&
+            other is _NotificationModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.tr, tr) || other.tr == tr) &&
             const DeepCollectionEquality()
@@ -245,7 +402,7 @@ class _$NotificationModelImpl extends _NotificationModel {
             (identical(other.updated, updated) || other.updated == updated));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -257,55 +414,82 @@ class _$NotificationModelImpl extends _NotificationModel {
       created,
       updated);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$NotificationModelImplCopyWith<_$NotificationModelImpl> get copyWith =>
-      __$$NotificationModelImplCopyWithImpl<_$NotificationModelImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$NotificationModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'NotificationModel(id: $id, tr: $tr, trNamedParams: $trNamedParams, data: $data, seen: $seen, created: $created, updated: $updated)';
   }
 }
 
-abstract class _NotificationModel extends NotificationModel {
-  const factory _NotificationModel(
-      {required final String id,
-      required final String tr,
-      required final Map<String, String> trNamedParams,
-      required final Map<String, dynamic> data,
-      @JsonKey(fromJson: getDateTimeLocalNullabe) required final DateTime? seen,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal)
-      required final DateTime updated}) = _$NotificationModelImpl;
-  const _NotificationModel._() : super._();
-
-  factory _NotificationModel.fromJson(Map<String, dynamic> json) =
-      _$NotificationModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$NotificationModelCopyWith<$Res>
+    implements $NotificationModelCopyWith<$Res> {
+  factory _$NotificationModelCopyWith(
+          _NotificationModel value, $Res Function(_NotificationModel) _then) =
+      __$NotificationModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get tr;
-  @override
-  Map<String, String> get trNamedParams;
-  @override
-  Map<String, dynamic> get data;
-  @override
-  @JsonKey(fromJson: getDateTimeLocalNullabe)
-  DateTime? get seen;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated;
-  @override
-  @JsonKey(ignore: true)
-  _$$NotificationModelImplCopyWith<_$NotificationModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call(
+      {String id,
+      String tr,
+      Map<String, String> trNamedParams,
+      Map<String, dynamic>? data,
+      @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? seen,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
+
+/// @nodoc
+class __$NotificationModelCopyWithImpl<$Res>
+    implements _$NotificationModelCopyWith<$Res> {
+  __$NotificationModelCopyWithImpl(this._self, this._then);
+
+  final _NotificationModel _self;
+  final $Res Function(_NotificationModel) _then;
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? tr = null,
+    Object? trNamedParams = null,
+    Object? data = freezed,
+    Object? seen = freezed,
+    Object? created = null,
+    Object? updated = null,
+  }) {
+    return _then(_NotificationModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      tr: null == tr
+          ? _self.tr
+          : tr // ignore: cast_nullable_to_non_nullable
+              as String,
+      trNamedParams: null == trNamedParams
+          ? _self._trNamedParams
+          : trNamedParams // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      data: freezed == data
+          ? _self._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      seen: freezed == seen
+          ? _self.seen
+          : seen // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      created: null == created
+          ? _self.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updated: null == updated
+          ? _self.updated
+          : updated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+// dart format on

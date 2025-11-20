@@ -12,7 +12,8 @@ class EventPage extends StackedView<EventPageModel> {
   const EventPage({super.key});
 
   @override
-  Widget builder(BuildContext context, EventPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, EventPageModel viewModel, Widget? child) {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
@@ -98,11 +99,16 @@ class EventPage extends StackedView<EventPageModel> {
               key: ValueKey(event.id),
               event: event,
               onTap: viewModel.onTapOnEvent(event),
-              onLongTap: (viewModel.allowControlEvents() && event.owner == viewModel.user.id) || viewModel.isSuper() ? viewModel.onLongTapEditEvent(event) : null,
+              onLongTap: (viewModel.allowControlEvents() &&
+                          event.owner == viewModel.user.id) ||
+                      viewModel.isSuper()
+                  ? viewModel.onLongTapEditEvent(event)
+                  : null,
             );
           },
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }

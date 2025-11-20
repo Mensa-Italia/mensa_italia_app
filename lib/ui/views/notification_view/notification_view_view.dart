@@ -13,8 +13,7 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
   const NotificationViewView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, NotificationViewViewModel viewModel,
-      Widget? child) {
+  Widget builder(BuildContext context, NotificationViewViewModel viewModel, Widget? child) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -53,15 +52,10 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
               itemBuilder: (context, index) {
                 final notificaiton = viewModel.notifications[index];
                 return ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                  title: Text(notificaiton.title
-                      .tr(namedArgs: notificaiton.trNamedParams)),
-                  subtitle: Text(notificaiton.body
-                      .tr(namedArgs: notificaiton.trNamedParams)),
-                  tileColor: (notificaiton.seen == null)
-                      ? Theme.of(context).primaryColor.withOpacity(.1)
-                      : null,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                  title: Text(notificaiton.title.tr(namedArgs: notificaiton.trNamedParams)),
+                  subtitle: Text(notificaiton.body.tr(namedArgs: notificaiton.trNamedParams)),
+                  tileColor: (notificaiton.seen == null) ? Theme.of(context).primaryColor.withOpacity(.1) : null,
                   leading: AspectRatio(
                     aspectRatio: 1,
                     child: Container(
@@ -77,8 +71,11 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                   ),
                   onTap: () {
                     Api().seeNotification(notificaiton.id);
+                    if (notificaiton.data == null) {
+                      return;
+                    }
                     handleNotificationActions(
-                      notificaiton.data,
+                      notificaiton.data!,
                       notificationID: notificaiton.id,
                     );
                   },
@@ -86,33 +83,34 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
               },
               itemCount: viewModel.notifications.length,
             ),
-          SliverSafeArea(
-              sliver: SliverToBoxAdapter(child: SizedBox(height: 100))),
+          SliverSafeArea(sliver: SliverToBoxAdapter(child: SizedBox(height: 100))),
         ],
       ),
     );
   }
 
   IconData getBasedOnNotification(NotificationModel notificaiton) {
-    if (notificaiton.data["type"] == "event") {
+    if (notificaiton.data == null) {
+      return EneftyIcons.notification_outline;
+    }
+    if (notificaiton.data!["type"] == "event") {
       return EneftyIcons.ticket_outline;
     }
-    if (notificaiton.data["type"] == "single_document") {
+    if (notificaiton.data!["type"] == "single_document") {
       return EneftyIcons.document_2_outline;
     }
-    if (notificaiton.data["type"] == "multiple_documents") {
+    if (notificaiton.data!["type"] == "multiple_documents") {
       return EneftyIcons.document_2_outline;
     }
-    if (notificaiton.data["type"] == "account_confirmation") {
+    if (notificaiton.data!["type"] == "account_confirmation") {
       return EneftyIcons.security_user_outline;
     }
-    if (notificaiton.data["type"] == "deal") {
+    if (notificaiton.data!["type"] == "deal") {
       return EneftyIcons.discount_shape_outline;
     }
     return EneftyIcons.notification_outline;
   }
 
   @override
-  NotificationViewViewModel viewModelBuilder(BuildContext context) =>
-      NotificationViewViewModel();
+  NotificationViewViewModel viewModelBuilder(BuildContext context) => NotificationViewViewModel();
 }

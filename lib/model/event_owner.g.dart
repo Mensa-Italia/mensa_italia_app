@@ -6,17 +6,15 @@ part of 'event_owner.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EventOwnerModelImpl _$$EventOwnerModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$EventOwnerModelImpl(
+_EventOwnerModel _$EventOwnerModelFromJson(Map<String, dynamic> json) =>
+    _EventOwnerModel(
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
       avatar: json['avatar'] as String,
     );
 
-Map<String, dynamic> _$$EventOwnerModelImplToJson(
-        _$EventOwnerModelImpl instance) =>
+Map<String, dynamic> _$EventOwnerModelToJson(_EventOwnerModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

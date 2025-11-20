@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
-import 'package:stacked/stacked.dart';
 import 'package:http/http.dart' as http;
 
 class EventCardGeneratorModel extends MasterModel {
-  Uri imageUrl = Uri.parse("https://svc.mensa.it/static/event_card_template.png");
+  Uri imageUrl =
+      Uri.parse("https://svc.mensa.it/static/event_card_template.png");
   String? _shortTitle;
   String? _date;
   String? _time;
@@ -53,7 +53,8 @@ class EventCardGeneratorModel extends MasterModel {
       'line4': _city,
     };
 
-    imageUrl = Uri.parse("https://svc.mensa.it/api/cs/generate-event-card").replace(queryParameters: queryParameters);
+    imageUrl = Uri.parse("https://svc.mensa.it/api/cs/generate-event-card")
+        .replace(queryParameters: queryParameters);
 
     setBusy(true);
 

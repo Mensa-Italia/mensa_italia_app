@@ -4,7 +4,7 @@ part 'document_elaborated.freezed.dart';
 part 'document_elaborated.g.dart';
 
 @freezed
-class DocumentElaboratedModel with _$DocumentElaboratedModel {
+abstract class DocumentElaboratedModel with _$DocumentElaboratedModel {
   const factory DocumentElaboratedModel({
     required String id,
     required String document,

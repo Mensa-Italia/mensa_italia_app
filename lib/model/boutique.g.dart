@@ -6,8 +6,8 @@ part of 'boutique.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BoutiqueModelImpl _$$BoutiqueModelImplFromJson(Map<String, dynamic> json) =>
-    _$BoutiqueModelImpl(
+_BoutiqueModel _$BoutiqueModelFromJson(Map<String, dynamic> json) =>
+    _BoutiqueModel(
       id: json['id'] as String,
       uid: json['uid'] as String,
       name: json['name'] as String,
@@ -19,7 +19,7 @@ _$BoutiqueModelImpl _$$BoutiqueModelImplFromJson(Map<String, dynamic> json) =>
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$BoutiqueModelImplToJson(_$BoutiqueModelImpl instance) =>
+Map<String, dynamic> _$BoutiqueModelToJson(_BoutiqueModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'uid': instance.uid,

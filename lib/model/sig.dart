@@ -4,7 +4,7 @@ part 'sig.freezed.dart';
 part 'sig.g.dart';
 
 @freezed
-class SigModel with _$SigModel {
+abstract class SigModel with _$SigModel {
   const factory SigModel({
     required String id,
     required String name,

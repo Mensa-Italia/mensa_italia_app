@@ -20,60 +20,70 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(1, 4002611926849840600),
-      name: 'RegSociDBModel',
-      lastPropertyId: const obx_int.IdUid(9, 4477363170825892831),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 6029295541143271620),
-            name: 'uid',
-            type: 6,
-            flags: 129),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 7041009877691192615),
-            name: 'image',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 3722775203403443812),
-            name: 'name',
-            type: 9,
-            flags: 2048,
-            indexId: const obx_int.IdUid(1, 4213997006478384440)),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 1120690818174341728),
-            name: 'city',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 3908210806771868456),
-            name: 'birthdate',
-            type: 10,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 2273453759402818576),
-            name: 'state',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 2455233351214942228),
-            name: 'fullDataJson',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 1624457953696464271),
-            name: 'fullProfileLink',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(9, 4477363170825892831),
-            name: 'nameToSearch',
-            type: 9,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[])
+    id: const obx_int.IdUid(1, 4002611926849840600),
+    name: 'RegSociDBModel',
+    lastPropertyId: const obx_int.IdUid(9, 4477363170825892831),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 6029295541143271620),
+        name: 'uid',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7041009877691192615),
+        name: 'image',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 3722775203403443812),
+        name: 'name',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(1, 4213997006478384440),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1120690818174341728),
+        name: 'city',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3908210806771868456),
+        name: 'birthdate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 2273453759402818576),
+        name: 'state',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 2455233351214942228),
+        name: 'fullDataJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 1624457953696464271),
+        name: 'fullProfileLink',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 4477363170825892831),
+        name: 'nameToSearch',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -87,120 +97,139 @@ final _entities = <obx_int.ModelEntity>[
 /// For Flutter apps, also calls `loadObjectBoxLibraryAndroidCompat()` from
 /// the ObjectBox Flutter library to fix loading the native ObjectBox library
 /// on Android 6 and older.
-Future<obx.Store> openStore(
-    {String? directory,
-    int? maxDBSizeInKB,
-    int? maxDataSizeInKB,
-    int? fileMode,
-    int? maxReaders,
-    bool queriesCaseSensitiveDefault = true,
-    String? macosApplicationGroup}) async {
+Future<obx.Store> openStore({
+  String? directory,
+  int? maxDBSizeInKB,
+  int? maxDataSizeInKB,
+  int? fileMode,
+  int? maxReaders,
+  bool queriesCaseSensitiveDefault = true,
+  String? macosApplicationGroup,
+}) async {
   await loadObjectBoxLibraryAndroidCompat();
-  return obx.Store(getObjectBoxModel(),
-      directory: directory ?? (await defaultStoreDirectory()).path,
-      maxDBSizeInKB: maxDBSizeInKB,
-      maxDataSizeInKB: maxDataSizeInKB,
-      fileMode: fileMode,
-      maxReaders: maxReaders,
-      queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
-      macosApplicationGroup: macosApplicationGroup);
+  return obx.Store(
+    getObjectBoxModel(),
+    directory: directory ?? (await defaultStoreDirectory()).path,
+    maxDBSizeInKB: maxDBSizeInKB,
+    maxDataSizeInKB: maxDataSizeInKB,
+    fileMode: fileMode,
+    maxReaders: maxReaders,
+    queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
+    macosApplicationGroup: macosApplicationGroup,
+  );
 }
 
 /// Returns the ObjectBox model definition for this project for use with
 /// [obx.Store.new].
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
-      entities: _entities,
-      lastEntityId: const obx_int.IdUid(1, 4002611926849840600),
-      lastIndexId: const obx_int.IdUid(1, 4213997006478384440),
-      lastRelationId: const obx_int.IdUid(0, 0),
-      lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [],
-      retiredIndexUids: const [],
-      retiredPropertyUids: const [],
-      retiredRelationUids: const [],
-      modelVersion: 5,
-      modelVersionParserMinimum: 5,
-      version: 1);
+    entities: _entities,
+    lastEntityId: const obx_int.IdUid(1, 4002611926849840600),
+    lastIndexId: const obx_int.IdUid(1, 4213997006478384440),
+    lastRelationId: const obx_int.IdUid(0, 0),
+    lastSequenceId: const obx_int.IdUid(0, 0),
+    retiredEntityUids: const [],
+    retiredIndexUids: const [],
+    retiredPropertyUids: const [],
+    retiredRelationUids: const [],
+    modelVersion: 5,
+    modelVersionParserMinimum: 5,
+    version: 1,
+  );
 
   final bindings = <Type, obx_int.EntityDefinition>{
     RegSociDBModel: obx_int.EntityDefinition<RegSociDBModel>(
-        model: _entities[0],
-        toOneRelations: (RegSociDBModel object) => [],
-        toManyRelations: (RegSociDBModel object) => {},
-        getId: (RegSociDBModel object) => object.uid,
-        setId: (RegSociDBModel object, int id) {
-          if (object.uid != id) {
-            throw ArgumentError('Field RegSociDBModel.uid is read-only '
-                '(final or getter-only) and it was declared to be self-assigned. '
-                'However, the currently inserted object (.uid=${object.uid}) '
-                "doesn't match the inserted ID (ID $id). "
-                'You must assign an ID before calling [box.put()].');
-          }
-        },
-        objectToFB: (RegSociDBModel object, fb.Builder fbb) {
-          final imageOffset = fbb.writeString(object.image);
-          final nameOffset = fbb.writeString(object.name);
-          final cityOffset = fbb.writeString(object.city);
-          final stateOffset = fbb.writeString(object.state);
-          final fullDataJsonOffset = fbb.writeString(object.fullDataJson);
-          final fullProfileLinkOffset = object.fullProfileLink == null
-              ? null
-              : fbb.writeString(object.fullProfileLink!);
-          final nameToSearchOffset = fbb.writeString(object.nameToSearch);
-          fbb.startTable(10);
-          fbb.addInt64(0, object.uid);
-          fbb.addOffset(1, imageOffset);
-          fbb.addOffset(2, nameOffset);
-          fbb.addOffset(3, cityOffset);
-          fbb.addInt64(4, object.birthdate?.millisecondsSinceEpoch);
-          fbb.addOffset(5, stateOffset);
-          fbb.addOffset(6, fullDataJsonOffset);
-          fbb.addOffset(7, fullProfileLinkOffset);
-          fbb.addOffset(8, nameToSearchOffset);
-          fbb.finish(fbb.endTable());
-          return object.uid;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final birthdateValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 12);
-          final uidParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          final imageParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 6, '');
-          final nameParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 8, '');
-          final cityParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 10, '');
-          final birthdateParam = birthdateValue == null
-              ? null
-              : DateTime.fromMillisecondsSinceEpoch(birthdateValue);
-          final stateParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 14, '');
-          final fullDataJsonParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 16, '');
-          final fullProfileLinkParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 18);
-          final nameToSearchParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 20, '');
-          final object = RegSociDBModel(
-              uid: uidParam,
-              image: imageParam,
-              name: nameParam,
-              city: cityParam,
-              birthdate: birthdateParam,
-              state: stateParam,
-              fullDataJson: fullDataJsonParam,
-              fullProfileLink: fullProfileLinkParam,
-              nameToSearch: nameToSearchParam);
+      model: _entities[0],
+      toOneRelations: (RegSociDBModel object) => [],
+      toManyRelations: (RegSociDBModel object) => {},
+      getId: (RegSociDBModel object) => object.uid,
+      setId: (RegSociDBModel object, int id) {
+        if (object.uid != id) {
+          throw ArgumentError(
+            'Field RegSociDBModel.uid is read-only '
+            '(final or getter-only) and it was declared to be self-assigned. '
+            'However, the currently inserted object (.uid=${object.uid}) '
+            "doesn't match the inserted ID (ID $id). "
+            'You must assign an ID before calling [box.put()].',
+          );
+        }
+      },
+      objectToFB: (RegSociDBModel object, fb.Builder fbb) {
+        final imageOffset = fbb.writeString(object.image);
+        final nameOffset = fbb.writeString(object.name);
+        final cityOffset = fbb.writeString(object.city);
+        final stateOffset = fbb.writeString(object.state);
+        final fullDataJsonOffset = fbb.writeString(object.fullDataJson);
+        final fullProfileLinkOffset = object.fullProfileLink == null
+            ? null
+            : fbb.writeString(object.fullProfileLink!);
+        final nameToSearchOffset = fbb.writeString(object.nameToSearch);
+        fbb.startTable(10);
+        fbb.addInt64(0, object.uid);
+        fbb.addOffset(1, imageOffset);
+        fbb.addOffset(2, nameOffset);
+        fbb.addOffset(3, cityOffset);
+        fbb.addInt64(4, object.birthdate?.millisecondsSinceEpoch);
+        fbb.addOffset(5, stateOffset);
+        fbb.addOffset(6, fullDataJsonOffset);
+        fbb.addOffset(7, fullProfileLinkOffset);
+        fbb.addOffset(8, nameToSearchOffset);
+        fbb.finish(fbb.endTable());
+        return object.uid;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final birthdateValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          12,
+        );
+        final uidParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final imageParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final cityParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final birthdateParam = birthdateValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(birthdateValue);
+        final stateParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final fullDataJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
+        final fullProfileLinkParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 18);
+        final nameToSearchParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 20, '');
+        final object = RegSociDBModel(
+          uid: uidParam,
+          image: imageParam,
+          name: nameParam,
+          city: cityParam,
+          birthdate: birthdateParam,
+          state: stateParam,
+          fullDataJson: fullDataJsonParam,
+          fullProfileLink: fullProfileLinkParam,
+          nameToSearch: nameToSearchParam,
+        );
 
-          return object;
-        })
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -209,38 +238,47 @@ obx_int.ModelDefinition getObjectBoxModel() {
 /// [RegSociDBModel] entity fields to define ObjectBox queries.
 class RegSociDBModel_ {
   /// See [RegSociDBModel.uid].
-  static final uid =
-      obx.QueryIntegerProperty<RegSociDBModel>(_entities[0].properties[0]);
+  static final uid = obx.QueryIntegerProperty<RegSociDBModel>(
+    _entities[0].properties[0],
+  );
 
   /// See [RegSociDBModel.image].
-  static final image =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[1]);
+  static final image = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[1],
+  );
 
   /// See [RegSociDBModel.name].
-  static final name =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[2]);
+  static final name = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[2],
+  );
 
   /// See [RegSociDBModel.city].
-  static final city =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[3]);
+  static final city = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[3],
+  );
 
   /// See [RegSociDBModel.birthdate].
-  static final birthdate =
-      obx.QueryDateProperty<RegSociDBModel>(_entities[0].properties[4]);
+  static final birthdate = obx.QueryDateProperty<RegSociDBModel>(
+    _entities[0].properties[4],
+  );
 
   /// See [RegSociDBModel.state].
-  static final state =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[5]);
+  static final state = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[5],
+  );
 
   /// See [RegSociDBModel.fullDataJson].
-  static final fullDataJson =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[6]);
+  static final fullDataJson = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[6],
+  );
 
   /// See [RegSociDBModel.fullProfileLink].
-  static final fullProfileLink =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[7]);
+  static final fullProfileLink = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[7],
+  );
 
   /// See [RegSociDBModel.nameToSearch].
-  static final nameToSearch =
-      obx.QueryStringProperty<RegSociDBModel>(_entities[0].properties[8]);
+  static final nameToSearch = obx.QueryStringProperty<RegSociDBModel>(
+    _entities[0].properties[8],
+  );
 }

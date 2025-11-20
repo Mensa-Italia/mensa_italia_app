@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,193 +9,30 @@ part of 'addon.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
 
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-AddonModel _$AddonModelFromJson(Map<String, dynamic> json) {
-  return _AddonModel.fromJson(json);
-}
-
 /// @nodoc
-mixin _$AddonModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  String get icon => throw _privateConstructorUsedError;
-  String get version => throw _privateConstructorUsedError;
-  String get url => throw _privateConstructorUsedError;
+mixin _$AddonModel implements DiagnosticableTreeMixin {
+  String get id;
+  String get name;
+  String get description;
+  String get icon;
+  String get version;
+  String get url;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  /// Create a copy of AddonModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $AddonModelCopyWith<AddonModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$AddonModelCopyWithImpl<AddonModel>(this as AddonModel, _$identity);
 
-/// @nodoc
-abstract class $AddonModelCopyWith<$Res> {
-  factory $AddonModelCopyWith(
-          AddonModel value, $Res Function(AddonModel) then) =
-      _$AddonModelCopyWithImpl<$Res, AddonModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String description,
-      String icon,
-      String version,
-      String url});
-}
-
-/// @nodoc
-class _$AddonModelCopyWithImpl<$Res, $Val extends AddonModel>
-    implements $AddonModelCopyWith<$Res> {
-  _$AddonModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? description = null,
-    Object? icon = null,
-    Object? version = null,
-    Object? url = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$AddonModelImplCopyWith<$Res>
-    implements $AddonModelCopyWith<$Res> {
-  factory _$$AddonModelImplCopyWith(
-          _$AddonModelImpl value, $Res Function(_$AddonModelImpl) then) =
-      __$$AddonModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String description,
-      String icon,
-      String version,
-      String url});
-}
-
-/// @nodoc
-class __$$AddonModelImplCopyWithImpl<$Res>
-    extends _$AddonModelCopyWithImpl<$Res, _$AddonModelImpl>
-    implements _$$AddonModelImplCopyWith<$Res> {
-  __$$AddonModelImplCopyWithImpl(
-      _$AddonModelImpl _value, $Res Function(_$AddonModelImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? description = null,
-    Object? icon = null,
-    Object? version = null,
-    Object? url = null,
-  }) {
-    return _then(_$AddonModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      version: null == version
-          ? _value.version
-          : version // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
-  const _$AddonModelImpl(
-      {required this.id,
-      required this.name,
-      required this.description,
-      required this.icon,
-      required this.version,
-      required this.url});
-
-  factory _$AddonModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AddonModelImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final String name;
-  @override
-  final String description;
-  @override
-  final String icon;
-  @override
-  final String version;
-  @override
-  final String url;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AddonModel(id: $id, name: $name, description: $description, icon: $icon, version: $version, url: $url)';
-  }
+  /// Serializes this AddonModel to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'AddonModel'))
       ..add(DiagnosticsProperty('id', id))
@@ -210,7 +47,7 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AddonModelImpl &&
+            other is AddonModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.description, description) ||
@@ -220,51 +57,387 @@ class _$AddonModelImpl with DiagnosticableTreeMixin implements _AddonModel {
             (identical(other.url, url) || other.url == url));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, id, name, description, icon, version, url);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$AddonModelImplCopyWith<_$AddonModelImpl> get copyWith =>
-      __$$AddonModelImplCopyWithImpl<_$AddonModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AddonModelImplToJson(
-      this,
-    );
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'AddonModel(id: $id, name: $name, description: $description, icon: $icon, version: $version, url: $url)';
   }
 }
 
-abstract class _AddonModel implements AddonModel {
-  const factory _AddonModel(
-      {required final String id,
-      required final String name,
-      required final String description,
-      required final String icon,
-      required final String version,
-      required final String url}) = _$AddonModelImpl;
-
-  factory _AddonModel.fromJson(Map<String, dynamic> json) =
-      _$AddonModelImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get name;
-  @override
-  String get description;
-  @override
-  String get icon;
-  @override
-  String get version;
-  @override
-  String get url;
-  @override
-  @JsonKey(ignore: true)
-  _$$AddonModelImplCopyWith<_$AddonModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+/// @nodoc
+abstract mixin class $AddonModelCopyWith<$Res> {
+  factory $AddonModelCopyWith(
+          AddonModel value, $Res Function(AddonModel) _then) =
+      _$AddonModelCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String description,
+      String icon,
+      String version,
+      String url});
 }
+
+/// @nodoc
+class _$AddonModelCopyWithImpl<$Res> implements $AddonModelCopyWith<$Res> {
+  _$AddonModelCopyWithImpl(this._self, this._then);
+
+  final AddonModel _self;
+  final $Res Function(AddonModel) _then;
+
+  /// Create a copy of AddonModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? description = null,
+    Object? icon = null,
+    Object? version = null,
+    Object? url = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      icon: null == icon
+          ? _self.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _self.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [AddonModel].
+extension AddonModelPatterns on AddonModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AddonModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AddonModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AddonModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String icon,
+            String version, String url)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.icon,
+            _that.version, _that.url);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String icon,
+            String version, String url)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel():
+        return $default(_that.id, _that.name, _that.description, _that.icon,
+            _that.version, _that.url);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String name, String description, String icon,
+            String version, String url)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddonModel() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.icon,
+            _that.version, _that.url);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _AddonModel with DiagnosticableTreeMixin implements AddonModel {
+  const _AddonModel(
+      {required this.id,
+      required this.name,
+      required this.description,
+      required this.icon,
+      required this.version,
+      required this.url});
+  factory _AddonModel.fromJson(Map<String, dynamic> json) =>
+      _$AddonModelFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String description;
+  @override
+  final String icon;
+  @override
+  final String version;
+  @override
+  final String url;
+
+  /// Create a copy of AddonModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AddonModelCopyWith<_AddonModel> get copyWith =>
+      __$AddonModelCopyWithImpl<_AddonModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$AddonModelToJson(
+      this,
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'AddonModel'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('icon', icon))
+      ..add(DiagnosticsProperty('version', version))
+      ..add(DiagnosticsProperty('url', url));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AddonModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.icon, icon) || other.icon == icon) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.url, url) || other.url == url));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, description, icon, version, url);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'AddonModel(id: $id, name: $name, description: $description, icon: $icon, version: $version, url: $url)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$AddonModelCopyWith<$Res>
+    implements $AddonModelCopyWith<$Res> {
+  factory _$AddonModelCopyWith(
+          _AddonModel value, $Res Function(_AddonModel) _then) =
+      __$AddonModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String description,
+      String icon,
+      String version,
+      String url});
+}
+
+/// @nodoc
+class __$AddonModelCopyWithImpl<$Res> implements _$AddonModelCopyWith<$Res> {
+  __$AddonModelCopyWithImpl(this._self, this._then);
+
+  final _AddonModel _self;
+  final $Res Function(_AddonModel) _then;
+
+  /// Create a copy of AddonModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? description = null,
+    Object? icon = null,
+    Object? version = null,
+    Object? url = null,
+  }) {
+    return _then(_AddonModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      icon: null == icon
+          ? _self.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: null == version
+          ? _self.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: null == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

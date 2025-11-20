@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,45 +9,93 @@ part of 'event.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-EventModel _$EventModelFromJson(Map<String, dynamic> json) {
-  return _EventModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$EventModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  String get infoLink => throw _privateConstructorUsedError;
-  String get bookingLink => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  String get image;
+  String get description;
+  String get infoLink;
+  String get bookingLink;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get whenStart => throw _privateConstructorUsedError;
+  DateTime get whenStart;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get whenEnd => throw _privateConstructorUsedError;
-  String get contact => throw _privateConstructorUsedError;
-  bool get isNational => throw _privateConstructorUsedError;
-  bool get isSpot => throw _privateConstructorUsedError;
-  String get owner => throw _privateConstructorUsedError;
+  DateTime get whenEnd;
+  String get contact;
+  bool get isNational;
+  bool get isSpot;
+  String get owner;
   @JsonKey(readValue: getDataFromExpanded)
-  LocationModel? get position => throw _privateConstructorUsedError;
+  LocationModel? get position;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $EventModelCopyWith<EventModel> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$EventModelCopyWithImpl<EventModel>(this as EventModel, _$identity);
+
+  /// Serializes this EventModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is EventModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.infoLink, infoLink) ||
+                other.infoLink == infoLink) &&
+            (identical(other.bookingLink, bookingLink) ||
+                other.bookingLink == bookingLink) &&
+            (identical(other.whenStart, whenStart) ||
+                other.whenStart == whenStart) &&
+            (identical(other.whenEnd, whenEnd) || other.whenEnd == whenEnd) &&
+            (identical(other.contact, contact) || other.contact == contact) &&
+            (identical(other.isNational, isNational) ||
+                other.isNational == isNational) &&
+            (identical(other.isSpot, isSpot) || other.isSpot == isSpot) &&
+            (identical(other.owner, owner) || other.owner == owner) &&
+            (identical(other.position, position) ||
+                other.position == position));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      image,
+      description,
+      infoLink,
+      bookingLink,
+      whenStart,
+      whenEnd,
+      contact,
+      isNational,
+      isSpot,
+      owner,
+      position);
+
+  @override
+  String toString() {
+    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, isSpot: $isSpot, owner: $owner, position: $position)';
+  }
 }
 
 /// @nodoc
-abstract class $EventModelCopyWith<$Res> {
+abstract mixin class $EventModelCopyWith<$Res> {
   factory $EventModelCopyWith(
-          EventModel value, $Res Function(EventModel) then) =
-      _$EventModelCopyWithImpl<$Res, EventModel>;
+          EventModel value, $Res Function(EventModel) _then) =
+      _$EventModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -68,15 +116,14 @@ abstract class $EventModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
-    implements $EventModelCopyWith<$Res> {
-  _$EventModelCopyWithImpl(this._value, this._then);
+class _$EventModelCopyWithImpl<$Res> implements $EventModelCopyWith<$Res> {
+  _$EventModelCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final EventModel _self;
+  final $Res Function(EventModel) _then;
 
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -94,188 +141,319 @@ class _$EventModelCopyWithImpl<$Res, $Val extends EventModel>
     Object? owner = null,
     Object? position = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       image: null == image
-          ? _value.image
+          ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       infoLink: null == infoLink
-          ? _value.infoLink
+          ? _self.infoLink
           : infoLink // ignore: cast_nullable_to_non_nullable
               as String,
       bookingLink: null == bookingLink
-          ? _value.bookingLink
+          ? _self.bookingLink
           : bookingLink // ignore: cast_nullable_to_non_nullable
               as String,
       whenStart: null == whenStart
-          ? _value.whenStart
+          ? _self.whenStart
           : whenStart // ignore: cast_nullable_to_non_nullable
               as DateTime,
       whenEnd: null == whenEnd
-          ? _value.whenEnd
+          ? _self.whenEnd
           : whenEnd // ignore: cast_nullable_to_non_nullable
               as DateTime,
       contact: null == contact
-          ? _value.contact
+          ? _self.contact
           : contact // ignore: cast_nullable_to_non_nullable
               as String,
       isNational: null == isNational
-          ? _value.isNational
+          ? _self.isNational
           : isNational // ignore: cast_nullable_to_non_nullable
               as bool,
       isSpot: null == isSpot
-          ? _value.isSpot
+          ? _self.isSpot
           : isSpot // ignore: cast_nullable_to_non_nullable
               as bool,
       owner: null == owner
-          ? _value.owner
+          ? _self.owner
           : owner // ignore: cast_nullable_to_non_nullable
               as String,
       position: freezed == position
-          ? _value.position
+          ? _self.position
           : position // ignore: cast_nullable_to_non_nullable
               as LocationModel?,
-    ) as $Val);
+    ));
   }
 
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $LocationModelCopyWith<$Res>? get position {
-    if (_value.position == null) {
+    if (_self.position == null) {
       return null;
     }
 
-    return $LocationModelCopyWith<$Res>(_value.position!, (value) {
-      return _then(_value.copyWith(position: value) as $Val);
+    return $LocationModelCopyWith<$Res>(_self.position!, (value) {
+      return _then(_self.copyWith(position: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$EventModelImplCopyWith<$Res>
-    implements $EventModelCopyWith<$Res> {
-  factory _$$EventModelImplCopyWith(
-          _$EventModelImpl value, $Res Function(_$EventModelImpl) then) =
-      __$$EventModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String image,
-      String description,
-      String infoLink,
-      String bookingLink,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
-      String contact,
-      bool isNational,
-      bool isSpot,
-      String owner,
-      @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
+/// Adds pattern-matching-related methods to [EventModel].
+extension EventModelPatterns on EventModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $LocationModelCopyWith<$Res>? get position;
-}
-
-/// @nodoc
-class __$$EventModelImplCopyWithImpl<$Res>
-    extends _$EventModelCopyWithImpl<$Res, _$EventModelImpl>
-    implements _$$EventModelImplCopyWith<$Res> {
-  __$$EventModelImplCopyWithImpl(
-      _$EventModelImpl _value, $Res Function(_$EventModelImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? image = null,
-    Object? description = null,
-    Object? infoLink = null,
-    Object? bookingLink = null,
-    Object? whenStart = null,
-    Object? whenEnd = null,
-    Object? contact = null,
-    Object? isNational = null,
-    Object? isSpot = null,
-    Object? owner = null,
-    Object? position = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_EventModel value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$EventModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      infoLink: null == infoLink
-          ? _value.infoLink
-          : infoLink // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookingLink: null == bookingLink
-          ? _value.bookingLink
-          : bookingLink // ignore: cast_nullable_to_non_nullable
-              as String,
-      whenStart: null == whenStart
-          ? _value.whenStart
-          : whenStart // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      whenEnd: null == whenEnd
-          ? _value.whenEnd
-          : whenEnd // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      contact: null == contact
-          ? _value.contact
-          : contact // ignore: cast_nullable_to_non_nullable
-              as String,
-      isNational: null == isNational
-          ? _value.isNational
-          : isNational // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isSpot: null == isSpot
-          ? _value.isSpot
-          : isSpot // ignore: cast_nullable_to_non_nullable
-              as bool,
-      owner: null == owner
-          ? _value.owner
-          : owner // ignore: cast_nullable_to_non_nullable
-              as String,
-      position: freezed == position
-          ? _value.position
-          : position // ignore: cast_nullable_to_non_nullable
-              as LocationModel?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _EventModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_EventModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EventModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_EventModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EventModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            String image,
+            String description,
+            String infoLink,
+            String bookingLink,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
+            String contact,
+            bool isNational,
+            bool isSpot,
+            String owner,
+            @JsonKey(readValue: getDataFromExpanded) LocationModel? position)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _EventModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.image,
+            _that.description,
+            _that.infoLink,
+            _that.bookingLink,
+            _that.whenStart,
+            _that.whenEnd,
+            _that.contact,
+            _that.isNational,
+            _that.isSpot,
+            _that.owner,
+            _that.position);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            String image,
+            String description,
+            String infoLink,
+            String bookingLink,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
+            String contact,
+            bool isNational,
+            bool isSpot,
+            String owner,
+            @JsonKey(readValue: getDataFromExpanded) LocationModel? position)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EventModel():
+        return $default(
+            _that.id,
+            _that.name,
+            _that.image,
+            _that.description,
+            _that.infoLink,
+            _that.bookingLink,
+            _that.whenStart,
+            _that.whenEnd,
+            _that.contact,
+            _that.isNational,
+            _that.isSpot,
+            _that.owner,
+            _that.position);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String name,
+            String image,
+            String description,
+            String infoLink,
+            String bookingLink,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
+            String contact,
+            bool isNational,
+            bool isSpot,
+            String owner,
+            @JsonKey(readValue: getDataFromExpanded) LocationModel? position)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EventModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.image,
+            _that.description,
+            _that.infoLink,
+            _that.bookingLink,
+            _that.whenStart,
+            _that.whenEnd,
+            _that.contact,
+            _that.isNational,
+            _that.isSpot,
+            _that.owner,
+            _that.position);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$EventModelImpl implements _EventModel {
-  const _$EventModelImpl(
+class _EventModel implements EventModel {
+  const _EventModel(
       {required this.id,
       required this.name,
       required this.image,
@@ -289,9 +467,8 @@ class _$EventModelImpl implements _EventModel {
       required this.isSpot,
       required this.owner,
       @JsonKey(readValue: getDataFromExpanded) required this.position});
-
-  factory _$EventModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EventModelImplFromJson(json);
+  factory _EventModel.fromJson(Map<String, dynamic> json) =>
+      _$EventModelFromJson(json);
 
   @override
   final String id;
@@ -323,16 +500,26 @@ class _$EventModelImpl implements _EventModel {
   @JsonKey(readValue: getDataFromExpanded)
   final LocationModel? position;
 
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, isSpot: $isSpot, owner: $owner, position: $position)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$EventModelCopyWith<_EventModel> get copyWith =>
+      __$EventModelCopyWithImpl<_EventModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$EventModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$EventModelImpl &&
+            other is _EventModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.image, image) || other.image == image) &&
@@ -354,7 +541,7 @@ class _$EventModelImpl implements _EventModel {
                 other.position == position));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -372,71 +559,134 @@ class _$EventModelImpl implements _EventModel {
       owner,
       position);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$EventModelImplCopyWith<_$EventModelImpl> get copyWith =>
-      __$$EventModelImplCopyWithImpl<_$EventModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EventModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'EventModel(id: $id, name: $name, image: $image, description: $description, infoLink: $infoLink, bookingLink: $bookingLink, whenStart: $whenStart, whenEnd: $whenEnd, contact: $contact, isNational: $isNational, isSpot: $isSpot, owner: $owner, position: $position)';
   }
 }
 
-abstract class _EventModel implements EventModel {
-  const factory _EventModel(
-      {required final String id,
-      required final String name,
-      required final String image,
-      required final String description,
-      required final String infoLink,
-      required final String bookingLink,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenStart,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime whenEnd,
-      required final String contact,
-      required final bool isNational,
-      required final bool isSpot,
-      required final String owner,
-      @JsonKey(readValue: getDataFromExpanded)
-      required final LocationModel? position}) = _$EventModelImpl;
+/// @nodoc
+abstract mixin class _$EventModelCopyWith<$Res>
+    implements $EventModelCopyWith<$Res> {
+  factory _$EventModelCopyWith(
+          _EventModel value, $Res Function(_EventModel) _then) =
+      __$EventModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String image,
+      String description,
+      String infoLink,
+      String bookingLink,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenStart,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime whenEnd,
+      String contact,
+      bool isNational,
+      bool isSpot,
+      String owner,
+      @JsonKey(readValue: getDataFromExpanded) LocationModel? position});
 
-  factory _EventModel.fromJson(Map<String, dynamic> json) =
-      _$EventModelImpl.fromJson;
-
   @override
-  String get id;
-  @override
-  String get name;
-  @override
-  String get image;
-  @override
-  String get description;
-  @override
-  String get infoLink;
-  @override
-  String get bookingLink;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get whenStart;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get whenEnd;
-  @override
-  String get contact;
-  @override
-  bool get isNational;
-  @override
-  bool get isSpot;
-  @override
-  String get owner;
-  @override
-  @JsonKey(readValue: getDataFromExpanded)
-  LocationModel? get position;
-  @override
-  @JsonKey(ignore: true)
-  _$$EventModelImplCopyWith<_$EventModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  $LocationModelCopyWith<$Res>? get position;
 }
+
+/// @nodoc
+class __$EventModelCopyWithImpl<$Res> implements _$EventModelCopyWith<$Res> {
+  __$EventModelCopyWithImpl(this._self, this._then);
+
+  final _EventModel _self;
+  final $Res Function(_EventModel) _then;
+
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? image = null,
+    Object? description = null,
+    Object? infoLink = null,
+    Object? bookingLink = null,
+    Object? whenStart = null,
+    Object? whenEnd = null,
+    Object? contact = null,
+    Object? isNational = null,
+    Object? isSpot = null,
+    Object? owner = null,
+    Object? position = freezed,
+  }) {
+    return _then(_EventModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      image: null == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      infoLink: null == infoLink
+          ? _self.infoLink
+          : infoLink // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookingLink: null == bookingLink
+          ? _self.bookingLink
+          : bookingLink // ignore: cast_nullable_to_non_nullable
+              as String,
+      whenStart: null == whenStart
+          ? _self.whenStart
+          : whenStart // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      whenEnd: null == whenEnd
+          ? _self.whenEnd
+          : whenEnd // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      contact: null == contact
+          ? _self.contact
+          : contact // ignore: cast_nullable_to_non_nullable
+              as String,
+      isNational: null == isNational
+          ? _self.isNational
+          : isNational // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isSpot: null == isSpot
+          ? _self.isSpot
+          : isSpot // ignore: cast_nullable_to_non_nullable
+              as bool,
+      owner: null == owner
+          ? _self.owner
+          : owner // ignore: cast_nullable_to_non_nullable
+              as String,
+      position: freezed == position
+          ? _self.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as LocationModel?,
+    ));
+  }
+
+  /// Create a copy of EventModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LocationModelCopyWith<$Res>? get position {
+    if (_self.position == null) {
+      return null;
+    }
+
+    return $LocationModelCopyWith<$Res>(_self.position!, (value) {
+      return _then(_self.copyWith(position: value));
+    });
+  }
+}
+
+// dart format on

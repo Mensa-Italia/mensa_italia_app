@@ -9,7 +9,7 @@ part 'event.freezed.dart';
 part 'event.g.dart';
 
 @freezed
-class EventModel with _$EventModel {
+abstract class EventModel with _$EventModel {
   const factory EventModel({
     required String id,
     required String name,

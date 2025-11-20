@@ -52,8 +52,10 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
-      dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+      dateTimeStartEvent.text =
+          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+      dateTimeEndEvent.text =
+          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       if (event.position != null) {
         location = event.position;
         locationController.text = location!.getAddress();
@@ -93,7 +95,8 @@ class AddEventViewModel extends MasterModel {
       child: EventCardGenerator(),
     ).then((value) {
       if (value != null && value is Uint8List) {
-        image = XFile.fromData(value, name: "event_card.png", mimeType: "image/png");
+        image = XFile.fromData(value,
+            name: "event_card.png", mimeType: "image/png");
         image?.readAsBytes().then((bytes) {
           imageBytes = bytes;
           rebuildUi();
@@ -150,7 +153,7 @@ class AddEventViewModel extends MasterModel {
           );
         }
         navigationService.back();
-      } catch (exception, stackTrace) {}
+      } catch (exception) {}
       setBusy(false);
     }
   }
@@ -176,9 +179,11 @@ class AddEventViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions.setStart(value);
-        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeStartEvent.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -199,7 +204,8 @@ class AddEventViewModel extends MasterModel {
       if (value != null) {
         dateTimeOptions.setEnd(value);
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text =
+              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";

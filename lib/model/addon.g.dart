@@ -6,8 +6,7 @@ part of 'addon.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AddonModelImpl _$$AddonModelImplFromJson(Map<String, dynamic> json) =>
-    _$AddonModelImpl(
+_AddonModel _$AddonModelFromJson(Map<String, dynamic> json) => _AddonModel(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
@@ -16,7 +15,7 @@ _$AddonModelImpl _$$AddonModelImplFromJson(Map<String, dynamic> json) =>
       url: json['url'] as String,
     );
 
-Map<String, dynamic> _$$AddonModelImplToJson(_$AddonModelImpl instance) =>
+Map<String, dynamic> _$AddonModelToJson(_AddonModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

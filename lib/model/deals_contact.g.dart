@@ -6,8 +6,8 @@ part of 'deals_contact.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DealsContactImpl _$$DealsContactImplFromJson(Map<String, dynamic> json) =>
-    _$DealsContactImpl(
+_DealsContact _$DealsContactFromJson(Map<String, dynamic> json) =>
+    _DealsContact(
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
@@ -17,7 +17,7 @@ _$DealsContactImpl _$$DealsContactImplFromJson(Map<String, dynamic> json) =>
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$DealsContactImplToJson(_$DealsContactImpl instance) =>
+Map<String, dynamic> _$DealsContactToJson(_DealsContact instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

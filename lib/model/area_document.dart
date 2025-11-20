@@ -5,7 +5,7 @@ part 'area_document.freezed.dart';
 part 'area_document.g.dart';
 
 @freezed
-class AreaDocumentModel with _$AreaDocumentModel {
+abstract class AreaDocumentModel with _$AreaDocumentModel {
   factory AreaDocumentModel({
     required String description,
     required String image,

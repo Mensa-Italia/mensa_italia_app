@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,7 +15,8 @@ class OptionPage extends StackedView<OptionPageModel> {
   const OptionPage({super.key});
 
   @override
-  Widget builder(BuildContext context, OptionPageModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, OptionPageModel viewModel, Widget? child) {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
@@ -76,6 +75,18 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
             const SizedBox(height: 20),
             _SettingContainer(
+              key: const ValueKey("settings:-1"),
+              children: [
+                _OptionTile(
+                  title: "views.settings.tile.tickets.title".tr(),
+                  icon: EneftyIcons.ticket_2_outline,
+                  onTap: viewModel.openTicketPage,
+                  color: Colors.purple,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _SettingContainer(
               key: const ValueKey("settings:0"),
               children: [
                 _OptionTile(
@@ -84,7 +95,6 @@ class OptionPage extends StackedView<OptionPageModel> {
                   icon: EneftyIcons.coin_outline,
                   onTap: viewModel.openDonationPage,
                   color: Colors.blue,
-                  
                 ),
                 _OptionTile(
                   title: "views.settings.tile.paymentmethods.title".tr(),
@@ -100,7 +110,8 @@ class OptionPage extends StackedView<OptionPageModel> {
                 ),
                 _OptionTile(
                   title: "views.settings.tile.renewmembership.title".tr(),
-                  trailing: DateFormat.yMMMd().format(viewModel.user.expireMembership),
+                  trailing: DateFormat.yMMMd()
+                      .format(viewModel.user.expireMembership),
                   icon: EneftyIcons.coin_2_outline,
                   onTap: viewModel.renewSubscription,
                   color: Colors.orange,
@@ -178,7 +189,8 @@ class OptionPage extends StackedView<OptionPageModel> {
             ),
           ],
         ),
-        const SliverSafeArea(sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
+        const SliverSafeArea(
+            sliver: SliverPadding(padding: EdgeInsets.only(bottom: 10))),
       ],
     );
   }
@@ -251,7 +263,8 @@ class _OptionTile extends StatelessWidget {
   }
 
   Widget getPlatformIcon() {
-    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform == TargetPlatform.iOS) {
+    if (Theme.of(StackedService.navigatorKey!.currentContext!).platform ==
+        TargetPlatform.iOS) {
       return Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
@@ -284,7 +297,8 @@ class _SettingContainer extends StatelessWidget {
     final isiOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isiOS ? 20 : 0),
-      padding: const EdgeInsets.all(8).copyWith(right: isiOS ? 0 : 20, left: isiOS ? 2 : 20),
+      padding: const EdgeInsets.all(8)
+          .copyWith(right: isiOS ? 0 : 20, left: isiOS ? 2 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(isiOS ? 10 : 0),

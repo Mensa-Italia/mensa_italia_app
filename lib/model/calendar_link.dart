@@ -4,7 +4,7 @@ part 'calendar_link.freezed.dart';
 part 'calendar_link.g.dart';
 
 @freezed
-class CalendarLinkModel with _$CalendarLinkModel {
+abstract class CalendarLinkModel with _$CalendarLinkModel {
   factory CalendarLinkModel({
     required String id,
     required String user,

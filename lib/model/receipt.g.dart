@@ -6,8 +6,8 @@ part of 'receipt.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ReceiptModelImpl _$$ReceiptModelImplFromJson(Map<String, dynamic> json) =>
-    _$ReceiptModelImpl(
+_ReceiptModel _$ReceiptModelFromJson(Map<String, dynamic> json) =>
+    _ReceiptModel(
       id: json['id'] as String,
       description: json['description'] as String?,
       user: json['user'] as String,
@@ -18,7 +18,7 @@ _$ReceiptModelImpl _$$ReceiptModelImplFromJson(Map<String, dynamic> json) =>
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$ReceiptModelImplToJson(_$ReceiptModelImpl instance) =>
+Map<String, dynamic> _$ReceiptModelToJson(_ReceiptModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,

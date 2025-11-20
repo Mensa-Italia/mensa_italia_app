@@ -35,6 +35,7 @@ import 'package:mensa_italia_app/ui/views/addon_area_documents_preview/addon_are
 import 'package:mensa_italia_app/ui/views/notification_view/notification_view_view.dart';
 import 'package:mensa_italia_app/ui/views/devices/devices_view.dart';
 import 'package:mensa_italia_app/ui/views/location_list_picker/location_list_picker_view.dart';
+import 'package:mensa_italia_app/ui/views/tickets/tickets_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -71,6 +72,7 @@ import 'package:mensa_italia_app/ui/views/location_list_picker/location_list_pic
     MaterialRoute(page: NotificationViewView),
     MaterialRoute(page: DevicesView),
     MaterialRoute(page: LocationListPickerView),
+    MaterialRoute(page: TicketsView),
 // @stacked-route
   ],
   dependencies: [

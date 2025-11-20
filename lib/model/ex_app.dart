@@ -20,7 +20,7 @@ part 'ex_app.freezed.dart';
 part 'ex_app.g.dart';
 
 @freezed
-class ExAppModel with _$ExAppModel {
+abstract class ExAppModel with _$ExAppModel {
   factory ExAppModel({
     String? collectionId,
     String? collectionName,

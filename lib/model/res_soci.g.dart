@@ -6,8 +6,8 @@ part of 'res_soci.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RegSociModelImpl _$$RegSociModelImplFromJson(Map<String, dynamic> json) =>
-    _$RegSociModelImpl(
+_RegSociModel _$RegSociModelFromJson(Map<String, dynamic> json) =>
+    _RegSociModel(
       id: json['id'] as String,
       image: json['image'] as String,
       name: json['name'] as String,
@@ -18,7 +18,7 @@ _$RegSociModelImpl _$$RegSociModelImplFromJson(Map<String, dynamic> json) =>
       fullProfileLink: json['full_profile_link'] as String?,
     );
 
-Map<String, dynamic> _$$RegSociModelImplToJson(_$RegSociModelImpl instance) =>
+Map<String, dynamic> _$RegSociModelToJson(_RegSociModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'image': instance.image,
@@ -30,8 +30,8 @@ Map<String, dynamic> _$$RegSociModelImplToJson(_$RegSociModelImpl instance) =>
       'full_profile_link': instance.fullProfileLink,
     };
 
-_$RegSociDBModelImpl _$$RegSociDBModelImplFromJson(Map<String, dynamic> json) =>
-    _$RegSociDBModelImpl(
+_RegSociDBModel _$RegSociDBModelFromJson(Map<String, dynamic> json) =>
+    _RegSociDBModel(
       uid: (json['uid'] as num).toInt(),
       image: json['image'] as String,
       name: json['name'] as String,
@@ -43,8 +43,7 @@ _$RegSociDBModelImpl _$$RegSociDBModelImplFromJson(Map<String, dynamic> json) =>
       nameToSearch: json['name_to_search'] as String,
     );
 
-Map<String, dynamic> _$$RegSociDBModelImplToJson(
-        _$RegSociDBModelImpl instance) =>
+Map<String, dynamic> _$RegSociDBModelToJson(_RegSociDBModel instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'image': instance.image,

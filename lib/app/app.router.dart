@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -5,13 +6,13 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:flutter/material.dart' as _i35;
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as _i34;
-import 'package:mensa_italia_app/model/boutique.dart' as _i38;
-import 'package:mensa_italia_app/model/deal.dart' as _i37;
-import 'package:mensa_italia_app/model/document.dart' as _i39;
-import 'package:mensa_italia_app/model/event.dart' as _i35;
-import 'package:mensa_italia_app/model/event_schedule.dart' as _i36;
+import 'package:mensa_italia_app/model/boutique.dart' as _i39;
+import 'package:mensa_italia_app/model/deal.dart' as _i38;
+import 'package:mensa_italia_app/model/document.dart' as _i40;
+import 'package:mensa_italia_app/model/event.dart' as _i36;
+import 'package:mensa_italia_app/model/event_schedule.dart' as _i37;
 import 'package:mensa_italia_app/ui/views/add_event/add_event_view.dart'
     as _i12;
 import 'package:mensa_italia_app/ui/views/add_event_schedule_list/add_event_schedule_list_view.dart'
@@ -71,8 +72,9 @@ import 'package:mensa_italia_app/ui/views/receipts/receipts_view.dart' as _i27;
 import 'package:mensa_italia_app/ui/views/renew_membership/renew_membership_view.dart'
     as _i7;
 import 'package:mensa_italia_app/ui/views/startup/startup_view.dart' as _i3;
+import 'package:mensa_italia_app/ui/views/tickets/tickets_view.dart' as _i34;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i40;
+import 'package:stacked_services/stacked_services.dart' as _i41;
 
 class Routes {
   static const loginView = '/login-view';
@@ -140,6 +142,8 @@ class Routes {
 
   static const locationListPickerView = '/location-list-picker-view';
 
+  static const ticketsView = '/tickets-view';
+
   static const all = <String>{
     loginView,
     startupView,
@@ -173,39 +177,22 @@ class Routes {
     notificationViewView,
     devicesView,
     locationListPickerView,
+    ticketsView,
   };
 }
 
 class StackedRouter extends _i1.RouterBase {
   final _routes = <_i1.RouteDef>[
-    _i1.RouteDef(
-      Routes.loginView,
-      page: _i2.LoginView,
-    ),
-    _i1.RouteDef(
-      Routes.startupView,
-      page: _i3.StartupView,
-    ),
-    _i1.RouteDef(
-      Routes.homeView,
-      page: _i4.HomeView,
-    ),
+    _i1.RouteDef(Routes.loginView, page: _i2.LoginView),
+    _i1.RouteDef(Routes.startupView, page: _i3.StartupView),
+    _i1.RouteDef(Routes.homeView, page: _i4.HomeView),
     _i1.RouteDef(
       Routes.externalAddonWebviewView,
       page: _i5.ExternalAddonWebviewView,
     ),
-    _i1.RouteDef(
-      Routes.addonContactsView,
-      page: _i6.AddonContactsView,
-    ),
-    _i1.RouteDef(
-      Routes.renewMembershipView,
-      page: _i7.RenewMembershipView,
-    ),
-    _i1.RouteDef(
-      Routes.genericWebviewView,
-      page: _i8.GenericWebviewView,
-    ),
+    _i1.RouteDef(Routes.addonContactsView, page: _i6.AddonContactsView),
+    _i1.RouteDef(Routes.renewMembershipView, page: _i7.RenewMembershipView),
+    _i1.RouteDef(Routes.genericWebviewView, page: _i8.GenericWebviewView),
     _i1.RouteDef(
       Routes.addonTestAssistantView,
       page: _i9.AddonTestAssistantView,
@@ -214,58 +201,25 @@ class StackedRouter extends _i1.RouterBase {
       Routes.addonAreaDocumentsView,
       page: _i10.AddonAreaDocumentsView,
     ),
-    _i1.RouteDef(
-      Routes.eventsMapView,
-      page: _i11.EventsMapView,
-    ),
-    _i1.RouteDef(
-      Routes.addEventView,
-      page: _i12.AddEventView,
-    ),
-    _i1.RouteDef(
-      Routes.mapPickerView,
-      page: _i13.MapPickerView,
-    ),
-    _i1.RouteDef(
-      Routes.documentViewerView,
-      page: _i14.DocumentViewerView,
-    ),
-    _i1.RouteDef(
-      Routes.eventCalendarView,
-      page: _i15.EventCalendarView,
-    ),
-    _i1.RouteDef(
-      Routes.calendarLinkerView,
-      page: _i16.CalendarLinkerView,
-    ),
-    _i1.RouteDef(
-      Routes.eventShowcaseView,
-      page: _i17.EventShowcaseView,
-    ),
+    _i1.RouteDef(Routes.eventsMapView, page: _i11.EventsMapView),
+    _i1.RouteDef(Routes.addEventView, page: _i12.AddEventView),
+    _i1.RouteDef(Routes.mapPickerView, page: _i13.MapPickerView),
+    _i1.RouteDef(Routes.documentViewerView, page: _i14.DocumentViewerView),
+    _i1.RouteDef(Routes.eventCalendarView, page: _i15.EventCalendarView),
+    _i1.RouteDef(Routes.calendarLinkerView, page: _i16.CalendarLinkerView),
+    _i1.RouteDef(Routes.eventShowcaseView, page: _i17.EventShowcaseView),
     _i1.RouteDef(
       Routes.addEventScheduleListView,
       page: _i18.AddEventScheduleListView,
     ),
-    _i1.RouteDef(
-      Routes.addScheduleView,
-      page: _i19.AddScheduleView,
-    ),
-    _i1.RouteDef(
-      Routes.addonDealsView,
-      page: _i20.AddonDealsView,
-    ),
+    _i1.RouteDef(Routes.addScheduleView, page: _i19.AddScheduleView),
+    _i1.RouteDef(Routes.addonDealsView, page: _i20.AddonDealsView),
     _i1.RouteDef(
       Routes.addonDealsDetailsView,
       page: _i21.AddonDealsDetailsView,
     ),
-    _i1.RouteDef(
-      Routes.addonDealsAddView,
-      page: _i22.AddonDealsAddView,
-    ),
-    _i1.RouteDef(
-      Routes.addonStampView,
-      page: _i23.AddonStampView,
-    ),
+    _i1.RouteDef(Routes.addonDealsAddView, page: _i22.AddonDealsAddView),
+    _i1.RouteDef(Routes.addonStampView, page: _i23.AddonStampView),
     _i1.RouteDef(
       Routes.notificationManagerView,
       page: _i24.NotificationManagerView,
@@ -274,18 +228,9 @@ class StackedRouter extends _i1.RouterBase {
       Routes.paymentMethodManagerView,
       page: _i25.PaymentMethodManagerView,
     ),
-    _i1.RouteDef(
-      Routes.makeDonationView,
-      page: _i26.MakeDonationView,
-    ),
-    _i1.RouteDef(
-      Routes.receiptsView,
-      page: _i27.ReceiptsView,
-    ),
-    _i1.RouteDef(
-      Routes.addonBoutiqueView,
-      page: _i28.AddonBoutiqueView,
-    ),
+    _i1.RouteDef(Routes.makeDonationView, page: _i26.MakeDonationView),
+    _i1.RouteDef(Routes.receiptsView, page: _i27.ReceiptsView),
+    _i1.RouteDef(Routes.addonBoutiqueView, page: _i28.AddonBoutiqueView),
     _i1.RouteDef(
       Routes.addonBoutiqueProductView,
       page: _i29.AddonBoutiqueProductView,
@@ -294,86 +239,110 @@ class StackedRouter extends _i1.RouterBase {
       Routes.addonAreaDocumentsPreviewView,
       page: _i30.AddonAreaDocumentsPreviewView,
     ),
-    _i1.RouteDef(
-      Routes.notificationViewView,
-      page: _i31.NotificationViewView,
-    ),
-    _i1.RouteDef(
-      Routes.devicesView,
-      page: _i32.DevicesView,
-    ),
+    _i1.RouteDef(Routes.notificationViewView, page: _i31.NotificationViewView),
+    _i1.RouteDef(Routes.devicesView, page: _i32.DevicesView),
     _i1.RouteDef(
       Routes.locationListPickerView,
       page: _i33.LocationListPickerView,
     ),
+    _i1.RouteDef(Routes.ticketsView, page: _i34.TicketsView),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.LoginView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i2.LoginView(),
+      final args = data.getArgs<LoginViewArguments>(
+        orElse: () => const LoginViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i2.LoginView(key: args.key),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i3.StartupView(),
+      final args = data.getArgs<StartupViewArguments>(
+        orElse: () => const StartupViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i3.StartupView(key: args.key),
         settings: data,
       );
     },
     _i4.HomeView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i4.HomeView(),
+      final args = data.getArgs<HomeViewArguments>(
+        orElse: () => const HomeViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i4.HomeView(key: args.key),
         settings: data,
       );
     },
     _i5.ExternalAddonWebviewView: (data) {
-      final args =
-          data.getArgs<ExternalAddonWebviewViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      final args = data.getArgs<ExternalAddonWebviewViewArguments>(
+        nullOk: false,
+      );
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) => _i5.ExternalAddonWebviewView(
-            key: args.key, addonID: args.addonID, addonURL: args.addonURL),
+          key: args.key,
+          addonID: args.addonID,
+          addonURL: args.addonURL,
+        ),
         settings: data,
       );
     },
     _i6.AddonContactsView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i6.AddonContactsView(),
+      final args = data.getArgs<AddonContactsViewArguments>(
+        orElse: () => const AddonContactsViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i6.AddonContactsView(key: args.key),
         settings: data,
       );
     },
     _i7.RenewMembershipView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i7.RenewMembershipView(),
+      final args = data.getArgs<RenewMembershipViewArguments>(
+        orElse: () => const RenewMembershipViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i7.RenewMembershipView(key: args.key),
         settings: data,
       );
     },
     _i8.GenericWebviewView: (data) {
       final args = data.getArgs<GenericWebviewViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) => _i8.GenericWebviewView(
-            key: args.key,
-            url: args.url,
-            title: args.title,
-            previousPageTitle: args.previousPageTitle),
+          key: args.key,
+          url: args.url,
+          title: args.title,
+          previousPageTitle: args.previousPageTitle,
+        ),
         settings: data,
       );
     },
     _i9.AddonTestAssistantView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i9.AddonTestAssistantView(),
+      final args = data.getArgs<AddonTestAssistantViewArguments>(
+        orElse: () => const AddonTestAssistantViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i9.AddonTestAssistantView(key: args.key),
         settings: data,
       );
     },
     _i10.AddonAreaDocumentsView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i10.AddonAreaDocumentsView(),
+      final args = data.getArgs<AddonAreaDocumentsViewArguments>(
+        orElse: () => const AddonAreaDocumentsViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i10.AddonAreaDocumentsView(key: args.key),
         settings: data,
       );
     },
     _i11.EventsMapView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i11.EventsMapView(),
+      final args = data.getArgs<EventsMapViewArguments>(
+        orElse: () => const EventsMapViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i11.EventsMapView(key: args.key),
         settings: data,
       );
     },
@@ -381,55 +350,68 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddEventViewArguments>(
         orElse: () => const AddEventViewArguments(),
       );
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i12.AddEventView(key: args.key, event: args.event),
         settings: data,
       );
     },
     _i13.MapPickerView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i13.MapPickerView(),
+      final args = data.getArgs<MapPickerViewArguments>(
+        orElse: () => const MapPickerViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i13.MapPickerView(key: args.key),
         settings: data,
       );
     },
     _i14.DocumentViewerView: (data) {
       final args = data.getArgs<DocumentViewerViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) => _i14.DocumentViewerView(
-            key: args.key,
-            downlaodUrl: args.downlaodUrl,
-            title: args.title,
-            previousPageTitle: args.previousPageTitle),
+          key: args.key,
+          downlaodUrl: args.downlaodUrl,
+          title: args.title,
+          previousPageTitle: args.previousPageTitle,
+        ),
         settings: data,
       );
     },
     _i15.EventCalendarView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i15.EventCalendarView(),
+      final args = data.getArgs<EventCalendarViewArguments>(
+        orElse: () => const EventCalendarViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i15.EventCalendarView(key: args.key),
         settings: data,
       );
     },
     _i16.CalendarLinkerView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i16.CalendarLinkerView(),
+      final args = data.getArgs<CalendarLinkerViewArguments>(
+        orElse: () => const CalendarLinkerViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i16.CalendarLinkerView(key: args.key),
         settings: data,
       );
     },
     _i17.EventShowcaseView: (data) {
       final args = data.getArgs<EventShowcaseViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i17.EventShowcaseView(key: args.key, event: args.event),
         settings: data,
       );
     },
     _i18.AddEventScheduleListView: (data) {
-      final args =
-          data.getArgs<AddEventScheduleListViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      final args = data.getArgs<AddEventScheduleListViewArguments>(
+        nullOk: false,
+      );
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) => _i18.AddEventScheduleListView(
-            key: args.key, eventSchedules: args.eventSchedules),
+          key: args.key,
+          eventSchedules: args.eventSchedules,
+        ),
         settings: data,
       );
     },
@@ -437,21 +419,24 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddScheduleViewArguments>(
         orElse: () => const AddScheduleViewArguments(),
       );
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i19.AddScheduleView(key: args.key, event: args.event),
         settings: data,
       );
     },
     _i20.AddonDealsView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i20.AddonDealsView(),
+      final args = data.getArgs<AddonDealsViewArguments>(
+        orElse: () => const AddonDealsViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i20.AddonDealsView(key: args.key),
         settings: data,
       );
     },
     _i21.AddonDealsDetailsView: (data) {
       final args = data.getArgs<AddonDealsDetailsViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i21.AddonDealsDetailsView(key: args.key, deal: args.deal),
         settings: data,
@@ -461,81 +446,121 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddonDealsAddViewArguments>(
         orElse: () => const AddonDealsAddViewArguments(),
       );
-      return _i34.MaterialPageRoute<dynamic>(
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i22.AddonDealsAddView(key: args.key, deal: args.deal),
         settings: data,
       );
     },
     _i23.AddonStampView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i23.AddonStampView(),
+      final args = data.getArgs<AddonStampViewArguments>(
+        orElse: () => const AddonStampViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i23.AddonStampView(key: args.key),
         settings: data,
       );
     },
     _i24.NotificationManagerView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i24.NotificationManagerView(),
+      final args = data.getArgs<NotificationManagerViewArguments>(
+        orElse: () => const NotificationManagerViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i24.NotificationManagerView(key: args.key),
         settings: data,
       );
     },
     _i25.PaymentMethodManagerView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i25.PaymentMethodManagerView(),
+      final args = data.getArgs<PaymentMethodManagerViewArguments>(
+        orElse: () => const PaymentMethodManagerViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i25.PaymentMethodManagerView(key: args.key),
         settings: data,
       );
     },
     _i26.MakeDonationView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i26.MakeDonationView(),
+      final args = data.getArgs<MakeDonationViewArguments>(
+        orElse: () => const MakeDonationViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i26.MakeDonationView(key: args.key),
         settings: data,
       );
     },
     _i27.ReceiptsView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i27.ReceiptsView(),
+      final args = data.getArgs<ReceiptsViewArguments>(
+        orElse: () => const ReceiptsViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i27.ReceiptsView(key: args.key),
         settings: data,
       );
     },
     _i28.AddonBoutiqueView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i28.AddonBoutiqueView(),
+      final args = data.getArgs<AddonBoutiqueViewArguments>(
+        orElse: () => const AddonBoutiqueViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i28.AddonBoutiqueView(key: args.key),
         settings: data,
       );
     },
     _i29.AddonBoutiqueProductView: (data) {
-      final args =
-          data.getArgs<AddonBoutiqueProductViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      final args = data.getArgs<AddonBoutiqueProductViewArguments>(
+        nullOk: false,
+      );
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i29.AddonBoutiqueProductView(key: args.key, product: args.product),
         settings: data,
       );
     },
     _i30.AddonAreaDocumentsPreviewView: (data) {
-      final args =
-          data.getArgs<AddonAreaDocumentsPreviewViewArguments>(nullOk: false);
-      return _i34.MaterialPageRoute<dynamic>(
+      final args = data.getArgs<AddonAreaDocumentsPreviewViewArguments>(
+        nullOk: false,
+      );
+      return _i35.MaterialPageRoute<dynamic>(
         builder: (context) => _i30.AddonAreaDocumentsPreviewView(
-            key: args.key, document: args.document),
+          key: args.key,
+          document: args.document,
+        ),
         settings: data,
       );
     },
     _i31.NotificationViewView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i31.NotificationViewView(),
+      final args = data.getArgs<NotificationViewViewArguments>(
+        orElse: () => const NotificationViewViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i31.NotificationViewView(key: args.key),
         settings: data,
       );
     },
     _i32.DevicesView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i32.DevicesView(),
+      final args = data.getArgs<DevicesViewArguments>(
+        orElse: () => const DevicesViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i32.DevicesView(key: args.key),
         settings: data,
       );
     },
     _i33.LocationListPickerView: (data) {
-      return _i34.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i33.LocationListPickerView(),
+      final args = data.getArgs<LocationListPickerViewArguments>(
+        orElse: () => const LocationListPickerViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i33.LocationListPickerView(key: args.key),
+        settings: data,
+      );
+    },
+    _i34.TicketsView: (data) {
+      final args = data.getArgs<TicketsViewArguments>(
+        orElse: () => const TicketsViewArguments(),
+      );
+      return _i35.MaterialPageRoute<dynamic>(
+        builder: (context) => _i34.TicketsView(key: args.key),
         settings: data,
       );
     },
@@ -548,6 +573,72 @@ class StackedRouter extends _i1.RouterBase {
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
+class LoginViewArguments {
+  const LoginViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant LoginViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class StartupViewArguments {
+  const StartupViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant StartupViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class HomeViewArguments {
+  const HomeViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant HomeViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class ExternalAddonWebviewViewArguments {
   const ExternalAddonWebviewViewArguments({
     this.key,
@@ -555,7 +646,7 @@ class ExternalAddonWebviewViewArguments {
     required this.addonURL,
   });
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
   final String addonID;
 
@@ -580,6 +671,50 @@ class ExternalAddonWebviewViewArguments {
   }
 }
 
+class AddonContactsViewArguments {
+  const AddonContactsViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonContactsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class RenewMembershipViewArguments {
+  const RenewMembershipViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant RenewMembershipViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class GenericWebviewViewArguments {
   const GenericWebviewViewArguments({
     this.key,
@@ -588,7 +723,7 @@ class GenericWebviewViewArguments {
     required this.previousPageTitle,
   });
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
   final String url;
 
@@ -619,15 +754,78 @@ class GenericWebviewViewArguments {
   }
 }
 
+class AddonTestAssistantViewArguments {
+  const AddonTestAssistantViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonTestAssistantViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class AddonAreaDocumentsViewArguments {
+  const AddonAreaDocumentsViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonAreaDocumentsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class EventsMapViewArguments {
+  const EventsMapViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant EventsMapViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class AddEventViewArguments {
-  const AddEventViewArguments({
-    this.key,
-    this.event,
-  });
+  const AddEventViewArguments({this.key, this.event});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i35.EventModel? event;
+  final _i36.EventModel? event;
 
   @override
   String toString() {
@@ -646,6 +844,28 @@ class AddEventViewArguments {
   }
 }
 
+class MapPickerViewArguments {
+  const MapPickerViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant MapPickerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class DocumentViewerViewArguments {
   const DocumentViewerViewArguments({
     this.key,
@@ -654,7 +874,7 @@ class DocumentViewerViewArguments {
     required this.previousPageTitle,
   });
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
   final String downlaodUrl;
 
@@ -685,15 +905,56 @@ class DocumentViewerViewArguments {
   }
 }
 
+class EventCalendarViewArguments {
+  const EventCalendarViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant EventCalendarViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class CalendarLinkerViewArguments {
+  const CalendarLinkerViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant CalendarLinkerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class EventShowcaseViewArguments {
-  const EventShowcaseViewArguments({
-    this.key,
-    required this.event,
-  });
+  const EventShowcaseViewArguments({this.key, required this.event});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i35.EventModel event;
+  final _i36.EventModel event;
 
   @override
   String toString() {
@@ -718,9 +979,9 @@ class AddEventScheduleListViewArguments {
     required this.eventSchedules,
   });
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final List<_i36.EventScheduleModel> eventSchedules;
+  final List<_i37.EventScheduleModel> eventSchedules;
 
   @override
   String toString() {
@@ -740,14 +1001,11 @@ class AddEventScheduleListViewArguments {
 }
 
 class AddScheduleViewArguments {
-  const AddScheduleViewArguments({
-    this.key,
-    this.event,
-  });
+  const AddScheduleViewArguments({this.key, this.event});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i36.EventScheduleModel? event;
+  final _i37.EventScheduleModel? event;
 
   @override
   String toString() {
@@ -766,15 +1024,34 @@ class AddScheduleViewArguments {
   }
 }
 
+class AddonDealsViewArguments {
+  const AddonDealsViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonDealsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class AddonDealsDetailsViewArguments {
-  const AddonDealsDetailsViewArguments({
-    this.key,
-    required this.deal,
-  });
+  const AddonDealsDetailsViewArguments({this.key, required this.deal});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i37.DealModel deal;
+  final _i38.DealModel deal;
 
   @override
   String toString() {
@@ -794,14 +1071,11 @@ class AddonDealsDetailsViewArguments {
 }
 
 class AddonDealsAddViewArguments {
-  const AddonDealsAddViewArguments({
-    this.key,
-    this.deal,
-  });
+  const AddonDealsAddViewArguments({this.key, this.deal});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i37.DealModel? deal;
+  final _i38.DealModel? deal;
 
   @override
   String toString() {
@@ -820,15 +1094,144 @@ class AddonDealsAddViewArguments {
   }
 }
 
+class AddonStampViewArguments {
+  const AddonStampViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonStampViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class NotificationManagerViewArguments {
+  const NotificationManagerViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant NotificationManagerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class PaymentMethodManagerViewArguments {
+  const PaymentMethodManagerViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant PaymentMethodManagerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class MakeDonationViewArguments {
+  const MakeDonationViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant MakeDonationViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class ReceiptsViewArguments {
+  const ReceiptsViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant ReceiptsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class AddonBoutiqueViewArguments {
+  const AddonBoutiqueViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddonBoutiqueViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
 class AddonBoutiqueProductViewArguments {
-  const AddonBoutiqueProductViewArguments({
-    this.key,
-    required this.product,
-  });
+  const AddonBoutiqueProductViewArguments({this.key, required this.product});
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i38.BoutiqueModel product;
+  final _i39.BoutiqueModel product;
 
   @override
   String toString() {
@@ -853,9 +1256,9 @@ class AddonAreaDocumentsPreviewViewArguments {
     required this.document,
   });
 
-  final _i34.Key? key;
+  final _i35.Key? key;
 
-  final _i39.DocumentModel document;
+  final _i40.DocumentModel document;
 
   @override
   String toString() {
@@ -874,51 +1277,151 @@ class AddonAreaDocumentsPreviewViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i40.NavigationService {
-  Future<dynamic> navigateToLoginView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.loginView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+class NotificationViewViewArguments {
+  const NotificationViewViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
   }
 
-  Future<dynamic> navigateToStartupView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.startupView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  @override
+  bool operator ==(covariant NotificationViewViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
   }
 
-  Future<dynamic> navigateToHomeView([
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class DevicesViewArguments {
+  const DevicesViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant DevicesViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class LocationListPickerViewArguments {
+  const LocationListPickerViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant LocationListPickerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+class TicketsViewArguments {
+  const TicketsViewArguments({this.key});
+
+  final _i35.Key? key;
+
+  @override
+  String toString() {
+    return '{"key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant TicketsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i41.NavigationService {
+  Future<dynamic> navigateToLoginView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.homeView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.loginView,
+      arguments: LoginViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> navigateToStartupView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.startupView,
+      arguments: StartupViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> navigateToHomeView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.homeView,
+      arguments: HomeViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToExternalAddonWebviewView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String addonID,
     required String addonURL,
     int? routerId,
@@ -927,45 +1430,58 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.externalAddonWebviewView,
-        arguments: ExternalAddonWebviewViewArguments(
-            key: key, addonID: addonID, addonURL: addonURL),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.externalAddonWebviewView,
+      arguments: ExternalAddonWebviewViewArguments(
+        key: key,
+        addonID: addonID,
+        addonURL: addonURL,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToAddonContactsView([
+  Future<dynamic> navigateToAddonContactsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonContactsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addonContactsView,
+      arguments: AddonContactsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToRenewMembershipView([
+  Future<dynamic> navigateToRenewMembershipView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.renewMembershipView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.renewMembershipView,
+      arguments: RenewMembershipViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToGenericWebviewView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -975,93 +1491,114 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.genericWebviewView,
-        arguments: GenericWebviewViewArguments(
-            key: key,
-            url: url,
-            title: title,
-            previousPageTitle: previousPageTitle),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.genericWebviewView,
+      arguments: GenericWebviewViewArguments(
+        key: key,
+        url: url,
+        title: title,
+        previousPageTitle: previousPageTitle,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToAddonTestAssistantView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonTestAssistantView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> navigateToAddonAreaDocumentsView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonAreaDocumentsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> navigateToEventsMapView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.eventsMapView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> navigateToAddEventView({
-    _i34.Key? key,
-    _i35.EventModel? event,
+  Future<dynamic> navigateToAddonTestAssistantView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addEventView,
-        arguments: AddEventViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addonTestAssistantView,
+      arguments: AddonTestAssistantViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToMapPickerView([
+  Future<dynamic> navigateToAddonAreaDocumentsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.mapPickerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addonAreaDocumentsView,
+      arguments: AddonAreaDocumentsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> navigateToEventsMapView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.eventsMapView,
+      arguments: EventsMapViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> navigateToAddEventView({
+    _i35.Key? key,
+    _i36.EventModel? event,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addEventView,
+      arguments: AddEventViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> navigateToMapPickerView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.mapPickerView,
+      arguments: MapPickerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToDocumentViewerView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String downlaodUrl,
     required String title,
     required String previousPageTitle,
@@ -1071,352 +1608,450 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.documentViewerView,
-        arguments: DocumentViewerViewArguments(
-            key: key,
-            downlaodUrl: downlaodUrl,
-            title: title,
-            previousPageTitle: previousPageTitle),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.documentViewerView,
+      arguments: DocumentViewerViewArguments(
+        key: key,
+        downlaodUrl: downlaodUrl,
+        title: title,
+        previousPageTitle: previousPageTitle,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToEventCalendarView([
+  Future<dynamic> navigateToEventCalendarView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.eventCalendarView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.eventCalendarView,
+      arguments: EventCalendarViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToCalendarLinkerView([
+  Future<dynamic> navigateToCalendarLinkerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.calendarLinkerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.calendarLinkerView,
+      arguments: CalendarLinkerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToEventShowcaseView({
-    _i34.Key? key,
-    required _i35.EventModel event,
+    _i35.Key? key,
+    required _i36.EventModel event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.eventShowcaseView,
-        arguments: EventShowcaseViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.eventShowcaseView,
+      arguments: EventShowcaseViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddEventScheduleListView({
-    _i34.Key? key,
-    required List<_i36.EventScheduleModel> eventSchedules,
+    _i35.Key? key,
+    required List<_i37.EventScheduleModel> eventSchedules,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addEventScheduleListView,
-        arguments: AddEventScheduleListViewArguments(
-            key: key, eventSchedules: eventSchedules),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addEventScheduleListView,
+      arguments: AddEventScheduleListViewArguments(
+        key: key,
+        eventSchedules: eventSchedules,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddScheduleView({
-    _i34.Key? key,
-    _i36.EventScheduleModel? event,
+    _i35.Key? key,
+    _i37.EventScheduleModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addScheduleView,
-        arguments: AddScheduleViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addScheduleView,
+      arguments: AddScheduleViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToAddonDealsView([
+  Future<dynamic> navigateToAddonDealsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonDealsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addonDealsView,
+      arguments: AddonDealsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddonDealsDetailsView({
-    _i34.Key? key,
-    required _i37.DealModel deal,
+    _i35.Key? key,
+    required _i38.DealModel deal,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addonDealsDetailsView,
-        arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addonDealsDetailsView,
+      arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddonDealsAddView({
-    _i34.Key? key,
-    _i37.DealModel? deal,
+    _i35.Key? key,
+    _i38.DealModel? deal,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addonDealsAddView,
-        arguments: AddonDealsAddViewArguments(key: key, deal: deal),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addonDealsAddView,
+      arguments: AddonDealsAddViewArguments(key: key, deal: deal),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToAddonStampView([
+  Future<dynamic> navigateToAddonStampView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonStampView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addonStampView,
+      arguments: AddonStampViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToNotificationManagerView([
+  Future<dynamic> navigateToNotificationManagerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.notificationManagerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.notificationManagerView,
+      arguments: NotificationManagerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToPaymentMethodManagerView([
+  Future<dynamic> navigateToPaymentMethodManagerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.paymentMethodManagerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.paymentMethodManagerView,
+      arguments: PaymentMethodManagerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToMakeDonationView([
+  Future<dynamic> navigateToMakeDonationView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.makeDonationView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.makeDonationView,
+      arguments: MakeDonationViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToReceiptsView([
+  Future<dynamic> navigateToReceiptsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.receiptsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.receiptsView,
+      arguments: ReceiptsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToAddonBoutiqueView([
+  Future<dynamic> navigateToAddonBoutiqueView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.addonBoutiqueView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.addonBoutiqueView,
+      arguments: AddonBoutiqueViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddonBoutiqueProductView({
-    _i34.Key? key,
-    required _i38.BoutiqueModel product,
+    _i35.Key? key,
+    required _i39.BoutiqueModel product,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addonBoutiqueProductView,
-        arguments:
-            AddonBoutiqueProductViewArguments(key: key, product: product),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addonBoutiqueProductView,
+      arguments: AddonBoutiqueProductViewArguments(key: key, product: product),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> navigateToAddonAreaDocumentsPreviewView({
-    _i34.Key? key,
-    required _i39.DocumentModel document,
+    _i35.Key? key,
+    required _i40.DocumentModel document,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return navigateTo<dynamic>(Routes.addonAreaDocumentsPreviewView,
-        arguments: AddonAreaDocumentsPreviewViewArguments(
-            key: key, document: document),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return navigateTo<dynamic>(
+      Routes.addonAreaDocumentsPreviewView,
+      arguments: AddonAreaDocumentsPreviewViewArguments(
+        key: key,
+        document: document,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToNotificationViewView([
+  Future<dynamic> navigateToNotificationViewView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.notificationViewView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.notificationViewView,
+      arguments: NotificationViewViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToDevicesView([
+  Future<dynamic> navigateToDevicesView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.devicesView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.devicesView,
+      arguments: DevicesViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> navigateToLocationListPickerView([
+  Future<dynamic> navigateToLocationListPickerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return navigateTo<dynamic>(Routes.locationListPickerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.locationListPickerView,
+      arguments: LocationListPickerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithLoginView([
+  Future<dynamic> navigateToTicketsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.loginView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.ticketsView,
+      arguments: TicketsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithStartupView([
+  Future<dynamic> replaceWithLoginView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.startupView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.loginView,
+      arguments: LoginViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithHomeView([
+  Future<dynamic> replaceWithStartupView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.homeView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.startupView,
+      arguments: StartupViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> replaceWithHomeView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.homeView,
+      arguments: HomeViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithExternalAddonWebviewView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String addonID,
     required String addonURL,
     int? routerId,
@@ -1425,45 +2060,58 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.externalAddonWebviewView,
-        arguments: ExternalAddonWebviewViewArguments(
-            key: key, addonID: addonID, addonURL: addonURL),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.externalAddonWebviewView,
+      arguments: ExternalAddonWebviewViewArguments(
+        key: key,
+        addonID: addonID,
+        addonURL: addonURL,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithAddonContactsView([
+  Future<dynamic> replaceWithAddonContactsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonContactsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addonContactsView,
+      arguments: AddonContactsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithRenewMembershipView([
+  Future<dynamic> replaceWithRenewMembershipView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.renewMembershipView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.renewMembershipView,
+      arguments: RenewMembershipViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithGenericWebviewView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String url,
     required String title,
     required String previousPageTitle,
@@ -1473,93 +2121,114 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.genericWebviewView,
-        arguments: GenericWebviewViewArguments(
-            key: key,
-            url: url,
-            title: title,
-            previousPageTitle: previousPageTitle),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.genericWebviewView,
+      arguments: GenericWebviewViewArguments(
+        key: key,
+        url: url,
+        title: title,
+        previousPageTitle: previousPageTitle,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithAddonTestAssistantView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonTestAssistantView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> replaceWithAddonAreaDocumentsView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonAreaDocumentsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> replaceWithEventsMapView([
-    int? routerId,
-    bool preventDuplicates = true,
-    Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.eventsMapView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
-  }
-
-  Future<dynamic> replaceWithAddEventView({
-    _i34.Key? key,
-    _i35.EventModel? event,
+  Future<dynamic> replaceWithAddonTestAssistantView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addEventView,
-        arguments: AddEventViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addonTestAssistantView,
+      arguments: AddonTestAssistantViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithMapPickerView([
+  Future<dynamic> replaceWithAddonAreaDocumentsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.mapPickerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addonAreaDocumentsView,
+      arguments: AddonAreaDocumentsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> replaceWithEventsMapView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.eventsMapView,
+      arguments: EventsMapViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> replaceWithAddEventView({
+    _i35.Key? key,
+    _i36.EventModel? event,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addEventView,
+      arguments: AddEventViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> replaceWithMapPickerView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.mapPickerView,
+      arguments: MapPickerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithDocumentViewerView({
-    _i34.Key? key,
+    _i35.Key? key,
     required String downlaodUrl,
     required String title,
     required String previousPageTitle,
@@ -1569,305 +2238,391 @@ extension NavigatorStateExtension on _i40.NavigationService {
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.documentViewerView,
-        arguments: DocumentViewerViewArguments(
-            key: key,
-            downlaodUrl: downlaodUrl,
-            title: title,
-            previousPageTitle: previousPageTitle),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.documentViewerView,
+      arguments: DocumentViewerViewArguments(
+        key: key,
+        downlaodUrl: downlaodUrl,
+        title: title,
+        previousPageTitle: previousPageTitle,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithEventCalendarView([
+  Future<dynamic> replaceWithEventCalendarView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.eventCalendarView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.eventCalendarView,
+      arguments: EventCalendarViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithCalendarLinkerView([
+  Future<dynamic> replaceWithCalendarLinkerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.calendarLinkerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.calendarLinkerView,
+      arguments: CalendarLinkerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithEventShowcaseView({
-    _i34.Key? key,
-    required _i35.EventModel event,
+    _i35.Key? key,
+    required _i36.EventModel event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.eventShowcaseView,
-        arguments: EventShowcaseViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.eventShowcaseView,
+      arguments: EventShowcaseViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddEventScheduleListView({
-    _i34.Key? key,
-    required List<_i36.EventScheduleModel> eventSchedules,
+    _i35.Key? key,
+    required List<_i37.EventScheduleModel> eventSchedules,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addEventScheduleListView,
-        arguments: AddEventScheduleListViewArguments(
-            key: key, eventSchedules: eventSchedules),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addEventScheduleListView,
+      arguments: AddEventScheduleListViewArguments(
+        key: key,
+        eventSchedules: eventSchedules,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddScheduleView({
-    _i34.Key? key,
-    _i36.EventScheduleModel? event,
+    _i35.Key? key,
+    _i37.EventScheduleModel? event,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addScheduleView,
-        arguments: AddScheduleViewArguments(key: key, event: event),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addScheduleView,
+      arguments: AddScheduleViewArguments(key: key, event: event),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithAddonDealsView([
+  Future<dynamic> replaceWithAddonDealsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonDealsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addonDealsView,
+      arguments: AddonDealsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddonDealsDetailsView({
-    _i34.Key? key,
-    required _i37.DealModel deal,
+    _i35.Key? key,
+    required _i38.DealModel deal,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addonDealsDetailsView,
-        arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addonDealsDetailsView,
+      arguments: AddonDealsDetailsViewArguments(key: key, deal: deal),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddonDealsAddView({
-    _i34.Key? key,
-    _i37.DealModel? deal,
+    _i35.Key? key,
+    _i38.DealModel? deal,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addonDealsAddView,
-        arguments: AddonDealsAddViewArguments(key: key, deal: deal),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addonDealsAddView,
+      arguments: AddonDealsAddViewArguments(key: key, deal: deal),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithAddonStampView([
+  Future<dynamic> replaceWithAddonStampView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonStampView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addonStampView,
+      arguments: AddonStampViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithNotificationManagerView([
+  Future<dynamic> replaceWithNotificationManagerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.notificationManagerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.notificationManagerView,
+      arguments: NotificationManagerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithPaymentMethodManagerView([
+  Future<dynamic> replaceWithPaymentMethodManagerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.paymentMethodManagerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.paymentMethodManagerView,
+      arguments: PaymentMethodManagerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithMakeDonationView([
+  Future<dynamic> replaceWithMakeDonationView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.makeDonationView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.makeDonationView,
+      arguments: MakeDonationViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithReceiptsView([
+  Future<dynamic> replaceWithReceiptsView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.receiptsView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.receiptsView,
+      arguments: ReceiptsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithAddonBoutiqueView([
+  Future<dynamic> replaceWithAddonBoutiqueView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.addonBoutiqueView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.addonBoutiqueView,
+      arguments: AddonBoutiqueViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddonBoutiqueProductView({
-    _i34.Key? key,
-    required _i38.BoutiqueModel product,
+    _i35.Key? key,
+    required _i39.BoutiqueModel product,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addonBoutiqueProductView,
-        arguments:
-            AddonBoutiqueProductViewArguments(key: key, product: product),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addonBoutiqueProductView,
+      arguments: AddonBoutiqueProductViewArguments(key: key, product: product),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
   Future<dynamic> replaceWithAddonAreaDocumentsPreviewView({
-    _i34.Key? key,
-    required _i39.DocumentModel document,
+    _i35.Key? key,
+    required _i40.DocumentModel document,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   }) async {
-    return replaceWith<dynamic>(Routes.addonAreaDocumentsPreviewView,
-        arguments: AddonAreaDocumentsPreviewViewArguments(
-            key: key, document: document),
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+    return replaceWith<dynamic>(
+      Routes.addonAreaDocumentsPreviewView,
+      arguments: AddonAreaDocumentsPreviewViewArguments(
+        key: key,
+        document: document,
+      ),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithNotificationViewView([
+  Future<dynamic> replaceWithNotificationViewView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.notificationViewView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.notificationViewView,
+      arguments: NotificationViewViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithDevicesView([
+  Future<dynamic> replaceWithDevicesView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.devicesView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.devicesView,
+      arguments: DevicesViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 
-  Future<dynamic> replaceWithLocationListPickerView([
+  Future<dynamic> replaceWithLocationListPickerView({
+    _i35.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
-    return replaceWith<dynamic>(Routes.locationListPickerView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.locationListPickerView,
+      arguments: LocationListPickerViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
+  Future<dynamic> replaceWithTicketsView({
+    _i35.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.ticketsView,
+      arguments: TicketsViewArguments(key: key),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
   }
 }

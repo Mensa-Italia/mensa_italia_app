@@ -29,6 +29,7 @@ import 'package:mensa_italia_app/model/res_soci.dart';
 import 'package:mensa_italia_app/model/sig.dart';
 import 'package:mensa_italia_app/model/stamp.dart';
 import 'package:mensa_italia_app/model/stamp_user.dart';
+import 'package:mensa_italia_app/model/ticket.dart';
 import 'package:mensa_italia_app/model/user.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
@@ -895,6 +896,20 @@ class Api {
     return await dio.get("/api/payment/method", options: Options(headers: {"Authorization": pb.authStore.token})).then((value) {
       return (value.data as List).map((e) {
         return InternalPaymentMethod.fromJson(e);
+      }).toList();
+    });
+  }
+
+  Future<List<TicketModel>> getTickets() async {
+    return await pb
+        .collection('tickets')
+        .getFullList(
+          sort: '-created',
+          filter: "user_id='${pb.authStore.model.id}'",
+        )
+        .then((value) {
+      return value.map((e) {
+        return TicketModel.fromJson(e.toJson());
       }).toList();
     });
   }

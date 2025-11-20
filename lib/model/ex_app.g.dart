@@ -6,8 +6,7 @@ part of 'ex_app.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ExAppModelImpl _$$ExAppModelImplFromJson(Map<String, dynamic> json) =>
-    _$ExAppModelImpl(
+_ExAppModel _$ExAppModelFromJson(Map<String, dynamic> json) => _ExAppModel(
       collectionId: json['collection_id'] as String?,
       collectionName: json['collection_name'] as String?,
       id: json['id'] as String?,
@@ -18,7 +17,7 @@ _$ExAppModelImpl _$$ExAppModelImplFromJson(Map<String, dynamic> json) =>
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$ExAppModelImplToJson(_$ExAppModelImpl instance) =>
+Map<String, dynamic> _$ExAppModelToJson(_ExAppModel instance) =>
     <String, dynamic>{
       'collection_id': instance.collectionId,
       'collection_name': instance.collectionName,

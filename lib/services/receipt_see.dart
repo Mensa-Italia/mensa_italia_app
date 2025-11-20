@@ -16,6 +16,7 @@ class ReceiptSSE extends ChangeNotifier {
   List<ReceiptModel> get receipts => _data;
 
   void start() {
+    _data.clear();
     Api().pb.collection('payments').subscribe('*', (e) {
       if (e.action == "create") {
         _data.add(ReceiptModel.fromJson(e.record!.toJson()));

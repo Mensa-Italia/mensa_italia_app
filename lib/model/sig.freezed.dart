@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,100 +9,58 @@ part of 'sig.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SigModel _$SigModelFromJson(Map<String, dynamic> json) {
-  return _SigModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SigModel {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
-  String get link => throw _privateConstructorUsedError;
-  String get groupType => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  String get description;
+  String get image;
+  String get link;
+  String get groupType;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $SigModelCopyWith<SigModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SigModelCopyWith<$Res> {
-  factory $SigModelCopyWith(SigModel value, $Res Function(SigModel) then) =
-      _$SigModelCopyWithImpl<$Res, SigModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String description,
-      String image,
-      String link,
-      String groupType});
-}
-
-/// @nodoc
-class _$SigModelCopyWithImpl<$Res, $Val extends SigModel>
-    implements $SigModelCopyWith<$Res> {
-  _$SigModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of SigModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $SigModelCopyWith<SigModel> get copyWith =>
+      _$SigModelCopyWithImpl<SigModel>(this as SigModel, _$identity);
+
+  /// Serializes this SigModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? description = null,
-    Object? image = null,
-    Object? link = null,
-    Object? groupType = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      link: null == link
-          ? _value.link
-          : link // ignore: cast_nullable_to_non_nullable
-              as String,
-      groupType: null == groupType
-          ? _value.groupType
-          : groupType // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SigModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.link, link) || other.link == link) &&
+            (identical(other.groupType, groupType) ||
+                other.groupType == groupType));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, description, image, link, groupType);
+
+  @override
+  String toString() {
+    return 'SigModel(id: $id, name: $name, description: $description, image: $image, link: $link, groupType: $groupType)';
   }
 }
 
 /// @nodoc
-abstract class _$$SigModelImplCopyWith<$Res>
-    implements $SigModelCopyWith<$Res> {
-  factory _$$SigModelImplCopyWith(
-          _$SigModelImpl value, $Res Function(_$SigModelImpl) then) =
-      __$$SigModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SigModelCopyWith<$Res> {
+  factory $SigModelCopyWith(SigModel value, $Res Function(SigModel) _then) =
+      _$SigModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -114,13 +72,14 @@ abstract class _$$SigModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SigModelImplCopyWithImpl<$Res>
-    extends _$SigModelCopyWithImpl<$Res, _$SigModelImpl>
-    implements _$$SigModelImplCopyWith<$Res> {
-  __$$SigModelImplCopyWithImpl(
-      _$SigModelImpl _value, $Res Function(_$SigModelImpl) _then)
-      : super(_value, _then);
+class _$SigModelCopyWithImpl<$Res> implements $SigModelCopyWith<$Res> {
+  _$SigModelCopyWithImpl(this._self, this._then);
 
+  final SigModel _self;
+  final $Res Function(SigModel) _then;
+
+  /// Create a copy of SigModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -131,48 +90,213 @@ class __$$SigModelImplCopyWithImpl<$Res>
     Object? link = null,
     Object? groupType = null,
   }) {
-    return _then(_$SigModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       image: null == image
-          ? _value.image
+          ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
       link: null == link
-          ? _value.link
+          ? _self.link
           : link // ignore: cast_nullable_to_non_nullable
               as String,
       groupType: null == groupType
-          ? _value.groupType
+          ? _self.groupType
           : groupType // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [SigModel].
+extension SigModelPatterns on SigModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SigModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SigModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SigModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String image,
+            String link, String groupType)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.image,
+            _that.link, _that.groupType);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String name, String description, String image,
+            String link, String groupType)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel():
+        return $default(_that.id, _that.name, _that.description, _that.image,
+            _that.link, _that.groupType);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String name, String description, String image,
+            String link, String groupType)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SigModel() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.image,
+            _that.link, _that.groupType);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$SigModelImpl implements _SigModel {
-  const _$SigModelImpl(
+class _SigModel implements SigModel {
+  const _SigModel(
       {required this.id,
       required this.name,
       required this.description,
       required this.image,
       required this.link,
       required this.groupType});
-
-  factory _$SigModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SigModelImplFromJson(json);
+  factory _SigModel.fromJson(Map<String, dynamic> json) =>
+      _$SigModelFromJson(json);
 
   @override
   final String id;
@@ -187,16 +311,26 @@ class _$SigModelImpl implements _SigModel {
   @override
   final String groupType;
 
+  /// Create a copy of SigModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SigModel(id: $id, name: $name, description: $description, image: $image, link: $link, groupType: $groupType)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SigModelCopyWith<_SigModel> get copyWith =>
+      __$SigModelCopyWithImpl<_SigModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SigModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SigModelImpl &&
+            other is _SigModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.description, description) ||
@@ -207,51 +341,79 @@ class _$SigModelImpl implements _SigModel {
                 other.groupType == groupType));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, id, name, description, image, link, groupType);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SigModelImplCopyWith<_$SigModelImpl> get copyWith =>
-      __$$SigModelImplCopyWithImpl<_$SigModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SigModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SigModel(id: $id, name: $name, description: $description, image: $image, link: $link, groupType: $groupType)';
   }
 }
 
-abstract class _SigModel implements SigModel {
-  const factory _SigModel(
-      {required final String id,
-      required final String name,
-      required final String description,
-      required final String image,
-      required final String link,
-      required final String groupType}) = _$SigModelImpl;
-
-  factory _SigModel.fromJson(Map<String, dynamic> json) =
-      _$SigModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$SigModelCopyWith<$Res>
+    implements $SigModelCopyWith<$Res> {
+  factory _$SigModelCopyWith(_SigModel value, $Res Function(_SigModel) _then) =
+      __$SigModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get name;
-  @override
-  String get description;
-  @override
-  String get image;
-  @override
-  String get link;
-  @override
-  String get groupType;
-  @override
-  @JsonKey(ignore: true)
-  _$$SigModelImplCopyWith<_$SigModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String description,
+      String image,
+      String link,
+      String groupType});
 }
+
+/// @nodoc
+class __$SigModelCopyWithImpl<$Res> implements _$SigModelCopyWith<$Res> {
+  __$SigModelCopyWithImpl(this._self, this._then);
+
+  final _SigModel _self;
+  final $Res Function(_SigModel) _then;
+
+  /// Create a copy of SigModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? description = null,
+    Object? image = null,
+    Object? link = null,
+    Object? groupType = null,
+  }) {
+    return _then(_SigModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      image: null == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      link: null == link
+          ? _self.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String,
+      groupType: null == groupType
+          ? _self.groupType
+          : groupType // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,124 +9,77 @@ part of 'boutique.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-BoutiqueModel _$BoutiqueModelFromJson(Map<String, dynamic> json) {
-  return _BoutiqueModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$BoutiqueModel {
-  String get id => throw _privateConstructorUsedError;
-  String get uid => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  List<String> get image => throw _privateConstructorUsedError;
-  int get amount => throw _privateConstructorUsedError;
-  String get alternativeOf => throw _privateConstructorUsedError;
+  String get id;
+  String get uid;
+  String get name;
+  String get description;
+  List<String> get image;
+  int get amount;
+  String get alternativeOf;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created => throw _privateConstructorUsedError;
+  DateTime get created;
   @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated => throw _privateConstructorUsedError;
+  DateTime get updated;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $BoutiqueModelCopyWith<BoutiqueModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BoutiqueModelCopyWith<$Res> {
-  factory $BoutiqueModelCopyWith(
-          BoutiqueModel value, $Res Function(BoutiqueModel) then) =
-      _$BoutiqueModelCopyWithImpl<$Res, BoutiqueModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String uid,
-      String name,
-      String description,
-      List<String> image,
-      int amount,
-      String alternativeOf,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
-}
-
-/// @nodoc
-class _$BoutiqueModelCopyWithImpl<$Res, $Val extends BoutiqueModel>
-    implements $BoutiqueModelCopyWith<$Res> {
-  _$BoutiqueModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of BoutiqueModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $BoutiqueModelCopyWith<BoutiqueModel> get copyWith =>
+      _$BoutiqueModelCopyWithImpl<BoutiqueModel>(
+          this as BoutiqueModel, _$identity);
+
+  /// Serializes this BoutiqueModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? uid = null,
-    Object? name = null,
-    Object? description = null,
-    Object? image = null,
-    Object? amount = null,
-    Object? alternativeOf = null,
-    Object? created = null,
-    Object? updated = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      uid: null == uid
-          ? _value.uid
-          : uid // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      amount: null == amount
-          ? _value.amount
-          : amount // ignore: cast_nullable_to_non_nullable
-              as int,
-      alternativeOf: null == alternativeOf
-          ? _value.alternativeOf
-          : alternativeOf // ignore: cast_nullable_to_non_nullable
-              as String,
-      created: null == created
-          ? _value.created
-          : created // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updated: null == updated
-          ? _value.updated
-          : updated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BoutiqueModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            const DeepCollectionEquality().equals(other.image, image) &&
+            (identical(other.amount, amount) || other.amount == amount) &&
+            (identical(other.alternativeOf, alternativeOf) ||
+                other.alternativeOf == alternativeOf) &&
+            (identical(other.created, created) || other.created == created) &&
+            (identical(other.updated, updated) || other.updated == updated));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      uid,
+      name,
+      description,
+      const DeepCollectionEquality().hash(image),
+      amount,
+      alternativeOf,
+      created,
+      updated);
+
+  @override
+  String toString() {
+    return 'BoutiqueModel(id: $id, uid: $uid, name: $name, description: $description, image: $image, amount: $amount, alternativeOf: $alternativeOf, created: $created, updated: $updated)';
   }
 }
 
 /// @nodoc
-abstract class _$$BoutiqueModelImplCopyWith<$Res>
-    implements $BoutiqueModelCopyWith<$Res> {
-  factory _$$BoutiqueModelImplCopyWith(
-          _$BoutiqueModelImpl value, $Res Function(_$BoutiqueModelImpl) then) =
-      __$$BoutiqueModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $BoutiqueModelCopyWith<$Res> {
+  factory $BoutiqueModelCopyWith(
+          BoutiqueModel value, $Res Function(BoutiqueModel) _then) =
+      _$BoutiqueModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -141,13 +94,15 @@ abstract class _$$BoutiqueModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$BoutiqueModelImplCopyWithImpl<$Res>
-    extends _$BoutiqueModelCopyWithImpl<$Res, _$BoutiqueModelImpl>
-    implements _$$BoutiqueModelImplCopyWith<$Res> {
-  __$$BoutiqueModelImplCopyWithImpl(
-      _$BoutiqueModelImpl _value, $Res Function(_$BoutiqueModelImpl) _then)
-      : super(_value, _then);
+class _$BoutiqueModelCopyWithImpl<$Res>
+    implements $BoutiqueModelCopyWith<$Res> {
+  _$BoutiqueModelCopyWithImpl(this._self, this._then);
 
+  final BoutiqueModel _self;
+  final $Res Function(BoutiqueModel) _then;
+
+  /// Create a copy of BoutiqueModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -161,51 +116,265 @@ class __$$BoutiqueModelImplCopyWithImpl<$Res>
     Object? created = null,
     Object? updated = null,
   }) {
-    return _then(_$BoutiqueModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       uid: null == uid
-          ? _value.uid
+          ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       image: null == image
-          ? _value._image
+          ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
               as List<String>,
       amount: null == amount
-          ? _value.amount
+          ? _self.amount
           : amount // ignore: cast_nullable_to_non_nullable
               as int,
       alternativeOf: null == alternativeOf
-          ? _value.alternativeOf
+          ? _self.alternativeOf
           : alternativeOf // ignore: cast_nullable_to_non_nullable
               as String,
       created: null == created
-          ? _value.created
+          ? _self.created
           : created // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updated: null == updated
-          ? _value.updated
+          ? _self.updated
           : updated // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [BoutiqueModel].
+extension BoutiqueModelPatterns on BoutiqueModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BoutiqueModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BoutiqueModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BoutiqueModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String uid,
+            String name,
+            String description,
+            List<String> image,
+            int amount,
+            String alternativeOf,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.uid,
+            _that.name,
+            _that.description,
+            _that.image,
+            _that.amount,
+            _that.alternativeOf,
+            _that.created,
+            _that.updated);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String uid,
+            String name,
+            String description,
+            List<String> image,
+            int amount,
+            String alternativeOf,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel():
+        return $default(
+            _that.id,
+            _that.uid,
+            _that.name,
+            _that.description,
+            _that.image,
+            _that.amount,
+            _that.alternativeOf,
+            _that.created,
+            _that.updated);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String uid,
+            String name,
+            String description,
+            List<String> image,
+            int amount,
+            String alternativeOf,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+            @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BoutiqueModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.uid,
+            _that.name,
+            _that.description,
+            _that.image,
+            _that.amount,
+            _that.alternativeOf,
+            _that.created,
+            _that.updated);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$BoutiqueModelImpl extends _BoutiqueModel {
-  _$BoutiqueModelImpl(
+class _BoutiqueModel extends BoutiqueModel {
+  _BoutiqueModel(
       {required this.id,
       required this.uid,
       required this.name,
@@ -217,9 +386,8 @@ class _$BoutiqueModelImpl extends _BoutiqueModel {
       @JsonKey(fromJson: getDateTimeLocal) required this.updated})
       : _image = image,
         super._();
-
-  factory _$BoutiqueModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BoutiqueModelImplFromJson(json);
+  factory _BoutiqueModel.fromJson(Map<String, dynamic> json) =>
+      _$BoutiqueModelFromJson(json);
 
   @override
   final String id;
@@ -248,16 +416,26 @@ class _$BoutiqueModelImpl extends _BoutiqueModel {
   @JsonKey(fromJson: getDateTimeLocal)
   final DateTime updated;
 
+  /// Create a copy of BoutiqueModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'BoutiqueModel(id: $id, uid: $uid, name: $name, description: $description, image: $image, amount: $amount, alternativeOf: $alternativeOf, created: $created, updated: $updated)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$BoutiqueModelCopyWith<_BoutiqueModel> get copyWith =>
+      __$BoutiqueModelCopyWithImpl<_BoutiqueModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BoutiqueModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BoutiqueModelImpl &&
+            other is _BoutiqueModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.name, name) || other.name == name) &&
@@ -271,7 +449,7 @@ class _$BoutiqueModelImpl extends _BoutiqueModel {
             (identical(other.updated, updated) || other.updated == updated));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -285,59 +463,94 @@ class _$BoutiqueModelImpl extends _BoutiqueModel {
       created,
       updated);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BoutiqueModelImplCopyWith<_$BoutiqueModelImpl> get copyWith =>
-      __$$BoutiqueModelImplCopyWithImpl<_$BoutiqueModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BoutiqueModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BoutiqueModel(id: $id, uid: $uid, name: $name, description: $description, image: $image, amount: $amount, alternativeOf: $alternativeOf, created: $created, updated: $updated)';
   }
 }
 
-abstract class _BoutiqueModel extends BoutiqueModel {
-  factory _BoutiqueModel(
-      {required final String id,
-      required final String uid,
-      required final String name,
-      required final String description,
-      required final List<String> image,
-      required final int amount,
-      required final String alternativeOf,
-      @JsonKey(fromJson: getDateTimeLocal) required final DateTime created,
-      @JsonKey(fromJson: getDateTimeLocal)
-      required final DateTime updated}) = _$BoutiqueModelImpl;
-  _BoutiqueModel._() : super._();
-
-  factory _BoutiqueModel.fromJson(Map<String, dynamic> json) =
-      _$BoutiqueModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$BoutiqueModelCopyWith<$Res>
+    implements $BoutiqueModelCopyWith<$Res> {
+  factory _$BoutiqueModelCopyWith(
+          _BoutiqueModel value, $Res Function(_BoutiqueModel) _then) =
+      __$BoutiqueModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get uid;
-  @override
-  String get name;
-  @override
-  String get description;
-  @override
-  List<String> get image;
-  @override
-  int get amount;
-  @override
-  String get alternativeOf;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get created;
-  @override
-  @JsonKey(fromJson: getDateTimeLocal)
-  DateTime get updated;
-  @override
-  @JsonKey(ignore: true)
-  _$$BoutiqueModelImplCopyWith<_$BoutiqueModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call(
+      {String id,
+      String uid,
+      String name,
+      String description,
+      List<String> image,
+      int amount,
+      String alternativeOf,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime created,
+      @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
 }
+
+/// @nodoc
+class __$BoutiqueModelCopyWithImpl<$Res>
+    implements _$BoutiqueModelCopyWith<$Res> {
+  __$BoutiqueModelCopyWithImpl(this._self, this._then);
+
+  final _BoutiqueModel _self;
+  final $Res Function(_BoutiqueModel) _then;
+
+  /// Create a copy of BoutiqueModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? uid = null,
+    Object? name = null,
+    Object? description = null,
+    Object? image = null,
+    Object? amount = null,
+    Object? alternativeOf = null,
+    Object? created = null,
+    Object? updated = null,
+  }) {
+    return _then(_BoutiqueModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      uid: null == uid
+          ? _self.uid
+          : uid // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      image: null == image
+          ? _self._image
+          : image // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      amount: null == amount
+          ? _self.amount
+          : amount // ignore: cast_nullable_to_non_nullable
+              as int,
+      alternativeOf: null == alternativeOf
+          ? _self.alternativeOf
+          : alternativeOf // ignore: cast_nullable_to_non_nullable
+              as String,
+      created: null == created
+          ? _self.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updated: null == updated
+          ? _self.updated
+          : updated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+// dart format on

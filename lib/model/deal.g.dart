@@ -6,8 +6,7 @@ part of 'deal.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DealModelImpl _$$DealModelImplFromJson(Map<String, dynamic> json) =>
-    _$DealModelImpl(
+_DealModel _$DealModelFromJson(Map<String, dynamic> json) => _DealModel(
       id: json['id'] as String,
       name: json['name'] as String,
       commercialSector: json['commercial_sector'] as String,
@@ -30,7 +29,7 @@ _$DealModelImpl _$$DealModelImplFromJson(Map<String, dynamic> json) =>
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$DealModelImplToJson(_$DealModelImpl instance) =>
+Map<String, dynamic> _$DealModelToJson(_DealModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

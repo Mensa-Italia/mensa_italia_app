@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,94 +9,67 @@ part of 'document_elaborated.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-DocumentElaboratedModel _$DocumentElaboratedModelFromJson(
-    Map<String, dynamic> json) {
-  return _DocumentElaboratedModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$DocumentElaboratedModel {
-  String get id => throw _privateConstructorUsedError;
-  String get document => throw _privateConstructorUsedError;
-  String get iaResume => throw _privateConstructorUsedError;
+  String get id;
+  String get document;
+  String get iaResume;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $DocumentElaboratedModelCopyWith<DocumentElaboratedModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DocumentElaboratedModelCopyWith<$Res> {
-  factory $DocumentElaboratedModelCopyWith(DocumentElaboratedModel value,
-          $Res Function(DocumentElaboratedModel) then) =
-      _$DocumentElaboratedModelCopyWithImpl<$Res, DocumentElaboratedModel>;
-  @useResult
-  $Res call({String id, String document, String iaResume});
-}
-
-/// @nodoc
-class _$DocumentElaboratedModelCopyWithImpl<$Res,
-        $Val extends DocumentElaboratedModel>
-    implements $DocumentElaboratedModelCopyWith<$Res> {
-  _$DocumentElaboratedModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of DocumentElaboratedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $DocumentElaboratedModelCopyWith<DocumentElaboratedModel> get copyWith =>
+      _$DocumentElaboratedModelCopyWithImpl<DocumentElaboratedModel>(
+          this as DocumentElaboratedModel, _$identity);
+
+  /// Serializes this DocumentElaboratedModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? document = null,
-    Object? iaResume = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      document: null == document
-          ? _value.document
-          : document // ignore: cast_nullable_to_non_nullable
-              as String,
-      iaResume: null == iaResume
-          ? _value.iaResume
-          : iaResume // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DocumentElaboratedModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.document, document) ||
+                other.document == document) &&
+            (identical(other.iaResume, iaResume) ||
+                other.iaResume == iaResume));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, document, iaResume);
+
+  @override
+  String toString() {
+    return 'DocumentElaboratedModel(id: $id, document: $document, iaResume: $iaResume)';
   }
 }
 
 /// @nodoc
-abstract class _$$DocumentElaboratedModelImplCopyWith<$Res>
-    implements $DocumentElaboratedModelCopyWith<$Res> {
-  factory _$$DocumentElaboratedModelImplCopyWith(
-          _$DocumentElaboratedModelImpl value,
-          $Res Function(_$DocumentElaboratedModelImpl) then) =
-      __$$DocumentElaboratedModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $DocumentElaboratedModelCopyWith<$Res> {
+  factory $DocumentElaboratedModelCopyWith(DocumentElaboratedModel value,
+          $Res Function(DocumentElaboratedModel) _then) =
+      _$DocumentElaboratedModelCopyWithImpl;
   @useResult
   $Res call({String id, String document, String iaResume});
 }
 
 /// @nodoc
-class __$$DocumentElaboratedModelImplCopyWithImpl<$Res>
-    extends _$DocumentElaboratedModelCopyWithImpl<$Res,
-        _$DocumentElaboratedModelImpl>
-    implements _$$DocumentElaboratedModelImplCopyWith<$Res> {
-  __$$DocumentElaboratedModelImplCopyWithImpl(
-      _$DocumentElaboratedModelImpl _value,
-      $Res Function(_$DocumentElaboratedModelImpl) _then)
-      : super(_value, _then);
+class _$DocumentElaboratedModelCopyWithImpl<$Res>
+    implements $DocumentElaboratedModelCopyWith<$Res> {
+  _$DocumentElaboratedModelCopyWithImpl(this._self, this._then);
 
+  final DocumentElaboratedModel _self;
+  final $Res Function(DocumentElaboratedModel) _then;
+
+  /// Create a copy of DocumentElaboratedModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -104,31 +77,187 @@ class __$$DocumentElaboratedModelImplCopyWithImpl<$Res>
     Object? document = null,
     Object? iaResume = null,
   }) {
-    return _then(_$DocumentElaboratedModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       document: null == document
-          ? _value.document
+          ? _self.document
           : document // ignore: cast_nullable_to_non_nullable
               as String,
       iaResume: null == iaResume
-          ? _value.iaResume
+          ? _self.iaResume
           : iaResume // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DocumentElaboratedModel].
+extension DocumentElaboratedModelPatterns on DocumentElaboratedModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DocumentElaboratedModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DocumentElaboratedModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DocumentElaboratedModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String document, String iaResume)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel() when $default != null:
+        return $default(_that.id, _that.document, _that.iaResume);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String document, String iaResume) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel():
+        return $default(_that.id, _that.document, _that.iaResume);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String document, String iaResume)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DocumentElaboratedModel() when $default != null:
+        return $default(_that.id, _that.document, _that.iaResume);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$DocumentElaboratedModelImpl implements _DocumentElaboratedModel {
-  const _$DocumentElaboratedModelImpl(
+class _DocumentElaboratedModel implements DocumentElaboratedModel {
+  const _DocumentElaboratedModel(
       {required this.id, required this.document, required this.iaResume});
-
-  factory _$DocumentElaboratedModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DocumentElaboratedModelImplFromJson(json);
+  factory _DocumentElaboratedModel.fromJson(Map<String, dynamic> json) =>
+      _$DocumentElaboratedModelFromJson(json);
 
   @override
   final String id;
@@ -137,16 +266,27 @@ class _$DocumentElaboratedModelImpl implements _DocumentElaboratedModel {
   @override
   final String iaResume;
 
+  /// Create a copy of DocumentElaboratedModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DocumentElaboratedModel(id: $id, document: $document, iaResume: $iaResume)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DocumentElaboratedModelCopyWith<_DocumentElaboratedModel> get copyWith =>
+      __$DocumentElaboratedModelCopyWithImpl<_DocumentElaboratedModel>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DocumentElaboratedModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DocumentElaboratedModelImpl &&
+            other is _DocumentElaboratedModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.document, document) ||
                 other.document == document) &&
@@ -154,42 +294,59 @@ class _$DocumentElaboratedModelImpl implements _DocumentElaboratedModel {
                 other.iaResume == iaResume));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, document, iaResume);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DocumentElaboratedModelImplCopyWith<_$DocumentElaboratedModelImpl>
-      get copyWith => __$$DocumentElaboratedModelImplCopyWithImpl<
-          _$DocumentElaboratedModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DocumentElaboratedModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'DocumentElaboratedModel(id: $id, document: $document, iaResume: $iaResume)';
   }
 }
 
-abstract class _DocumentElaboratedModel implements DocumentElaboratedModel {
-  const factory _DocumentElaboratedModel(
-      {required final String id,
-      required final String document,
-      required final String iaResume}) = _$DocumentElaboratedModelImpl;
-
-  factory _DocumentElaboratedModel.fromJson(Map<String, dynamic> json) =
-      _$DocumentElaboratedModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$DocumentElaboratedModelCopyWith<$Res>
+    implements $DocumentElaboratedModelCopyWith<$Res> {
+  factory _$DocumentElaboratedModelCopyWith(_DocumentElaboratedModel value,
+          $Res Function(_DocumentElaboratedModel) _then) =
+      __$DocumentElaboratedModelCopyWithImpl;
   @override
-  String get id;
-  @override
-  String get document;
-  @override
-  String get iaResume;
-  @override
-  @JsonKey(ignore: true)
-  _$$DocumentElaboratedModelImplCopyWith<_$DocumentElaboratedModelImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  @useResult
+  $Res call({String id, String document, String iaResume});
 }
+
+/// @nodoc
+class __$DocumentElaboratedModelCopyWithImpl<$Res>
+    implements _$DocumentElaboratedModelCopyWith<$Res> {
+  __$DocumentElaboratedModelCopyWithImpl(this._self, this._then);
+
+  final _DocumentElaboratedModel _self;
+  final $Res Function(_DocumentElaboratedModel) _then;
+
+  /// Create a copy of DocumentElaboratedModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? document = null,
+    Object? iaResume = null,
+  }) {
+    return _then(_DocumentElaboratedModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      document: null == document
+          ? _self.document
+          : document // ignore: cast_nullable_to_non_nullable
+              as String,
+      iaResume: null == iaResume
+          ? _self.iaResume
+          : iaResume // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

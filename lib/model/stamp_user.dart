@@ -9,7 +9,7 @@ part 'stamp_user.freezed.dart';
 part 'stamp_user.g.dart';
 
 @freezed
-class StampUserModel with _$StampUserModel {
+abstract class StampUserModel with _$StampUserModel {
   const StampUserModel._();
   const factory StampUserModel({
     required String id,

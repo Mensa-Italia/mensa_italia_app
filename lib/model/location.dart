@@ -30,7 +30,7 @@ final ListOfStates = [
 ]..sort();
 
 @freezed
-class LocationModel with _$LocationModel {
+abstract class LocationModel with _$LocationModel {
   const LocationModel._();
 
   const factory LocationModel({

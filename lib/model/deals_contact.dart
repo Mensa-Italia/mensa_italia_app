@@ -7,7 +7,7 @@ part 'deals_contact.freezed.dart';
 part 'deals_contact.g.dart';
 
 @freezed
-class DealsContact with _$DealsContact {
+abstract class DealsContact with _$DealsContact {
   const factory DealsContact({
     required String id,
     required String name,

@@ -8,7 +8,7 @@ part 'deal.freezed.dart';
 part 'deal.g.dart';
 
 @freezed
-class DealModel with _$DealModel {
+abstract class DealModel with _$DealModel {
   const DealModel._();
 
   const factory DealModel({

@@ -12,5 +12,9 @@
 	<array>
 		<string>merchant.it.mensa.app</string>
 	</array>
+	<key>com.apple.developer.pass-type-identifiers</key>
+	<array>
+		<string>$(TeamIdentifierPrefix)pass.app.mensa.it</string>
+	</array>
 </dict>
 </plist>

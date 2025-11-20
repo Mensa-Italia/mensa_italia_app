@@ -26,8 +26,13 @@ class EventsMapViewModel extends MasterModel {
     controller.onFeatureTapped.add(onSymbolTapped);
   }
 
-  void onSymbolTapped(dynamic id, Point<double> point, LatLng coordinates,
-      String layerId) async {
+  void onSymbolTapped(
+    Point<double> point,
+    LatLng coordinates,
+    String id,
+    String layerId,
+    Annotation? annotation,
+  ) async {
     final event = events.firstWhere((element) => element.id == id);
     navigationService.navigateToEventShowcaseView(event: event);
   }

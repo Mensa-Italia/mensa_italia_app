@@ -8,7 +8,7 @@ part 'res_soci.freezed.dart';
 part 'res_soci.g.dart';
 
 @freezed
-class RegSociModel with _$RegSociModel {
+abstract class RegSociModel with _$RegSociModel {
   const RegSociModel._();
   const factory RegSociModel({
     required String id,
@@ -54,18 +54,19 @@ class RegSociModel with _$RegSociModel {
     }
   }
 
-
   static List<String> nameToSearchCombination(String nameToDo) {
     final listOfWords = nameToDo.trim().split(" ");
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(
+        List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)
+            ..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }
@@ -80,7 +81,7 @@ class RegSociModel with _$RegSociModel {
 }
 
 @freezed
-class RegSociDBModel with _$RegSociDBModel {
+abstract class RegSociDBModel with _$RegSociDBModel {
   const RegSociDBModel._();
 
   @Entity(realClass: RegSociDBModel)
@@ -99,10 +100,8 @@ class RegSociDBModel with _$RegSociDBModel {
     required String nameToSearch,
   }) = _RegSociDBModel;
 
-
   factory RegSociDBModel.fromJson(Map<String, dynamic> json) =>
       _$RegSociDBModelFromJson(json);
-
 
   RegSociModel toModel() {
     return RegSociModel(
@@ -124,6 +123,4 @@ class RegSociDBModel with _$RegSociDBModel {
       return {};
     }
   }
-
-
 }

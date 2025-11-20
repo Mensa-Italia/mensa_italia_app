@@ -6,9 +6,9 @@ part of 'ex_granted_permissions.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ExGrantedPermissionsModelImpl _$$ExGrantedPermissionsModelImplFromJson(
+_ExGrantedPermissionsModel _$ExGrantedPermissionsModelFromJson(
         Map<String, dynamic> json) =>
-    _$ExGrantedPermissionsModelImpl(
+    _ExGrantedPermissionsModel(
       id: json['id'] as String,
       user: json['user'] as String,
       exApp: json['ex_app'] as String,
@@ -19,8 +19,8 @@ _$ExGrantedPermissionsModelImpl _$$ExGrantedPermissionsModelImplFromJson(
       updated: getDateTimeLocal(json['updated'] as String),
     );
 
-Map<String, dynamic> _$$ExGrantedPermissionsModelImplToJson(
-        _$ExGrantedPermissionsModelImpl instance) =>
+Map<String, dynamic> _$ExGrantedPermissionsModelToJson(
+        _ExGrantedPermissionsModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user': instance.user,

@@ -5,7 +5,7 @@ part 'testelab.freezed.dart';
 part 'testelab.g.dart';
 
 @freezed
-class TestelabModel with _$TestelabModel {
+abstract class TestelabModel with _$TestelabModel {
   const TestelabModel._();
 
   const factory TestelabModel({

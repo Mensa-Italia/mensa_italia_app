@@ -282,6 +282,9 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
     if (typeOfAction == "multiple_documents") {
       navigationService.navigateToAddonAreaDocumentsView();
     }
+    if (typeOfAction == "ticket_purchase") {
+      navigationService.navigateToTicketsView();
+    }
     if (typeOfAction == "single_document") {
       final String documentId = data["document_id"] ?? "";
       if (documentId.isNotEmpty) {

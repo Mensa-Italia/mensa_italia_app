@@ -6,8 +6,7 @@ part of 'sig.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SigModelImpl _$$SigModelImplFromJson(Map<String, dynamic> json) =>
-    _$SigModelImpl(
+_SigModel _$SigModelFromJson(Map<String, dynamic> json) => _SigModel(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
@@ -16,8 +15,7 @@ _$SigModelImpl _$$SigModelImplFromJson(Map<String, dynamic> json) =>
       groupType: json['group_type'] as String,
     );
 
-Map<String, dynamic> _$$SigModelImplToJson(_$SigModelImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$SigModelToJson(_SigModel instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,

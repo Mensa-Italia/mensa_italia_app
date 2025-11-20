@@ -16,7 +16,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   const AddEventView({super.key, this.event});
 
   @override
-  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(
+      BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: getAppBarPlatform(
@@ -63,12 +64,14 @@ class AddEventView extends StackedView<AddEventViewModel> {
                                 )
                               : event?.image != null && event!.image.isNotEmpty
                                   ? DecorationImage(
-                                      image: CachedNetworkImageProvider(event!.image),
+                                      image: CachedNetworkImageProvider(
+                                          event!.image),
                                       fit: BoxFit.cover,
                                     )
                                   : null,
                         ),
-                        child: !(viewModel.imageBytes != null || event?.image != null)
+                        child: !(viewModel.imageBytes != null ||
+                                event?.image != null)
                             ? const Text(
                                 'Add Image',
                                 style: TextStyle(
@@ -84,7 +87,9 @@ class AddEventView extends StackedView<AddEventViewModel> {
             ),
             Padding(
               padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
-              child: ElevatedButton(onPressed: viewModel.generateImage, child: const Text("IA Generate Image")),
+              child: ElevatedButton(
+                  onPressed: viewModel.generateImage,
+                  child: const Text("IA Generate Image")),
             ),
           ],
           Form(
@@ -241,7 +246,8 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
+  AddEventViewModel viewModelBuilder(BuildContext context) =>
+      AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {

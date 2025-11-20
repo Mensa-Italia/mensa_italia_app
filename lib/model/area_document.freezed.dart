@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,95 +9,70 @@ part of 'area_document.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-AreaDocumentModel _$AreaDocumentModelFromJson(Map<String, dynamic> json) {
-  return _AreaDocumentModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$AreaDocumentModel {
-  String get description => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
-  String get dimension => throw _privateConstructorUsedError;
-  String get link => throw _privateConstructorUsedError;
+  String get description;
+  String get image;
+  String get dimension;
+  String get link;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $AreaDocumentModelCopyWith<AreaDocumentModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $AreaDocumentModelCopyWith<$Res> {
-  factory $AreaDocumentModelCopyWith(
-          AreaDocumentModel value, $Res Function(AreaDocumentModel) then) =
-      _$AreaDocumentModelCopyWithImpl<$Res, AreaDocumentModel>;
-  @useResult
-  $Res call({String description, String image, String dimension, String link});
-}
-
-/// @nodoc
-class _$AreaDocumentModelCopyWithImpl<$Res, $Val extends AreaDocumentModel>
-    implements $AreaDocumentModelCopyWith<$Res> {
-  _$AreaDocumentModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of AreaDocumentModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $AreaDocumentModelCopyWith<AreaDocumentModel> get copyWith =>
+      _$AreaDocumentModelCopyWithImpl<AreaDocumentModel>(
+          this as AreaDocumentModel, _$identity);
+
+  /// Serializes this AreaDocumentModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? description = null,
-    Object? image = null,
-    Object? dimension = null,
-    Object? link = null,
-  }) {
-    return _then(_value.copyWith(
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      dimension: null == dimension
-          ? _value.dimension
-          : dimension // ignore: cast_nullable_to_non_nullable
-              as String,
-      link: null == link
-          ? _value.link
-          : link // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AreaDocumentModel &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.dimension, dimension) ||
+                other.dimension == dimension) &&
+            (identical(other.link, link) || other.link == link));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, description, image, dimension, link);
+
+  @override
+  String toString() {
+    return 'AreaDocumentModel(description: $description, image: $image, dimension: $dimension, link: $link)';
   }
 }
 
 /// @nodoc
-abstract class _$$AreaDocumentModelImplCopyWith<$Res>
-    implements $AreaDocumentModelCopyWith<$Res> {
-  factory _$$AreaDocumentModelImplCopyWith(_$AreaDocumentModelImpl value,
-          $Res Function(_$AreaDocumentModelImpl) then) =
-      __$$AreaDocumentModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $AreaDocumentModelCopyWith<$Res> {
+  factory $AreaDocumentModelCopyWith(
+          AreaDocumentModel value, $Res Function(AreaDocumentModel) _then) =
+      _$AreaDocumentModelCopyWithImpl;
   @useResult
   $Res call({String description, String image, String dimension, String link});
 }
 
 /// @nodoc
-class __$$AreaDocumentModelImplCopyWithImpl<$Res>
-    extends _$AreaDocumentModelCopyWithImpl<$Res, _$AreaDocumentModelImpl>
-    implements _$$AreaDocumentModelImplCopyWith<$Res> {
-  __$$AreaDocumentModelImplCopyWithImpl(_$AreaDocumentModelImpl _value,
-      $Res Function(_$AreaDocumentModelImpl) _then)
-      : super(_value, _then);
+class _$AreaDocumentModelCopyWithImpl<$Res>
+    implements $AreaDocumentModelCopyWith<$Res> {
+  _$AreaDocumentModelCopyWithImpl(this._self, this._then);
 
+  final AreaDocumentModel _self;
+  final $Res Function(AreaDocumentModel) _then;
+
+  /// Create a copy of AreaDocumentModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -106,38 +81,203 @@ class __$$AreaDocumentModelImplCopyWithImpl<$Res>
     Object? dimension = null,
     Object? link = null,
   }) {
-    return _then(_$AreaDocumentModelImpl(
+    return _then(_self.copyWith(
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       image: null == image
-          ? _value.image
+          ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
       dimension: null == dimension
-          ? _value.dimension
+          ? _self.dimension
           : dimension // ignore: cast_nullable_to_non_nullable
               as String,
       link: null == link
-          ? _value.link
+          ? _self.link
           : link // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [AreaDocumentModel].
+extension AreaDocumentModelPatterns on AreaDocumentModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AreaDocumentModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AreaDocumentModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AreaDocumentModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String description, String image, String dimension, String link)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel() when $default != null:
+        return $default(
+            _that.description, _that.image, _that.dimension, _that.link);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String description, String image, String dimension, String link)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel():
+        return $default(
+            _that.description, _that.image, _that.dimension, _that.link);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String description, String image, String dimension, String link)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AreaDocumentModel() when $default != null:
+        return $default(
+            _that.description, _that.image, _that.dimension, _that.link);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$AreaDocumentModelImpl implements _AreaDocumentModel {
-  _$AreaDocumentModelImpl(
+class _AreaDocumentModel implements AreaDocumentModel {
+  _AreaDocumentModel(
       {required this.description,
       required this.image,
       required this.dimension,
       required this.link});
-
-  factory _$AreaDocumentModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AreaDocumentModelImplFromJson(json);
+  factory _AreaDocumentModel.fromJson(Map<String, dynamic> json) =>
+      _$AreaDocumentModelFromJson(json);
 
   @override
   final String description;
@@ -148,16 +288,26 @@ class _$AreaDocumentModelImpl implements _AreaDocumentModel {
   @override
   final String link;
 
+  /// Create a copy of AreaDocumentModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'AreaDocumentModel(description: $description, image: $image, dimension: $dimension, link: $link)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AreaDocumentModelCopyWith<_AreaDocumentModel> get copyWith =>
+      __$AreaDocumentModelCopyWithImpl<_AreaDocumentModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$AreaDocumentModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AreaDocumentModelImpl &&
+            other is _AreaDocumentModel &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.image, image) || other.image == image) &&
@@ -166,46 +316,65 @@ class _$AreaDocumentModelImpl implements _AreaDocumentModel {
             (identical(other.link, link) || other.link == link));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, description, image, dimension, link);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$AreaDocumentModelImplCopyWith<_$AreaDocumentModelImpl> get copyWith =>
-      __$$AreaDocumentModelImplCopyWithImpl<_$AreaDocumentModelImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AreaDocumentModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'AreaDocumentModel(description: $description, image: $image, dimension: $dimension, link: $link)';
   }
 }
 
-abstract class _AreaDocumentModel implements AreaDocumentModel {
-  factory _AreaDocumentModel(
-      {required final String description,
-      required final String image,
-      required final String dimension,
-      required final String link}) = _$AreaDocumentModelImpl;
-
-  factory _AreaDocumentModel.fromJson(Map<String, dynamic> json) =
-      _$AreaDocumentModelImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$AreaDocumentModelCopyWith<$Res>
+    implements $AreaDocumentModelCopyWith<$Res> {
+  factory _$AreaDocumentModelCopyWith(
+          _AreaDocumentModel value, $Res Function(_AreaDocumentModel) _then) =
+      __$AreaDocumentModelCopyWithImpl;
   @override
-  String get description;
-  @override
-  String get image;
-  @override
-  String get dimension;
-  @override
-  String get link;
-  @override
-  @JsonKey(ignore: true)
-  _$$AreaDocumentModelImplCopyWith<_$AreaDocumentModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @useResult
+  $Res call({String description, String image, String dimension, String link});
 }
+
+/// @nodoc
+class __$AreaDocumentModelCopyWithImpl<$Res>
+    implements _$AreaDocumentModelCopyWith<$Res> {
+  __$AreaDocumentModelCopyWithImpl(this._self, this._then);
+
+  final _AreaDocumentModel _self;
+  final $Res Function(_AreaDocumentModel) _then;
+
+  /// Create a copy of AreaDocumentModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? description = null,
+    Object? image = null,
+    Object? dimension = null,
+    Object? link = null,
+  }) {
+    return _then(_AreaDocumentModel(
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      image: null == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      dimension: null == dimension
+          ? _self.dimension
+          : dimension // ignore: cast_nullable_to_non_nullable
+              as String,
+      link: null == link
+          ? _self.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on
