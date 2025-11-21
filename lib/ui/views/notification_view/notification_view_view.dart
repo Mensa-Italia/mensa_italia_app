@@ -94,7 +94,7 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
       return EneftyIcons.notification_outline;
     }
     if (notificaiton.data!["type"] == "event") {
-      return EneftyIcons.ticket_outline;
+      return EneftyIcons.star_outline;
     }
     if (notificaiton.data!["type"] == "single_document") {
       return EneftyIcons.document_2_outline;
@@ -107,6 +107,9 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
     }
     if (notificaiton.data!["type"] == "deal") {
       return EneftyIcons.discount_shape_outline;
+    }
+    if (notificaiton.data!["type"] == "ticket_purchase") {
+      return EneftyIcons.ticket_2_outline;
     }
     return EneftyIcons.notification_outline;
   }
