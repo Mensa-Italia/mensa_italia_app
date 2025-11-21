@@ -26,13 +26,7 @@ class EventsMapViewModel extends MasterModel {
     controller.onFeatureTapped.add(onSymbolTapped);
   }
 
-  void onSymbolTapped(
-    Point<double> point,
-    LatLng coordinates,
-    String id,
-    String layerId,
-    Annotation? annotation,
-  ) async {
+  void onSymbolTapped(dynamic id, Point<double> point, LatLng coordinates, String layerId) async {
     final event = events.firstWhere((element) => element.id == id);
     navigationService.navigateToEventShowcaseView(event: event);
   }
@@ -61,8 +55,7 @@ class EventsMapViewModel extends MasterModel {
     await loadMarkerImage('assets/images/marker_blue.png').then((value) async {
       await mapController!.addImage('marker_cs_image_blue', value);
     });
-    await loadMarkerImage('assets/images/marker_blue_spot.png')
-        .then((value) async {
+    await loadMarkerImage('assets/images/marker_blue_spot.png').then((value) async {
       await mapController!.addImage('marker_cs_image_blue_spot', value);
     });
 
