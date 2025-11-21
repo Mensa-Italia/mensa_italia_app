@@ -296,7 +296,7 @@ class Api {
     });
   }
 
-  Future<EventModel> getFirstNextEvent() async {
+  Future<EventModel?> getFirstNextEvent() async {
     if (Memoized().has("first_next_event")) {
       return Memoized().get("first_next_event");
     }
@@ -309,6 +309,9 @@ class Api {
           sort: 'when_start',
         )
         .then((value) {
+      if (value.items.isEmpty) {
+        return null;
+      }
       Memoized().set(
           "first_next_event",
           value.items.map((e) {
