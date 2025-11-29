@@ -14,6 +14,7 @@ abstract class TicketModel with _$TicketModel {
     String? link,
     String? qr,
     @JsonKey(name: 'internal_ref_id') String? internalRefId,
+    @JsonKey(name: 'customer_data') String? customerData,
     @JsonKey(
       fromJson: getDateTimeLocalNullabe,
     )

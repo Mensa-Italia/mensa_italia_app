@@ -23,6 +23,8 @@ mixin _$TicketModel {
   String? get qr;
   @JsonKey(name: 'internal_ref_id')
   String? get internalRefId;
+  @JsonKey(name: 'customer_data')
+  String? get customerData;
   @JsonKey(fromJson: getDateTimeLocalNullabe)
   DateTime? get deadline;
   @JsonKey(fromJson: getDateTimeLocal)
@@ -54,6 +56,8 @@ mixin _$TicketModel {
             (identical(other.qr, qr) || other.qr == qr) &&
             (identical(other.internalRefId, internalRefId) ||
                 other.internalRefId == internalRefId) &&
+            (identical(other.customerData, customerData) ||
+                other.customerData == customerData) &&
             (identical(other.deadline, deadline) ||
                 other.deadline == deadline) &&
             (identical(other.created, created) || other.created == created) &&
@@ -63,11 +67,11 @@ mixin _$TicketModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, description, userId,
-      link, qr, internalRefId, deadline, created, updated);
+      link, qr, internalRefId, customerData, deadline, created, updated);
 
   @override
   String toString() {
-    return 'TicketModel(id: $id, name: $name, description: $description, userId: $userId, link: $link, qr: $qr, internalRefId: $internalRefId, deadline: $deadline, created: $created, updated: $updated)';
+    return 'TicketModel(id: $id, name: $name, description: $description, userId: $userId, link: $link, qr: $qr, internalRefId: $internalRefId, customerData: $customerData, deadline: $deadline, created: $created, updated: $updated)';
   }
 }
 
@@ -85,6 +89,7 @@ abstract mixin class $TicketModelCopyWith<$Res> {
       String? link,
       String? qr,
       @JsonKey(name: 'internal_ref_id') String? internalRefId,
+      @JsonKey(name: 'customer_data') String? customerData,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? deadline,
       @JsonKey(fromJson: getDateTimeLocal) DateTime created,
       @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
@@ -109,6 +114,7 @@ class _$TicketModelCopyWithImpl<$Res> implements $TicketModelCopyWith<$Res> {
     Object? link = freezed,
     Object? qr = freezed,
     Object? internalRefId = freezed,
+    Object? customerData = freezed,
     Object? deadline = freezed,
     Object? created = null,
     Object? updated = null,
@@ -141,6 +147,10 @@ class _$TicketModelCopyWithImpl<$Res> implements $TicketModelCopyWith<$Res> {
       internalRefId: freezed == internalRefId
           ? _self.internalRefId
           : internalRefId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customerData: freezed == customerData
+          ? _self.customerData
+          : customerData // ignore: cast_nullable_to_non_nullable
               as String?,
       deadline: freezed == deadline
           ? _self.deadline
@@ -259,6 +269,7 @@ extension TicketModelPatterns on TicketModel {
             String? link,
             String? qr,
             @JsonKey(name: 'internal_ref_id') String? internalRefId,
+            @JsonKey(name: 'customer_data') String? customerData,
             @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? deadline,
             @JsonKey(fromJson: getDateTimeLocal) DateTime created,
             @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
@@ -276,6 +287,7 @@ extension TicketModelPatterns on TicketModel {
             _that.link,
             _that.qr,
             _that.internalRefId,
+            _that.customerData,
             _that.deadline,
             _that.created,
             _that.updated);
@@ -307,6 +319,7 @@ extension TicketModelPatterns on TicketModel {
             String? link,
             String? qr,
             @JsonKey(name: 'internal_ref_id') String? internalRefId,
+            @JsonKey(name: 'customer_data') String? customerData,
             @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? deadline,
             @JsonKey(fromJson: getDateTimeLocal) DateTime created,
             @JsonKey(fromJson: getDateTimeLocal) DateTime updated)
@@ -323,6 +336,7 @@ extension TicketModelPatterns on TicketModel {
             _that.link,
             _that.qr,
             _that.internalRefId,
+            _that.customerData,
             _that.deadline,
             _that.created,
             _that.updated);
@@ -353,6 +367,7 @@ extension TicketModelPatterns on TicketModel {
             String? link,
             String? qr,
             @JsonKey(name: 'internal_ref_id') String? internalRefId,
+            @JsonKey(name: 'customer_data') String? customerData,
             @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? deadline,
             @JsonKey(fromJson: getDateTimeLocal) DateTime created,
             @JsonKey(fromJson: getDateTimeLocal) DateTime updated)?
@@ -369,6 +384,7 @@ extension TicketModelPatterns on TicketModel {
             _that.link,
             _that.qr,
             _that.internalRefId,
+            _that.customerData,
             _that.deadline,
             _that.created,
             _that.updated);
@@ -389,6 +405,7 @@ class _TicketModel implements TicketModel {
       this.link,
       this.qr,
       @JsonKey(name: 'internal_ref_id') this.internalRefId,
+      @JsonKey(name: 'customer_data') this.customerData,
       @JsonKey(fromJson: getDateTimeLocalNullabe) this.deadline,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated});
@@ -411,6 +428,9 @@ class _TicketModel implements TicketModel {
   @override
   @JsonKey(name: 'internal_ref_id')
   final String? internalRefId;
+  @override
+  @JsonKey(name: 'customer_data')
+  final String? customerData;
   @override
   @JsonKey(fromJson: getDateTimeLocalNullabe)
   final DateTime? deadline;
@@ -450,6 +470,8 @@ class _TicketModel implements TicketModel {
             (identical(other.qr, qr) || other.qr == qr) &&
             (identical(other.internalRefId, internalRefId) ||
                 other.internalRefId == internalRefId) &&
+            (identical(other.customerData, customerData) ||
+                other.customerData == customerData) &&
             (identical(other.deadline, deadline) ||
                 other.deadline == deadline) &&
             (identical(other.created, created) || other.created == created) &&
@@ -459,11 +481,11 @@ class _TicketModel implements TicketModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, description, userId,
-      link, qr, internalRefId, deadline, created, updated);
+      link, qr, internalRefId, customerData, deadline, created, updated);
 
   @override
   String toString() {
-    return 'TicketModel(id: $id, name: $name, description: $description, userId: $userId, link: $link, qr: $qr, internalRefId: $internalRefId, deadline: $deadline, created: $created, updated: $updated)';
+    return 'TicketModel(id: $id, name: $name, description: $description, userId: $userId, link: $link, qr: $qr, internalRefId: $internalRefId, customerData: $customerData, deadline: $deadline, created: $created, updated: $updated)';
   }
 }
 
@@ -483,6 +505,7 @@ abstract mixin class _$TicketModelCopyWith<$Res>
       String? link,
       String? qr,
       @JsonKey(name: 'internal_ref_id') String? internalRefId,
+      @JsonKey(name: 'customer_data') String? customerData,
       @JsonKey(fromJson: getDateTimeLocalNullabe) DateTime? deadline,
       @JsonKey(fromJson: getDateTimeLocal) DateTime created,
       @JsonKey(fromJson: getDateTimeLocal) DateTime updated});
@@ -507,6 +530,7 @@ class __$TicketModelCopyWithImpl<$Res> implements _$TicketModelCopyWith<$Res> {
     Object? link = freezed,
     Object? qr = freezed,
     Object? internalRefId = freezed,
+    Object? customerData = freezed,
     Object? deadline = freezed,
     Object? created = null,
     Object? updated = null,
@@ -539,6 +563,10 @@ class __$TicketModelCopyWithImpl<$Res> implements _$TicketModelCopyWith<$Res> {
       internalRefId: freezed == internalRefId
           ? _self.internalRefId
           : internalRefId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customerData: freezed == customerData
+          ? _self.customerData
+          : customerData // ignore: cast_nullable_to_non_nullable
               as String?,
       deadline: freezed == deadline
           ? _self.deadline

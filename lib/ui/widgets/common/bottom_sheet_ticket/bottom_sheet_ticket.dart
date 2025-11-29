@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/model/ticket.dart';
+import 'package:mensa_italia_app/ui/common/app_colors.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:stacked/stacked.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -41,22 +42,6 @@ class BottomSheetTicket extends StackedView<BottomSheetTicketModel> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(height: 20),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      height: MediaQuery.of(context).size.width * 0.5,
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: PrettyQrView.data(
-                          data: ticket.qr ?? "",
-                          decoration: const PrettyQrDecoration(
-                            quietZone: PrettyQrQuietZone.zero,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   AutoSizeText(
                     ticket.name ?? "",
                     style: const TextStyle(
@@ -77,6 +62,39 @@ class BottomSheetTicket extends StackedView<BottomSheetTicketModel> {
                     textAlign: TextAlign.center,
                     minFontSize: 0,
                     maxLines: 1,
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      height: MediaQuery.of(context).size.width * 0.5,
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: PrettyQrView.data(
+                          data: ticket.qr ?? "",
+                          decoration: const PrettyQrDecoration(
+                            quietZone: PrettyQrQuietZone.zero,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                    decoration: BoxDecoration(
+                      color: kcPrimaryColor.withOpacity(.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: AutoSizeText(
+                      ticket.customerData ?? "",
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
+                      minFontSize: 0,
+                      maxLines: 2,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   if ((ticket.internalRefId ?? "").contains("event:"))
