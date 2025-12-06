@@ -12,6 +12,8 @@ import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class AddonDealsAddViewModel extends MasterModel {
+  @override
+  String componentName = "views.addons.deals.add.title";
   final DealModel? deal;
   // Form key for validation
   final formKey = GlobalKey<FormState>();
@@ -138,7 +140,8 @@ class AddonDealsAddViewModel extends MasterModel {
   }
 
   void pickLocation() {
-    navigationService.navigateToLocationListPickerView().then((value) {
+    navigationService.navigateToLocationListPickerView(
+      previousPageTitle: componentName,).then((value) {
       if (value != null && value is LocationModel) {
         location = value;
         locationController.text = value.getAddress();

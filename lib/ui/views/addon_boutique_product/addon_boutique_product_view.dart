@@ -8,11 +8,10 @@ import 'package:stacked/stacked.dart';
 
 import 'addon_boutique_product_viewmodel.dart';
 
-class AddonBoutiqueProductView
-    extends StackedView<AddonBoutiqueProductViewModel> {
+class AddonBoutiqueProductView extends StackedView<AddonBoutiqueProductViewModel> {
   final BoutiqueModel product;
-  const AddonBoutiqueProductView({Key? key, required this.product})
-      : super(key: key);
+  final String previousPageTitle;
+  const AddonBoutiqueProductView({Key? key, required this.product, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -22,8 +21,8 @@ class AddonBoutiqueProductView
   ) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: "views.addons.boutiqueproduct.title".tr(),
-        previousPageTitle: "views.addons.boutique.title".tr(),
+        title: viewModel.componentName.tr(),
+        previousPageTitle: previousPageTitle.tr(),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
@@ -60,13 +59,10 @@ class AddonBoutiqueProductView
                   return Container(
                     width: 8.0,
                     height: 8.0,
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 2.0),
+                    margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: (value == entry.key)
-                          ? const Color.fromRGBO(0, 0, 0, 0.9)
-                          : const Color.fromRGBO(0, 0, 0, 0.4),
+                      color: (value == entry.key) ? const Color.fromRGBO(0, 0, 0, 0.9) : const Color.fromRGBO(0, 0, 0, 0.4),
                     ),
                   );
                 }).toList(),
@@ -98,6 +94,5 @@ class AddonBoutiqueProductView
   }
 
   @override
-  AddonBoutiqueProductViewModel viewModelBuilder(BuildContext context) =>
-      AddonBoutiqueProductViewModel();
+  AddonBoutiqueProductViewModel viewModelBuilder(BuildContext context) => AddonBoutiqueProductViewModel();
 }

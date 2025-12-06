@@ -8,6 +8,8 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CalendarLinkerViewModel extends MasterModel {
+  @override
+  String componentName = "views.calendar_linker.title";
   CalendarLinkModel? calendarLink;
 
   CalendarLinkerViewModel() {

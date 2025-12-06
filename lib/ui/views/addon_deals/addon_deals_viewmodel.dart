@@ -5,6 +5,8 @@ import 'package:mensa_italia_app/model/deal.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonDealsViewModel extends MasterModel {
+  @override
+  String componentName = "addons.deals.title";
   ScrollController scrollController = ScrollController();
   List<DealModel> _originalDeals = [];
   List<DealModel> deals = [];
@@ -30,17 +32,7 @@ class AddonDealsViewModel extends MasterModel {
     }
     deals = _originalDeals
         .where(
-          (element) =>
-              element.name.toLowerCase().contains(p1.toLowerCase()) ||
-              (element.details ?? "")
-                  .toLowerCase()
-                  .contains(p1.toLowerCase()) ||
-              (element.howToGet ?? "")
-                  .toLowerCase()
-                  .contains(p1.toLowerCase()) ||
-              (element.commercialSector)
-                  .toLowerCase()
-                  .contains(p1.toLowerCase()),
+          (element) => element.name.toLowerCase().contains(p1.toLowerCase()) || (element.details ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.howToGet ?? "").toLowerCase().contains(p1.toLowerCase()) || (element.commercialSector).toLowerCase().contains(p1.toLowerCase()),
         )
         .toList();
     rebuildUi();
@@ -52,12 +44,19 @@ class AddonDealsViewModel extends MasterModel {
 
   void Function() tapOnDeal(int index) {
     return () {
-      navigationService.navigateToAddonDealsDetailsView(deal: deals[index]);
+      navigationService.navigateToAddonDealsDetailsView(
+        deal: deals[index],
+        previousPageTitle: componentName,
+      );
     };
   }
 
   void tapAddDeal() {
-    navigationService.navigateToAddonDealsAddView().then((value) {
+    navigationService
+        .navigateToAddonDealsAddView(
+      previousPageTitle: componentName,
+    )
+        .then((value) {
       load();
     });
   }
@@ -65,7 +64,10 @@ class AddonDealsViewModel extends MasterModel {
   onLongPress(int index) {
     return () {
       navigationService
-          .navigateToAddonDealsAddView(deal: deals[index])
+          .navigateToAddonDealsAddView(
+        deal: deals[index],
+        previousPageTitle: componentName,
+      )
           .then((value) {
         load();
       });

@@ -3,16 +3,13 @@ import 'package:stacked/stacked.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'external_addon_webview_viewmodel.dart';
 
-class ExternalAddonWebviewView
-    extends StackedView<ExternalAddonWebviewViewModel> {
+class ExternalAddonWebviewView extends StackedView<ExternalAddonWebviewViewModel> {
   final String addonID;
   final String addonURL;
-  const ExternalAddonWebviewView(
-      {super.key, required this.addonID, required this.addonURL});
+  const ExternalAddonWebviewView({super.key, required this.addonID, required this.addonURL});
 
   @override
-  Widget builder(BuildContext context, ExternalAddonWebviewViewModel viewModel,
-      Widget? child) {
+  Widget builder(BuildContext context, ExternalAddonWebviewViewModel viewModel, Widget? child) {
     return PopScope(
       canPop: viewModel.willPopCallback(),
       onPopInvoked: viewModel.onPopInvoked,
@@ -31,8 +28,7 @@ class ExternalAddonWebviewView
   }
 
   @override
-  ExternalAddonWebviewViewModel viewModelBuilder(BuildContext context) =>
-      ExternalAddonWebviewViewModel(addonID, addonURL);
+  ExternalAddonWebviewViewModel viewModelBuilder(BuildContext context) => ExternalAddonWebviewViewModel(addonID, addonURL);
 
   Widget iosFixer(Widget child, ExternalAddonWebviewViewModel viewModel) {
     return child;

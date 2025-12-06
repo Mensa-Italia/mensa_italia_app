@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -8,7 +9,8 @@ import 'package:stacked/stacked.dart';
 import 'events_map_viewmodel.dart';
 
 class EventsMapView extends StackedView<EventsMapViewModel> {
-  const EventsMapView({super.key});
+  final String previousPageTitle;
+  const EventsMapView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
@@ -17,8 +19,8 @@ class EventsMapView extends StackedView<EventsMapViewModel> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: getAppBarPlatform(
-        previousPageTitle: "Events",
-        title: "Events Map",
+        previousPageTitle: previousPageTitle.tr(),
+        title: viewModel.componentName.tr(),
       ),
       body: MapLibreMap(
         styleString:

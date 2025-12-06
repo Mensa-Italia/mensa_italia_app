@@ -18,7 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
-class MasterModel extends ReactiveViewModel {
+abstract class MasterModel extends ReactiveViewModel {
+  String componentName = "none";
   final _dialogService = locator<DialogService>();
   final _navigationService = locator<NavigationService>();
 
@@ -272,7 +273,7 @@ class MasterModel extends ReactiveViewModel {
   }
 }
 
-handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
+handleNotificationActions(Map<String, dynamic> data, {String? notificationID, required String componentName}) {
   final navigationService = locator<NavigationService>();
   String typeOfAction = data["type"] ?? "";
   if ((notificationID ?? "").isNotEmpty) {
@@ -280,16 +281,16 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
   }
   if (typeOfAction.isNotEmpty) {
     if (typeOfAction == "multiple_documents") {
-      navigationService.navigateToAddonAreaDocumentsView();
+      navigationService.navigateToAddonAreaDocumentsView(previousPageTitle: componentName);
     }
     if (typeOfAction == "ticket_purchase") {
-      navigationService.navigateToTicketsView();
+      navigationService.navigateToTicketsView(previousPageTitle: componentName);
     }
     if (typeOfAction == "single_document") {
       final String documentId = data["document_id"] ?? "";
       if (documentId.isNotEmpty) {
         Api().getDocument(documentId).then((document) {
-          navigationService.navigateToAddonAreaDocumentsPreviewView(document: document);
+          navigationService.navigateToAddonAreaDocumentsPreviewView(document: document, previousPageTitle: componentName);
         });
       }
     }
@@ -297,7 +298,7 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
       final String eventId = data["event_id"] ?? "";
       if (eventId.isNotEmpty) {
         Api().getEvent(eventId).then((event) {
-          navigationService.navigateToEventShowcaseView(event: event);
+          navigationService.navigateToEventShowcaseView(event: event, previousPageTitle: componentName);
         });
       }
     }
@@ -317,14 +318,14 @@ handleNotificationActions(Map<String, dynamic> data, {String? notificationID}) {
       }
     }
     if (typeOfAction == "payment_update_status") {
-      navigationService.navigateToReceiptsView();
+      navigationService.navigateToReceiptsView(previousPageTitle: componentName);
     }
     if (typeOfAction == "deal") {
       final String dealId = data["deal_id"] ?? "";
       if (dealId.isNotEmpty) {
         Api().getDeal(dealId).then((deal) {
           if (deal != null) {
-            navigationService.navigateToAddonDealsDetailsView(deal: deal);
+            navigationService.navigateToAddonDealsDetailsView(deal: deal, previousPageTitle: componentName);
           }
         });
       }

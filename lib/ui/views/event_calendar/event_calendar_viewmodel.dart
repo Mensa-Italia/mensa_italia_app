@@ -10,6 +10,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class EventCalendarViewModel extends MasterModel {
+  @override
+  String componentName = "views.event_calendar.title";
   List<EventModel> events = [];
   DateTime selectedDate = DateTime.now();
   String selectedState = "Nearby & Online";
@@ -141,7 +143,8 @@ class EventCalendarViewModel extends MasterModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      navigationService.navigateToEventShowcaseView(event: event);
+      navigationService.navigateToEventShowcaseView(event: event,
+      previousPageTitle: componentName,);
     };
   }
 

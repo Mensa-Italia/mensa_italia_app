@@ -8,7 +8,8 @@ import 'package:stacked/stacked.dart';
 import 'addon_area_documents_viewmodel.dart';
 
 class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
-  const AddonAreaDocumentsView({super.key});
+  final String previousPageTitle;
+  const AddonAreaDocumentsView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(BuildContext context, AddonAreaDocumentsViewModel viewModel,
@@ -18,8 +19,8 @@ class AddonAreaDocumentsView extends StackedView<AddonAreaDocumentsViewModel> {
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.addons.documents.title".tr(),
-            previousPageTitle: "addons.documents.view.previouspagetitle".tr(),
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
             searchBarActions: SearchBarActions(
               onChanged: viewModel.search,
               controller: viewModel.searchController,

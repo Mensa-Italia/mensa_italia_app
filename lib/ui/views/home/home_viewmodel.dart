@@ -10,6 +10,8 @@ import 'package:mensa_italia_app/services/tickets_see%20.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class HomeViewModel extends MasterModel {
+  @override
+  String componentName = "views.home.title";
   int currentIndex = 2;
 
   HomeViewModel() {
@@ -68,7 +70,7 @@ class HomeViewModel extends MasterModel {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     String? internalID = initialMessage?.data["internal_id"];
     try {
-      handleNotificationActions(initialMessage!.data, notificationID: internalID);
+      handleNotificationActions(initialMessage!.data, notificationID: internalID, componentName: componentName);
     } catch (_) {}
   }
 
@@ -77,14 +79,15 @@ class HomeViewModel extends MasterModel {
   void listenForMessages() {
     listenForMessagesvar = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       String? internalID = message.data["internal_id"];
-      handleNotificationActions(message.data, notificationID: internalID);
+      handleNotificationActions(message.data, notificationID: internalID, componentName: componentName);
     }); // AppLinks is singleton
     final appLinks = AppLinks();
     appLinksSub = appLinks.uriLinkStream.listen((uri) {
       if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == "links" && uri.pathSegments.length > 1 && uri.pathSegments[1] == "event") {
         String eventId = uri.pathSegments[2];
         Api().getEvent(eventId).then((event) {
-          navigationService.navigateToEventShowcaseView(event: event);
+          navigationService.navigateToEventShowcaseView(event: event,
+      previousPageTitle: componentName,);
         });
       }
     });

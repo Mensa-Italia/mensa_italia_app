@@ -7,7 +7,8 @@ import 'package:stacked/stacked.dart';
 import 'tickets_viewmodel.dart';
 
 class TicketsView extends StackedView<TicketsViewModel> {
-  const TicketsView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const TicketsView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -19,8 +20,8 @@ class TicketsView extends StackedView<TicketsViewModel> {
       body: CustomScrollView(
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.tickets.title".tr(),
-            previousPageTitle: "views.back.button.generic".tr(),
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
           ),
           if (viewModel.tickets.isEmpty && !viewModel.isBusy)
             SliverFillRemaining(

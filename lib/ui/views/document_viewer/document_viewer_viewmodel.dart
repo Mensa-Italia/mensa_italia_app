@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:mensa_italia_app/api/scraperapi.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:stacked/stacked.dart';
 import 'package:syncfusion_flutter_pdfviewer/src/control/pdfviewer_callback_details.dart';
 
@@ -19,5 +20,17 @@ class DocumentViewerViewModel extends BaseViewModel {
   void onDocumentLoadFailed(PdfDocumentLoadFailedDetails details) {
     hasFailed = true;
     rebuildUi();
+  }
+
+  void shareDocument() {
+    if (genericFile != null) {
+      XFile file = XFile(genericFile!.path);
+      SharePlus.instance.share(
+        ShareParams(
+          files: [file],
+          fileNameOverrides: [downloadUrl.split('/').last],
+        ),
+      );
+    }
   }
 }

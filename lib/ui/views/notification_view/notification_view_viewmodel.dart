@@ -5,6 +5,8 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:pocketbase/pocketbase.dart';
 
 class NotificationViewViewModel extends MasterModel {
+  @override
+  String componentName = "views.notificaiton.title";
   List<NotificationModel> get notifications => NotifySSE().notifications;
   UnsubscribeFunc? subscribe;
 
@@ -19,6 +21,7 @@ class NotificationViewViewModel extends MasterModel {
   }
 
   void goToSettings() {
-    navigationService.navigateToNotificationManagerView();
+    navigationService.navigateToNotificationManagerView(
+      previousPageTitle: componentName,);
   }
 }

@@ -50,6 +50,8 @@ window.location.href = `{url}`;
 """;
 
 class GenericWebviewViewModel extends MasterModel {
+  @override
+  String componentName = "views.generic_webview.title";
   WebviewCookieManager cookieManager = WebviewCookieManager();
   WebViewController? controller;
   double wholeOpacity = 0;

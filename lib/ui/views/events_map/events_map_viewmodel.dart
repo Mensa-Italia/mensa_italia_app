@@ -8,6 +8,8 @@ import 'package:mensa_italia_app/model/event.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class EventsMapViewModel extends MasterModel {
+  @override
+  String componentName = "views.events_map.title";
   MapLibreMapController? mapController;
 
   List<EventModel> events = [];
@@ -28,7 +30,10 @@ class EventsMapViewModel extends MasterModel {
 
   void onSymbolTapped(dynamic id, Point<double> point, LatLng coordinates, String layerId) async {
     final event = events.firstWhere((element) => element.id == id);
-    navigationService.navigateToEventShowcaseView(event: event);
+    navigationService.navigateToEventShowcaseView(
+      event: event,
+      previousPageTitle: componentName,
+    );
   }
 
   void onStyleLoadedCallback() async {

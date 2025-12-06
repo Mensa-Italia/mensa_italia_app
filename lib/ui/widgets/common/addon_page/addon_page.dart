@@ -19,7 +19,7 @@ class AddonPage extends StackedView<AddonPageModel> {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
-          title: "views.addons.title".tr(),
+          title: viewModel.componentName.tr(),
           searchBarActions: SearchBarActions(
             onChanged: viewModel.search,
             controller: viewModel.searchController,

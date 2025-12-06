@@ -8,7 +8,8 @@ import 'package:stacked/stacked.dart';
 import 'notification_manager_viewmodel.dart';
 
 class NotificationManagerView extends StackedView<NotificationManagerViewModel> {
-  const NotificationManagerView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const NotificationManagerView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -18,9 +19,9 @@ class NotificationManagerView extends StackedView<NotificationManagerViewModel> 
   ) {
     return Scaffold(
         appBar: CupertinoNavigationBar(
-          previousPageTitle: "views.settings.title".tr(),
+          previousPageTitle: previousPageTitle.tr(),
           middle: Text(
-            "views.notification_manager.title".tr(),
+            viewModel.componentName.tr(),
             maxLines: 1,
           ),
         ),

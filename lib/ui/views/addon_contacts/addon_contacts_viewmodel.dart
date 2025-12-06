@@ -7,6 +7,8 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_regsoci/bottom_sheet_regsoci.dart';
 
 class AddonContactsViewModel extends MasterModel {
+  @override
+  String componentName = "addons.contacts.title";
   final List<RegSociModel?> _contacts = [];
   String nameToSearch = "";
   ScrollController scrollController = ScrollController();
@@ -53,11 +55,7 @@ class AddonContactsViewModel extends MasterModel {
   }
 
   refresh() {
-    final value = regSociBox
-        .query(buildQuery())
-        .order(RegSociDBModel_.name)
-        .build()
-        .find();
+    final value = regSociBox.query(buildQuery()).order(RegSociDBModel_.name).build().find();
     _contacts.clear();
     _contacts.addAll(value.map((e) => e.toModel()).toList());
     rebuildUi();
@@ -67,12 +65,10 @@ class AddonContactsViewModel extends MasterModel {
     Condition<RegSociDBModel>? query;
     if (nameToSearch.isNotEmpty) {
       final allWords = nameToSearchCombination();
-      query = RegSociDBModel_.nameToSearch
-          .contains(nameToSearch, caseSensitive: false);
+      query = RegSociDBModel_.nameToSearch.contains(nameToSearch, caseSensitive: false);
 
       for (var word in allWords) {
-        query = query!.or(
-            RegSociDBModel_.nameToSearch.contains(word, caseSensitive: false));
+        query = query!.or(RegSociDBModel_.nameToSearch.contains(word, caseSensitive: false));
       }
     }
     return query;
@@ -99,14 +95,12 @@ class AddonContactsViewModel extends MasterModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }

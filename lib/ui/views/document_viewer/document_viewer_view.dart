@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -8,19 +9,22 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   final String downlaodUrl;
   final String title;
   final String previousPageTitle;
-  const DocumentViewerView(
-      {super.key,
-      required this.downlaodUrl,
-      required this.title,
-      required this.previousPageTitle});
+  const DocumentViewerView({super.key, required this.downlaodUrl, required this.title, required this.previousPageTitle});
 
   @override
-  Widget builder(
-      BuildContext context, DocumentViewerViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, DocumentViewerViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
         middle: Text(title),
-        previousPageTitle: previousPageTitle,
+        previousPageTitle: previousPageTitle.tr(),
+        trailing: IconButton(
+          icon: Icon(
+            Theme.of(context).platform == TargetPlatform.iOS ? CupertinoIcons.share_up : Icons.share,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+          ),
+          onPressed: viewModel.shareDocument,
+          iconSize: Theme.of(context).appBarTheme.iconTheme?.size,
+        ),
       ),
       body: viewModel.hasFailed
           ? failedInfos(viewModel)
@@ -33,7 +37,6 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
               : SfPdfViewer.file(
                   viewModel.genericFile!,
                   onDocumentLoadFailed: viewModel.onDocumentLoadFailed,
-                  enableTextSelection: false,
                 ),
     );
   }
@@ -63,6 +66,5 @@ class DocumentViewerView extends StackedView<DocumentViewerViewModel> {
   }
 
   @override
-  DocumentViewerViewModel viewModelBuilder(BuildContext context) =>
-      DocumentViewerViewModel(downloadUrl: downlaodUrl);
+  DocumentViewerViewModel viewModelBuilder(BuildContext context) => DocumentViewerViewModel(downloadUrl: downlaodUrl);
 }

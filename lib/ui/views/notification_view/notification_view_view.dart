@@ -10,7 +10,8 @@ import 'package:stacked/stacked.dart';
 import 'notification_view_viewmodel.dart';
 
 class NotificationViewView extends StackedView<NotificationViewViewModel> {
-  const NotificationViewView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const NotificationViewView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(BuildContext context, NotificationViewViewModel viewModel, Widget? child) {
@@ -18,8 +19,8 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
       body: CustomScrollView(
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.notificaiton.title".tr(),
-            previousPageTitle: "Back",
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
             trailings: [
               IconButton(
                 icon: Icon(EneftyIcons.setting_2_outline),
@@ -77,6 +78,7 @@ class NotificationViewView extends StackedView<NotificationViewViewModel> {
                     handleNotificationActions(
                       notificaiton.data!,
                       notificationID: notificaiton.id,
+                      componentName: viewModel.componentName,
                     );
                   },
                 );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -9,15 +10,17 @@ import 'add_schedule_viewmodel.dart';
 
 class AddScheduleView extends StackedView<AddScheduleViewModel> {
   final EventScheduleModel? event;
-  const AddScheduleView({super.key, this.event});
+
+  final String previousPageTitle;
+  const AddScheduleView({super.key, this.event, required this.previousPageTitle});
 
   @override
   Widget builder(
       BuildContext context, AddScheduleViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: event == null ? 'Add Event' : 'Edit Event',
-        previousPageTitle: 'Back',
+        title: viewModel.componentName.tr(),
+        previousPageTitle: previousPageTitle.tr(),
         trailings: event == null
             ? null
             : [

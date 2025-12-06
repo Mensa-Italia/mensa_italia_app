@@ -16,6 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MembershipPageModel extends MasterModel {
+  @override
+  String componentName = "views.home.title";
   RssItem? lastBlogPost;
   SigModel? randomoSig;
   EventModel? nextEvent;
@@ -115,22 +117,34 @@ class MembershipPageModel extends MasterModel {
     return () {
       switch (addonName.toLowerCase()) {
         case "contacts":
-          navigationService.navigateToAddonContactsView();
+          navigationService.navigateToAddonContactsView(
+            previousPageTitle: componentName,
+          );
           break;
         case "testmakers":
-          navigationService.navigateToAddonTestAssistantView();
+          navigationService.navigateToAddonTestAssistantView(
+            previousPageTitle: componentName,
+          );
           break;
         case "documents":
-          navigationService.navigateToAddonAreaDocumentsView();
+          navigationService.navigateToAddonAreaDocumentsView(
+            previousPageTitle: componentName,
+          );
           break;
         case "deals":
-          navigationService.navigateToAddonDealsView();
+          navigationService.navigateToAddonDealsView(
+            previousPageTitle: componentName,
+          );
           break;
         case "tableport":
-          navigationService.navigateToAddonStampView();
+          navigationService.navigateToAddonStampView(
+            previousPageTitle: componentName,
+          );
           break;
         case 'boutique':
-          navigationService.navigateToAddonBoutiqueView();
+          navigationService.navigateToAddonBoutiqueView(
+            previousPageTitle: componentName,
+          );
           break;
         default:
           break;
@@ -170,7 +184,9 @@ class MembershipPageModel extends MasterModel {
   }
 
   void openNotifications() {
-    navigationService.navigateToNotificationViewView();
+    navigationService.navigateToNotificationViewView(
+      previousPageTitle: componentName,
+    );
   }
 
   @override

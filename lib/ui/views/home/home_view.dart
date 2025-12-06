@@ -36,7 +36,31 @@ class HomeView extends StackedView<HomeViewModel> {
                   borderRadius: BorderRadius.circular(300),
                 ),
                 onPressed: () {
-                  viewModel.navigationService.navigateToTicketsView();
+                  if (viewModel.currentIndex == 0) {
+                    viewModel.navigationService.navigateToTicketsView(
+                      previousPageTitle: "views.events.title",
+                    );
+                  }
+                  if (viewModel.currentIndex == 1) {
+                    viewModel.navigationService.navigateToTicketsView(
+                      previousPageTitle: "views.community.title",
+                    );
+                  }
+                  if (viewModel.currentIndex == 2) {
+                    viewModel.navigationService.navigateToTicketsView(
+                      previousPageTitle: "views.home.title",
+                    );
+                  }
+                  if (viewModel.currentIndex == 3) {
+                    viewModel.navigationService.navigateToTicketsView(
+                      previousPageTitle: "views.addons.title",
+                    );
+                  }
+                  if (viewModel.currentIndex == 4) {
+                    viewModel.navigationService.navigateToTicketsView(
+                      previousPageTitle: "views.settings.title",
+                    );
+                  }
                 },
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,

@@ -4,6 +4,8 @@ import 'package:mensa_italia_app/model/payment_method.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class PaymentMethodManagerViewModel extends MasterModel {
+  @override
+  String componentName = "views.payment_method_manager.title";
   final controller = CardFormEditController();
   final List<InternalPaymentMethod> paymentMethods = [];
   dynamic customer;

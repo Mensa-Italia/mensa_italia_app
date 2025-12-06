@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,15 +12,16 @@ import 'package:table_calendar/table_calendar.dart';
 import 'event_calendar_viewmodel.dart';
 
 class EventCalendarView extends StackedView<EventCalendarViewModel> {
-  const EventCalendarView({super.key});
+  final String previousPageTitle;
+  const EventCalendarView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
       BuildContext context, EventCalendarViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        previousPageTitle: "Events",
-        title: "Events Calendar",
+        previousPageTitle: previousPageTitle.tr(),
+        title:  viewModel.componentName.tr(),
         trailings: [
           IconButton(
             onPressed: viewModel.changeSearchRadius,

@@ -17,8 +17,7 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
   const BottomSheetRegsoci({super.key, required this.regSoci});
 
   @override
-  Widget builder(
-      BuildContext context, BottomSheetRegsociModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, BottomSheetRegsociModel viewModel, Widget? child) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -44,10 +43,8 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                     children: [
                       Expanded(child: SizedBox()),
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: Colors.purple,
@@ -80,8 +77,7 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                     ],
                   ),
                 const SizedBox(height: 20),
-                if (regSoci.image ==
-                    "https://www.cloud32.it/Associazioni/img/Uomo-1.png")
+                if (regSoci.image == "https://www.cloud32.it/Associazioni/img/Uomo-1.png")
                   Container(
                     width: MediaQuery.of(context).size.width / 3,
                     height: MediaQuery.of(context).size.width / 3,
@@ -152,40 +148,66 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                   children: [
                     if (viewModel.hasPhoneNumbers())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.call_bold,
-                            color: Colors.black),
+                        icon: const Icon(EneftyIcons.call_bold, color: Colors.black),
                         text: "addons.contacts.infos.call".tr(),
                         onPressed: viewModel.linkToPhone,
                       ),
                     if (viewModel.hasPhoneNumbers())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.message_bold,
-                            color: Colors.black),
+                        icon: const Icon(EneftyIcons.message_bold, color: Colors.black),
                         text: "addons.contacts.infos.text".tr(),
                         onPressed: viewModel.linkToMessage,
                       ),
                     if (viewModel.hasEmail())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.sms_bold,
-                            color: Colors.black),
+                        icon: const Icon(EneftyIcons.sms_bold, color: Colors.black),
                         text: "addons.contacts.infos.email".tr(),
                         onPressed: viewModel.linkToEmail,
                       ),
                     if (viewModel.hasWebsite())
                       _squareButtoon(
-                        icon: const Icon(EneftyIcons.link_bold,
-                            color: Colors.black),
+                        icon: const Icon(EneftyIcons.link_bold, color: Colors.black),
                         text: "addons.contacts.infos.website".tr(),
                         onPressed: viewModel.linkToWebsite,
                       ),
-                    if (viewModel.regSoci.fullProfileLink != null)
-                      _squareButtoon(
-                        icon: const Icon(EneftyIcons.profile_bold,
-                            color: Colors.black),
-                        text: "addons.contacts.infos.profile".tr(),
-                        onPressed: viewModel.linkToProfile,
-                      ),
                   ],
+                ),
+                const SizedBox(height: 10),
+                Divider(color: Colors.black.withOpacity(.2), thickness: 1, indent: 20, endIndent: 20),
+                Column(
+                  children: viewModel.regSoci.fullData.entries.map((e) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              e.key,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Text(
+                              elaborateValue(e.key, e.value),
+                              style: const TextStyle(
+                                color: Colors.black,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -196,20 +218,41 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
     );
   }
 
+  String elaborateValue(String key, String value) {
+    if (key == "Facebook ID:") {
+      //check if it's an url, if it is extract the username
+      if (value.startsWith("http")) {
+        // trim the url and remove the last / if present
+        var uri = Uri.parse(value);
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments.last.isEmpty) {
+          uri = uri.replace(path: uri.path.substring(0, uri.path.length - 1));
+        }
+        return uri.pathSegments.isNotEmpty ? uri.pathSegments.last : value;
+      } else {
+        return value.replaceAll("/", "");
+      }
+    }
+    if (value.startsWith("mailto:")) {
+      return value.replaceFirst("mailto:", "");
+    } else if (value.startsWith("tel:")) {
+      return value.replaceFirst("tel:", "");
+    } else {
+      return value;
+    }
+  }
+
   String capitalization(String text) {
     var textList = text.split(" ");
     if (textList.length == 1) {
       if (textList[0].length > 1) {
-        textList[0] = textList[0][0].toUpperCase() +
-            textList[0].substring(1).toLowerCase();
+        textList[0] = textList[0][0].toUpperCase() + textList[0].substring(1).toLowerCase();
       } else {
         textList[0] = textList[0].toUpperCase();
       }
     } else {
       for (var i = 0; i < textList.length; i++) {
         if (textList[i].length > 1) {
-          textList[i] = textList[i][0].toUpperCase() +
-              textList[i].substring(1).toLowerCase();
+          textList[i] = textList[i][0].toUpperCase() + textList[i].substring(1).toLowerCase();
         } else {
           textList[i] = textList[i].toUpperCase();
         }
@@ -219,16 +262,14 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
   }
 
   @override
-  BottomSheetRegsociModel viewModelBuilder(BuildContext context) =>
-      BottomSheetRegsociModel(regSoci: regSoci);
+  BottomSheetRegsociModel viewModelBuilder(BuildContext context) => BottomSheetRegsociModel(regSoci: regSoci);
 }
 
 class _squareButtoon extends StatelessWidget {
   final Widget icon;
   final String text;
   final Function()? onPressed;
-  const _squareButtoon(
-      {required this.icon, required this.text, this.onPressed});
+  const _squareButtoon({required this.icon, required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -252,8 +293,7 @@ class _squareButtoon extends StatelessWidget {
             Expanded(child: icon),
             AutoSizeText(
               text,
-              style: const TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               minFontSize: 0,
               maxLines: 1,
               group: _autoSizeGroup,

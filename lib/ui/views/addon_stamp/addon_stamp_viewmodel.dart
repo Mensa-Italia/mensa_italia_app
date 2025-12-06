@@ -10,6 +10,8 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class AddonStampViewModel extends MasterModel {
+  @override
+  String componentName = "addons.tableport.title";
   final List<StampUserModel> stamps = [];
 
   AddonStampViewModel() {

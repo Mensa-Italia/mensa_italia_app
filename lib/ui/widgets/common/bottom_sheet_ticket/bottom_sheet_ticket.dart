@@ -14,7 +14,8 @@ import 'bottom_sheet_ticket_model.dart';
 
 class BottomSheetTicket extends StackedView<BottomSheetTicketModel> {
   final TicketModel ticket;
-  const BottomSheetTicket({super.key, required this.ticket});
+  final String underPageTitle;
+  const BottomSheetTicket({super.key, required this.ticket, required this.underPageTitle});
 
   @override
   Widget builder(BuildContext context, BottomSheetTicketModel viewModel, Widget? child) {
@@ -132,5 +133,5 @@ class BottomSheetTicket extends StackedView<BottomSheetTicketModel> {
   }
 
   @override
-  BottomSheetTicketModel viewModelBuilder(BuildContext context) => BottomSheetTicketModel();
+  BottomSheetTicketModel viewModelBuilder(BuildContext context) => BottomSheetTicketModel(underPageTitle: underPageTitle);
 }

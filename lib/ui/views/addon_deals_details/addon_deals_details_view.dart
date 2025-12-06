@@ -9,15 +9,16 @@ import 'addon_deals_details_viewmodel.dart';
 
 class AddonDealsDetailsView extends StackedView<AddonDealsDetailsViewModel> {
   final DealModel deal;
-  const AddonDealsDetailsView({super.key, required this.deal});
+  final String previousPageTitle;
+  const AddonDealsDetailsView({super.key, required this.deal, required this.previousPageTitle});
 
   @override
   Widget builder(BuildContext context, AddonDealsDetailsViewModel viewModel,
       Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: "addons.deals.details.title".tr(),
-        previousPageTitle: "addons.deals.details.previouspagetitle".tr(),
+        title: viewModel.componentName.tr(),
+        previousPageTitle: previousPageTitle.tr(),
       ),
       extendBody: true,
       extendBodyBehindAppBar: true,

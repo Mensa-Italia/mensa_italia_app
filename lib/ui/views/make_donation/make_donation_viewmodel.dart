@@ -6,6 +6,8 @@ import 'package:mensa_italia_app/app/app.router.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class MakeDonationViewModel extends MasterModel {
+  @override
+  String componentName = "views.make_donation.title";
   int selectedDontaion = 50;
   TextEditingController otherAmountController = TextEditingController();
 

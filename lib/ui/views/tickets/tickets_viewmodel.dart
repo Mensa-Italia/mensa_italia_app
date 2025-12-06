@@ -5,6 +5,8 @@ import 'package:mensa_italia_app/ui/widgets/common/bottom_sheet_ticket/bottom_sh
 import 'package:stacked/stacked.dart';
 
 class TicketsViewModel extends MasterModel {
+  @override
+  String componentName = "views.tickets.title";
   List<TicketModel> get tickets => TicketSSE().tickets;
 
   TicketsViewModel() {
@@ -23,6 +25,7 @@ class TicketsViewModel extends MasterModel {
       showBeautifulBottomSheet(
         child: BottomSheetTicket(
           ticket: ticket,
+          underPageTitle: componentName,
         ),
       );
     };

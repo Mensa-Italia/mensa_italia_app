@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,16 +14,16 @@ import 'add_event_viewmodel.dart';
 
 class AddEventView extends StackedView<AddEventViewModel> {
   final EventModel? event;
-  const AddEventView({super.key, this.event});
+  final String previousPageTitle;
+  const AddEventView({super.key, this.event, required this.previousPageTitle});
 
   @override
-  Widget builder(
-      BuildContext context, AddEventViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddEventViewModel viewModel, Widget? child) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: getAppBarPlatform(
-        previousPageTitle: "Events",
-        title: event == null ? 'Add Event' : 'Edit Event',
+        previousPageTitle: previousPageTitle.tr(),
+        title: viewModel.componentName.tr(),
         trailings: (event != null)
             ? [
                 IconButton(
@@ -64,14 +65,12 @@ class AddEventView extends StackedView<AddEventViewModel> {
                                 )
                               : event?.image != null && event!.image.isNotEmpty
                                   ? DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          event!.image),
+                                      image: CachedNetworkImageProvider(event!.image),
                                       fit: BoxFit.cover,
                                     )
                                   : null,
                         ),
-                        child: !(viewModel.imageBytes != null ||
-                                event?.image != null)
+                        child: !(viewModel.imageBytes != null || event?.image != null)
                             ? const Text(
                                 'Add Image',
                                 style: TextStyle(
@@ -87,9 +86,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
             ),
             Padding(
               padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
-              child: ElevatedButton(
-                  onPressed: viewModel.generateImage,
-                  child: const Text("IA Generate Image")),
+              child: ElevatedButton(onPressed: viewModel.generateImage, child: const Text("IA Generate Image")),
             ),
           ],
           Form(
@@ -246,8 +243,7 @@ class AddEventView extends StackedView<AddEventViewModel> {
   }
 
   @override
-  AddEventViewModel viewModelBuilder(BuildContext context) =>
-      AddEventViewModel(event: event);
+  AddEventViewModel viewModelBuilder(BuildContext context) => AddEventViewModel(event: event);
 }
 
 class _SettingContainer extends StatelessWidget {

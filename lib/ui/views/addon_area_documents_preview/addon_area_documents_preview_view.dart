@@ -8,14 +8,13 @@ import 'package:stacked/stacked.dart';
 
 import 'addon_area_documents_preview_viewmodel.dart';
 
-class AddonAreaDocumentsPreviewView
-    extends StackedView<AddonAreaDocumentsPreviewViewModel> {
+class AddonAreaDocumentsPreviewView extends StackedView<AddonAreaDocumentsPreviewViewModel> {
   final DocumentModel document;
-  const AddonAreaDocumentsPreviewView({super.key, required this.document});
+  final String previousPageTitle;
+  const AddonAreaDocumentsPreviewView({super.key, required this.document, required this.previousPageTitle});
 
   @override
-  Widget builder(BuildContext context,
-      AddonAreaDocumentsPreviewViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonAreaDocumentsPreviewViewModel viewModel, Widget? child) {
     return Scaffold(
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -25,9 +24,7 @@ class AddonAreaDocumentsPreviewView
         child: SafeArea(
           child: ElevatedButton(
             onPressed: viewModel.onTapViewOriginal,
-            child: Text("views.addons.documents_resume.view_orginal"
-                .tr()
-                .toUpperCase()),
+            child: Text("views.addons.documents_resume.view_orginal".tr().toUpperCase()),
           ),
         ),
       ),
@@ -35,12 +32,11 @@ class AddonAreaDocumentsPreviewView
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.addons.documents_resume.title".tr(),
-            previousPageTitle: "views.addons.documents.title".tr(),
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
           ),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20)
-                .copyWith(top: 10, bottom: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10, bottom: 0),
             sliver: SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
@@ -84,8 +80,7 @@ class AddonAreaDocumentsPreviewView
             )
           else
             SliverPadding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 30),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,17 +93,17 @@ class AddonAreaDocumentsPreviewView
               ),
             ),
           SliverSafeArea(
-              sliver: SliverToBoxAdapter(
-            child: SizedBox(height: 50),
-          )),
+            sliver: SliverToBoxAdapter(
+              child: SizedBox(height: 50),
+            ),
+          ),
         ],
       ),
     );
   }
 
   @override
-  AddonAreaDocumentsPreviewViewModel viewModelBuilder(BuildContext context) =>
-      AddonAreaDocumentsPreviewViewModel(
+  AddonAreaDocumentsPreviewViewModel viewModelBuilder(BuildContext context) => AddonAreaDocumentsPreviewViewModel(
         document: document,
       );
 }

@@ -12,7 +12,8 @@ import 'package:stacked/stacked.dart';
 import 'addon_contacts_viewmodel.dart';
 
 class AddonContactsView extends StackedView<AddonContactsViewModel> {
-  const AddonContactsView({super.key});
+  final String previousPageTitle;
+  const AddonContactsView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
@@ -24,8 +25,8 @@ class AddonContactsView extends StackedView<AddonContactsViewModel> {
           controller: viewModel.scrollController,
           slivers: [
             getAppBarSliverPlatform(
-              title: "addons.contacts.view.title".tr(),
-              previousPageTitle: "addons.contacts.view.previouspagetitle".tr(),
+              title:  viewModel.componentName.tr(),
+              previousPageTitle: previousPageTitle.tr(),
               searchBarActions: SearchBarActions(
                 onChanged: viewModel.search,
                 controller: viewModel.searchController,

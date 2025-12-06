@@ -4,6 +4,10 @@ import 'package:mensa_italia_app/api/api.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class NotificationManagerViewModel extends MasterModel {
+
+
+  @override
+  String componentName = "views.notification_manager.title";
   List<String> notificationEvents = [];
 
   NotificationManagerViewModel() {

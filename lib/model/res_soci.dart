@@ -24,8 +24,7 @@ abstract class RegSociModel with _$RegSociModel {
     required String? fullProfileLink,
   }) = _RegSociModel;
 
-  factory RegSociModel.fromJson(Map<String, dynamic> json) =>
-      _$RegSociModelFromJson(json);
+  factory RegSociModel.fromJson(Map<String, dynamic> json) => _$RegSociModelFromJson(json);
 
   RegSociDBModel toDBModel() {
     return RegSociDBModel(
@@ -37,7 +36,7 @@ abstract class RegSociModel with _$RegSociModel {
       state: state,
       fullDataJson: jsonEncode(fullData),
       fullProfileLink: fullProfileLink,
-      nameToSearch: nameToSearchCombination(name).join(" . "),
+      nameToSearch: nameToSearchCombination("${name.trim()} $id").join(" . "),
     );
   }
 
@@ -59,14 +58,12 @@ abstract class RegSociModel with _$RegSociModel {
     final List<String> result = [];
 
     // Funzione ricorsiva per trovare tutte le combinazioni
-    void generateCombinations(
-        List<String> currentCombination, List<String> remainingWords) {
+    void generateCombinations(List<String> currentCombination, List<String> remainingWords) {
       if (remainingWords.isEmpty) {
         result.add(currentCombination.join(" "));
       } else {
         for (int i = 0; i < remainingWords.length; i++) {
-          List<String> nextCombination = List.from(currentCombination)
-            ..add(remainingWords[i]);
+          List<String> nextCombination = List.from(currentCombination)..add(remainingWords[i]);
           List<String> nextRemaining = List.from(remainingWords)..removeAt(i);
           generateCombinations(nextCombination, nextRemaining);
         }
@@ -100,8 +97,7 @@ abstract class RegSociDBModel with _$RegSociDBModel {
     required String nameToSearch,
   }) = _RegSociDBModel;
 
-  factory RegSociDBModel.fromJson(Map<String, dynamic> json) =>
-      _$RegSociDBModelFromJson(json);
+  factory RegSociDBModel.fromJson(Map<String, dynamic> json) => _$RegSociDBModelFromJson(json);
 
   RegSociModel toModel() {
     return RegSociModel(

@@ -17,7 +17,7 @@ class EventPage extends StackedView<EventPageModel> {
     return getCustomScrollViewPlatform(
       slivers: [
         getAppBarSliverPlatform(
-          title: "views.events.title".tr(),
+          title: viewModel.componentName.tr(),
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: viewModel.navigateToAddEvent,

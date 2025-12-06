@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:mensa_italia_app/ui/common/custom_scroll_view.dart';
@@ -6,7 +7,8 @@ import 'package:stacked/stacked.dart';
 import 'addon_test_assistant_viewmodel.dart';
 
 class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
-  const AddonTestAssistantView({super.key});
+  final String previousPageTitle;
+  const AddonTestAssistantView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(BuildContext context, AddonTestAssistantViewModel viewModel,
@@ -16,8 +18,8 @@ class AddonTestAssistantView extends StackedView<AddonTestAssistantViewModel> {
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "Candidates",
-            previousPageTitle: "Addons",
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
             searchBarActions: SearchBarActions(
               onChanged: viewModel.search,
               controller: viewModel.searchController,

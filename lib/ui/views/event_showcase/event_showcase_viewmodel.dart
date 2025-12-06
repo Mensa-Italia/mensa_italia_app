@@ -9,6 +9,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class EventShowcaseViewModel extends MasterModel {
+  @override
+  String componentName = "views.event_showcase.title";
+
   EventModel event;
   final List<EventScheduleModel> eventSchedules = [];
   List<EventOwnerModel>? owners;
@@ -25,8 +28,7 @@ class EventShowcaseViewModel extends MasterModel {
       event = value;
       Api().getEventSchedules(event.id).then((value) {
         eventSchedules.clear();
-        eventSchedules
-            .addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
+        eventSchedules.addAll(value..sort((a, b) => a.whenStart.compareTo(b.whenStart)));
         rebuildUi();
       });
     });
@@ -40,8 +42,7 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void openUrl() async {
-    if (event.infoLink.trim().isNotEmpty &&
-        await canLaunchUrlString(event.infoLink.trim())) {
+    if (event.infoLink.trim().isNotEmpty && await canLaunchUrlString(event.infoLink.trim())) {
       launchUrlString(
         event.infoLink.trim(),
       );
@@ -54,7 +55,8 @@ class EventShowcaseViewModel extends MasterModel {
   }
 
   void editEvent() {
-    navigationService.navigateToAddEventView(event: event).then((value) {
+    navigationService.navigateToAddEventView(event: event,
+      previousPageTitle: componentName,).then((value) {
       load();
     });
   }

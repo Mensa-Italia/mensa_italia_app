@@ -14,6 +14,9 @@ import 'package:mensa_italia_app/ui/widgets/common/event_card_generator/event_ca
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class AddEventViewModel extends MasterModel {
+  @override
+  String componentName = "views.add_event_viewmodel.add_event.title";
+
   final formKey = GlobalKey<FormState>();
   Uint8List? imageBytes;
   TextEditingController locationController = TextEditingController();
@@ -38,6 +41,7 @@ class AddEventViewModel extends MasterModel {
 
   AddEventViewModel({EventModel? event}) {
     if (event != null) {
+      componentName = "views.add_event_viewmodel.edit_event.title";
       Api().getEventSchedules(event.id).then((value) {
         eventSchedules.clear();
         eventSchedules.addAll(value);
@@ -52,16 +56,16 @@ class AddEventViewModel extends MasterModel {
         start: event.whenStart,
         end: event.whenEnd,
       );
-      dateTimeStartEvent.text =
-          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
-      dateTimeEndEvent.text =
-          DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+      dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+      dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
       if (event.position != null) {
         location = event.position;
         locationController.text = location!.getAddress();
       }
       isNational = event.isNational;
       isOnline = event.position == null;
+    }else {
+      componentName = "views.add_event_viewmodel.add_event.title";
     }
   }
 
@@ -95,8 +99,7 @@ class AddEventViewModel extends MasterModel {
       child: EventCardGenerator(),
     ).then((value) {
       if (value != null && value is Uint8List) {
-        image = XFile.fromData(value,
-            name: "event_card.png", mimeType: "image/png");
+        image = XFile.fromData(value, name: "event_card.png", mimeType: "image/png");
         image?.readAsBytes().then((bytes) {
           imageBytes = bytes;
           rebuildUi();
@@ -159,7 +162,9 @@ class AddEventViewModel extends MasterModel {
   }
 
   void pickLocation() {
-    navigationService.navigateToLocationListPickerView().then((value) {
+    navigationService.navigateToLocationListPickerView(
+      previousPageTitle: componentName
+    ).then((value) {
       if (value != null && value is LocationModel) {
         location = value;
         locationController.text = value.getAddress();
@@ -179,11 +184,9 @@ class AddEventViewModel extends MasterModel {
     ).then((value) {
       if (value != null) {
         dateTimeOptions.setStart(value);
-        dateTimeStartEvent.text =
-            DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
+        dateTimeStartEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getStart());
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text =
-              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -204,8 +207,7 @@ class AddEventViewModel extends MasterModel {
       if (value != null) {
         dateTimeOptions.setEnd(value);
         if (dateTimeOptions.isValidRange()) {
-          dateTimeEndEvent.text =
-              DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
+          dateTimeEndEvent.text = DateFormat("dd/MM/yyyy HH:mm").format(dateTimeOptions.getEnd());
         } else {
           dateTimeOptions.clearEnd();
           dateTimeEndEvent.text = "";
@@ -251,6 +253,7 @@ class AddEventViewModel extends MasterModel {
   void editSchedule() {
     navigationService.navigateToAddEventScheduleListView(
       eventSchedules: eventSchedules,
+      previousPageTitle: componentName,
     );
   }
 

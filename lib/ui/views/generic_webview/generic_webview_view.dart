@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
 import 'package:stacked/stacked.dart';
@@ -9,15 +10,10 @@ class GenericWebviewView extends StackedView<GenericWebviewViewModel> {
   final String title;
   final String previousPageTitle;
   final String url;
-  const GenericWebviewView(
-      {super.key,
-      required this.url,
-      required this.title,
-      required this.previousPageTitle});
+  const GenericWebviewView({super.key, required this.url, required this.title, required this.previousPageTitle});
 
   @override
-  Widget builder(
-      BuildContext context, GenericWebviewViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, GenericWebviewViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: title,
@@ -37,6 +33,5 @@ class GenericWebviewView extends StackedView<GenericWebviewViewModel> {
   }
 
   @override
-  GenericWebviewViewModel viewModelBuilder(BuildContext context) =>
-      GenericWebviewViewModel(url: url);
+  GenericWebviewViewModel viewModelBuilder(BuildContext context) => GenericWebviewViewModel(url: url);
 }

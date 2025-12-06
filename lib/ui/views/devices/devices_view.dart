@@ -8,7 +8,8 @@ import 'package:stacked/stacked.dart';
 import 'devices_viewmodel.dart';
 
 class DevicesView extends StackedView<DevicesViewModel> {
-  const DevicesView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const DevicesView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -20,8 +21,8 @@ class DevicesView extends StackedView<DevicesViewModel> {
       body: CustomScrollView(
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.devices.title".tr(),
-            previousPageTitle: "views.settings.title".tr(),
+            title:  viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
           ),
           const SliverPadding(padding: EdgeInsets.all(5)),
           if (viewModel.isBusy)

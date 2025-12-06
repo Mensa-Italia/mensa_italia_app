@@ -10,7 +10,8 @@ import 'package:stacked/stacked.dart';
 import 'addon_boutique_viewmodel.dart';
 
 class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
-  const AddonBoutiqueView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const AddonBoutiqueView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -27,8 +28,8 @@ class AddonBoutiqueView extends StackedView<AddonBoutiqueViewModel> {
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "views.addons.boutique.title".tr(),
-            previousPageTitle: "views.back.button.generic".tr(),
+            title: viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
             searchBarActions: SearchBarActions(
               onChanged: viewModel.search,
               controller: viewModel.searchController,

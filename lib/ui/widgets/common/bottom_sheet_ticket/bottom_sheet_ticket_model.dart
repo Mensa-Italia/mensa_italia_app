@@ -7,9 +7,13 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:stacked/stacked.dart';
 
 class BottomSheetTicketModel extends MasterModel {
+  final String underPageTitle;
+
+  BottomSheetTicketModel({required this.underPageTitle});
+
   void goToEvent(String s) {
     Api().getEvent(s.replaceFirst("event:", "")).then((event) {
-      navigationService.navigateToEventShowcaseView(event: event);
+      navigationService.navigateToEventShowcaseView(event: event, previousPageTitle: underPageTitle,);
     });
   }
 

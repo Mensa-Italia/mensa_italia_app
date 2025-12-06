@@ -16,8 +16,9 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'event_showcase_viewmodel.dart';
 
 class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
+  final String previousPageTitle;
   final EventModel event;
-  const EventShowcaseView({super.key, required this.event});
+  const EventShowcaseView({super.key, required this.previousPageTitle, required this.event});
 
   @override
   Widget builder(
@@ -25,7 +26,7 @@ class EventShowcaseView extends StackedView<EventShowcaseViewModel> {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: event.name,
-        previousPageTitle: "views.events.title".tr(),
+        previousPageTitle: previousPageTitle,
         trailings: [
           IconButton(
             icon: Icon(

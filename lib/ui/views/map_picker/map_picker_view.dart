@@ -14,7 +14,8 @@ import 'package:stacked/stacked.dart';
 import 'map_picker_viewmodel.dart';
 
 class MapPickerView extends StackedView<MapPickerViewModel> {
-  const MapPickerView({super.key});
+  final String previousPageTitle;
+  const MapPickerView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
@@ -22,8 +23,8 @@ class MapPickerView extends StackedView<MapPickerViewModel> {
     return Scaffold(
       extendBody: true,
       appBar: getAppBarPlatform(
-        title: "viewModel.locationMapPicker.title".tr(),
-        previousPageTitle: "Locations",
+        title:  viewModel.componentName.tr(),
+        previousPageTitle: previousPageTitle.tr(),
       ),
       resizeToAvoidBottomInset: true,
       bottomNavigationBar: true

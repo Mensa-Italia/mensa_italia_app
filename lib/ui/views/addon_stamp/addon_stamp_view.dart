@@ -10,15 +10,16 @@ import 'package:stacked/stacked.dart';
 import 'addon_stamp_viewmodel.dart';
 
 class AddonStampView extends StackedView<AddonStampViewModel> {
-  const AddonStampView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const AddonStampView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
       BuildContext context, AddonStampViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
-        title: "addons.tableport.title".tr(),
-        previousPageTitle: "addons.tableport.details.previouspagetitle".tr(),
+        title: viewModel.componentName.tr(),
+        previousPageTitle: previousPageTitle.tr(),
       ),
       body: Center(
         child: AnimatedTableport(

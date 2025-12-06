@@ -11,6 +11,8 @@ import 'package:mensa_italia_app/ui/widgets/common/bottom_filter/bottom_filter_m
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class EventPageModel extends MasterModel {
+  @override
+  String componentName = "views.events.title";
   ScrollController scrollController = ScrollController();
 
   TextEditingController searchController = TextEditingController();
@@ -57,9 +59,7 @@ class EventPageModel extends MasterModel {
     if (event.position == null && selectedState.contains("Online")) {
       return true;
     }
-    if (event.position != null &&
-        selectedState.contains("Online") &&
-        !selectedState.contains("Nearby")) {
+    if (event.position != null && selectedState.contains("Online") && !selectedState.contains("Nearby")) {
       return false;
     }
     if (!selectedState.contains("Nearby")) {
@@ -75,9 +75,7 @@ class EventPageModel extends MasterModel {
       if (event.position == null) {
         return false;
       }
-      final distance = const Distance().distance(
-          LatLng(position!.latitude, position!.longitude),
-          event.position!.toLatLong2());
+      final distance = const Distance().distance(LatLng(position!.latitude, position!.longitude), event.position!.toLatLong2());
       return distance < this.distance * 1000;
     }
   }
@@ -129,25 +127,35 @@ class EventPageModel extends MasterModel {
 
   Function() onTapOnEvent(EventModel event) {
     return () async {
-      navigationService.navigateToEventShowcaseView(event: event).then((value) {
+      navigationService.navigateToEventShowcaseView(previousPageTitle: componentName, event: event).then((value) {
         load();
       });
     };
   }
 
   void navigateToMap() {
-    navigationService.navigateToEventsMapView();
+    navigationService.navigateToEventsMapView(
+      previousPageTitle: componentName,
+    );
   }
 
   void navigateToAddEvent() {
     if (allowControlEvents()) {
-      navigationService.navigateToAddEventView().then((value) {
+      navigationService
+          .navigateToAddEventView(
+        previousPageTitle: componentName,
+      )
+          .then((value) {
         load();
       });
     } else {
       Api().canAddEvent().then((value) {
         if (value) {
-          navigationService.navigateToAddEventView().then((value) {
+          navigationService
+              .navigateToAddEventView(
+            previousPageTitle: componentName,
+          )
+              .then((value) {
             load();
           });
         } else {
@@ -162,17 +170,18 @@ class EventPageModel extends MasterModel {
   }
 
   void navigateToCalendar() {
-    navigationService.navigateToEventCalendarView();
+    navigationService.navigateToEventCalendarView(
+      previousPageTitle: componentName,
+    );
   }
 
   void changeSearchRadius() async {
-    showCupertinoModalBottomSheet(
-        context: context, builder: (context) => BottomFilter());
+    showCupertinoModalBottomSheet(context: context, builder: (context) => BottomFilter());
   }
 
   Function() onLongTapEditEvent(EventModel? event) {
     return () async {
-      navigationService.navigateToAddEventView(event: event).then((value) {
+      navigationService.navigateToAddEventView(previousPageTitle: componentName, event: event).then((value) {
         load();
       });
     };

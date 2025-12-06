@@ -8,6 +8,8 @@ import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ExternalAddonWebviewViewModel extends MasterModel {
+  @override
+  String componentName = "views.external_addon_webview.title";
   WebviewCookieManager cookieManager = WebviewCookieManager();
   WebViewController? controller;
   bool _canGoBack = true;

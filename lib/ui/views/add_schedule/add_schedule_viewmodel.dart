@@ -9,6 +9,8 @@ import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class AddScheduleViewModel extends MasterModel {
+  @override
+  String componentName = "views.add_schedule_viewmodel.title";
   final formKey = GlobalKey<FormState>();
 
   TextEditingController locationController = TextEditingController();
@@ -19,6 +21,7 @@ class AddScheduleViewModel extends MasterModel {
 
   AddScheduleViewModel({this.event}) {
     if (event != null) {
+      componentName = "views.add_schedule_viewmodel.edit_title";
       nameController.text = event!.title;
       descriptionController.text = event!.description;
       linkController.text = event!.infoLink;
@@ -47,7 +50,8 @@ class AddScheduleViewModel extends MasterModel {
   // END FORM DATA
 
   void pickLocation() {
-    navigationService.navigateToMapPickerView().then((value) {
+    navigationService.navigateToMapPickerView(
+      previousPageTitle: componentName,).then((value) {
       if (value != null && value is LocationSelected) {
         location = value;
         locationController.text = value.locationName;

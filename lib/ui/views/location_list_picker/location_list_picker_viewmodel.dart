@@ -5,9 +5,12 @@ import 'package:mensa_italia_app/ui/common/master_model.dart';
 import 'package:mensa_italia_app/ui/views/map_picker/map_picker_viewmodel.dart';
 
 class LocationListPickerViewModel extends MasterModel {
+  @override
+  String componentName = "views.location_list_picker.title";
   List<LocationModel> locations = [];
   void addLocation() {
-    navigationService.navigateToMapPickerView().then((value) {
+    navigationService.navigateToMapPickerView(
+      previousPageTitle: componentName,).then((value) {
       if (value != null && value is LocationSelected) {
         Api()
             .createLocation(

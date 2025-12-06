@@ -11,7 +11,8 @@ import 'package:stacked/stacked.dart';
 import 'addon_deals_viewmodel.dart';
 
 class AddonDealsView extends StackedView<AddonDealsViewModel> {
-  const AddonDealsView({super.key});
+  final String previousPageTitle;
+  const AddonDealsView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
@@ -24,8 +25,8 @@ class AddonDealsView extends StackedView<AddonDealsViewModel> {
         controller: viewModel.scrollController,
         slivers: [
           getAppBarSliverPlatform(
-            title: "addons.deals.view.title".tr(),
-            previousPageTitle: "addons.deals.view.previouspagetitle".tr(),
+            title:  viewModel.componentName.tr(),
+            previousPageTitle: previousPageTitle.tr(),
             searchBarActions: SearchBarActions(
               onChanged: viewModel.onChanged,
               controller: viewModel.controller,

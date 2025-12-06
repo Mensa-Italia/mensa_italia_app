@@ -11,7 +11,8 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'receipts_viewmodel.dart';
 
 class ReceiptsView extends StackedView<ReceiptsViewModel> {
-  const ReceiptsView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const ReceiptsView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -21,9 +22,9 @@ class ReceiptsView extends StackedView<ReceiptsViewModel> {
   ) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
-        previousPageTitle: "views.settings.title".tr(),
+        previousPageTitle: previousPageTitle.tr(),
         middle: Text(
-          "views.recieipt.title".tr(),
+          viewModel.componentName.tr(),
           maxLines: 1,
         ),
       ),

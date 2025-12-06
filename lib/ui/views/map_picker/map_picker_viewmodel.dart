@@ -19,6 +19,8 @@ class LocationSelected {
 }
 
 class MapPickerViewModel extends MasterModel {
+  @override
+  String componentName = "views.locationMapPicker.title";
   MapLibreMapController? mapController;
   Placemark? locationToUse;
   String get locationName => locationToUse?.name ?? "";

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mensa_italia_app/api/scraperapi.dart';
@@ -6,6 +7,8 @@ import 'package:mensa_italia_app/model/testelab.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonTestAssistantViewModel extends MasterModel {
+  @override
+  String componentName = "views.addons.test_assistant.title";
   int _page = 1;
   bool _isRequiringData = false;
   final List<TestelabModel> testelabs = [];
@@ -49,10 +52,9 @@ class AddonTestAssistantViewModel extends MasterModel {
     return () {
       final candidate = testelabs[index];
       navigationService.navigateToGenericWebviewView(
-        url:
-            "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit",
+        url: "https://www.cloud32.it/Associazioni/utenti/testelab/${candidate.id}/edit",
         title: "Candidate",
-        previousPageTitle: "Candidates",
+        previousPageTitle: componentName.tr(),
       );
     };
   }

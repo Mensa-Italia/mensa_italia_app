@@ -9,16 +9,17 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'calendar_linker_viewmodel.dart';
 
 class CalendarLinkerView extends StackedView<CalendarLinkerViewModel> {
-  const CalendarLinkerView({super.key});
+  final String previousPageTitle;
+  const CalendarLinkerView({super.key, required this.previousPageTitle});
 
   @override
   Widget builder(
       BuildContext context, CalendarLinkerViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
-        previousPageTitle: "views.settings.title".tr(),
+        previousPageTitle: previousPageTitle.tr(),
         middle: Text(
-          'Calendar Linker',
+          viewModel.componentName.tr(),
           maxLines: 1,
         ),
       ),

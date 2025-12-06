@@ -20,7 +20,7 @@ class OptionPage extends StackedView<OptionPageModel> {
     return CustomScrollView(
       slivers: [
         getAppBarSliverPlatform(
-          title: "views.settings.title".tr(),
+          title: viewModel.componentName.tr(),
         ),
         const SliverPadding(padding: EdgeInsets.all(5)),
         SliverList.list(

@@ -5,6 +5,8 @@ import 'package:mensa_italia_app/services/receipt_see.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class ReceiptsViewModel extends MasterModel {
+  @override
+  String componentName = "views.recieipt.title";
   List<ReceiptModel> get receipts => ReceiptSSE().receipts;
 
   ReceiptsViewModel() {
@@ -44,8 +46,7 @@ class ReceiptsViewModel extends MasterModel {
           Stripe.instance.confirmPayment(
             paymentIntentClientSecret: value["client_secret"],
             data: PaymentMethodParams.cardFromMethodId(
-              paymentMethodData:
-                  PaymentMethodDataCardFromMethod(paymentMethodId: value2.id),
+              paymentMethodData: PaymentMethodDataCardFromMethod(paymentMethodId: value2.id),
             ),
           );
         }

@@ -7,16 +7,17 @@ import 'package:stacked/stacked.dart';
 import 'make_donation_viewmodel.dart';
 
 class MakeDonationView extends StackedView<MakeDonationViewModel> {
-  const MakeDonationView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const MakeDonationView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
       BuildContext context, MakeDonationViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
-        previousPageTitle: "views.settings.title".tr(),
+        previousPageTitle: previousPageTitle.tr(),
         middle: Text(
-          "views.make_donation.title".tr(),
+          viewModel.componentName.tr(),
           maxLines: 1,
         ),
       ),

@@ -8,9 +8,9 @@ import 'package:stacked/stacked.dart';
 
 import 'payment_method_manager_viewmodel.dart';
 
-class PaymentMethodManagerView
-    extends StackedView<PaymentMethodManagerViewModel> {
-  const PaymentMethodManagerView({Key? key}) : super(key: key);
+class PaymentMethodManagerView extends StackedView<PaymentMethodManagerViewModel> {
+  final String previousPageTitle;
+  const PaymentMethodManagerView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -20,8 +20,9 @@ class PaymentMethodManagerView
   ) {
     return Scaffold(
       appBar: CupertinoNavigationBar(
+        previousPageTitle: previousPageTitle.tr(),
         middle: Text(
-          "views.payment_method_manager.title".tr(),
+          viewModel.componentName.tr(),
           maxLines: 1,
         ),
         trailing: IconButton(
@@ -55,16 +56,13 @@ class PaymentMethodManagerView
                       child: ElevatedButton(
                         onPressed: viewModel.addPaymentMethod,
                         style: ElevatedButton.styleFrom(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           minimumSize: Size(0, 0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(300),
                           ),
                         ),
-                        child: Text(
-                            "views.payment_method_manager.add_payment_method"
-                                .tr()),
+                        child: Text("views.payment_method_manager.add_payment_method".tr()),
                       ),
                     ),
                   ],
@@ -75,8 +73,7 @@ class PaymentMethodManagerView
                     return PaymentCardTile(
                       ipm: viewModel.paymentMethods[index],
                       index: index,
-                      isSelected:
-                          viewModel.isSelected(viewModel.paymentMethods[index]),
+                      isSelected: viewModel.isSelected(viewModel.paymentMethods[index]),
                       key: ValueKey(viewModel.paymentMethods[index].id),
                       onChanged: viewModel.onPaymentMethodSelected,
                     );
@@ -92,8 +89,7 @@ class PaymentMethodManagerView
   }
 
   @override
-  PaymentMethodManagerViewModel viewModelBuilder(BuildContext context) =>
-      PaymentMethodManagerViewModel();
+  PaymentMethodManagerViewModel viewModelBuilder(BuildContext context) => PaymentMethodManagerViewModel();
 }
 
 class PaymentCardTile extends StatelessWidget {

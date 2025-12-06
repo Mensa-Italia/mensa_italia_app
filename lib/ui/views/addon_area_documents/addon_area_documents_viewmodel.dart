@@ -8,6 +8,9 @@ import 'package:mensa_italia_app/model/document.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonAreaDocumentsViewModel extends MasterModel {
+  @override
+  String componentName = "views.addons.documents.title";
+
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
 
@@ -35,12 +38,13 @@ class AddonAreaDocumentsViewModel extends MasterModel {
       if (document.elaborated.isEmpty) {
         navigationService.navigateToDocumentViewerView(
           downlaodUrl: document.file,
-          title: "Document",
+          title: "views.documentpreview.title.document".tr(),
           previousPageTitle: "views.addons.documents.title".tr(),
         );
       } else {
         navigationService.navigateToAddonAreaDocumentsPreviewView(
           document: document,
+          previousPageTitle: componentName,
         );
       }
     };
@@ -94,12 +98,9 @@ class AddonAreaDocumentsViewModel extends MasterModel {
   applyFilters() {
     documents.clear();
     if (selectedCategories.isEmpty) {
-      documents.addAll(originalDocuments.where((element) =>
-          element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
+      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase())));
     } else {
-      documents.addAll(originalDocuments.where((element) =>
-          element.name.toLowerCase().contains(nameToSearch.toLowerCase()) &&
-          selectedCategories.contains(element.category)));
+      documents.addAll(originalDocuments.where((element) => element.name.toLowerCase().contains(nameToSearch.toLowerCase()) && selectedCategories.contains(element.category)));
     }
     rebuildUi();
   }

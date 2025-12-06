@@ -7,6 +7,9 @@ import 'package:mensa_italia_app/model/document_elaborated.dart';
 import 'package:mensa_italia_app/ui/common/master_model.dart';
 
 class AddonAreaDocumentsPreviewViewModel extends MasterModel {
+  @override
+  String componentName = "views.addons.documents_resume.title";
+
   final DocumentModel document;
   DocumentElaboratedModel? documentElaboratedModel;
   ScrollController scrollController = ScrollController();
@@ -22,8 +25,8 @@ class AddonAreaDocumentsPreviewViewModel extends MasterModel {
   void onTapViewOriginal() {
     navigationService.navigateToDocumentViewerView(
       downlaodUrl: document.file,
-      title: "Document",
-      previousPageTitle: "views.addons.documents_resume.title".tr(),
+      title: "views.documentpreview.title.document".tr(),
+      previousPageTitle: componentName,
     );
   }
 }

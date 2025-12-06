@@ -8,16 +8,12 @@ class Changelog extends StackedView<ChangelogModel> {
   const Changelog({super.key});
 
   @override
-  Widget builder(
-      BuildContext context, ChangelogModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, ChangelogModel viewModel, Widget? child) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
       ),
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.top -
-          MediaQuery.of(context).padding.bottom -
-          50,
+      height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 50,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,25 +36,22 @@ class Changelog extends StackedView<ChangelogModel> {
                   SizedBox(height: 40),
                   _WhatsNewComponent(
                     icon: EneftyIcons.ticket_2_outline,
-                    title: "Sharing events",
-                    description:
-                        "You can now share events outside the app, making it easier to invite friends.",
+                    title: "Tickets",
+                    description: "For some kind of events you can see your ticket directly in the app.",
+                    color: Colors.red,
+                  ),
+                  SizedBox(height: 20),
+                  _WhatsNewComponent(
+                    icon: EneftyIcons.document_2_outline,
+                    title: "Share documents",
+                    description: "You can now share documents directly from the app to other apps installed on your device.",
                     color: Colors.blueAccent,
                   ),
                   SizedBox(height: 20),
                   _WhatsNewComponent(
-                    icon: EneftyIcons.link_outline,
-                    title: "External links",
-                    description:
-                        "When you will click on a link outside the app, it will now open the app.",
-                    color: Colors.greenAccent,
-                  ),
-                  SizedBox(height: 20),
-                  _WhatsNewComponent(
-                    icon: Icons.bug_report,
-                    title: "Bug fixes",
-                    description:
-                        "We've fixed various bugs to improve the app's stability.",
+                    icon: EneftyIcons.bookmark_outline,
+                    title: "Phonebook improvements",
+                    description: "We have fully disconnected the phonebook from Area32 and improved the search algorithm to let you search using Mensa Membership ID.",
                     color: Colors.orangeAccent,
                   ),
                   SizedBox(height: 20),
@@ -87,11 +80,7 @@ class _WhatsNewComponent extends StatelessWidget {
   final String title;
   final String description;
   final Color color;
-  const _WhatsNewComponent(
-      {required this.icon,
-      required this.title,
-      required this.description,
-      required this.color});
+  const _WhatsNewComponent({required this.icon, required this.title, required this.description, required this.color});
 
   @override
   Widget build(BuildContext context) {

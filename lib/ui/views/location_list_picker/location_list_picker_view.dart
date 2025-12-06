@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/ui/common/app_bar.dart';
@@ -7,7 +8,8 @@ import 'package:stacked/stacked.dart';
 import 'location_list_picker_viewmodel.dart';
 
 class LocationListPickerView extends StackedView<LocationListPickerViewModel> {
-  const LocationListPickerView({Key? key}) : super(key: key);
+  final String previousPageTitle;
+  const LocationListPickerView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
   Widget builder(
@@ -18,8 +20,8 @@ class LocationListPickerView extends StackedView<LocationListPickerViewModel> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: getAppBarPlatform(
-        previousPageTitle: "Add event",
-        title: 'Locations',
+        previousPageTitle: previousPageTitle.tr(),
+        title:  viewModel.componentName.tr()
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: viewModel.addLocation,
