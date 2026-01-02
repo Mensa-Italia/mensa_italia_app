@@ -24,7 +24,7 @@ class AddonStampViewModel extends MasterModel {
 
   addStamp() {
     showBeautifulBottomSheet(
-      child: _addStampModal(),
+      child: AddStampModal(),
     ).then((value) {
       Api().getStamps().then((value) {
         stamps.clear();
@@ -89,8 +89,7 @@ class _showStamp extends StatelessWidget {
                 ),
                 Center(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.all(20.0).copyWith(top: 0, bottom: 0),
+                    padding: const EdgeInsets.all(20.0).copyWith(top: 0, bottom: 0),
                     child: Text(
                       stamp.description,
                       style: const TextStyle(
@@ -111,14 +110,16 @@ class _showStamp extends StatelessWidget {
   }
 }
 
-class _addStampModal extends StatefulWidget {
-  const _addStampModal();
+class AddStampModal extends StatefulWidget {
+  final String? idStamp;
+  final String? codeStamp;
+  const AddStampModal({this.idStamp, this.codeStamp});
 
   @override
-  State<_addStampModal> createState() => __addStampModalState();
+  State<AddStampModal> createState() => __addStampModalState();
 }
 
-class __addStampModalState extends State<_addStampModal> {
+class __addStampModalState extends State<AddStampModal> {
   String idStamp = "";
   String codeStamp = "";
   MobileScannerController controller = MobileScannerController();
@@ -128,6 +129,17 @@ class __addStampModalState extends State<_addStampModal> {
 
   @override
   void initState() {
+    idStamp = widget.idStamp ?? "";
+    codeStamp = widget.codeStamp ?? "";
+    if (idStamp.isNotEmpty && codeStamp.isNotEmpty) {
+      state = 1;
+      Api().getStamp(idStamp, codeStamp).then((value) {
+        stamp = value;
+        setState(() {
+          state = 2;
+        });
+      });
+    }
     _subscription = controller.barcodes.listen(_handleBarcode);
     super.initState();
   }
@@ -141,9 +153,11 @@ class __addStampModalState extends State<_addStampModal> {
         state = 1;
       });
       _subscription?.cancel();
-      final valuesScanned =
-          (barcode.barcodes.first.rawValue ?? "").split(":::");
+      final valuesScanned = (barcode.barcodes.first.rawValue ?? "").split(":::");
       idStamp = valuesScanned[0];
+      if (idStamp.contains("http")) {
+        idStamp = idStamp.split("/").last;
+      }
       codeStamp = valuesScanned[1];
       Api().getStamp(idStamp, codeStamp).then((value) {
         stamp = value;
@@ -248,8 +262,7 @@ class __addStampModalState extends State<_addStampModal> {
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
-                    stamp?.description ??
-                        ("addons.tableport.addstamp.scanqr".tr()),
+                    stamp?.description ?? ("addons.tableport.addstamp.scanqr".tr()),
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -264,7 +277,9 @@ class __addStampModalState extends State<_addStampModal> {
                     child: ElevatedButton(
                       onPressed: () {
                         Api().addStamp(idStamp, codeStamp).then((value) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(
+                            true,
+                          );
                         });
                       },
                       child: Text("addons.tableport.addstamp.addstamp".tr()),
