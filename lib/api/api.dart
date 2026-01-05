@@ -41,11 +41,6 @@ import 'package:timezone/timezone.dart' as tz;
 class Api {
   static getBaseUrl() {
     return 'https://svc.mensa.it';
-    if (kDebugMode) {
-      return 'https://dev.svc.mensa.it';
-    } else {
-      return 'https://svc.mensa.it';
-    }
   }
 
   final Dio dio = Dio(BaseOptions(baseUrl: getBaseUrl()));
@@ -966,7 +961,7 @@ class Api {
 
   Future<Map<String, String>> settings() async {
     if (Memoized().has("configs")) {
-      //return Memoized().get("configs");
+      return Memoized().get("configs");
     }
     return await pb.collection('configs').getFullList().then((value) {
       final Map<String, String> res = {};

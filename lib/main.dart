@@ -25,8 +25,7 @@ Future<void> main() async {
   tz.initializeTimeZones();
   Intl.defaultLocale = await findSystemLocale();
   try {
-    tz.setLocalLocation(
-        tz.getLocation((await FlutterTimezone.getLocalTimezone()).identifier));
+    tz.setLocalLocation(tz.getLocation((await FlutterTimezone.getLocalTimezone()).identifier));
   } catch (_) {}
   try {
     await Firebase.initializeApp(
