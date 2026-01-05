@@ -194,14 +194,16 @@ class BottomSheetRegsoci extends StackedView<BottomSheetRegsociModel> {
                           ),
                           Expanded(
                             flex: 5,
-                            child: Text(
-                              elaborateValue(e.key, e.value),
-                              style: const TextStyle(
-                                color: Colors.black,
+                            child: SelectionArea(
+                              child: Text(
+                                elaborateValue(e.key, e.value),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                                textAlign: TextAlign.right,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                              textAlign: TextAlign.right,
                             ),
                           ),
                         ],
