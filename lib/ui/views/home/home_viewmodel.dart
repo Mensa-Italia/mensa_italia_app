@@ -108,7 +108,6 @@ class HomeViewModel extends MasterModel {
         ).then((value) {
           if (value == true) {
             if (navigationService.currentRoute == Routes.addonStampView) {
-              print("Same place");
               navigationService.back();
             }
             navigationService.navigateToAddonStampView(previousPageTitle: componentName);

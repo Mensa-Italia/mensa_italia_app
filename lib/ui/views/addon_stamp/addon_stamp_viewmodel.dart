@@ -280,6 +280,10 @@ class __addStampModalState extends State<AddStampModal> {
                           Navigator.of(context).pop(
                             true,
                           );
+                        }).catchError((error) {
+                          Navigator.of(context).pop(
+                            true,
+                          );
                         });
                       },
                       child: Text("addons.tableport.addstamp.addstamp".tr()),
