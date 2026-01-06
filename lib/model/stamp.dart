@@ -9,6 +9,7 @@ part 'stamp.g.dart';
 
 @freezed
 abstract class StampModel with _$StampModel {
+  const StampModel._();
   const factory StampModel({
     required String id,
     @JsonKey(
@@ -23,6 +24,14 @@ abstract class StampModel with _$StampModel {
     required String image,
   }) = _StampModel;
 
-  factory StampModel.fromJson(Map<String, dynamic> json) =>
-      _$StampModelFromJson(json);
+  factory StampModel.fromJson(Map<String, dynamic> json) => _$StampModelFromJson(json);
+
+  Uri getImageUri() {
+    return Uri.parse(image);
+  }
+
+  Uri getThumbImageUri() {
+    //set query parameters for thumb image thumb=0x50
+    return Uri.parse(image).replace(queryParameters: {'thumb': '0x500'});
+  }
 }

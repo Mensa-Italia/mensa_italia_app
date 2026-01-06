@@ -293,13 +293,14 @@ extension StampModelPatterns on StampModel {
 
 /// @nodoc
 @JsonSerializable()
-class _StampModel implements StampModel {
+class _StampModel extends StampModel {
   const _StampModel(
       {required this.id,
       @JsonKey(fromJson: getDateTimeLocal) required this.created,
       @JsonKey(fromJson: getDateTimeLocal) required this.updated,
       required this.description,
-      required this.image});
+      required this.image})
+      : super._();
   factory _StampModel.fromJson(Map<String, dynamic> json) =>
       _$StampModelFromJson(json);
 

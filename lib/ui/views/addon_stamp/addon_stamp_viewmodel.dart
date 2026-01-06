@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_italia_app/api/api.dart';
@@ -75,13 +76,10 @@ class _showStamp extends StatelessWidget {
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: MediaQuery.of(context).size.width * 0.8,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(stamp.image),
-                        fit: BoxFit.cover,
-                      ),
+                    child: CachedNetworkImage(
+                      imageUrl: stamp.getImageUri().toString(),
+                      fit: BoxFit.cover,
                     ),
-                    clipBehavior: Clip.antiAlias,
                   ),
                 ),
                 SizedBox(

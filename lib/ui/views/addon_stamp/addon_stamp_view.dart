@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,7 @@ class AddonStampView extends StackedView<AddonStampViewModel> {
   const AddonStampView({Key? key, required this.previousPageTitle}) : super(key: key);
 
   @override
-  Widget builder(
-      BuildContext context, AddonStampViewModel viewModel, Widget? child) {
+  Widget builder(BuildContext context, AddonStampViewModel viewModel, Widget? child) {
     return Scaffold(
       appBar: getAppBarPlatform(
         title: viewModel.componentName.tr(),
@@ -32,8 +32,7 @@ class AddonStampView extends StackedView<AddonStampViewModel> {
   }
 
   @override
-  AddonStampViewModel viewModelBuilder(BuildContext context) =>
-      AddonStampViewModel();
+  AddonStampViewModel viewModelBuilder(BuildContext context) => AddonStampViewModel();
 }
 
 //book opening animation
@@ -41,18 +40,13 @@ class AnimatedTableport extends StatefulWidget {
   final List<StampUserModel> stamps;
   final Function onTapAddStamp;
   final Function(StampModel stamp) showStamp;
-  const AnimatedTableport(
-      {super.key,
-      required this.stamps,
-      required this.onTapAddStamp,
-      required this.showStamp});
+  const AnimatedTableport({super.key, required this.stamps, required this.onTapAddStamp, required this.showStamp});
 
   @override
   State<AnimatedTableport> createState() => _AnimatedTableportState();
 }
 
-class _AnimatedTableportState extends State<AnimatedTableport>
-    with SingleTickerProviderStateMixin {
+class _AnimatedTableportState extends State<AnimatedTableport> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animationFirst;
   late Animation<double> _animationSecond;
@@ -62,8 +56,7 @@ class _AnimatedTableportState extends State<AnimatedTableport>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 6000), vsync: this)
+    _controller = AnimationController(duration: const Duration(milliseconds: 6000), vsync: this)
       ..addListener(() {
         setState(() {});
       });
@@ -103,29 +96,21 @@ class _AnimatedTableportState extends State<AnimatedTableport>
       child: Stack(
         children: [
           Positioned(
-            top: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) *
-                _animationThird.value,
-            bottom:
-                (MediaQuery.of(context).size.height / 2 - heightPassport / 2) *
-                    _animationThird.value,
+            top: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) * _animationThird.value,
+            bottom: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) * _animationThird.value,
             right: 0,
             left: 0,
             child: Transform.scale(
               scale: (_animationFirst.value * 2) + 1,
               child: Transform.translate(
-                offset: Offset(
-                    _animationFirst.value * MediaQuery.of(context).size.width,
-                    ((_animationFirst.value *
-                            (MediaQuery.of(context).size.height)) /
-                        2)),
+                offset: Offset(_animationFirst.value * MediaQuery.of(context).size.width, ((_animationFirst.value * (MediaQuery.of(context).size.height)) / 2)),
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     childAspectRatio: 1,
                   ),
                   reverse: false,
-                  itemCount: (widget.stamps.length + 1) +
-                      (24 - (widget.stamps.length + 1) % 24),
+                  itemCount: (widget.stamps.length + 1) + (24 - (widget.stamps.length + 1) % 24),
                   itemBuilder: (context, index) {
                     if (index >= (widget.stamps.length + 1)) {
                       return Container(
@@ -196,25 +181,16 @@ class _AnimatedTableportState extends State<AnimatedTableport>
                           ),
                         ),
                         child: Transform.rotate(
-                          angle: doubleInRange(
-                              Random(stamp.fastHash()), -pi / 2, pi / 2),
+                          angle: doubleInRange(Random(stamp.fastHash()), -pi / 2, pi / 2),
                           child: Transform.translate(
                             offset: Offset(
-                              doubleInRange(Random(stamp.fastHash()),
-                                  -sizeOfCell / 10, sizeOfCell / 10),
-                              doubleInRange(Random(stamp.fastHash()),
-                                  -sizeOfCell / 10, sizeOfCell / 10),
+                              doubleInRange(Random(stamp.fastHash()), -sizeOfCell / 10, sizeOfCell / 10),
+                              doubleInRange(Random(stamp.fastHash()), -sizeOfCell / 10, sizeOfCell / 10),
                             ),
                             child: Transform.scale(
                               scale: .9,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(300),
-                                  image: DecorationImage(
-                                    image: NetworkImage(stamp.stamp.image),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                              child: CachedNetworkImage(
+                                imageUrl: stamp.stamp.getThumbImageUri().toString(),
                               ),
                             ),
                           ),
@@ -227,11 +203,8 @@ class _AnimatedTableportState extends State<AnimatedTableport>
             ),
           ),
           Positioned(
-            top: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) *
-                _animationThird.value,
-            bottom:
-                (MediaQuery.of(context).size.height / 2 - heightPassport / 2) *
-                    _animationThird.value,
+            top: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) * _animationThird.value,
+            bottom: (MediaQuery.of(context).size.height / 2 - heightPassport / 2) * _animationThird.value,
             right: 0,
             left: 0,
             child: IgnorePointer(
@@ -264,18 +237,12 @@ class _AnimatedTableportState extends State<AnimatedTableport>
               child: Transform.scale(
                 scale: (_animationFirst.value * 2) + 1,
                 child: Transform.translate(
-                  offset: Offset(
-                      _animationFirst.value * MediaQuery.of(context).size.width,
-                      _animationFirst.value *
-                          MediaQuery.of(context).size.height /
-                          2),
+                  offset: Offset(_animationFirst.value * MediaQuery.of(context).size.width, _animationFirst.value * MediaQuery.of(context).size.height / 2),
                   child: Container(
                     width: widthPassport,
                     height: heightPassport,
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/images/tableport_base.jpg"),
-                          fit: BoxFit.cover),
+                      image: DecorationImage(image: AssetImage("assets/images/tableport_base.jpg"), fit: BoxFit.cover),
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(30),
                         bottomRight: Radius.circular(30),
@@ -291,6 +258,5 @@ class _AnimatedTableportState extends State<AnimatedTableport>
     );
   }
 
-  double doubleInRange(Random source, num start, num end) =>
-      source.nextDouble() * (end - start) + start;
+  double doubleInRange(Random source, num start, num end) => source.nextDouble() * (end - start) + start;
 }
