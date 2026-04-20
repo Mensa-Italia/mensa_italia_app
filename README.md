@@ -13,13 +13,16 @@
   <a href="https://play.google.com/store/apps/details?id=it.mensa.app"><img alt="Play Store" src="https://img.shields.io/badge/Play%20Store-it.mensa.app-34A853?logo=googleplay&logoColor=white"></a>
 </p>
 
-<p align="center">
-  <strong>iOS build</strong><br>
-  <a href="https://codemagic.io/app/5e9c113c18efc2f5280237db/5e9c113c18efc2f5280237da/latest_build"><img alt="iOS build" src="https://api.codemagic.io/apps/5e9c113c18efc2f5280237db/5e9c113c18efc2f5280237da/status_badge.svg"></a>
-  &nbsp;&nbsp;
-  <strong>Android build</strong><br>
-  <a href="https://codemagic.io/app/5e9c113c18efc2f5280237db/66acb863e713f465afc6fe46/latest_build"><img alt="Android build" src="https://api.codemagic.io/apps/5e9c113c18efc2f5280237db/66acb863e713f465afc6fe46/status_badge.svg"></a>
-</p>
+<table align="center">
+  <tr>
+    <th align="center">iOS build</th>
+    <th align="center">Android build</th>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://codemagic.io/app/5e9c113c18efc2f5280237db/5e9c113c18efc2f5280237da/latest_build"><img alt="iOS build" src="https://api.codemagic.io/apps/5e9c113c18efc2f5280237db/5e9c113c18efc2f5280237da/status_badge.svg"></a></td>
+    <td align="center"><a href="https://codemagic.io/app/5e9c113c18efc2f5280237db/66acb863e713f465afc6fe46/latest_build"><img alt="Android build" src="https://api.codemagic.io/apps/5e9c113c18efc2f5280237db/66acb863e713f465afc6fe46/status_badge.svg"></a></td>
+  </tr>
+</table>
 
 ---
 
@@ -36,16 +39,27 @@ Il codice sorgente del backend è pubblicato in [Mensa-Italia/mensa_online](http
 
 ## Screenshot
 
-<p align="center">
-  <em>[ Placeholder — inserire qui gli screenshot dell'app ]</em>
-</p>
+Screenshot ufficiali pubblicati su [App Store](https://apps.apple.com/it/app/mensa-italia/id1524200080) e [Google Play](https://play.google.com/store/apps/details?id=it.mensa.app).
+
+### iPhone
 
 <table>
   <tr>
-    <td align="center"><em>Home / Tessera</em><br><img src="docs/screenshots/home.png" width="200" alt="Home"></td>
-    <td align="center"><em>Eventi</em><br><img src="docs/screenshots/events.png" width="200" alt="Events"></td>
-    <td align="center"><em>Mappa eventi</em><br><img src="docs/screenshots/map.png" width="200" alt="Events Map"></td>
-    <td align="center"><em>Addons</em><br><img src="docs/screenshots/addons.png" width="200" alt="Addons"></td>
+    <td align="center"><img src="docs/screenshots/ios-1.png" width="200" alt="Home – Be smart, use the app"><br><sub>Home</sub></td>
+    <td align="center"><img src="docs/screenshots/ios-2.png" width="200" alt="Tessera digitale"><br><sub>Tessera</sub></td>
+    <td align="center"><img src="docs/screenshots/ios-3.png" width="200" alt="SIG — Special Interest Groups"><br><sub>SIG</sub></td>
+    <td align="center"><img src="docs/screenshots/ios-4.png" width="200" alt="Addons"><br><sub>Addons</sub></td>
+  </tr>
+</table>
+
+### Android
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/android-1.webp" width="200" alt="Home – Be smart, use the app"><br><sub>Home</sub></td>
+    <td align="center"><img src="docs/screenshots/android-2.webp" width="200" alt="Tessera digitale"><br><sub>Tessera</sub></td>
+    <td align="center"><img src="docs/screenshots/android-3.webp" width="200" alt="SIG — Special Interest Groups"><br><sub>SIG</sub></td>
+    <td align="center"><img src="docs/screenshots/android-4.webp" width="200" alt="Addons"><br><sub>Addons</sub></td>
   </tr>
 </table>
 
