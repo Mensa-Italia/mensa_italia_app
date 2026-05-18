@@ -9,9 +9,32 @@ local_offices_images/
 tools/
 apk_check/
 
-# Build artifacts (we re-build shared in CI and webApp inside the image)
-**/build/
-!shared/build/dist/js/productionLibrary/
+# Build artifacts (we re-build shared in CI and webApp inside the image).
+# IMPORTANT: docker .dockerignore non re-include i contenuti di una dir riammessa
+# se non specifichi `/**` esplicitamente. Per evitare di copiare productionLibrary
+# vuota (solo package.json) usiamo regole esplicite per ogni sub-dir da scartare.
+shared/build/bin/
+shared/build/classes/
+shared/build/cocoapods/
+shared/build/compileSync/
+shared/build/generated/
+shared/build/intermediates/
+shared/build/js/
+shared/build/kotlin/
+shared/build/libs/
+shared/build/outputs/
+shared/build/processedResources/
+shared/build/reports/
+shared/build/spotless/
+shared/build/test-results/
+shared/build/tmp/
+shared/build/xcframeworks/
+shared/build/XCFrameworks/
+shared/build/dist/js/developmentLibrary/
+shared/build/dist/js/main/
+androidApp/build/
+webApp/build/
+webApp/dist/
 **/.gradle/
 **/.kotlin/
 **/kotlin-js-store/
