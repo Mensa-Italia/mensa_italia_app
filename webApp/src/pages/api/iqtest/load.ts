@@ -112,6 +112,10 @@ export const GET: APIRoute = async () => {
         "User-Agent": USER_AGENT,
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
+        // identity: il fetch di bun ha incappato in ZlibError sulla risposta
+        // compressa di test.mensa.no. Disabilitiamo la compressione: l'HTML
+        // pesa ~20KB, non vale la pena.
+        "Accept-Encoding": "identity",
       },
     });
     if (!res.ok) {

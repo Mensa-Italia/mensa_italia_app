@@ -104,6 +104,8 @@ export const POST: APIRoute = async ({ request }) => {
         "Content-Type": "application/json",
         Accept: "application/json,text/plain,*/*",
         "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
+        // Vedi nota in load.ts: bun fetch ha ZlibError sulla risposta compressa.
+        "Accept-Encoding": "identity",
         Origin: BASE_URL,
         Referer: TEST_URL,
         Cookie: input.cookies ?? "",
