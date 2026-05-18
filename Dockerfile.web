@@ -5,7 +5,7 @@
 # by `./gradlew :shared:jsBrowserProductionLibraryDistribution` (the CI workflow
 # runs it before `docker build`). Building gradle/Android inside the image would
 # require the Android SDK and balloons the image, so we keep it out.
-FROM oven/bun:1.1-alpine AS build
+FROM oven/bun:1-alpine AS build
 WORKDIR /work
 
 # Bring the KMP/JS library first so the `file:../shared/...` dep resolves.
@@ -22,7 +22,7 @@ RUN bun run build
 
 
 # Stage 2: minimal runtime — only production deps + built output.
-FROM oven/bun:1.1-alpine AS runtime
+FROM oven/bun:1-alpine AS runtime
 WORKDIR /srv
 
 ENV NODE_ENV=production \
