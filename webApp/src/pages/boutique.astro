@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { BoutiqueListApp } from "../components/boutique/BoutiqueListApp";
+---
+
+<AppShell title="Boutique — Mensa Italia" pageTitle="Boutique">
+  <BoutiqueListApp client:only="react" />
+</AppShell>

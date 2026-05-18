@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../layouts/AppShell.astro";
+import { SigDetailApp } from "../../components/sigs/SigDetailApp";
+
+const { id } = Astro.params;
+---
+
+<AppShell title="Gruppo — Mensa Italia" pageTitle="Gruppo">
+  <SigDetailApp sigId={id ?? ""} client:only="react" />
+</AppShell>

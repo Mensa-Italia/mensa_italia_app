@@ -1,6 +1,0 @@
-{
-  "cmake.configureOnOpen": false,
-  "i18n-ally.localesPaths": ["locals/"],
-  "i18n-ally.sourceLanguage": "it",
-  "i18n-ally.keystyle": "nested"
-}

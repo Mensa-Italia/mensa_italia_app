@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import AppShell from "../../layouts/AppShell.astro";
+import { AddSigForm } from "../../components/sigs/AddSigForm";
+---
+
+<AppShell title="Nuovo gruppo — Mensa Italia" pageTitle="Nuovo gruppo">
+  <AddSigForm client:only="react" />
+</AppShell>

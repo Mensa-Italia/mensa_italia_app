@@ -1,0 +1,36 @@
+CREATE TABLE Deal (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    commercialSector TEXT NOT NULL,
+    positionJson TEXT,
+    isLocal INTEGER NOT NULL DEFAULT 0,
+    details TEXT,
+    who TEXT,
+    starting INTEGER,
+    ending INTEGER,
+    howToGet TEXT,
+    link TEXT,
+    owner TEXT,
+    attachment TEXT,
+    isActive INTEGER NOT NULL DEFAULT 0,
+    vatNumber TEXT,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX deal_isActive ON Deal(isActive);
+
+selectAll:
+SELECT * FROM Deal ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Deal WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Deal(id, name, commercialSector, positionJson, isLocal, details, who, starting, ending, howToGet, link, owner, attachment, isActive, vatNumber, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Deal WHERE id = ?;
+
+deleteAll:
+DELETE FROM Deal;

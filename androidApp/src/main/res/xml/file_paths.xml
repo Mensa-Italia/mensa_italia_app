@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Internal app files -->
+    <files-path name="files" path="." />
+    <!-- Cache directory (downloaded PDFs, QR exports) -->
+    <cache-path name="cache" path="." />
+    <!-- External cache (optional, for sharing) -->
+    <external-cache-path name="external_cache" path="." />
+    <!-- External files -->
+    <external-files-path name="external_files" path="." />
+</paths>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification icon: simplified Mensa M mark (monochrome, white) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="86"
+    android:viewportHeight="86">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z" />
+</vector>

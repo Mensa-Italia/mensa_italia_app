@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+
+import AppShell from "../../../layouts/AppShell.astro";
+import { EditEventForm } from "../../../components/events/EditEventForm";
+
+const { id } = Astro.params;
+---
+
+<AppShell title="Modifica evento — Mensa Italia" pageTitle="Modifica evento">
+  <EditEventForm eventId={id ?? ""} client:only="react" />
+</AppShell>

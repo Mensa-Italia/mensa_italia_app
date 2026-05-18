@@ -1,0 +1,44 @@
+CREATE TABLE RegSoci (
+    id TEXT NOT NULL PRIMARY KEY,
+    uid INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    image TEXT NOT NULL,
+    city TEXT NOT NULL,
+    birthdate INTEGER,
+    state TEXT NOT NULL,
+    fullDataJson TEXT NOT NULL,
+    fullProfileLink TEXT,
+    nameToSearch TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    -- Hash from the server payload; drives the Spotlight diff.
+    -- `dataHash` covers identity/contacts/etc. — change ⇒ re-index attributes.
+    -- `imageHash` covers the avatar file — change ⇒ re-download thumbnail.
+    -- Not indexed: never used as a query key, only compared 1:1 by id.
+    dataHash TEXT,
+    imageHash TEXT
+);
+
+CREATE INDEX reg_soci_name ON RegSoci(name);
+CREATE INDEX reg_soci_nameToSearch ON RegSoci(nameToSearch);
+
+selectAll:
+SELECT * FROM RegSoci ORDER BY name ASC;
+
+selectAllHashes:
+SELECT id, dataHash, imageHash FROM RegSoci;
+
+selectById:
+SELECT * FROM RegSoci WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO RegSoci(id, uid, name, image, city, birthdate, state, fullDataJson, fullProfileLink, nameToSearch, updatedAt, dataHash, imageHash)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM RegSoci WHERE id = ?;
+
+deleteAll:
+DELETE FROM RegSoci;
+
+searchByName:
+SELECT * FROM RegSoci WHERE nameToSearch LIKE :query ORDER BY name ASC LIMIT 50;

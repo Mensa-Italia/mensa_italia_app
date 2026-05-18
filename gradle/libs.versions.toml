@@ -1,0 +1,193 @@
+[versions]
+kotlin = "2.1.21"
+agp = "8.7.2"
+android-compileSdk = "35"
+android-minSdk = "24"
+ktor = "3.1.3"
+sqldelight = "2.1.0"
+koin = "4.0.4"
+kotlinx-serialization = "1.8.1"
+kotlinx-coroutines = "1.10.2"
+kotlinx-coroutines-test = "1.10.2"
+kotlinx-datetime = "0.6.2"
+multiplatform-settings = "1.2.0"
+compose-bom = "2024.10.01"
+androidx-activity = "1.9.3"
+koin-android = "4.0.4"
+
+# Compose Multiplatform (wasmJs + future :webApp)
+compose-multiplatform = "1.8.2"
+
+# Navigation & Lifecycle
+androidx-navigation = "2.8.4"
+androidx-lifecycle = "2.8.7"
+# JetBrains fork of navigation-compose — multiplatform (wasmJs + Android + iOS)
+jetbrains-navigation-compose = "2.8.0-alpha13"
+
+# DataStore
+androidx-datastore = "1.1.1"
+
+# Coil
+coil = "3.0.4"
+
+# Media3 / ExoPlayer
+media3 = "1.4.1"
+
+# Maps
+maps-compose = "6.2.1"
+play-services-maps = "19.0.0"
+play-services-location = "21.3.0"
+
+# Accompanist
+accompanist = "0.36.0"
+
+# Firebase
+firebase-bom-version = "33.7.0"
+google-services = "4.4.2"
+
+# Stripe
+stripe-android = "21.5.0"
+
+# ML Kit & Camera
+mlkit-barcode = "17.3.0"
+camerax = "1.4.0"
+
+# Google Wallet / Pay
+play-services-pay = "16.5.0"
+
+# Browser (Chrome Custom Tabs)
+androidx-browser = "1.8.0"
+
+# ZXing (QR fallback)
+zxing-core = "3.5.3"
+
+# Gson
+gson = "2.11.0"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
+koin-android-main = { module = "io.insert-koin:koin-android", version.ref = "koin-android" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android" }
+
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+# Provides `awaitAsList/awaitAsOneOrNull/awaitCreate` + sync schema adapter (.synchronous()).
+sqldelight-async-extensions = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
+
+androidx-security-crypto = { module = "androidx.security:security-crypto", version = "1.1.0-alpha06" }
+
+# Multiplatform Settings (Russhwolf) — cross-platform key/value with native
+# secure backends: KeychainSettings (iOS), SharedPreferencesSettings wrapping
+# EncryptedSharedPreferences (Android), StorageSettings backed by localStorage
+# (web). Used for ITokenStore.
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+
+# Navigation
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+
+# Lifecycle
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+
+# DataStore
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
+
+# Coil
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
+
+# Compose extras (BOM-driven)
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-compose-animation = { module = "androidx.compose.animation:animation" }
+androidx-compose-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class" }
+
+# Media3
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
+androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+androidx-media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
+
+# Maps
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+
+# Accompanist
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+
+# Firebase (BOM-driven)
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom-version" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
+
+# Stripe
+stripe-android = { module = "com.stripe:stripe-android", version.ref = "stripe-android" }
+
+# ML Kit barcode
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode" }
+
+# CameraX
+camerax-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camerax-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+
+# Google Wallet / Pay
+play-services-pay = { module = "com.google.android.gms:play-services-pay", version.ref = "play-services-pay" }
+
+# Chrome Custom Tabs
+androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }
+
+# ZXing
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing-core" }
+
+# Gson
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
+# --- wasmJs / web ---
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+sqldelight-web-worker-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+# Browser DOM/storage bindings for Kotlin/Wasm (`kotlinx.browser.localStorage`, `org.w3c.dom.*`).
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.3" }
+# JetBrains multiplatform navigation-compose (supports wasmJs, Android, iOS)
+jetbrains-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jetbrains-navigation-compose" }
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

@@ -1,0 +1,437 @@
+---
+/**
+ * Gruppo locale (detail pubblico).
+ *
+ * Fetch parallelo server-side: dettagli office, admins, test dates, linktree.
+ * Tutte queste view sono accessibili senza autenticazione.
+ *
+ * Mirror di `PublicLocalOfficeDetailView.swift` ma reimmaginato per desktop:
+ *   - Hero cover con name + region
+ *   - Bio (se presente)
+ *   - Sezione "Date dei test del QI" se ci sono date future
+ *   - Sezione "Team" (segretario in evidenza + assistants)
+ *   - Sezione "Linktree" raggruppato per parent/section
+ *   - CTA "Diventa socio per partecipare"
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+import { LocalOfficeTeam } from "../../../components/public/LocalOfficeTeam";
+import {
+  publicLocalOfficeBySlug,
+  publicAdminsByOffice,
+  publicAssistantsByOffice,
+  publicUpcomingTestDatesByOffice,
+  publicLinktreeByOffice,
+  pbFileUrl,
+} from "../../../lib/publicApi";
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect("/public/chapters");
+}
+
+const office = await publicLocalOfficeBySlug(slug);
+if (!office) {
+  return new Response("Gruppo locale non trovato", { status: 404 });
+}
+
+const [admins, assistants, testDates, linktree] = await Promise.all([
+  publicAdminsByOffice(office.id),
+  publicAssistantsByOffice(office.id),
+  publicUpcomingTestDatesByOffice(office.id),
+  publicLinktreeByOffice(office.id),
+]);
+
+const cover = office.image ? pbFileUrl(office, office.image) : "";
+
+// Pre-build URL avatar (PB file URL) — serializzato lato server,
+// l'island client riceve solo l'URL pronto.
+const adminsProps = admins.map((a) => ({
+  id: a.id,
+  name: a.name,
+  email: a.email,
+  imageUrl: a.image ? pbFileUrl(a, a.image) : "",
+  is_the_officer: a.is_the_officer,
+  region: a.region,
+}));
+
+const assistantsProps = assistants.map((a) => ({
+  id: a.id,
+  name: a.name,
+  email: a.email,
+  imageUrl: a.image ? pbFileUrl(a, a.image) : "",
+  city: a.city,
+  area: a.area,
+  state: a.state,
+  region: a.region,
+}));
+
+const dateFmt = new Intl.DateTimeFormat("it-IT", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const timeFmt = new Intl.DateTimeFormat("it-IT", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+// Raggruppa il linktree per parent (per ora struttura piatta + sezioni)
+type LinktreeRow = (typeof linktree)[number];
+const sections = linktree.filter((r) => !r.parent || r.parent === "");
+const linksByParent = new Map<string, LinktreeRow[]>();
+for (const row of linktree) {
+  if (row.parent) {
+    const arr = linksByParent.get(row.parent) ?? [];
+    arr.push(row);
+    linksByParent.set(row.parent, arr);
+  }
+}
+
+const showRegion = office.region && office.region !== office.name;
+---
+
+<PublicLayout
+  active="gruppi"
+  title={`${office.name} — Mensa Italia`}
+  description={office.bio || `Il gruppo locale Mensa Italia di ${office.name}.`}
+>
+  <section class="hero">
+    {cover && <div class="hero__bg" style={`background-image: url('${cover}')`} aria-hidden="true" />}
+    <div class="hero__inner">
+      <a href="/public/chapters" class="hero__back" data-i18n="web.local_offices.detail.back">← Tutti i gruppi locali</a>
+      <p class="hero__kicker" data-i18n="web.local_offices.detail.kicker">Gruppo locale Mensa Italia</p>
+      <h1 class="hero__title">{office.name}</h1>
+      {showRegion && <p class="hero__region">{office.region}</p>}
+      {office.bio && <p class="hero__bio">{office.bio}</p>}
+    </div>
+  </section>
+
+  <div class="page">
+    <div class="page__inner">
+      {/* ── TEAM + ASSISTENTI ─────────────────────────────────────── */}
+      <LocalOfficeTeam
+        officeName={office.name}
+        admins={adminsProps}
+        assistants={assistantsProps}
+        client:load
+      />
+
+
+      {/* ── DATE DEI TEST QI ──────────────────────────────────────── */}
+      {testDates.length > 0 && (
+        <section class="block">
+          <h2 class="block__title" data-i18n="web.local_offices.detail.testdates_title">Prossime date del test del QI</h2>
+          <p class="block__sub" data-i18n="web.local_offices.detail.testdates_sub">
+            Sessioni d'ammissione ufficiale organizzate dal gruppo locale.
+            Per prenotare scrivi al segretario o consulta il sito di Mensa Italia.
+          </p>
+          <ul class="dates">
+            {testDates.map((d) => {
+              const dt = new Date(d.date);
+              return (
+                <li class="date">
+                  <div class="date__when">
+                    <p class="date__day">{dateFmt.format(dt)}</p>
+                    <p class="date__time">ore {timeFmt.format(dt)}</p>
+                  </div>
+                  <div class="date__where">
+                    <p class="date__loc">{d.location}</p>
+                    {d.max_participants > 0 && (
+                      <p class="date__cap">
+                        <span data-i18n="web.local_offices.detail.testdate_max">Max partecipanti</span>:
+                        {" "}{d.max_participants}
+                      </p>
+                    )}
+                  </div>
+                  {d.notes && <p class="date__notes">{d.notes}</p>}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      {/* ── LINKTREE ──────────────────────────────────────────────── */}
+      {linktree.length > 0 && (
+        <section class="block">
+          <h2 class="block__title" data-i18n="web.local_offices.detail.links_title">Link e risorse</h2>
+          <div class="links">
+            {sections.length === 0 && linktree.map((row) => (
+              row.url && (
+                <a class="link" href={row.url} target="_blank" rel="noopener">
+                  <span class="link__title">{row.title}</span>
+                  <span class="link__arrow" aria-hidden="true">↗</span>
+                </a>
+              )
+            ))}
+            {sections.map((section) => {
+              const children = linksByParent.get(section.id) ?? [];
+              if (!section.url && children.length === 0) return null;
+              return (
+                <div class="link-section">
+                  {section.title && <h3>{section.title}</h3>}
+                  <ul>
+                    {children.map((row) => (
+                      <li>
+                        <a class="link" href={row.url} target="_blank" rel="noopener">
+                          <span class="link__title">{row.title}</span>
+                          <span class="link__arrow" aria-hidden="true">↗</span>
+                        </a>
+                      </li>
+                    ))}
+                    {!children.length && section.url && (
+                      <li>
+                        <a class="link" href={section.url} target="_blank" rel="noopener">
+                          <span class="link__title">{section.title}</span>
+                          <span class="link__arrow" aria-hidden="true">↗</span>
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── CTA ───────────────────────────────────────────────────── */}
+      <section class="block cta">
+        <h2 class="block__title" data-i18n="web.local_offices.detail.cta_title">Vuoi venire a un evento del gruppo?</h2>
+        <p data-i18n="web.local_offices.detail.cta_body">
+          Le cene mensili, le gite e i weekend tematici del gruppo sono
+          riservati ai soci. Per partecipare basta superare il test d'ammissione
+          (anche in un'altra regione: la tessera è una sola per tutta Italia).
+        </p>
+        <div class="cta__btns">
+          <a href="/public/iq-test" class="cta__btn cta__btn--primary" data-i18n="web.common.cta.try_test">Mettiti alla prova</a>
+          <a href="/public/about" class="cta__btn cta__btn--ghost" data-i18n="web.common.cta.how_to_join">Come si entra</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</PublicLayout>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    background: var(--color-mensa-cobalt-night);
+    color: var(--color-text-on-brand);
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+    z-index: -1;
+    filter: saturate(110%);
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, transparent 0%, var(--color-mensa-cobalt-night) 95%),
+      radial-gradient(40% 50% at 0% 0%, color-mix(in oklch, var(--color-mensa-blue-deep) 50%, transparent), transparent 70%);
+    z-index: -1;
+  }
+  .hero__inner {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    padding-block: clamp(var(--spacing-10), 14vh, var(--spacing-16)) var(--spacing-8);
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__back {
+    margin-block-end: var(--spacing-4);
+    font-size: var(--text-xs);
+    color: color-mix(in oklch, var(--color-text-on-brand) 70%, transparent);
+    text-decoration: none;
+    font-weight: 500;
+    justify-self: start;
+  }
+  .hero__back:hover { color: var(--color-text-on-brand); }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-cyan);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  .hero__region {
+    margin: 0;
+    font-size: var(--text-base);
+    color: color-mix(in oklch, var(--color-text-on-brand) 75%, transparent);
+  }
+  .hero__bio {
+    margin: var(--spacing-3) 0 0 0;
+    font-size: var(--text-sm);
+    color: color-mix(in oklch, var(--color-text-on-brand) 85%, transparent);
+    line-height: 1.65;
+    max-inline-size: 60ch;
+  }
+
+  /* ── PAGE ──────────────────────────────────────────────────────── */
+  .page { padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12)); }
+  .page__inner {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-10);
+  }
+
+  .block { display: grid; gap: var(--spacing-4); }
+  .block__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+  }
+  .block__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-inline-size: 64ch;
+  }
+
+  /* ── DATES ─────────────────────────────────────────────────────── */
+  .dates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .date {
+    padding: var(--spacing-4) var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--spacing-4) var(--spacing-5);
+  }
+  @media (max-width: 600px) { .date { grid-template-columns: 1fr; } }
+  .date__when, .date__where { display: grid; gap: 2px; }
+  .date__day {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+  }
+  .date__time {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .date__loc {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .date__cap {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .date__notes {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding-block-start: var(--spacing-3);
+    border-block-start: 1px solid var(--color-border-subtle);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+    white-space: pre-line;
+  }
+
+  /* ── LINKS ─────────────────────────────────────────────────────── */
+  .links { display: grid; gap: var(--spacing-5); }
+  .link-section h3 {
+    margin: 0 0 var(--spacing-2) 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .link-section ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    transition: border-color var(--motion-fast) var(--ease-out-quart);
+  }
+  .link:hover { border-color: var(--color-mensa-blue); }
+  .link__title { font-size: var(--text-sm); font-weight: 500; }
+  .link__arrow { font-size: var(--text-sm); color: var(--color-text-tertiary); }
+
+  /* ── CTA ───────────────────────────────────────────────────────── */
+  .cta {
+    padding: var(--spacing-6);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+  }
+  .cta p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .cta__btns {
+    margin-block-start: var(--spacing-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+  }
+  .cta__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+  .cta__btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .cta__btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .cta__btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .cta__btn--ghost:hover { background: var(--color-surface); }
+</style>

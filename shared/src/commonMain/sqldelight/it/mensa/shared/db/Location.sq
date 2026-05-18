@@ -1,0 +1,27 @@
+CREATE TABLE Location (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    lat REAL NOT NULL,
+    lon REAL NOT NULL,
+    address TEXT NOT NULL,
+    state TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX location_state ON Location(state);
+
+selectAll:
+SELECT * FROM Location ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Location WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Location(id, name, lat, lon, address, state, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Location WHERE id = ?;
+
+deleteAll:
+DELETE FROM Location;

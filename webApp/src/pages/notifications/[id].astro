@@ -1,0 +1,30 @@
+---
+/**
+ * Notification detail page.
+ *
+ * Because this project uses Astro's default static output (no SSR adapter),
+ * dynamic routes require getStaticPaths. We return a single placeholder path
+ * so the page shell is pre-rendered. The React island extracts the real
+ * notification ID from window.location.pathname on the client, so any
+ * /notifications/<id> URL renders correctly via client-side navigation.
+ *
+ * In development the Astro dev server serves this shell for the path
+ * /notifications/_ only — direct navigation to /notifications/<real-id> will 404
+ * from the static server. Links from the NotificationsApp inbox use
+ * client-side `<a href>` navigation which works correctly after initial load.
+ * A full SSR solution requires adding @astrojs/node to astro.config.mjs
+ * (tracked as a follow-up).
+ */
+export function getStaticPaths() {
+  return [{ params: { id: "_" } }];
+}
+
+const { id } = Astro.params;
+
+import AppShell from "../../layouts/AppShell.astro";
+import { NotificationDetailApp } from "../../components/notifications/NotificationDetailApp";
+---
+
+<AppShell title="Notifica — Mensa Italia" pageTitle="Notifica">
+  <NotificationDetailApp id={id ?? "_"} client:only="react" />
+</AppShell>

@@ -1,0 +1,27 @@
+CREATE TABLE StampUser (
+    id TEXT NOT NULL PRIMARY KEY,
+    userId TEXT NOT NULL DEFAULT '',
+    stampId TEXT NOT NULL DEFAULT '',
+    acquiredAt INTEGER NOT NULL,
+    expandedStampJson TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX stamp_user_user ON StampUser(userId);
+CREATE INDEX stamp_user_stamp ON StampUser(stampId);
+
+selectAll:
+SELECT * FROM StampUser ORDER BY acquiredAt DESC;
+
+selectById:
+SELECT * FROM StampUser WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO StampUser(id, userId, stampId, acquiredAt, expandedStampJson, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM StampUser WHERE id = ?;
+
+deleteAll:
+DELETE FROM StampUser;

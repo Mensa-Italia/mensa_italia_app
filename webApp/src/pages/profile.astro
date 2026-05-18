@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { ProfileApp } from "../components/profile/ProfileApp";
+---
+
+<AppShell title="Impostazioni — Mensa Italia" pageTitle="Impostazioni">
+  <ProfileApp client:only="react" />
+</AppShell>

@@ -1,0 +1,37 @@
+**/.git
+**/.gitignore
+**/.DS_Store
+
+# Native targets we don't need for the web container
+iosApp/
+androidApp/
+local_offices_images/
+tools/
+apk_check/
+
+# Build artifacts (we re-build shared in CI and webApp inside the image)
+**/build/
+!shared/build/dist/js/productionLibrary/
+**/.gradle/
+**/.kotlin/
+**/kotlin-js-store/
+
+# Node / Astro
+**/node_modules/
+**/.astro/
+**/dist/
+
+# IDE / editors
+**/.idea/
+**/.vscode/
+**/.web-plan/
+**/.claude/
+
+# Local config / secrets
+**/local.properties
+**/*.env
+**/.env.local
+**/secrets.properties
+
+# Docs unrelated to the web image
+DEPLOY_TO_IPHONE.md

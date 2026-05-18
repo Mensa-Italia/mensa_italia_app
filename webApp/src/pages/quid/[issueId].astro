@@ -1,0 +1,11 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import { QuidIssueApp } from "../../components/quid/QuidIssueApp";
+
+const { issueId } = Astro.params;
+const issueIdNum = parseInt(issueId ?? "", 10);
+---
+
+<AppShell title="Quid — Mensa Italia" pageTitle="Quid">
+  <QuidIssueApp client:only="react" issueId={issueIdNum} />
+</AppShell>

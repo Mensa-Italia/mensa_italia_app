@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { TableportApp } from "../components/tableport/TableportApp";
+---
+
+<AppShell title="Tableport — Mensa Italia" pageTitle="Tableport">
+  <TableportApp client:only="react" />
+</AppShell>

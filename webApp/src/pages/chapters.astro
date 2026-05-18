@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import AppShell from "../layouts/AppShell.astro";
+import { LocalOfficesListApp } from "../components/localOffices/LocalOfficesListApp";
+---
+
+<AppShell title="Gruppi locali — Mensa Italia" pageTitle="Gruppi locali">
+  <LocalOfficesListApp client:only="react" />
+</AppShell>

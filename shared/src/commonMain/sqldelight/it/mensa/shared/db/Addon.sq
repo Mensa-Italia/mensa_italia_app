@@ -1,0 +1,26 @@
+CREATE TABLE Addon (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    version TEXT NOT NULL,
+    url TEXT NOT NULL,
+    requiredPower INTEGER NOT NULL DEFAULT 0,
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Addon ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Addon WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Addon(id, name, description, icon, version, url, requiredPower, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Addon WHERE id = ?;
+
+deleteAll:
+DELETE FROM Addon;

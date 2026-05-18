@@ -1,0 +1,28 @@
+CREATE TABLE Receipt (
+    id TEXT NOT NULL PRIMARY KEY,
+    user TEXT NOT NULL DEFAULT '',
+    description TEXT,
+    stripeCode TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT '',
+    amount INTEGER NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX receipt_status ON Receipt(status);
+
+selectAll:
+SELECT * FROM Receipt ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Receipt WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Receipt(id, user, description, stripeCode, status, amount, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Receipt WHERE id = ?;
+
+deleteAll:
+DELETE FROM Receipt;

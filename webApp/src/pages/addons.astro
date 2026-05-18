@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { AddonsHubApp } from "../components/addons/AddonsHubApp";
+---
+
+<AppShell title="Addons — Mensa Italia" pageTitle="Addons">
+  <AddonsHubApp client:only="react" />
+</AppShell>

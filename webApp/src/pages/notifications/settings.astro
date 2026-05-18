@@ -1,0 +1,8 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import { NotificationManagerApp } from "../../components/notifications/NotificationManagerApp";
+---
+
+<AppShell title="Preferenze notifiche — Mensa Italia" pageTitle="Preferenze notifiche">
+  <NotificationManagerApp client:only="react" />
+</AppShell>

@@ -1,0 +1,23 @@
+CREATE TABLE Calendar (
+    id TEXT NOT NULL PRIMARY KEY,
+    user TEXT NOT NULL DEFAULT '',
+    hash TEXT NOT NULL DEFAULT '',
+    stateJson TEXT NOT NULL DEFAULT '[]',
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Calendar;
+
+selectById:
+SELECT * FROM Calendar WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Calendar(id, user, hash, stateJson, updatedAt)
+VALUES (?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Calendar WHERE id = ?;
+
+deleteAll:
+DELETE FROM Calendar;

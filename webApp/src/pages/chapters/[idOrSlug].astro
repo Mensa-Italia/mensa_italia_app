@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../layouts/AppShell.astro";
+import { LocalOfficeDetailApp } from "../../components/localOffices/LocalOfficeDetailApp";
+
+const { idOrSlug } = Astro.params;
+---
+
+<AppShell title="Gruppo locale — Mensa Italia" pageTitle="Gruppo locale">
+  <LocalOfficeDetailApp idOrSlug={idOrSlug ?? ""} client:only="react" />
+</AppShell>

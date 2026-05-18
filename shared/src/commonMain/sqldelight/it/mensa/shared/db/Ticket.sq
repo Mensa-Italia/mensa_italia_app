@@ -1,0 +1,31 @@
+CREATE TABLE Ticket (
+    id TEXT NOT NULL PRIMARY KEY,
+    userId TEXT,
+    name TEXT,
+    description TEXT,
+    link TEXT,
+    qr TEXT,
+    internalRefId TEXT,
+    customerData TEXT,
+    deadline INTEGER,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX ticket_userId ON Ticket(userId);
+
+selectAll:
+SELECT * FROM Ticket ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Ticket WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Ticket(id, userId, name, description, link, qr, internalRefId, customerData, deadline, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Ticket WHERE id = ?;
+
+deleteAll:
+DELETE FROM Ticket;

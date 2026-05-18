@@ -1,0 +1,39 @@
+CREATE TABLE EventSchedule (
+    id TEXT NOT NULL PRIMARY KEY,
+    eventId TEXT,
+    title TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    image TEXT,
+    whenStart INTEGER NOT NULL,
+    whenEnd INTEGER NOT NULL,
+    maxExternalGuests INTEGER NOT NULL DEFAULT 0,
+    price REAL NOT NULL DEFAULT 0.0,
+    infoLink TEXT NOT NULL DEFAULT '',
+    isSubscriptable INTEGER NOT NULL DEFAULT 0,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX event_schedule_event ON EventSchedule(eventId);
+CREATE INDEX event_schedule_when ON EventSchedule(whenStart);
+
+selectAll:
+SELECT * FROM EventSchedule ORDER BY whenStart ASC;
+
+selectById:
+SELECT * FROM EventSchedule WHERE id = ?;
+
+selectByEventId:
+SELECT * FROM EventSchedule WHERE eventId = ? ORDER BY whenStart ASC;
+
+insertOrReplace:
+INSERT OR REPLACE INTO EventSchedule(id, eventId, title, description, image, whenStart, whenEnd, maxExternalGuests, price, infoLink, isSubscriptable, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM EventSchedule WHERE id = ?;
+
+deleteByEventId:
+DELETE FROM EventSchedule WHERE eventId = ?;
+
+deleteAll:
+DELETE FROM EventSchedule;

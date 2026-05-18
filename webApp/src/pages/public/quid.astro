@@ -1,0 +1,352 @@
+---
+/**
+ * Quid — pagina pubblica della rivista.
+ *
+ * Fetch server-side della collection `quid_issues` (PB pubblica). Per ogni
+ * numero: cover, titolo, numero, conteggio articoli, link al PDF (se
+ * presente). I singoli articoli + audio narrazione + viewer PDF embedded
+ * sono riservati ai soci nella dashboard.
+ */
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import {
+  listPublicQuidIssues,
+  type PublicQuidIssueRecord,
+} from "../../lib/publicApi";
+
+let issues: readonly PublicQuidIssueRecord[] = [];
+let fetchError: string | null = null;
+try {
+  issues = await listPublicQuidIssues();
+} catch (err) {
+  fetchError = err instanceof Error ? err.message : "Errore di caricamento";
+}
+
+const dateFmt = new Intl.DateTimeFormat("it-IT", {
+  year: "numeric",
+  month: "long",
+});
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Periodical",
+  "name": "Quid — La rivista di Mensa Italia",
+  "issn": undefined,
+  "publisher": { "@type": "Organization", "name": "Mensa Italia" },
+  "description":
+    "Trimestrale dei soci Mensa Italia. Saggi, racconti, recensioni — scritti dai soci stessi.",
+  "url": "https://app.mensa.it/public/quid",
+};
+---
+
+<PublicLayout
+  active="quid"
+  title="Quid — la rivista di Mensa Italia"
+  description="Quid è il trimestrale dei soci Mensa Italia. Saggi, racconti, recensioni — scritti dai soci stessi. Pubblicato senza interruzioni dal 1985."
+  jsonLd={jsonLd}
+>
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker" data-i18n="web.quid.hero.kicker">La rivista dei soci</p>
+      <h1 class="hero__title">Quid.</h1>
+      <p class="hero__sub" data-i18n="web.quid.hero.sub">
+        Il trimestrale dei soci, scritto dai soci stessi. Sfoglialo online su
+        quid.mensa.it. Audio narrazione, archivio completo e viewer integrato
+        sono nell'app per soci.
+      </p>
+    </div>
+  </section>
+
+  <section class="list">
+    <div class="list__inner">
+      {fetchError && (
+        <div class="list__error" role="alert">
+          <p><strong>Errore di caricamento</strong></p>
+          <p class="list__error-detail">{fetchError}</p>
+        </div>
+      )}
+
+      {!fetchError && issues.length === 0 && (
+        <div class="list__empty">
+          <h2>Nessun numero pubblicato</h2>
+          <p>Riprova più tardi.</p>
+        </div>
+      )}
+
+      {!fetchError && issues.length > 0 && (
+        <ul class="grid">
+          {issues.map((issue) => {
+            const published = issue.published_at
+              ? dateFmt.format(new Date(issue.published_at))
+              : "";
+            return (
+              <li>
+                <article class="card">
+                  {issue.image ? (
+                    <img class="card__cover" src={issue.image} alt={`Copertina ${issue.name}`} loading="lazy" />
+                  ) : (
+                    <div class="card__cover card__cover--ph" aria-hidden="true">
+                      <span>#{issue.number}</span>
+                    </div>
+                  )}
+                  <div class="card__body">
+                    <p class="card__num">Numero {issue.number}</p>
+                    <h2 class="card__name">{issue.name}</h2>
+                    <p class="card__meta">
+                      {published && <span>{published}</span>}
+                      {issue.articles_count > 0 && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span>{issue.articles_count} articoli</span>
+                        </>
+                      )}
+                    </p>
+                    <div class="card__cta">
+                      <a
+                        class="card__btn"
+                        href={`https://quid.mensa.it/${issue.slug}/`}
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        <span data-i18n="web.quid.open_on_site">Leggi su quid.mensa.it ↗</span>
+                      </a>
+                      {issue.pdf_url && (
+                        <a
+                          class="card__btn card__btn--ghost"
+                          href={issue.pdf_url}
+                          target="_blank"
+                          rel="noopener"
+                          download
+                        >
+                          <span data-i18n="web.quid.download_pdf">Scarica PDF</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="cta__inner">
+      <p class="cta__kicker">Vuoi scrivere su Quid?</p>
+      <h2>I pezzi della rivista nascono dai soci.</h2>
+      <p>
+        Ogni numero esce con un tema (la <em>Casa</em>, il <em>Tempo</em>, la
+        <em>Fine</em>…) e raccoglie saggi, narrativa, recensioni e poesia
+        scritte direttamente dai soci. La redazione è aperta a tutti coloro
+        che vogliono contribuire.
+      </p>
+      <div class="cta__btns">
+        <a href="/public/iq-test" class="cta__btn cta__btn--primary">Mettiti alla prova</a>
+        <a href="/login" class="cta__btn cta__btn--ghost">Sono già socio</a>
+      </div>
+    </div>
+  </section>
+</PublicLayout>
+
+<style>
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 14%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 760px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 9vw, 5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--color-text-primary);
+  }
+  .hero__sub {
+    margin: var(--spacing-2) auto 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    max-inline-size: 56ch;
+  }
+
+  .list { padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10)); }
+  .list__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .list__error {
+    padding: var(--spacing-4) var(--spacing-5);
+    background: color-mix(in oklch, var(--color-status-error) 8%, var(--color-surface));
+    border: 1px solid color-mix(in oklch, var(--color-status-error) 30%, var(--color-surface));
+    border-radius: var(--radius-md);
+  }
+  .list__error p { margin: 0; }
+  .list__error-detail { color: var(--color-text-tertiary); font-family: var(--font-mono); margin-block-start: var(--spacing-1) !important; font-size: var(--text-xs); }
+  .list__empty { text-align: center; padding-block: var(--spacing-10); color: var(--color-text-tertiary); }
+  .list__empty h2 { font-family: var(--font-display); margin: 0; }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--spacing-5);
+  }
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--motion-fast) var(--ease-out-quart),
+                transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .card:hover {
+    border-color: var(--color-mensa-blue);
+    transform: translateY(-2px);
+  }
+  .card__cover {
+    aspect-ratio: 3 / 4;
+    inline-size: 100%;
+    object-fit: cover;
+    display: block;
+    background: var(--color-surface-sunken);
+  }
+  .card__cover--ph {
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(135deg,
+        color-mix(in oklch, var(--color-mensa-blue) 26%, var(--color-surface)),
+        color-mix(in oklch, var(--color-mensa-cyan) 24%, var(--color-surface)));
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-text-on-brand);
+    letter-spacing: -0.03em;
+  }
+  .card__body { padding: var(--spacing-4) var(--spacing-5); display: grid; gap: var(--spacing-2); }
+  .card__num {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .card__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .card__meta {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card__cta { margin-block-start: var(--spacing-2); }
+  .card__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px var(--spacing-4);
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+  .card__btn:hover { background: var(--color-mensa-blue-deep); }
+  .card__btn--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+  .card__btn--ghost:hover { background: var(--color-surface-elevated); }
+
+  .cta {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+    background: var(--color-surface-elevated);
+    text-align: center;
+  }
+  .cta__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .cta__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cta h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .cta p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .cta em { font-style: italic; color: var(--color-text-primary); }
+  .cta__btns {
+    margin-block-start: var(--spacing-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+    justify-content: center;
+  }
+  .cta__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+  .cta__btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .cta__btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .cta__btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .cta__btn--ghost:hover { background: var(--color-surface); }
+</style>

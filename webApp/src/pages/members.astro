@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import AppShell from "../layouts/AppShell.astro";
+import { MembersListApp } from "../components/members/MembersListApp";
+---
+
+<AppShell title="Registro Soci — Mensa Italia" pageTitle="Registro Soci">
+  <MembersListApp client:only="react" />
+</AppShell>

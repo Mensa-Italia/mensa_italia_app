@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import AppShell from "../layouts/AppShell.astro";
+import { SigsListApp } from "../components/sigs/SigsListApp";
+---
+
+<AppShell title="SIG e gruppi — Mensa Italia" pageTitle="SIG e gruppi">
+  <SigsListApp client:only="react" />
+</AppShell>

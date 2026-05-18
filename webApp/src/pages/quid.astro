@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { QuidApp } from "../components/quid/QuidApp";
+---
+
+<AppShell title="Quid — Mensa Italia" pageTitle="Quid">
+  <QuidApp client:only="react" />
+</AppShell>

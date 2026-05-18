@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../../layouts/AppShell.astro";
+import { LinktreeEditor } from "../../../components/localOffices/LinktreeEditor";
+
+const { idOrSlug } = Astro.params;
+---
+
+<AppShell title="Modifica linktree — Mensa Italia" pageTitle="Modifica linktree">
+  <LinktreeEditor idOrSlug={idOrSlug ?? ""} client:only="react" />
+</AppShell>

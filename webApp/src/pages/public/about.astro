@@ -1,0 +1,568 @@
+---
+/**
+ * Chi siamo — pagina informativa pubblica.
+ *
+ * Tutti i testi usano le chiavi Tolgee `public.chi_siamo.*` già definite
+ * per la versione iOS (ChiSiamoView.swift). I fallback in italiano sono
+ * identici a quelli del codice Swift — quando l'i18n hydrator gira lato
+ * client sostituisce con la traduzione attiva.
+ */
+import PublicLayout from "../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  active="chi-siamo"
+  title="Chi siamo — Mensa Italia"
+  description="Mensa è un club internazionale di persone curiose. L'unico requisito è un test di logica nel 98° percentile."
+>
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">Mensa Italia</p>
+      <h1 class="hero__title" data-i18n="public.chi_siamo.hero.tagline">
+        Persone curiose. Un test in comune.
+      </h1>
+      <p class="hero__sub">The High I.Q. Society</p>
+    </div>
+  </section>
+
+  <!-- ═══ NUMERI ════════════════════════════════════════════════ -->
+  <section class="numbers">
+    <div class="numbers__inner">
+      <h2 class="numbers__title" data-i18n="public.chi_siamo.section.numbers">In numeri</h2>
+      <dl class="numbers__grid">
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.population">della popolazione</dt>
+          <dd>2<span>%</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.members_world">soci nel mondo</dt>
+          <dd>150.000<span>+</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.countries">Paesi</dt>
+          <dd>100<span>+</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.founded">anno di fondazione</dt>
+          <dd>1946</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ═══ COS'È IL MENSA ════════════════════════════════════════ -->
+  <section class="prose">
+    <div class="prose__inner">
+      <article>
+        <h2 data-i18n="public.chi_siamo.section.what_is">Cos'è il Mensa</h2>
+        <p data-i18n="public.chi_siamo.what_is.body">
+          Mensa è un club internazionale di persone curiose. L'unico requisito
+          per entrare è un test di logica: se rientri nel 2% più alto della
+          popolazione, sei dentro. Da lì in poi non conta più cosa hai
+          studiato, che lavoro fai o quanti anni hai. Il nome viene dal latino
+          mensa, la tavola rotonda: tra soci si sta tutti allo stesso livello.
+        </p>
+
+        <h2>Mensa Italia</h2>
+        <p data-i18n="public.chi_siamo.mensa_italia.body">
+          Dal 1983 siamo la sezione italiana di Mensa. Oltre 2.600 soci in
+          venti gruppi locali, dal Trentino alla Sicilia, che si incontrano
+          per cene, conferenze, weekend di giochi e progetti comuni. Niente
+          politica, niente religione, niente scopo di lucro.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══ COSA FACCIAMO ════════════════════════════════════════ -->
+  <section class="activities">
+    <div class="activities__inner">
+      <h2 class="activities__title" data-i18n="public.chi_siamo.section.what_we_do">Cosa facciamo</h2>
+      <div class="activities__grid">
+        <article class="activity">
+          <div class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+            </svg>
+          </div>
+          <h3 data-i18n="public.chi_siamo.do.local.title">Gruppi locali</h3>
+          <p data-i18n="public.chi_siamo.do.local.subtitle">Aperitivi, cene, gite, vicino a te</p>
+        </article>
+
+        <article class="activity">
+          <div class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+          </div>
+          <h3 data-i18n="public.chi_siamo.do.contests.title">Concorsi</h3>
+          <p data-i18n="public.chi_siamo.do.contests.subtitle">Il Brain e Mensa Ludo, ogni anno</p>
+        </article>
+
+        <article class="activity">
+          <div class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-6Z"/>
+              <path d="M16 14h3a1 1 0 0 1 1 1v5a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2Z"/>
+              <path d="M3 14a9 9 0 0 1 18 0"/>
+            </svg>
+          </div>
+          <h3 data-i18n="public.chi_siamo.do.podcasts.title">Podcast</h3>
+          <p>Brainwaves, She Talks, Mensa Talk</p>
+        </article>
+
+        <article class="activity">
+          <div class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <h3 data-i18n="public.chi_siamo.do.quid.title">Rivista QUID</h3>
+          <p data-i18n="public.chi_siamo.do.quid.subtitle">Approfondimenti scritti dai soci</p>
+        </article>
+
+        <article class="activity">
+          <div class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+              <path d="M15.09 14a4.97 4.97 0 0 1 1.82-3.09 6 6 0 1 0-9.82 0A4.97 4.97 0 0 1 8.91 14"/>
+            </svg>
+          </div>
+          <h3 data-i18n="public.chi_siamo.do.research.title">Ricerca</h3>
+          <p data-i18n="public.chi_siamo.do.research.subtitle">Cosa significa davvero "essere intelligenti"</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COME SI ENTRA ════════════════════════════════════════ -->
+  <section class="join">
+    <div class="join__inner">
+      <h2 data-i18n="public.chi_siamo.section.how_to_join">Come si entra</h2>
+      <div class="join__body">
+        <p data-i18n="public.chi_siamo.how_to.test_body">
+          Il test ufficiale dura circa 20 minuti: 45 sequenze di figure,
+          niente matematica, niente cultura generale. L'esito arriva in due
+          settimane. Se sei nel 2% più alto, ti scriviamo per darti il
+          benvenuto.
+        </p>
+        <p data-i18n="public.chi_siamo.how_to.bypass_body">
+          Hai già fatto un test del QI riconosciuto altrove? Puoi chiedere
+          l'ammissione diretta senza rifarlo.
+        </p>
+      </div>
+
+      <div class="join__rows">
+        <div class="join__row">
+          <div class="join__row-label">
+            <p class="join__row-title" data-i18n="public.chi_siamo.how_to.fees_label">Quote annuali</p>
+            <p class="join__row-meta" data-i18n="web.chi_siamo.fees_meta">Pagamento una volta l'anno, ovunque tu sia in Italia</p>
+          </div>
+          <p class="join__row-value">€25 primo anno · €50 standard · €25 under 26</p>
+        </div>
+
+        <div class="join__row">
+          <div class="join__row-label">
+            <p class="join__row-title" data-i18n="web.chi_siamo.try_test_title">Prova il test d'esempio</p>
+            <p class="join__row-meta" data-i18n="web.chi_siamo.try_test_meta">Test dimostrativo in-app realizzato da Mensa Norge</p>
+          </div>
+          <a href="/public/iq-test" class="join__row-cta join__row-cta--primary">
+            <span data-i18n="web.chi_siamo.try_test_cta">Inizia →</span>
+          </a>
+        </div>
+
+        <div class="join__row">
+          <div class="join__row-label">
+            <p class="join__row-title" data-i18n="web.chi_siamo.real_test_title">Iscriviti al test ufficiale</p>
+            <p class="join__row-meta" data-i18n="web.chi_siamo.real_test_meta">Sessioni d'esame supervisionate, ammissione formale</p>
+          </div>
+          <a
+            href="https://www.mensa.it/ammissione-tramite-test-ufficiale/"
+            target="_blank"
+            rel="noopener"
+            class="join__row-cta join__row-cta--ghost"
+          >
+            <span data-i18n="web.chi_siamo.real_test_cta">Apri mensa.it ↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTATTI ════════════════════════════════════════════════ -->
+  <section class="contact">
+    <div class="contact__inner">
+      <h2 data-i18n="public.chi_siamo.section.contacts">Contatti</h2>
+      <div class="contact__grid">
+        <a href="mailto:info@mensa.it" class="contact__card">
+          <div class="contact__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-10 5L2 7"/>
+            </svg>
+          </div>
+          <div class="contact__body">
+            <p class="contact__label" data-i18n="public.chi_siamo.contact.email.title">Scrivici una mail</p>
+            <p class="contact__value">info@mensa.it</p>
+          </div>
+        </a>
+
+        <a
+          href="https://www.google.com/maps/search/?api=1&query=Viale+Lunigiana+7+20125+Milano"
+          target="_blank"
+          rel="noopener"
+          class="contact__card"
+        >
+          <div class="contact__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 10c0 7-8 12-8 12s-8-5-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="contact__body">
+            <p class="contact__label" data-i18n="public.chi_siamo.contact.address.title">Sede nazionale, Milano</p>
+            <p class="contact__value">Viale Lunigiana 7</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</PublicLayout>
+
+<style>
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 12%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  /* ═══ NUMBERS ═══════════════════════════════════════════════ */
+  .numbers {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .numbers__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .numbers__title {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .numbers__grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-5);
+  }
+  @media (max-width: 720px) {
+    .numbers__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .numbers__grid > div { display: grid; gap: var(--spacing-2); }
+  .numbers__grid dt {
+    margin: 0;
+    order: 2;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .numbers__grid dd {
+    margin: 0;
+    order: 1;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
+    font-weight: 800;
+    color: var(--color-text-primary);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .numbers__grid dd span { color: var(--color-mensa-blue); }
+
+  /* ═══ PROSE ═══════════════════════════════════════════════════ */
+  .prose {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .prose__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .prose article h2 {
+    margin: var(--spacing-6) 0 var(--spacing-3) 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+  }
+  .prose article h2:first-child { margin-block-start: 0; }
+  .prose article p {
+    margin: 0 0 var(--spacing-4) 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+  .prose article p:last-child { margin-block-end: 0; }
+
+  /* ═══ ACTIVITIES ════════════════════════════════════════════ */
+  .activities {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .activities__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .activities__title {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .activities__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-4);
+  }
+  .activity {
+    display: grid;
+    gap: var(--spacing-2);
+    padding: var(--spacing-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .activity__icon {
+    inline-size: 28px;
+    block-size: 28px;
+    color: var(--color-mensa-blue);
+    margin-block-end: var(--spacing-1);
+  }
+  .activity__icon svg { inline-size: 100%; block-size: 100%; }
+  .activity h3 {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .activity p {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+  }
+
+  /* ═══ JOIN ════════════════════════════════════════════════════ */
+  .join {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .join__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .join h2 {
+    margin: 0 0 var(--spacing-2) 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .join__body p {
+    margin: 0 0 var(--spacing-3) 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+  .join__rows {
+    margin: var(--spacing-3) 0 0 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .join__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .join__row:last-child { border-block-end: none; }
+  .join__row-label { display: grid; gap: 2px; min-inline-size: 0; flex: 1; }
+  .join__row-title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .join__row-meta {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+  }
+  .join__row-value {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+    flex-shrink: 0;
+  }
+  .join__row-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px var(--spacing-4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .join__row-cta--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .join__row-cta--primary:hover { background: var(--color-mensa-blue-deep); }
+  .join__row-cta--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+  .join__row-cta--ghost:hover { background: var(--color-surface-elevated); }
+  @media (max-width: 600px) {
+    .join__row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--spacing-3);
+    }
+    .join__row-value, .join__row-cta { align-self: flex-end; }
+  }
+
+  /* ═══ CONTACT ════════════════════════════════════════════════ */
+  .contact {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .contact__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .contact h2 {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+  @media (max-width: 720px) {
+    .contact__grid { grid-template-columns: 1fr; }
+  }
+  .contact__card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--motion-fast) var(--ease-out-quart);
+  }
+  .contact__card:hover { border-color: var(--color-mensa-blue); }
+  .contact__icon {
+    inline-size: 32px;
+    block-size: 32px;
+    color: var(--color-mensa-blue);
+    flex-shrink: 0;
+  }
+  .contact__icon svg { inline-size: 100%; block-size: 100%; }
+  .contact__body { display: grid; gap: 2px; }
+  .contact__label {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .contact__value {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+</style>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Brand blue gradient background for launch/splash screen -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="135"
+        android:startColor="#184295"
+        android:centerColor="#0D2E6B"
+        android:endColor="#061F2E" />
+</shape>

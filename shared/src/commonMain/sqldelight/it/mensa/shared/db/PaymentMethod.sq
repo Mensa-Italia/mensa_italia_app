@@ -1,0 +1,23 @@
+CREATE TABLE PaymentMethod (
+    id TEXT NOT NULL PRIMARY KEY,
+    brand TEXT NOT NULL DEFAULT '',
+    display TEXT NOT NULL DEFAULT '',
+    isDefault INTEGER NOT NULL DEFAULT 0,
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM PaymentMethod ORDER BY isDefault DESC, brand ASC;
+
+selectById:
+SELECT * FROM PaymentMethod WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO PaymentMethod(id, brand, display, isDefault, updatedAt)
+VALUES (?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM PaymentMethod WHERE id = ?;
+
+deleteAll:
+DELETE FROM PaymentMethod;

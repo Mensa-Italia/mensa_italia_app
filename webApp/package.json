@@ -1,0 +1,43 @@
+{
+  "name": "web",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "build:shared": "cd .. && ./gradlew :shared:jsBrowserProductionLibraryDistribution --no-daemon"
+  },
+  "dependencies": {
+    "@astrojs/node": "^10.1.1",
+    "@cashapp/sqldelight-sqljs-worker": "2.1.0",
+    "@js-joda/core": "3.2.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.3.3",
+    "clsx": "^2.1.1",
+    "format-util": "1.0.5",
+    "lucide-react": "^1.16.0",
+    "mensa-shared": "file:../shared/build/dist/js/productionLibrary",
+    "qrcode-generator": "1.4.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "sql.js": "1.10.3",
+    "tailwind-merge": "^3.6.0",
+    "tailwind-variants": "^3.2.2",
+    "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/react": "^5.0.5",
+    "@types/node": "^25.8.0",
+    "ws": "8.18.0"
+  }
+}

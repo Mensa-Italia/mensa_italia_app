@@ -1,0 +1,9 @@
+---
+export const prerender = false;
+import AppShell from "../../layouts/AppShell.astro";
+import { AddDealForm } from "../../components/deals/AddDealForm";
+---
+
+<AppShell title="Nuova convenzione — Mensa Italia" pageTitle="Nuova convenzione">
+  <AddDealForm client:only="react" />
+</AppShell>

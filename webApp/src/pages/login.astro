@@ -1,0 +1,326 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { LoginApp } from "../components/LoginApp";
+---
+
+<BaseLayout title="Accedi — Mensa Italia">
+  <div class="login">
+    <aside class="login__brand" aria-hidden="true">
+      <div class="login__brand-inner">
+        <a href="/" class="login__mark" aria-label="Mensa Italia">
+          <span class="login__mark-glyph">
+            <svg viewBox="0 0 86 86" fill="currentColor" aria-hidden="true" focusable="false">
+              <path fill-rule="evenodd" d="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z"/>
+              <path d="M43,0.05C33.35,0.05 25.5,7.84 25.5,17.42s7.85,17.36 17.5,17.36s17.5,-7.79 17.5,-17.36S52.65,0.05 43,0.05ZM42.45,4.68s0.11,-0.01 0.17,-0.01v12.25h-5.77c0.07,-3.73 1.17,-7.09 2.87,-9.52c0.81,-1.14 1.73,-2.06 2.73,-2.72ZM40.58,4.89c-0.71,0.61 -1.35,1.34 -1.92,2.15c-1.8,2.57 -2.93,6.04 -3,9.88h-5.53c0.23,-5.99 4.65,-10.94 10.45,-12.03ZM30.13,17.91h5.53c0.1,3.79 1.22,7.21 3,9.76c0.62,0.88 1.32,1.65 2.09,2.3c-5.88,-1.02 -10.4,-6.01 -10.62,-12.06ZM39.72,27.31c-1.69,-2.4 -2.77,-5.72 -2.87,-9.4h5.77v12.23c-1.07,-0.67 -2.05,-1.63 -2.9,-2.83ZM55.87,16.92h-5.31c-0.07,-3.84 -1.19,-7.31 -2.99,-9.88c-0.56,-0.79 -1.18,-1.5 -1.87,-2.09c5.66,1.19 9.95,6.08 10.17,11.97ZM43.61,4.68c0.07,0 0.13,0 0.19,0c0.99,0.66 1.91,1.58 2.71,2.71c1.7,2.43 2.8,5.79 2.87,9.52h-5.77V4.68ZM43.61,30.14v-12.23h5.77c-0.1,3.68 -1.19,7 -2.87,9.4c-0.85,1.2 -1.84,2.16 -2.9,2.83ZM45.52,29.92c0.76,-0.62 1.44,-1.39 2.05,-2.25c1.78,-2.55 2.89,-5.97 2.99,-9.76h5.31c-0.22,5.96 -4.6,10.88 -10.35,12.01Z"/>
+            </svg>
+          </span>
+          <span class="login__mark-name">Mensa Italia</span>
+        </a>
+
+        <div class="login__quote">
+          <blockquote>
+            <p data-i18n="login.brand.quote">«In Mensa l'unico criterio di ammissione è un risultato pari o superiore al 98° percentile in un test del quoziente intellettivo riconosciuto.»</p>
+            <footer data-i18n="login.brand.quote_source">Statuto, art. 3 · Roma, 1946</footer>
+          </blockquote>
+        </div>
+
+        <dl class="login__stats">
+          <div>
+            <dt data-i18n="login.stats.years_label">Anni di attività</dt>
+            <dd data-i18n="login.stats.years_value">80</dd>
+          </div>
+          <div>
+            <dt data-i18n="login.stats.members_label">Soci attivi</dt>
+            <dd data-i18n="login.stats.members_value">2.400+</dd>
+          </div>
+          <div>
+            <dt data-i18n="login.stats.percentile_label">Percentile</dt>
+            <dd data-i18n="login.stats.percentile_value">98°</dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+
+    <main class="login__main">
+      <header class="login__topbar">
+        <a href="/" class="login__topbar-mark" aria-label="Mensa Italia">
+          <span class="login__topbar-glyph">
+            <svg viewBox="0 0 86 86" fill="currentColor" aria-hidden="true" focusable="false">
+              <path fill-rule="evenodd" d="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z"/>
+              <path d="M43,0.05C33.35,0.05 25.5,7.84 25.5,17.42s7.85,17.36 17.5,17.36s17.5,-7.79 17.5,-17.36S52.65,0.05 43,0.05ZM42.45,4.68s0.11,-0.01 0.17,-0.01v12.25h-5.77c0.07,-3.73 1.17,-7.09 2.87,-9.52c0.81,-1.14 1.73,-2.06 2.73,-2.72ZM40.58,4.89c-0.71,0.61 -1.35,1.34 -1.92,2.15c-1.8,2.57 -2.93,6.04 -3,9.88h-5.53c0.23,-5.99 4.65,-10.94 10.45,-12.03ZM30.13,17.91h5.53c0.1,3.79 1.22,7.21 3,9.76c0.62,0.88 1.32,1.65 2.09,2.3c-5.88,-1.02 -10.4,-6.01 -10.62,-12.06ZM39.72,27.31c-1.69,-2.4 -2.77,-5.72 -2.87,-9.4h5.77v12.23c-1.07,-0.67 -2.05,-1.63 -2.9,-2.83ZM55.87,16.92h-5.31c-0.07,-3.84 -1.19,-7.31 -2.99,-9.88c-0.56,-0.79 -1.18,-1.5 -1.87,-2.09c5.66,1.19 9.95,6.08 10.17,11.97ZM43.61,4.68c0.07,0 0.13,0 0.19,0c0.99,0.66 1.91,1.58 2.71,2.71c1.7,2.43 2.8,5.79 2.87,9.52h-5.77V4.68ZM43.61,30.14v-12.23h5.77c-0.1,3.68 -1.19,7 -2.87,9.4c-0.85,1.2 -1.84,2.16 -2.9,2.83ZM45.52,29.92c0.76,-0.62 1.44,-1.39 2.05,-2.25c1.78,-2.55 2.89,-5.97 2.99,-9.76h5.31c-0.22,5.96 -4.6,10.88 -10.35,12.01Z"/>
+            </svg>
+          </span>
+          <span>Mensa Italia</span>
+        </a>
+        <nav>
+          <a href="/">← Torna al sito</a>
+        </nav>
+      </header>
+
+      <section class="login__panel">
+        <header class="login__hero">
+          <p class="login__kicker" data-i18n="login.hero.kicker">Area soci</p>
+          <h1 class="login__title" data-i18n="login.hero.title">Accedi al portale</h1>
+          <p class="login__sub" data-i18n="login.hero.subtitle">Usa le credenziali del tuo account socio. Per il primo accesso o il recupero password, segui il link sotto.</p>
+        </header>
+
+        <LoginApp client:only="react" />
+
+        <div class="login__links">
+          <a href="https://www.mensa.it/area-soci/password-dimenticata/" target="_blank" rel="noopener" data-i18n="login.links.forgot_password">Password dimenticata</a>
+          <span aria-hidden="true">·</span>
+          <a href="/public/about" data-i18n="login.links.discover">Non sei socio? Scopri Mensa</a>
+        </div>
+
+        <p class="login__note" data-i18n="login.note">Effettuando l'accesso confermi di rispettare lo Statuto e il Regolamento dell'associazione.</p>
+      </section>
+
+      <footer class="login__footer">
+        <p data-i18n="login.footer.tagline">the high I.Q. society · dal 1946</p>
+        <p>
+          <a href="https://www.mensa.it/privacy" target="_blank" rel="noopener" data-i18n="login.footer.privacy">Privacy</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://www.mensa.it/termini" target="_blank" rel="noopener" data-i18n="login.footer.terms">Termini</a>
+        </p>
+      </footer>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .login {
+    min-block-size: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  /* ── Brand column (left) ─────────────────────────────────────── */
+  .login__brand {
+    position: relative;
+    background: var(--color-mensa-blue-deep);
+    color: var(--color-text-on-brand);
+    overflow: hidden;
+    padding: var(--spacing-10) clamp(var(--spacing-6), 5vw, var(--spacing-12));
+    display: flex;
+    align-items: stretch;
+  }
+  /* Subtle radial wash for visual interest without gradient-text or glassmorphism */
+  .login__brand::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 80% at 20% 0%, oklch(38% 0.16 263 / 60%), transparent 60%),
+      radial-gradient(80% 60% at 80% 100%, oklch(78% 0.13 222 / 24%), transparent 70%);
+    pointer-events: none;
+  }
+  .login__brand-inner {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--spacing-10);
+    inline-size: 100%;
+    max-inline-size: 480px;
+    align-self: stretch;
+  }
+
+  .login__mark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    text-decoration: none;
+    color: inherit;
+  }
+  .login__mark-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    color: var(--color-text-on-brand);
+  }
+  .login__mark-glyph svg { inline-size: 100%; block-size: 100%; display: block; }
+  .login__mark-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  .login__quote {
+    align-self: center;
+  }
+  .login__quote blockquote {
+    margin: 0;
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .login__quote p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--color-text-on-brand);
+    text-wrap: balance;
+  }
+  .login__quote footer {
+    font-size: var(--text-xs);
+    color: oklch(85% 0.02 263);
+    letter-spacing: 0.02em;
+  }
+
+  .login__stats {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-5);
+    padding-block-start: var(--spacing-8);
+    border-block-start: 1px solid oklch(60% 0.08 263 / 30%);
+  }
+  .login__stats > div { display: grid; gap: 4px; }
+  .login__stats dt {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: oklch(78% 0.04 263);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .login__stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text-on-brand);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Main column (right) ─────────────────────────────────────── */
+  .login__main {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    background: var(--color-surface);
+  }
+  .login__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-5) clamp(var(--spacing-5), 5vw, var(--spacing-8));
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .login__topbar-mark {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-2);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .login__topbar-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 28px;
+    block-size: 28px;
+    color: var(--color-mensa-blue);
+  }
+  .login__topbar-glyph svg { inline-size: 100%; block-size: 100%; display: block; }
+  .login__topbar nav a {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .login__topbar nav a:hover {
+    color: var(--color-text-primary);
+  }
+
+  .login__panel {
+    align-self: center;
+    justify-self: center;
+    inline-size: 100%;
+    max-inline-size: 440px;
+    padding: var(--spacing-8) clamp(var(--spacing-5), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .login__hero {
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .login__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .login__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-text-primary);
+  }
+  .login__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+    max-inline-size: 56ch;
+  }
+
+  .login__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .login__links a {
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .login__links a:hover { text-decoration: underline; }
+
+  .login__note {
+    margin: 0;
+    padding-block-start: var(--spacing-3);
+    border-block-start: 1px solid var(--color-border-subtle);
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.55;
+  }
+
+  .login__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-5) clamp(var(--spacing-5), 5vw, var(--spacing-8));
+    border-block-start: 1px solid var(--color-border-subtle);
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+  }
+  .login__footer p { margin: 0; }
+  .login__footer a {
+    color: inherit;
+    text-decoration: none;
+    margin-inline: 4px;
+  }
+  .login__footer a:hover { color: var(--color-text-primary); }
+
+  /* ── Compact (< 960px): collapse left column ─────────────────── */
+  @media (max-width: 960px) {
+    .login { grid-template-columns: 1fr; }
+    .login__brand { display: none; }
+    .login__topbar-mark { display: inline-flex; }
+  }
+</style>

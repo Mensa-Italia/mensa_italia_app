@@ -1,0 +1,13 @@
+---
+import AppShell from "../../../layouts/AppShell.astro";
+import { QuidArticleApp } from "../../../components/quid/QuidArticleApp";
+import { AudioRoot } from "../../../components/audio/AudioRoot";
+
+const { articleId } = Astro.params;
+const articleIdNum = parseInt(articleId ?? "", 10);
+---
+
+<AppShell title="Articolo — Quid — Mensa Italia" pageTitle="Quid">
+  <QuidArticleApp client:only="react" articleId={articleIdNum} />
+  <AudioRoot client:only="react" />
+</AppShell>

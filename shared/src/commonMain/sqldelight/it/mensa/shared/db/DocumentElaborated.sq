@@ -1,0 +1,24 @@
+CREATE TABLE DocumentElaborated (
+    id TEXT NOT NULL PRIMARY KEY,
+    document TEXT NOT NULL,
+    iaResume TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX doc_elab_document ON DocumentElaborated(document);
+
+selectAll:
+SELECT * FROM DocumentElaborated;
+
+selectById:
+SELECT * FROM DocumentElaborated WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO DocumentElaborated(id, document, iaResume, updatedAt)
+VALUES (?, ?, ?, ?);
+
+deleteById:
+DELETE FROM DocumentElaborated WHERE id = ?;
+
+deleteAll:
+DELETE FROM DocumentElaborated;

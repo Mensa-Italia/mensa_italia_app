@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground: Mensa M mark centered in white -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- M shape centered, scaled to fit safe zone (roughly 72dp centered in 108dp) -->
+    <group android:translateX="11" android:translateY="11"
+        android:scaleX="1.0" android:scaleY="1.0">
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z" />
+    </group>
+</vector>

@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../../layouts/AppShell.astro";
+import { EditDealForm } from "../../../components/deals/EditDealForm";
+
+const { id } = Astro.params;
+---
+
+<AppShell title="Modifica convenzione — Mensa Italia" pageTitle="Modifica convenzione">
+  <EditDealForm dealId={id!} client:only="react" />
+</AppShell>

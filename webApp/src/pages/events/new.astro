@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+
+import AppShell from "../../layouts/AppShell.astro";
+import { AddEventForm } from "../../components/events/AddEventForm";
+---
+
+<AppShell title="Nuovo evento — Mensa Italia" pageTitle="Nuovo evento">
+  <AddEventForm client:only="react" />
+</AppShell>

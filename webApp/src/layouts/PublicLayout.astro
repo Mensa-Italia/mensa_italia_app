@@ -1,0 +1,402 @@
+---
+/**
+ * Public marketing/site layout for non-authenticated visitors.
+ *
+ *   ┌────────────────────────────────────────────────────┐
+ *   │ topbar (logo · nav · CTA "Accedi soci")            │
+ *   ├────────────────────────────────────────────────────┤
+ *   │ <slot> — page content                              │
+ *   ├────────────────────────────────────────────────────┤
+ *   │ footer (links · brand line)                        │
+ *   └────────────────────────────────────────────────────┘
+ *
+ * Deliberately quieter than AppShell — calmer surface, more whitespace,
+ * editorial typography. This is the "front of house" for the org.
+ */
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Active nav item slug — used to highlight the right link */
+  active?: "home" | "chi-siamo" | "eventi" | "gruppi" | "test-qi" | "podcasts" | "quid";
+  /** Optional Open Graph / Twitter image URL (absolute) */
+  ogImage?: string;
+  /** Optional JSON-LD payload to inject in <head> */
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const {
+  title = "Mensa Italia — the high I.Q. society",
+  description = "Mensa Italia è l'associazione che riunisce le persone con un quoziente intellettivo nel 98° percentile. Eventi, cultura, comunità — dal 1946.",
+  active = "home",
+  ogImage,
+  jsonLd,
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
+
+type NavItem = { href: string; label: string; key: Props["active"]; i18n: string };
+const navItems: NavItem[] = [
+  { href: "/public/about",        label: "Chi siamo",     key: "chi-siamo", i18n: "web.nav.about" },
+  { href: "/public/events",  label: "Eventi",        key: "eventi",    i18n: "web.nav.events" },
+  { href: "/public/chapters",           label: "Gruppi locali", key: "gruppi",    i18n: "web.nav.local_offices" },
+  { href: "/public/podcasts",label: "Podcast",       key: "podcasts",  i18n: "web.nav.podcasts" },
+  { href: "/public/quid",    label: "Quid",          key: "quid",      i18n: "web.nav.quid" },
+  { href: "/public/iq-test",          label: "Test QI",       key: "test-qi",   i18n: "web.nav.iq_test" },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mensa Italia" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="theme-color" content="#0f1d3b" />
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+  </Fragment>
+  <div class="pub">
+    <input type="checkbox" id="pub-nav-toggle" class="pub__mobile-toggle" />
+
+    <header class="pub__topbar">
+      <div class="pub__topbar-inner">
+        <a href="/" class="pub__brand" aria-label="Mensa Italia — home" data-i18n-aria-label="web.nav.brand_aria">
+          <span class="pub__brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 86 86" fill="currentColor" aria-hidden="true" focusable="false">
+              <path fill-rule="evenodd" d="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z"/>
+              <path d="M43,0.05C33.35,0.05 25.5,7.84 25.5,17.42s7.85,17.36 17.5,17.36s17.5,-7.79 17.5,-17.36S52.65,0.05 43,0.05ZM42.45,4.68s0.11,-0.01 0.17,-0.01v12.25h-5.77c0.07,-3.73 1.17,-7.09 2.87,-9.52c0.81,-1.14 1.73,-2.06 2.73,-2.72ZM40.58,4.89c-0.71,0.61 -1.35,1.34 -1.92,2.15c-1.8,2.57 -2.93,6.04 -3,9.88h-5.53c0.23,-5.99 4.65,-10.94 10.45,-12.03ZM30.13,17.91h5.53c0.1,3.79 1.22,7.21 3,9.76c0.62,0.88 1.32,1.65 2.09,2.3c-5.88,-1.02 -10.4,-6.01 -10.62,-12.06ZM39.72,27.31c-1.69,-2.4 -2.77,-5.72 -2.87,-9.4h5.77v12.23c-1.07,-0.67 -2.05,-1.63 -2.9,-2.83ZM55.87,16.92h-5.31c-0.07,-3.84 -1.19,-7.31 -2.99,-9.88c-0.56,-0.79 -1.18,-1.5 -1.87,-2.09c5.66,1.19 9.95,6.08 10.17,11.97ZM43.61,4.68c0.07,0 0.13,0 0.19,0c0.99,0.66 1.91,1.58 2.71,2.71c1.7,2.43 2.8,5.79 2.87,9.52h-5.77V4.68ZM43.61,30.14v-12.23h5.77c-0.1,3.68 -1.19,7 -2.87,9.4c-0.85,1.2 -1.84,2.16 -2.9,2.83ZM45.52,29.92c0.76,-0.62 1.44,-1.39 2.05,-2.25c1.78,-2.55 2.89,-5.97 2.99,-9.76h5.31c-0.22,5.96 -4.6,10.88 -10.35,12.01Z"/>
+            </svg>
+          </span>
+          <span class="pub__brand-text">
+            <span class="pub__brand-name">Mensa Italia</span>
+            <span class="pub__brand-tag">the high I.Q. society</span>
+          </span>
+        </a>
+
+        <label
+          for="pub-nav-toggle"
+          class="pub__hamburger"
+          aria-label="Apri menu"
+          data-i18n-aria-label="web.nav.menu_open_aria"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+
+        <nav
+          class="pub__nav"
+          aria-label="Navigazione principale"
+          data-i18n-aria-label="web.nav.primary_aria"
+        >
+          <ul>
+            {navItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class={`pub__nav-link${active === item.key ? " pub__nav-link--active" : ""}`}
+                  aria-current={active === item.key ? "page" : undefined}
+                  data-i18n={item.i18n}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="pub__cta">
+          <a href="/login" class="pub__cta-btn" data-i18n="web.nav.member_login">Accedi come socio</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="pub__main">
+      <slot />
+    </main>
+
+    <footer class="pub__footer">
+      <div class="pub__footer-inner">
+        <div class="pub__footer-brand">
+          <span class="pub__brand-mark pub__brand-mark--sm" aria-hidden="true">
+            <svg viewBox="0 0 86 86" fill="currentColor" focusable="false">
+              <path fill-rule="evenodd" d="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="pub__footer-name">Mensa Italia</p>
+            <p class="pub__footer-tag" data-i18n="web.footer.tagline">the high I.Q. society · dal 1946</p>
+          </div>
+        </div>
+
+        <nav class="pub__footer-nav" aria-label="Footer" data-i18n-aria-label="web.footer.nav_aria">
+          <ul>
+            <li><a href="/public/about" data-i18n="web.nav.about">Chi siamo</a></li>
+            <li><a href="/public/events" data-i18n="web.nav.events">Eventi</a></li>
+            <li><a href="/public/chapters" data-i18n="web.nav.local_offices">Gruppi locali</a></li>
+            <li><a href="/public/iq-test" data-i18n="web.nav.iq_test">Test del QI</a></li>
+            <li><a href="/login" data-i18n="web.footer.member_area">Area soci</a></li>
+          </ul>
+        </nav>
+
+        <div class="pub__footer-legal">
+          <p data-i18n="web.footer.copy" data-i18n-params={JSON.stringify({ year: String(new Date().getFullYear()) })}>
+            &copy; {new Date().getFullYear()} Mensa Italia APS
+          </p>
+          <p>
+            <a href="https://www.mensa.it/privacy" target="_blank" rel="noopener" data-i18n="web.footer.privacy">Privacy</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://www.mensa.it/termini" target="_blank" rel="noopener" data-i18n="web.footer.terms">Termini</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+  .pub {
+    min-block-size: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    background: var(--color-surface);
+  }
+
+  .pub__mobile-toggle { display: none; }
+
+  /* ── Topbar ──────────────────────────────────────────────────── */
+  .pub__topbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 30;
+    background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .pub__topbar-inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    padding-block: var(--spacing-3);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+  }
+
+  .pub__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    text-decoration: none;
+    color: var(--color-text-primary);
+  }
+  .pub__brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 36px;
+    block-size: 36px;
+    color: var(--color-mensa-blue);
+  }
+  .pub__brand-mark svg { inline-size: 100%; block-size: 100%; display: block; }
+  .pub__brand-mark--sm { inline-size: 28px; block-size: 28px; }
+  .pub__brand-text {
+    display: grid;
+    line-height: 1.15;
+  }
+  .pub__brand-name {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+  .pub__brand-tag {
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  .pub__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    margin-inline-start: auto;
+    padding: var(--spacing-2);
+    cursor: pointer;
+  }
+  .pub__hamburger span {
+    display: block;
+    inline-size: 20px;
+    block-size: 1.5px;
+    background: var(--color-text-primary);
+    border-radius: 2px;
+  }
+
+  .pub__nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .pub__nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: var(--spacing-1);
+  }
+  .pub__nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: color var(--motion-fast) var(--ease-out-quart),
+                background var(--motion-fast) var(--ease-out-quart);
+  }
+  .pub__nav-link:hover {
+    color: var(--color-text-primary);
+    background: var(--color-surface-elevated);
+  }
+  .pub__nav-link--active {
+    color: var(--color-mensa-blue);
+    font-weight: 600;
+  }
+
+  .pub__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px var(--spacing-4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-on-brand);
+    background: var(--color-mensa-blue);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    letter-spacing: -0.005em;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .pub__cta-btn:hover {
+    background: var(--color-mensa-blue-deep);
+  }
+
+  /* ── Main ─────────────────────────────────────────────────────── */
+  .pub__main {
+    min-inline-size: 0;
+  }
+
+  /* ── Footer ───────────────────────────────────────────────────── */
+  .pub__footer {
+    border-block-start: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-elevated);
+    padding-block: var(--spacing-8) var(--spacing-6);
+  }
+  .pub__footer-inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spacing-6);
+  }
+  .pub__footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+  .pub__footer-name {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .pub__footer-tag {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  .pub__footer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-4);
+  }
+  .pub__footer-nav a {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+  .pub__footer-nav a:hover { color: var(--color-mensa-blue); }
+
+  .pub__footer-legal {
+    text-align: end;
+  }
+  .pub__footer-legal p {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+  }
+  .pub__footer-legal a {
+    color: inherit;
+    text-decoration: none;
+    margin-inline: 4px;
+  }
+  .pub__footer-legal a:hover { color: var(--color-text-primary); }
+
+  /* ── Responsive ───────────────────────────────────────────────── */
+  @media (max-width: 880px) {
+    .pub__hamburger { display: flex; }
+    .pub__cta { display: none; }
+    .pub__nav {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      flex-direction: column;
+      align-items: stretch;
+      padding: var(--spacing-3);
+      background: var(--color-surface);
+      border-block-end: 1px solid var(--color-border-subtle);
+      box-shadow: var(--shadow-popover);
+      display: none;
+    }
+    .pub__nav ul {
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pub__nav-link {
+      padding: var(--spacing-3) var(--spacing-4);
+      font-size: var(--text-sm);
+    }
+    .pub__mobile-toggle:checked ~ .pub__topbar .pub__nav {
+      display: flex;
+    }
+    .pub__footer-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: var(--spacing-4);
+    }
+    .pub__footer-brand { justify-content: center; }
+    .pub__footer-legal { text-align: center; }
+  }
+</style>

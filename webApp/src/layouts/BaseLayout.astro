@@ -1,0 +1,135 @@
+---
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Mensa Italia — Area Soci",
+  description = "Il portale dei soci di Mensa Italia. The high I.Q. society dal 1946.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Favicon (Mensa mark, SVG with built-in dark-mode swap) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="mask-icon" href="/favicon.svg" color="#1d2f6f" />
+
+    <!-- Inter web font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+
+    <!-- View Transitions -->
+    <ClientRouter />
+
+    <!-- Optional per-page <head> additions (canonical, OG, JSON-LD…) -->
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+
+    <script>
+      // i18n hydrator: after Mensa.initialize() resolves, swap the textContent
+      // of any [data-i18n] element with the Tolgee translation for the active
+      // locale. The original (Italian) text stays in the DOM as a synchronous
+      // fallback, so SSR output is correct and there's no flash for IT users.
+      // Re-runs on astro:page-load to cover client-side route changes.
+      import { Mensa } from "../lib/mensa";
+
+      let initPromise: Promise<void> | null = null;
+      function ensureInit() {
+        if (!initPromise) initPromise = Mensa.initialize();
+        return initPromise;
+      }
+
+      async function translate() {
+        await ensureInit();
+        // textContent
+        const nodes = document.querySelectorAll<HTMLElement>("[data-i18n]");
+        nodes.forEach((el) => {
+          const key = el.dataset.i18n;
+          if (!key) return;
+          const fallback = (el.textContent ?? "").trim();
+          const next = Mensa.i18n.t(key, fallback);
+          if (next && next !== fallback) el.textContent = next;
+        });
+        // attribute variants: data-i18n-placeholder, data-i18n-aria-label, data-i18n-title
+        const ATTRS: Array<[string, string]> = [
+          ["data-i18n-placeholder", "placeholder"],
+          ["data-i18n-aria-label", "aria-label"],
+          ["data-i18n-title", "title"],
+          ["data-i18n-alt", "alt"],
+        ];
+        for (const [dataAttr, targetAttr] of ATTRS) {
+          const els = document.querySelectorAll<HTMLElement>(`[${dataAttr}]`);
+          els.forEach((el) => {
+            const key = el.getAttribute(dataAttr);
+            if (!key) return;
+            const fallback = el.getAttribute(targetAttr) ?? "";
+            const next = Mensa.i18n.t(key, fallback);
+            if (next && next !== fallback) el.setAttribute(targetAttr, next);
+          });
+        }
+      }
+
+      translate();
+      document.addEventListener("astro:page-load", translate);
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /*
+   * View-transitions timing. DESIGN.md prescribes ease-out-expo +
+   * 520ms (motion-page). The default Astro animation is fine but slightly
+   * snappier than we want — override to land on calm, intentional motion.
+   */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  ::view-transition-old(root) {
+    animation-name: mensa-fade-out;
+  }
+  ::view-transition-new(root) {
+    animation-name: mensa-fade-in;
+  }
+
+  @keyframes mensa-fade-out {
+    to {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+  }
+  @keyframes mensa-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,27 @@
+CREATE TABLE Device (
+    id TEXT NOT NULL PRIMARY KEY,
+    user TEXT NOT NULL DEFAULT '',
+    firebaseId TEXT NOT NULL DEFAULT '',
+    deviceName TEXT NOT NULL DEFAULT '',
+    language TEXT NOT NULL DEFAULT '',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX device_firebase ON Device(firebaseId);
+
+selectAll:
+SELECT * FROM Device ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Device WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Device(id, user, firebaseId, deviceName, language, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Device WHERE id = ?;
+
+deleteAll:
+DELETE FROM Device;

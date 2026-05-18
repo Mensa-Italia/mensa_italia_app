@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../../layouts/AppShell.astro";
+import { TestDateEditor } from "../../../components/localOffices/TestDateEditor";
+
+const { idOrSlug } = Astro.params;
+---
+
+<AppShell title="Date test QI — Mensa Italia" pageTitle="Date test QI">
+  <TestDateEditor idOrSlug={idOrSlug ?? ""} client:only="react" />
+</AppShell>

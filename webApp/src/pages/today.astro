@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { TodayApp } from "../components/TodayApp";
+---
+
+<AppShell title="Today — Mensa Italia" pageTitle="Today">
+  <TodayApp client:only="react" />
+</AppShell>

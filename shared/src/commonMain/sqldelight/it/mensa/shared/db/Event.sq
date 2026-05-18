@@ -1,0 +1,35 @@
+CREATE TABLE Event (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image TEXT NOT NULL DEFAULT '',
+    infoLink TEXT NOT NULL DEFAULT '',
+    contact TEXT NOT NULL DEFAULT '',
+    whenStart INTEGER NOT NULL,
+    whenEnd INTEGER NOT NULL,
+    owner TEXT NOT NULL,
+    isNational INTEGER NOT NULL DEFAULT 0,
+    isSpot INTEGER NOT NULL DEFAULT 0,
+    isPublic INTEGER NOT NULL DEFAULT 0,
+    bookingLink TEXT,
+    positionJson TEXT,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX event_whenStart ON Event(whenStart);
+
+selectAll:
+SELECT * FROM Event ORDER BY whenStart DESC;
+
+selectById:
+SELECT * FROM Event WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Event(id, name, description, image, infoLink, contact, whenStart, whenEnd, owner, isNational, isSpot, isPublic, bookingLink, positionJson, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Event WHERE id = ?;
+
+deleteAll:
+DELETE FROM Event;

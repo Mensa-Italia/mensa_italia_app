@@ -1,0 +1,385 @@
+---
+/**
+ * Eventi pubblici — pagina marketing.
+ *
+ * Fetch server-side dei record `events` con `is_public=true && when_end>=now`,
+ * via `pb.fullListUnauthenticated` (replicato in `publicApi.ts`). Gli eventi
+ * pubblici includono sessioni di test ufficiale, conferenze aperte, eventi
+ * promozionali — tutto ciò che un non-socio può vedere prima di iscriversi.
+ *
+ * I dati sono identici a quelli che la dashboard mostra per i soci, ma qui
+ * filtriamo solo i pubblici e mostriamo CTA "Diventa socio per tutti gli eventi".
+ */
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import {
+  listPublicEvents,
+  pbFileUrl,
+  type PublicEventRecord,
+} from "../../lib/publicApi";
+
+let events: readonly PublicEventRecord[] = [];
+let fetchError: string | null = null;
+try {
+  events = await listPublicEvents();
+} catch (err) {
+  fetchError = err instanceof Error ? err.message : "Errore di caricamento";
+}
+
+const dateFmt = new Intl.DateTimeFormat("it-IT", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+const timeFmt = new Intl.DateTimeFormat("it-IT", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function dateLabel(startsIso: string, endsIso: string): string {
+  const s = new Date(startsIso);
+  const e = new Date(endsIso);
+  const sameDay = s.toDateString() === e.toDateString();
+  if (sameDay) {
+    return `${dateFmt.format(s)} · ${timeFmt.format(s)}–${timeFmt.format(e)}`;
+  }
+  return `${dateFmt.format(s)} → ${dateFmt.format(e)}`;
+}
+---
+
+<PublicLayout
+  active="eventi"
+  title="Eventi pubblici — Mensa Italia"
+  description="Test d'ammissione, conferenze aperte, presentazioni: tutti gli eventi pubblici di Mensa Italia in programma."
+>
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker" data-i18n="public.events.title">Eventi pubblici</p>
+      <h1 class="hero__title" data-i18n="web.public_events.hero.title">Quello che puoi venire a vedere senza essere socio.</h1>
+      <p class="hero__sub" data-i18n="web.public_events.hero.sub">
+        Sessioni di test d'ammissione, conferenze aperte al pubblico,
+        presentazioni di libri e iniziative culturali. Sono tutti eventi
+        organizzati dai gruppi locali Mensa Italia.
+      </p>
+    </div>
+  </section>
+
+  <section class="list">
+    <div class="list__inner">
+      {fetchError && (
+        <div class="list__error" role="alert">
+          <p>
+            <strong data-i18n="public.events.error.title">Errore di caricamento</strong>
+          </p>
+          <p class="list__error-detail">{fetchError}</p>
+        </div>
+      )}
+
+      {!fetchError && events.length === 0 && (
+        <div class="list__empty">
+          <h2 data-i18n="public.events.empty.title">Nessun evento pubblico</h2>
+          <p data-i18n="public.events.empty.description">
+            Al momento non ci sono eventi pubblici in programma.
+            Torna a trovarci tra qualche giorno o seguici sui canali ufficiali.
+          </p>
+        </div>
+      )}
+
+      {!fetchError && events.length > 0 && (
+        <ul class="cards">
+          {events.map((ev) => {
+            const cover = ev.image ? pbFileUrl(ev, ev.image) : "";
+            const position = ev.expand?.position;
+            const region = ev.expand?.owner?.region;
+            return (
+              <li class="card">
+                <a class="card__link" href={`/public/events/${ev.id}`}>
+                  {cover ? (
+                    <img class="card__cover" src={cover} alt="" loading="lazy" />
+                  ) : (
+                    <div class="card__cover card__cover--placeholder" aria-hidden="true" />
+                  )}
+                  <div class="card__body">
+                    <div class="card__tags">
+                      {ev.is_national && <span class="card__tag card__tag--nat">Nazionale</span>}
+                      {!ev.is_national && region && <span class="card__tag">{region}</span>}
+                      {ev.is_spot && <span class="card__tag card__tag--accent">Spot</span>}
+                    </div>
+                    <h2 class="card__title">{ev.name}</h2>
+                    <p class="card__when">{dateLabel(ev.when_start, ev.when_end)}</p>
+                    {position?.name && (
+                      <p class="card__where">
+                        <svg viewBox="0 0 24 24" width={14} height={14} fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                          <path d="M20 10c0 7-8 12-8 12s-8-5-8-12a8 8 0 0 1 16 0Z"/>
+                          <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>{position.name}{position.address ? ` · ${position.address}` : ""}</span>
+                      </p>
+                    )}
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="cta__inner">
+      <p class="cta__kicker" data-i18n="web.public_events.cta.kicker">Per i soci</p>
+      <h2 data-i18n="web.public_events.cta.title">Eventi soltanto soci, una calendarizzazione fitta.</h2>
+      <p data-i18n="web.public_events.cta.body">
+        Oltre agli eventi pubblici, Mensa Italia organizza ogni anno oltre
+        duecento attività riservate ai soci: cene mensili, weekend tematici,
+        gite, congressi nazionali. Tutto pubblicato nella tua area personale.
+      </p>
+      <div class="cta__btns">
+        <a href="/public/iq-test" class="cta__btn cta__btn--primary" data-i18n="web.common.cta.try_test_demo">Prova il test d'esempio</a>
+        <a href="/login" class="cta__btn cta__btn--ghost" data-i18n="web.common.cta.member_login">Sono già socio · Accedi</a>
+      </div>
+    </div>
+  </section>
+</PublicLayout>
+
+<style>
+  /* HERO */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 12%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.625rem, 4.5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-inline-size: 56ch;
+    margin-inline: auto;
+  }
+
+  /* LIST */
+  .list {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .list__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .list__error {
+    padding: var(--spacing-4) var(--spacing-5);
+    background: color-mix(in oklch, var(--color-status-error) 8%, var(--color-surface));
+    border: 1px solid color-mix(in oklch, var(--color-status-error) 30%, var(--color-surface));
+    border-radius: var(--radius-md);
+  }
+  .list__error p { margin: 0; font-size: var(--text-sm); color: var(--color-text-primary); }
+  .list__error-detail { color: var(--color-text-tertiary); font-family: var(--font-mono); margin-block-start: var(--spacing-1) !important; font-size: var(--text-xs) !important; }
+  .list__empty {
+    text-align: center;
+    padding-block: var(--spacing-10);
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .list__empty h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+  .list__empty p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    max-inline-size: 56ch;
+    margin-inline: auto;
+    line-height: 1.55;
+  }
+
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-5);
+  }
+  .card { display: contents; }
+  .card__link {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--motion-fast) var(--ease-out-quart),
+                transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .card__link:hover {
+    border-color: var(--color-mensa-blue);
+    transform: translateY(-2px);
+  }
+  .card__cover {
+    aspect-ratio: 16 / 9;
+    inline-size: 100%;
+    object-fit: cover;
+    background: var(--color-surface-sunken);
+  }
+  .card__cover--placeholder {
+    background:
+      linear-gradient(135deg,
+        color-mix(in oklch, var(--color-mensa-blue) 18%, var(--color-surface)),
+        color-mix(in oklch, var(--color-mensa-cyan) 18%, var(--color-surface)));
+  }
+  .card__body {
+    padding: var(--spacing-4);
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .card__tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    border-radius: 4px;
+  }
+  .card__tag--nat {
+    background: color-mix(in oklch, var(--color-mensa-blue) 12%, var(--color-surface));
+    color: var(--color-mensa-blue);
+  }
+  .card__tag--accent {
+    background: color-mix(in oklch, var(--color-mensa-cyan) 18%, var(--color-surface));
+    color: color-mix(in oklch, var(--color-mensa-cyan) 60%, black);
+  }
+  .card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  .card__when {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .card__where {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card__where svg { flex-shrink: 0; color: var(--color-text-tertiary); }
+
+  /* CTA */
+  .cta {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+    background: var(--color-surface-elevated);
+    text-align: center;
+  }
+  .cta__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .cta__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cta h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .cta p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .cta__btns {
+    margin-block-start: var(--spacing-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+    justify-content: center;
+  }
+  .cta__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+  .cta__btn--primary {
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+  }
+  .cta__btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .cta__btn--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+  .cta__btn--ghost:hover { background: var(--color-surface); }
+</style>

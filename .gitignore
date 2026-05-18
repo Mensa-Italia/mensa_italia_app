@@ -1,4 +1,64 @@
-**/.dart/
-**/.dart_tool/
+# Gradle
+.gradle/
+build/
 **/build/
-**/.vscode/
+!gradle-wrapper.jar
+!**/gradle-wrapper.jar
+local.properties
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.iws
+.kotlin/
+
+# Kotlin Multiplatform / native
+*.klib
+kotlin-js-store/
+
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Generated XCFrameworks
+shared/build/XCFrameworks/
+
+# Generated iOS project (we keep project.yml, regenerate via xcodegen)
+iosApp/iosApp.xcodeproj/
+
+# Env / secrets
+*.env
+.env.local
+secrets.properties
+
+# JavaScript / Web (Astro, Node, Bun)
+node_modules/
+**/node_modules/
+.astro/
+**/.astro/
+**/dist/
+.cache/
+**/.cache/
+*.log
+**/bun-debug-*.log
+
+# Editor / OS
+.DS_Store
+**/.DS_Store

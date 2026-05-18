@@ -1,0 +1,12 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import { PodcastDetailApp } from "../../components/podcasts/PodcastDetailApp";
+import { AudioRoot } from "../../components/audio/AudioRoot";
+
+const { podcastId } = Astro.params;
+---
+
+<AppShell title="Podcast — Mensa Italia" pageTitle="Podcasts">
+  <PodcastDetailApp client:only="react" podcastId={podcastId ?? ""} />
+  <AudioRoot client:only="react" />
+</AppShell>

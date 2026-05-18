@@ -1,0 +1,27 @@
+CREATE TABLE Boutique (
+    id TEXT NOT NULL PRIMARY KEY,
+    uid TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    imagesJson TEXT NOT NULL,
+    amount INTEGER NOT NULL DEFAULT 0,
+    alternativeOf TEXT NOT NULL DEFAULT '',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Boutique ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Boutique WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Boutique(id, uid, name, description, imagesJson, amount, alternativeOf, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Boutique WHERE id = ?;
+
+deleteAll:
+DELETE FROM Boutique;

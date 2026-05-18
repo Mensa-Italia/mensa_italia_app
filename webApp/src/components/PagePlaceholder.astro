@@ -1,0 +1,144 @@
+---
+/**
+ * Reusable scaffold for routes whose full feature isn't built yet.
+ * Renders a real dashboard header (H1 + subtitle) plus a single panel
+ * with an icon, a short description of what the page will do, and
+ * optional bullet list of capabilities. Matches the densità di /today
+ * so the navigation between sections feels continuous instead of
+ * "this one is half-built".
+ */
+import type { ComponentType } from "react";
+
+interface Props {
+  title: string;
+  subtitle: string;
+  icon: ComponentType<{ size?: number; strokeWidth?: number }>;
+  description: string;
+  capabilities?: string[];
+}
+
+const { title, subtitle, icon: Icon, description, capabilities = [] } = Astro.props;
+---
+
+<div class="ph">
+  <header class="ph__head">
+    <h1 class="ph__title">{title}</h1>
+    <p class="ph__subtitle">{subtitle}</p>
+  </header>
+
+  <section class="ph__panel" aria-labelledby="ph-status">
+    <div class="ph__icon" aria-hidden="true">
+      <Icon size={20} strokeWidth={1.75} />
+    </div>
+    <div class="ph__copy">
+      <p class="ph__badge">In arrivo</p>
+      <h2 id="ph-status" class="ph__h2">Questa sezione sta arrivando</h2>
+      <p class="ph__desc">{description}</p>
+      {
+        capabilities.length > 0 && (
+          <ul class="ph__list">
+            {capabilities.map((cap) => (
+              <li>{cap}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+</div>
+
+<style>
+  .ph {
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .ph__head {
+    display: grid;
+    gap: var(--spacing-2);
+    padding-block-end: var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .ph__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+  }
+  .ph__subtitle {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    max-inline-size: 68ch;
+    line-height: 1.55;
+  }
+  .ph__panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-5);
+    align-items: start;
+  }
+  @media (max-width: 600px) {
+    .ph__panel {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ph__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklch, var(--color-mensa-blue) 10%, var(--color-surface));
+    color: var(--color-mensa-blue);
+  }
+  .ph__copy {
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .ph__badge {
+    margin: 0;
+    inline-size: max-content;
+    padding: 2px 8px;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in oklch, var(--color-status-info) 70%, black);
+    background: color-mix(in oklch, var(--color-status-info) 18%, var(--color-surface));
+    border-radius: var(--radius-full);
+  }
+  .ph__h2 {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.005em;
+  }
+  .ph__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-inline-size: 68ch;
+  }
+  .ph__list {
+    margin: var(--spacing-2) 0 0 0;
+    padding: 0 0 0 var(--spacing-4);
+    display: grid;
+    gap: var(--spacing-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .ph__list li::marker {
+    color: var(--color-text-tertiary);
+  }
+</style>

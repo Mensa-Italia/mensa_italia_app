@@ -1,0 +1,178 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <!-- Top navigation bar: sticky, blurred backdrop -->
+  <header
+    style="
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-subtle);
+    "
+  >
+    <div
+      style="
+        max-inline-size: 1200px;
+        margin-inline: auto;
+        padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+        padding-block: var(--spacing-3);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-4);
+      "
+    >
+      <!-- Logo mark + wordmark -->
+      <a
+        href="/"
+        aria-label="Mensa Italia — Home"
+        style="
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-2);
+          text-decoration: none;
+          color: var(--color-text-primary);
+        "
+      >
+        <span
+          style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--color-mensa-blue);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-on-brand);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            letter-spacing: -0.02em;
+          "
+        >
+          M
+        </span>
+        <span style="font-weight: 600; font-size: var(--text-sm); letter-spacing: -0.01em;">
+          Mensa Italia
+        </span>
+      </a>
+
+      <!-- Primary nav -->
+      <nav
+        aria-label="Navigazione principale"
+        style="display: flex; gap: var(--spacing-4); margin-inline-start: var(--spacing-4);"
+      >
+        <a
+          href="/events"
+          style="
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            padding-block: var(--spacing-1);
+            transition: color var(--motion-fast) var(--ease-out-quart);
+          "
+        >
+          Eventi
+        </a>
+        <a
+          href="/card"
+          style="
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            padding-block: var(--spacing-1);
+            transition: color var(--motion-fast) var(--ease-out-quart);
+          "
+        >
+          Tessera
+        </a>
+        <a
+          href="/directory"
+          style="
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            padding-block: var(--spacing-1);
+            transition: color var(--motion-fast) var(--ease-out-quart);
+          "
+        >
+          Soci
+        </a>
+      </nav>
+
+      <!-- Spacer -->
+      <div style="flex: 1;" aria-hidden="true"></div>
+
+      <!-- User menu placeholder -->
+      <div style="display: flex; align-items: center; gap: var(--spacing-2);">
+        <slot name="user-menu" />
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main
+    style="
+      min-block-size: calc(100dvh - 57px - 56px);
+      padding-block: var(--spacing-8);
+      padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    "
+  >
+    <div style="max-inline-size: 1200px; margin-inline: auto;">
+      <slot />
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer
+    style="
+      border-top: 1px solid var(--color-border-subtle);
+      padding-block: var(--spacing-5);
+      padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    "
+  >
+    <div
+      style="
+        max-inline-size: 1200px;
+        margin-inline: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-4);
+        flex-wrap: wrap;
+      "
+    >
+      <p
+        style="
+          font-size: var(--text-xs);
+          color: var(--color-text-tertiary);
+          margin: 0;
+        "
+      >
+        &copy; {new Date().getFullYear()} Mensa Italia. Tutti i diritti riservati.
+      </p>
+      <p
+        style="
+          font-size: var(--text-xs);
+          color: var(--color-text-tertiary);
+          margin: 0;
+        "
+      >
+        The high I.Q. society — dal 1946
+      </p>
+    </div>
+  </footer>
+</BaseLayout>

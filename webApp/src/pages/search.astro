@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { SearchApp } from "../components/search/SearchApp";
+---
+
+<AppShell title="Cerca — Mensa Italia" pageTitle="Cerca">
+  <SearchApp client:only="react" />
+</AppShell>

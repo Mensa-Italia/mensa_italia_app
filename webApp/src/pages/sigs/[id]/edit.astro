@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../../layouts/AppShell.astro";
+import { EditSigForm } from "../../../components/sigs/EditSigForm";
+
+const { id } = Astro.params;
+---
+
+<AppShell title="Modifica gruppo — Mensa Italia" pageTitle="Modifica gruppo">
+  <EditSigForm sigId={id ?? ""} client:only="react" />
+</AppShell>

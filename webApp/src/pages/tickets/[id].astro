@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AppShell from "../../layouts/AppShell.astro";
+import { TicketDetailApp } from "../../components/tickets/TicketDetailApp";
+
+const { id } = Astro.params;
+---
+
+<AppShell title="Biglietto — Mensa Italia" pageTitle="Biglietto">
+  <TicketDetailApp ticketId={id ?? ""} client:only="react" />
+</AppShell>

@@ -1,0 +1,25 @@
+CREATE TABLE Sig (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image TEXT NOT NULL,
+    link TEXT NOT NULL,
+    groupType TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Sig ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Sig WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Sig(id, name, description, image, link, groupType, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Sig WHERE id = ?;
+
+deleteAll:
+DELETE FROM Sig;

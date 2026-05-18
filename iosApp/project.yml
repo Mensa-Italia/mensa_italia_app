@@ -1,0 +1,80 @@
+name: iosApp
+options:
+  bundleIdPrefix: it.mensa
+  deploymentTarget:
+    iOS: "26.0"
+
+packages:
+  Stripe:
+    url: https://github.com/stripe/stripe-ios-spm
+    from: 23.30.0
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.0.0
+
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+        excludes:
+          - "**/*.orig"
+    info:
+      path: iosApp/Info.plist
+      properties:
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+          UIImageName: LaunchLogo
+          UIImageRespectsSafeAreaInsets: false
+        CFBundleDisplayName: Mensa
+        NSCalendarsFullAccessUsageDescription: "Mensa Italia chiede accesso al tuo calendario per aggiungere eventi che ti interessano."
+        NSCameraUsageDescription: "Mensa Italia usa la fotocamera per scansionare i QR dei francobolli Tableport."
+        NSLocationWhenInUseUsageDescription: "Mensa Italia usa la tua posizione per mostrarti eventi vicini sulla mappa."
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: it.mensa.app.stripe
+            CFBundleURLSchemes:
+              - mensa
+        UIBackgroundModes:
+          - audio
+          - remote-notification
+          - fetch
+          - processing
+        BGTaskSchedulerPermittedIdentifiers:
+          - it.mensa.app.spotlight-refresh
+        FirebaseAppDelegateProxyEnabled: false
+    settings:
+      base:
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 6WA5D3RJBU
+        CODE_SIGN_ENTITLEMENTS: iosApp/iosApp.entitlements
+        # Mensa Italia paid team (dev@mensa.it) — canonical bundle id.
+        PRODUCT_BUNDLE_IDENTIFIER: it.mensa.app
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortraitUpsideDown"
+        SWIFT_VERSION: "5.10"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../shared/build/XCFrameworks/debug
+        LD_RUNPATH_SEARCH_PATHS: $(inherited) @executable_path/Frameworks
+        OTHER_LDFLAGS: -framework Shared -lsqlite3 -lc++
+    preBuildScripts:
+      - script: |
+          cd "$SRCROOT/.."
+          ./gradlew :shared:assembleSharedDebugXCFramework
+        name: Build Kotlin Shared
+        basedOnDependencyAnalysis: false
+    dependencies:
+      - framework: ../shared/build/XCFrameworks/debug/Shared.xcframework
+        embed: true
+      - package: Stripe
+        product: StripePaymentSheet
+      - package: Stripe
+        product: StripePaymentsUI
+      - package: Stripe
+        product: StripeApplePay
+      - package: Firebase
+        product: FirebaseMessaging

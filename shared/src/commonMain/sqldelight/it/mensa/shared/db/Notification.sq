@@ -1,0 +1,27 @@
+CREATE TABLE Notification (
+    id TEXT NOT NULL PRIMARY KEY,
+    tr TEXT NOT NULL,
+    trNamedParamsJson TEXT NOT NULL,
+    dataJson TEXT,
+    seen INTEGER,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX notification_seen ON Notification(seen);
+
+selectAll:
+SELECT * FROM Notification ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Notification WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Notification(id, tr, trNamedParamsJson, dataJson, seen, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Notification WHERE id = ?;
+
+deleteAll:
+DELETE FROM Notification;

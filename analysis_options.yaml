@@ -1,4 +1,0 @@
-include: package:flutter_lints/flutter.yaml
-analyzer:
-  errors:
-    use_build_context_synchronously: ignore

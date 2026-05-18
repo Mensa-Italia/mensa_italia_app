@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1.7
+
+# Stage 1: bundle Astro + React with bun.
+# Assumes `shared/build/dist/js/productionLibrary` has been produced beforehand
+# by `./gradlew :shared:jsBrowserProductionLibraryDistribution` (the CI workflow
+# runs it before `docker build`). Building gradle/Android inside the image would
+# require the Android SDK and balloons the image, so we keep it out.
+FROM oven/bun:1.1-alpine AS build
+WORKDIR /work
+
+# Bring the KMP/JS library first so the `file:../shared/...` dep resolves.
+COPY shared/build/dist/js/productionLibrary ./shared/build/dist/js/productionLibrary
+
+# Install deps (cacheable layer) before copying the rest of the source.
+WORKDIR /work/webApp
+COPY webApp/package.json webApp/bun.lock ./
+RUN bun install --frozen-lockfile
+
+# Source + build.
+COPY webApp/ ./
+RUN bun run build
+
+
+# Stage 2: minimal runtime — only production deps + built output.
+FROM oven/bun:1.1-alpine AS runtime
+WORKDIR /srv
+
+ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=4321
+
+# Layout mirrors the source tree so the `file:../shared/...` symlink resolves.
+COPY --from=build /work/shared/build/dist/js/productionLibrary /srv/shared/build/dist/js/productionLibrary
+COPY --from=build /work/webApp/package.json /srv/webApp/package.json
+COPY --from=build /work/webApp/bun.lock /srv/webApp/bun.lock
+COPY --from=build /work/webApp/dist /srv/webApp/dist
+
+WORKDIR /srv/webApp
+RUN bun install --frozen-lockfile --production
+
+EXPOSE 4321
+
+# Astro standalone Node adapter entrypoint.
+CMD ["node", "./dist/server/entry.mjs"]

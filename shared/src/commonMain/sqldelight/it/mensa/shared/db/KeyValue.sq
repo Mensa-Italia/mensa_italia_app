@@ -1,0 +1,20 @@
+CREATE TABLE KeyValue (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT
+);
+
+selectAll:
+SELECT * FROM KeyValue;
+
+selectById:
+SELECT * FROM KeyValue WHERE key = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO KeyValue(key, value)
+VALUES (?, ?);
+
+deleteById:
+DELETE FROM KeyValue WHERE key = ?;
+
+deleteAll:
+DELETE FROM KeyValue;

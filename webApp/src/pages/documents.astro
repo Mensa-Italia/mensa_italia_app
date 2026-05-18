@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { DocumentsListApp } from "../components/documents/DocumentsListApp";
+---
+
+<AppShell title="Documenti — Mensa Italia" pageTitle="Documenti">
+  <DocumentsListApp client:only="react" />
+</AppShell>

@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { TesseraApp } from "../components/card/TesseraApp";
+---
+
+<AppShell title="Tessera — Mensa Italia" pageTitle="Tessera">
+  <TesseraApp client:only="react" />
+</AppShell>

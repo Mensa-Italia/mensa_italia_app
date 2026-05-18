@@ -1,0 +1,23 @@
+CREATE TABLE Stamp (
+    id TEXT NOT NULL PRIMARY KEY,
+    description TEXT NOT NULL,
+    image TEXT NOT NULL,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Stamp ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Stamp WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Stamp(id, description, image, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM Stamp WHERE id = ?;
+
+deleteAll:
+DELETE FROM Stamp;

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material3 base theme — Compose applies M3 theme dynamically, this XML theme
+         is used only for the window/status bar setup before Compose draws. -->
+    <style name="Theme.MensaApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Transparent status and nav bars — Compose handles colors via WindowCompat -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+    </style>
+
+    <!-- Splash/launch screen — brand blue backdrop, no flash -->
+    <style name="Theme.MensaApp.Splash" parent="Theme.MensaApp">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+</resources>

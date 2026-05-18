@@ -1,0 +1,8 @@
+---
+import AppShell from "../layouts/AppShell.astro";
+import { DiscoverApp } from "../components/discover/DiscoverApp";
+---
+
+<AppShell title="Esplora — Mensa Italia" pageTitle="Esplora">
+  <DiscoverApp client:only="react" />
+</AppShell>

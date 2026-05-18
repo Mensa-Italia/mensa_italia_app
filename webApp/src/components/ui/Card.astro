@@ -1,0 +1,22 @@
+---
+interface Props {
+  tinted?: boolean;
+  class?: string;
+}
+
+const { tinted = false, class: className } = Astro.props;
+---
+
+<div
+  class={className}
+  style={{
+    border: "1px solid var(--color-border-subtle)",
+    borderRadius: "var(--radius-md)",
+    padding: "var(--spacing-5)",
+    background: tinted
+      ? "color-mix(in oklch, var(--color-mensa-blue) 6%, var(--color-surface))"
+      : "var(--color-surface)",
+  }}
+>
+  <slot />
+</div>

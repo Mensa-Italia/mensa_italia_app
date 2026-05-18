@@ -1,0 +1,38 @@
+# Sample compose to run the published image behind Traefik with HTTPS.
+# Copia su un'altra macchina (es. server casa / VPS), aggiorna:
+#   - DOMAIN: il dominio puntato all'IP della macchina
+#   - ACME_EMAIL: email per Let's Encrypt
+# Servono 80/443 raggiungibili dall'esterno per il challenge TLS-ALPN.
+
+services:
+  traefik:
+    image: traefik:v3
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+  web:
+    image: ghcr.io/mensa-italia/mensa-web:latest
+    restart: unless-stopped
+    environment:
+      ASTRO_SITE: https://${DOMAIN}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mensa-web.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.mensa-web.entrypoints=websecure
+      - traefik.http.routers.mensa-web.tls.certresolver=le
+      - traefik.http.services.mensa-web.loadbalancer.server.port=4321

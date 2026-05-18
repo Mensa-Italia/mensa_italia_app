@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mensa</string>
+    <string name="default_notification_channel_id">mensa_default</string>
+    <string name="default_notification_channel_name">Mensa Notifiche</string>
+    <string name="default_notification_channel_desc">Notifiche generali Mensa Italia</string>
+</resources>

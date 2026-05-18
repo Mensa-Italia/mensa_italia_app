@@ -1,0 +1,603 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "name": "Mensa Italia",
+  "alternateName": "Mensa Italia APS",
+  "url": "https://app.mensa.it",
+  "logo": "https://www.mensa.it/wp-content/uploads/2022/01/logo-mensa-italia.png",
+  "foundingDate": "1983",
+  "founder": [
+    { "@type": "Organization", "name": "Mensa International (Oxford, 1946)" },
+  ],
+  "areaServed": "IT",
+  "memberOf": {
+    "@type": "Organization",
+    "name": "Mensa International",
+    "url": "https://www.mensa.org/",
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Viale Lunigiana 7",
+    "addressLocality": "Milano",
+    "postalCode": "20125",
+    "addressCountry": "IT",
+  },
+  "email": "info@mensa.it",
+  "sameAs": [
+    "https://www.mensa.it",
+    "https://www.facebook.com/MensaItalia",
+    "https://www.instagram.com/mensa_italia/",
+  ],
+  "description": "Mensa è un club internazionale di persone curiose. L'unico requisito per entrare è un test di logica nel 98° percentile.",
+};
+---
+
+<PublicLayout active="home" jsonLd={organizationJsonLd}>
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker" data-i18n="web.home.hero.kicker">Mensa Italia · dal 1983 · The High I.Q. Society</p>
+      <h1 class="hero__title" data-i18n="web.home.hero.title">
+        Persone <em>curiose</em>.<br/>Un test in comune.
+      </h1>
+      <p class="hero__sub" data-i18n="web.home.hero.sub">
+        Mensa è un club internazionale di persone curiose. L'unico requisito
+        per entrare è un test di logica: se rientri nel 2% più alto della
+        popolazione, sei dentro. Dal latino <em>mensa</em>, la tavola rotonda:
+        tra soci si sta tutti allo stesso livello.
+      </p>
+      <div class="hero__cta">
+        <a href="/public/iq-test" class="hero__btn hero__btn--primary" data-i18n="web.home.hero.cta_primary">
+          Mettiti alla prova
+        </a>
+        <a href="/public/about" class="hero__btn hero__btn--ghost" data-i18n="web.home.hero.cta_ghost">
+          Cos'è Mensa →
+        </a>
+      </div>
+
+      <dl class="hero__stats">
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.population">della popolazione</dt>
+          <dd>2<span>%</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="public.chi_siamo.stat.members_world">soci nel mondo</dt>
+          <dd>150.000<span>+</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="web.home.stats.members_italy">soci in Italia</dt>
+          <dd>2.600<span>+</span></dd>
+        </div>
+        <div>
+          <dt data-i18n="web.home.stats.local_offices">gruppi locali</dt>
+          <dd>20</dd>
+        </div>
+      </dl>
+    </div>
+
+    <aside class="hero__quote" aria-hidden="true">
+      <blockquote>
+        <p>«In Mensa l'unico criterio di ammissione è un risultato pari o superiore al 98° percentile in un test del quoziente intellettivo riconosciuto.»</p>
+        <footer>Statuto, art. 3 · Roma, 1946</footer>
+      </blockquote>
+    </aside>
+  </section>
+
+  <!-- ═══ COSA FACCIAMO ════════════════════════════════════════ -->
+  <section class="features">
+    <div class="features__inner">
+      <header class="features__head">
+        <p class="features__kicker" data-i18n="web.home.features.kicker">Cosa facciamo</p>
+        <h2 class="features__title" data-i18n="web.home.features.title">Comunità, cultura, conversazione.</h2>
+      </header>
+
+      <div class="features__grid">
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.events.title">Eventi nazionali</h3>
+          <p data-i18n="web.home.features.events.body">Incontri annuali, convegni, weekend a tema. Soci da tutta Italia si ritrovano per condividere idee e tempo.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 12l2 2 4-4" />
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.local.title">Gruppi locali</h3>
+          <p data-i18n="web.home.features.local.body">20 gruppi territoriali coprono tutta l'Italia. Cene, mostre, gite, partite a scacchi. La vita ordinaria di una comunità.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.quid.title">La rivista <em>Quid</em></h3>
+          <p data-i18n="web.home.features.quid.body">Pubblicazione trimestrale dei soci, dal 1985. Saggi, racconti, riflessioni, recensioni — l'archivio è tuo dopo l'iscrizione.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 6.1H3M21 12.1H3M15.1 18H3" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.sigs.title">SIG &amp; interessi</h3>
+          <p data-i18n="web.home.features.sigs.body">Gruppi tematici (SIG) sui temi più disparati: filosofia, vino, escape room, programmazione, fotografia, archeologia.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.intl.title">Internazionale</h3>
+          <p data-i18n="web.home.features.intl.body">Mensa è in 100 paesi con 145.000 soci. La tessera italiana ti riconosce ovunque, dagli incontri regionali ai mondiali annuali.</p>
+        </article>
+
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 9V5a3 3 0 0 0-6 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <h3 data-i18n="web.home.features.deals.title">Convenzioni</h3>
+          <p data-i18n="web.home.features.deals.body">Sconti dedicati ai soci su libri, musei, software, formazione, ristoranti. Una rete che cresce ogni mese.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COME ENTRARE ════════════════════════════════════════ -->
+  <section class="join">
+    <div class="join__inner">
+      <header>
+        <p class="join__kicker" data-i18n="web.home.join.kicker">Come entrare</p>
+        <h2 class="join__title" data-i18n="web.home.join.title">Due strade, una porta.</h2>
+      </header>
+
+      <ol class="join__steps">
+        <li class="join__step">
+          <span class="join__num">1</span>
+          <h3 data-i18n="web.home.join.step1.title">Test ufficiale Mensa</h3>
+          <p data-i18n="web.home.join.step1.body">
+            Iscriviti a una delle sessioni d'esame organizzate dai gruppi locali.
+            Il test ufficiale dura circa due ore ed è supervisionato da un test administrator certificato.
+          </p>
+          <a href="/public/events" class="join__link" data-i18n="web.home.join.step1.cta">Vedi prossime sessioni →</a>
+        </li>
+        <li class="join__step">
+          <span class="join__num">2</span>
+          <h3 data-i18n="web.home.join.step2.title">Test pregressi</h3>
+          <p data-i18n="web.home.join.step2.body">
+            Se hai già sostenuto un test del QI riconosciuto (Stanford-Binet, WAIS, Cattell, Raven, ecc.),
+            puoi presentare il certificato e saltare il test interno.
+          </p>
+          <a href="/public/about#test-pregressi" class="join__link" data-i18n="web.home.join.step2.cta">Test riconosciuti →</a>
+        </li>
+      </ol>
+
+      <div class="join__try">
+        <div>
+          <p class="join__try-kicker" data-i18n="web.home.join.try.kicker">Non sai da dove iniziare?</p>
+          <h3 data-i18n="web.home.join.try.title">Prova il nostro test dimostrativo</h3>
+          <p class="join__try-sub" data-i18n="web.home.join.try.body">
+            Niente di ufficiale: lo stesso test di esempio realizzato da Mensa Norge,
+            con domande figurative. Dieci minuti per capire come funziona e darti
+            un primo orientamento.
+          </p>
+        </div>
+        <a href="/public/iq-test" class="join__try-btn" data-i18n="web.home.join.try.cta">Inizia il test →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA finale ══════════════════════════════════════════ -->
+  <section class="end">
+    <div class="end__inner">
+      <p class="end__kicker" data-i18n="web.home.end.kicker">Sei già socio?</p>
+      <h2 data-i18n="web.home.end.title">Accedi alla tua area personale.</h2>
+      <p class="end__sub" data-i18n="web.home.end.body">
+        Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.
+      </p>
+      <a href="/login" class="end__btn" data-i18n="web.home.end.cta">Accedi come socio</a>
+    </div>
+  </section>
+</PublicLayout>
+
+<style>
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(80% 50% at 100% 0%, color-mix(in oklch, var(--color-mensa-cyan) 18%, transparent), transparent 70%),
+      radial-gradient(60% 50% at 0% 100%, color-mix(in oklch, var(--color-mensa-blue) 12%, transparent), transparent 70%),
+      var(--color-surface);
+  }
+  .hero__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    padding-block: clamp(var(--spacing-10), 12vh, var(--spacing-16));
+    display: grid;
+    gap: var(--spacing-5);
+    max-inline-size: min(1200px, 100%);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+    max-inline-size: 18ch;
+  }
+  .hero__title em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--color-mensa-blue);
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: clamp(var(--text-base), 2vw, var(--text-lg));
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+    max-inline-size: 56ch;
+  }
+  .hero__cta {
+    margin-block-start: var(--spacing-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+  }
+  .hero__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    letter-spacing: -0.005em;
+    transition: transform var(--motion-fast) var(--ease-out-quart),
+                background var(--motion-fast) var(--ease-out-quart);
+  }
+  .hero__btn--primary {
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+  }
+  .hero__btn--primary:hover {
+    background: var(--color-mensa-blue-deep);
+    transform: translateY(-1px);
+  }
+  .hero__btn--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+  .hero__btn--ghost:hover {
+    background: var(--color-surface-elevated);
+  }
+
+  .hero__stats {
+    margin: var(--spacing-6) 0 0 0;
+    padding-block-start: var(--spacing-6);
+    border-block-start: 1px solid var(--color-border-subtle);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-4);
+  }
+  .hero__stats > div { display: grid; gap: 4px; }
+  .hero__stats dt {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+  .hero__stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 3vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__stats dd span { color: var(--color-mensa-blue); }
+
+  .hero__quote {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .hero__stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* ═══ FEATURES ═══════════════════════════════════════════════ */
+  .features {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .features__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-8);
+  }
+  .features__head {
+    display: grid;
+    gap: var(--spacing-2);
+    max-inline-size: 60ch;
+  }
+  .features__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .features__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-5);
+  }
+  .feature {
+    display: grid;
+    gap: var(--spacing-3);
+    padding: var(--spacing-5);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    transition: border-color var(--motion-fast) var(--ease-out-quart),
+                transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .feature:hover {
+    border-color: var(--color-mensa-blue);
+    transform: translateY(-2px);
+  }
+  .feature__icon {
+    inline-size: 36px;
+    block-size: 36px;
+    color: var(--color-mensa-blue);
+  }
+  .feature__icon svg { inline-size: 100%; block-size: 100%; }
+  .feature h3 {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.005em;
+  }
+  .feature h3 em { font-style: italic; font-weight: 500; }
+  .feature p {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+
+  /* ═══ JOIN ═══════════════════════════════════════════════════ */
+  .join {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .join__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-8);
+  }
+  .join__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .join__title {
+    margin: var(--spacing-2) 0 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .join__steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-5);
+  }
+  @media (max-width: 720px) {
+    .join__steps { grid-template-columns: 1fr; }
+  }
+  .join__step {
+    position: relative;
+    padding: var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .join__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    margin-block-end: var(--spacing-3);
+  }
+  .join__step h3 {
+    margin: 0 0 var(--spacing-2) 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.005em;
+  }
+  .join__step p {
+    margin: 0 0 var(--spacing-3) 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .join__link {
+    font-size: var(--text-xs);
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .join__link:hover { text-decoration: underline; }
+
+  .join__try {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-5);
+    align-items: center;
+    padding: var(--spacing-6);
+    background: linear-gradient(135deg,
+      var(--color-mensa-blue),
+      var(--color-mensa-blue-deep));
+    color: var(--color-text-on-brand);
+    border-radius: var(--radius-lg);
+  }
+  @media (max-width: 720px) {
+    .join__try { grid-template-columns: 1fr; }
+  }
+  .join__try-kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+  .join__try h3 {
+    margin: var(--spacing-1) 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .join__try-sub {
+    margin: 0;
+    font-size: var(--text-xs);
+    opacity: 0.85;
+    line-height: 1.5;
+    max-inline-size: 56ch;
+  }
+  .join__try-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-5);
+    background: white;
+    color: var(--color-mensa-blue-deep);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .join__try-btn:hover {
+    background: var(--color-mensa-parchment);
+  }
+
+  /* ═══ END ═══════════════════════════════════════════════════ */
+  .end {
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .end__inner {
+    max-inline-size: 56ch;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .end__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .end h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .end__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .end__btn {
+    justify-self: center;
+    margin-block-start: var(--spacing-3);
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-6);
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+  .end__btn:hover { background: var(--color-mensa-blue-deep); }
+</style>
