@@ -42,7 +42,8 @@ webApp/dist/
 # Node / Astro
 **/node_modules/
 **/.astro/
-**/dist/
+# NB: NON usare `**/dist/` qui — matcherebbe anche shared/build/dist/ (la lib JS).
+# webApp/dist/ è già escluso esplicitamente sopra.
 
 # IDE / editors
 **/.idea/
