@@ -50,7 +50,7 @@ stripe-android = "21.19.0"
 
 # ML Kit & Camera
 mlkit-barcode = "17.3.0"
-camerax = "1.4.0"
+camerax = "1.6.1"
 
 # Google Wallet / Pay
 play-services-pay = "16.5.0"
