@@ -1,0 +1,390 @@
+---
+/**
+ * Landing MensaTesting — pagina pubblica di ingresso al flusso di ammissione.
+ * Demo navigabile: nessuna logica reale, solo navigazione tra pagine MVP.
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  title="Diventa socio Mensa Italia — Test di ammissione"
+  description="Scopri come diventare socio Mensa Italia: registrati, prenota il test di ammissione e unisciti alla comunità."
+>
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">MensaTesting</p>
+      <h1 class="hero__title">Diventa socio<br>Mensa Italia</h1>
+      <p class="hero__sub">
+        Il test di ammissione dura 90 minuti ed è aperto a tutti.<br>
+        Se rientri nel 2% più alto della popolazione, sei dentro.
+      </p>
+      <div class="hero__actions">
+        <a href="/public/mvp/register" class="btn btn--primary">Crea account</a>
+        <a href="/login" class="btn btn--ghost">Ho già un account</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3 STEP ════════════════════════════════════════════════ -->
+  <section class="steps">
+    <div class="steps__inner">
+      <h2 class="steps__label">Come funziona</h2>
+      <div class="steps__grid">
+        <div class="step">
+          <span class="step__num">1</span>
+          <h3 class="step__title">Iscriviti</h3>
+          <p class="step__body">Crea il tuo account gratuito, completa il profilo con i dati anagrafici.</p>
+        </div>
+        <div class="step">
+          <span class="step__num">2</span>
+          <h3 class="step__title">Prenota e fai il test</h3>
+          <p class="step__body">Scegli sede e data, paga i 30 € di quota esame, presentati con un documento.</p>
+        </div>
+        <div class="step">
+          <span class="step__num">3</span>
+          <h3 class="step__title">Diventa socio</h3>
+          <p class="step__body">Se superi la soglia del 98° percentile, completa l'iscrizione e benvenuto in Mensa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ DETTAGLI ═══════════════════════════════════════════════ -->
+  <section class="details">
+    <div class="details__inner">
+      <h2 class="details__title">Tutto quello che devi sapere</h2>
+      <ul class="details__list">
+        <li>
+          <span class="details__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </span>
+          <div>
+            <strong>Durata</strong>
+            <p>Il test dura 90 minuti: 45 sequenze di figure, niente matematica né cultura generale.</p>
+          </div>
+        </li>
+        <li>
+          <span class="details__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
+          <div>
+            <strong>Costo</strong>
+            <p>30 € la quota esame. La quota associativa annuale è di 75 € se superi il test.</p>
+          </div>
+        </li>
+        <li>
+          <span class="details__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 10c0 7-8 12-8 12s-8-5-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          <div>
+            <strong>Sedi</strong>
+            <p>Le sessioni si tengono in diverse città italiane: Roma, Milano, Bologna, Napoli e altre.</p>
+          </div>
+        </li>
+        <li>
+          <span class="details__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </span>
+          <div>
+            <strong>Quando</strong>
+            <p>Sessioni regolari tutto l'anno. Consulta il calendario e prenota il posto che preferisci.</p>
+          </div>
+        </li>
+        <li>
+          <span class="details__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          </span>
+          <div>
+            <strong>Esito</strong>
+            <p>Ricevi l'esito entro due settimane dalla sessione, con il tuo punteggio e il percentile.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ CTA FINALE ════════════════════════════════════════════ -->
+  <section class="ready">
+    <div class="ready__inner">
+      <h2 class="ready__title">Pronto a scoprire il tuo QI?</h2>
+      <p class="ready__sub">Crea un account gratuito per prenotare la tua sessione d'esame.</p>
+      <div class="ready__actions">
+        <a href="/public/mvp/register" class="btn btn--primary btn--lg">Crea account</a>
+        <a href="/login" class="btn btn--ghost">Ho già un account →</a>
+      </div>
+      <p class="ready__faq">
+        Hai dubbi?
+        <a href="/public/mvp/faq">Leggi le domande frequenti →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ DEMO BANNER ═══════════════════════════════════════════ -->
+  <div class="demo-banner">
+    <p>
+      <strong>Demo navigabile</strong> — i bottoni non eseguono operazioni reali.
+      <a href="/public/mvp/hub">Hub demo MVP →</a>
+    </p>
+  </div>
+</PublicLayout>
+
+<style>
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    letter-spacing: -0.005em;
+    transition: background var(--motion-fast) var(--ease-out-quart),
+                border-color var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary {
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+  }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+  .btn--lg { padding: 14px var(--spacing-7); font-size: var(--text-base); }
+
+  /* ── Hero ─────────────────────────────────────────────────────── */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 12%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 12vh, 5rem);
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .hero__actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-block-start: var(--spacing-2);
+  }
+
+  /* ── Steps ────────────────────────────────────────────────────── */
+  .steps {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .steps__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .steps__label {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .steps__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+  }
+  @media (max-width: 720px) { .steps__grid { grid-template-columns: 1fr; } }
+  .step {
+    padding: var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .step__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand);
+    border-radius: 50%;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-block-end: var(--spacing-1);
+  }
+  .step__title {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .step__body {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.6;
+  }
+
+  /* ── Details ────────────────────────────────────────────────────── */
+  .details {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .details__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .details__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .details__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .details__list li {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+    align-items: flex-start;
+  }
+  .details__list li:last-child { border-block-end: none; }
+  .details__icon {
+    inline-size: 24px;
+    block-size: 24px;
+    color: var(--color-mensa-blue);
+    flex-shrink: 0;
+    margin-block-start: 2px;
+  }
+  .details__icon svg { inline-size: 100%; block-size: 100%; }
+  .details__list strong {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-block-end: 2px;
+  }
+  .details__list p {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.55;
+  }
+
+  /* ── Ready ─────────────────────────────────────────────────────── */
+  .ready {
+    padding-block: clamp(var(--spacing-10), 10vh, 5rem);
+    text-align: center;
+  }
+  .ready__inner {
+    max-inline-size: 560px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .ready__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .ready__sub {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .ready__actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .ready__faq {
+    margin: var(--spacing-2) 0 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .ready__faq a {
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+  }
+  .ready__faq a:hover { text-decoration: underline; }
+
+  /* ── Demo banner ────────────────────────────────────────────────── */
+  .demo-banner {
+    background: color-mix(in oklch, var(--color-mensa-blue) 8%, transparent);
+    border-block-start: 1px solid color-mix(in oklch, var(--color-mensa-blue) 20%, transparent);
+    padding-block: var(--spacing-3);
+    text-align: center;
+  }
+  .demo-banner p {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .demo-banner a {
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+    margin-inline-start: var(--spacing-2);
+  }
+  .demo-banner a:hover { text-decoration: underline; }
+</style>

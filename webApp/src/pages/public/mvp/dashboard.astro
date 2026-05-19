@@ -1,0 +1,257 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Dashboard — MensaTesting"
+  pageTitle="Dashboard"
+  audience="applicant"
+  activeHref="/public/mvp/dashboard"
+>
+  <div class="page-content">
+
+    <div class="greeting">
+      <div>
+        <h1 class="greeting__title">Ciao, Marco</h1>
+        <p class="greeting__sub">Sei a metà del percorso. Manca solo la prenotazione del test.</p>
+      </div>
+    </div>
+
+    <div class="stepper">
+      <div class="stepper__item stepper__item--done">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Registrato</p>
+        </div>
+      </div>
+      <div class="stepper__item stepper__item--done">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Email confermata</p>
+        </div>
+      </div>
+      <div class="stepper__item stepper__item--done">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Profilo completato</p>
+        </div>
+      </div>
+      <div class="stepper__item stepper__item--current">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Test prenotato</p>
+          <p class="stepper__meta">Prossimo step</p>
+        </div>
+      </div>
+      <div class="stepper__item">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Esito</p>
+        </div>
+      </div>
+      <div class="stepper__item">
+        <div class="stepper__dot"></div>
+        <div class="stepper__content">
+          <p class="stepper__label">Iscrizione socio</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-card">
+      <div class="next-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="next-card__body">
+        <p class="next-card__label">Prossimo step</p>
+        <p class="next-card__title">Prenota il tuo test</p>
+        <p class="next-card__meta">Scegli sede e data · 30 € · 90 minuti</p>
+      </div>
+      <a href="/public/mvp/book-test" class="btn btn--primary">Prenota test →</a>
+    </div>
+
+    <div class="quick">
+      <h2 class="quick__title">Azioni rapide</h2>
+      <div class="quick__grid">
+        <a href="/public/mvp/profile" class="quick__item">
+          <span class="quick__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          </span>
+          <span class="quick__label">Modifica profilo</span>
+          <span class="quick__arrow">→</span>
+        </a>
+        <a href="/public/mvp/my-tests" class="quick__item">
+          <span class="quick__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </span>
+          <span class="quick__label">I miei test</span>
+          <span class="quick__arrow">→</span>
+        </a>
+        <a href="/public/mvp/faq" class="quick__item">
+          <span class="quick__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </span>
+          <span class="quick__label">FAQ</span>
+          <span class="quick__arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<style>
+  .page-content {
+    max-inline-size: 720px;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px var(--spacing-4);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+
+  .greeting__title {
+    margin: 0 0 var(--spacing-2) 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .greeting__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .stepper {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  @media (max-width: 600px) {
+    .stepper { grid-template-columns: 1fr; gap: 0; }
+  }
+  .stepper::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-start: calc(100% / 12);
+    inline-size: calc(100% - 100% / 6);
+    block-size: 2px;
+    background: var(--color-border-subtle);
+    z-index: 0;
+  }
+  @media (max-width: 600px) { .stepper::before { display: none; } }
+  .stepper__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 600px) {
+    .stepper__item { flex-direction: row; text-align: start; padding-block: var(--spacing-2); }
+  }
+  .stepper__dot {
+    inline-size: 24px;
+    block-size: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border-subtle);
+    background: var(--color-surface);
+    flex-shrink: 0;
+  }
+  .stepper__item--done .stepper__dot {
+    background: #22c55e;
+    border-color: #22c55e;
+    position: relative;
+  }
+  .stepper__item--done .stepper__dot::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .stepper__item--current .stepper__dot {
+    border-color: var(--color-mensa-blue);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 20%, transparent);
+  }
+  .stepper__label {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  .stepper__item--done .stepper__label { color: #16a34a; }
+  .stepper__item--current .stepper__label { color: var(--color-mensa-blue); }
+  .stepper__meta {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .next-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    border-inline-start: 3px solid var(--color-mensa-blue);
+  }
+  @media (max-width: 600px) { .next-card { flex-direction: column; align-items: flex-start; } }
+  .next-card__icon { inline-size: 36px; block-size: 36px; color: var(--color-mensa-blue); flex-shrink: 0; }
+  .next-card__icon svg { inline-size: 100%; block-size: 100%; }
+  .next-card__body { flex: 1; display: grid; gap: 2px; }
+  .next-card__label { margin: 0; font-size: var(--text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-mensa-blue); }
+  .next-card__title { margin: 0; font-size: var(--text-base); font-weight: 600; color: var(--color-text-primary); }
+  .next-card__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .quick__title { margin: 0 0 var(--spacing-3) 0; font-size: var(--text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+  .quick__grid { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+  .quick__item { display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-4) var(--spacing-5); text-decoration: none; color: var(--color-text-primary); border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .quick__item:last-child { border-block-end: none; }
+  .quick__item:hover { background: var(--color-surface-elevated); }
+  .quick__icon { inline-size: 22px; block-size: 22px; color: var(--color-mensa-blue); flex-shrink: 0; }
+  .quick__icon svg { inline-size: 100%; block-size: 100%; }
+  .quick__label { flex: 1; font-size: var(--text-sm); font-weight: 500; }
+  .quick__arrow { color: var(--color-text-tertiary); font-size: var(--text-sm); }
+</style>

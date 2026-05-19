@@ -1,0 +1,182 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const offices = [
+  {
+    name: "Roma",
+    dates: [
+      { date: "Sab 6 Giu 2026",  slots: 12, free: 3,  stato: "Quasi piena" },
+      { date: "Sab 27 Giu 2026", slots: 12, free: 9,  stato: "Aperta"      },
+      { date: "Sab 11 Lug 2026", slots: 12, free: 12, stato: "Aperta"      },
+      { date: "Sab 1 Ago 2026",  slots: 12, free: 0,  stato: "Chiusa"      },
+    ],
+  },
+  {
+    name: "Milano",
+    dates: [
+      { date: "Dom 7 Giu 2026",  slots: 16, free: 2,  stato: "Quasi piena" },
+      { date: "Dom 28 Giu 2026", slots: 16, free: 14, stato: "Aperta"      },
+      { date: "Dom 5 Lug 2026",  slots: 16, free: 16, stato: "Aperta"      },
+    ],
+  },
+  {
+    name: "Torino",
+    dates: [
+      { date: "Ven 5 Giu 2026",  slots: 8,  free: 0,  stato: "Chiusa"      },
+      { date: "Ven 3 Lug 2026",  slots: 8,  free: 7,  stato: "Aperta"      },
+      { date: "Ven 7 Ago 2026",  slots: 8,  free: 8,  stato: "Aperta"      },
+    ],
+  },
+  {
+    name: "Napoli",
+    dates: [
+      { date: "Sab 13 Giu 2026", slots: 10, free: 4,  stato: "Aperta"      },
+      { date: "Sab 4 Lug 2026",  slots: 10, free: 10, stato: "Aperta"      },
+      { date: "Sab 1 Ago 2026",  slots: 10, free: 6,  stato: "Aperta"      },
+      { date: "Sab 5 Set 2026",  slots: 10, free: 10, stato: "Aperta"      },
+    ],
+  },
+];
+
+const statoClass: Record<string, string> = {
+  "Aperta":      "badge--green",
+  "Quasi piena": "badge--orange",
+  "Chiusa":      "badge--gray",
+};
+---
+
+<ConsoleShell
+  title="Calendario sessioni — Admin Nazionale"
+  pageTitle="Calendario sessioni"
+  
+  activeHref="/console/admin/dates" scope="admin"
+  
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Calendario sessioni</h1>
+        <p class="page-header__sub">Gestione date e posti per sede</p>
+      </div>
+      <span class="badge badge--purple">applicants_admin</span>
+    </header>
+
+    <div class="top-actions">
+      <details class="new-date-panel">
+        <summary class="btn btn--primary">+ Apri nuova data</summary>
+        <div class="new-date-panel__body">
+          <h3 class="new-date-panel__title">Aggiungi sessione</h3>
+          <div class="new-date-form">
+            <div class="form-group">
+              <label class="form-label" for="nd-sede">Sede</label>
+              <select id="nd-sede" class="form-select">
+                <option>Roma</option><option>Milano</option><option>Torino</option><option>Napoli</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nd-data">Data</label>
+              <input type="date" id="nd-data" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nd-slots">Posti totali</label>
+              <input type="number" id="nd-slots" class="form-input" min="1" max="50" value="12" />
+            </div>
+            <button class="btn btn--primary btn--sm" disabled>Crea sessione (demo)</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    {offices.map((office) => (
+      <div class="office-block">
+        <h2 class="office-block__title">{office.name}</h2>
+        <div class="date-table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Data</th><th>Posti totali</th><th>Posti liberi</th><th>Stato</th><th aria-label="Azioni"></th></tr>
+            </thead>
+            <tbody>
+              {office.dates.map((d) => (
+                <tr>
+                  <td class="td--date">{d.date}</td>
+                  <td>{d.slots}</td>
+                  <td>
+                    <span class={d.free === 0 ? "td-free td-free--zero" : d.free <= 3 ? "td-free td-free--low" : "td-free"}>
+                      {d.free}
+                    </span>
+                  </td>
+                  <td><span class={`badge badge--sm ${statoClass[d.stato]}`}>{d.stato}</span></td>
+                  <td class="td--actions">
+                    <a href={`/console/admin/dates?msg=ok`} class="btn btn--xs btn--ghost">Modifica posti</a>
+                    <a href={`/console/admin/dates?msg=ok`} class="btn btn--xs btn--warn-ghost">Chiudi sede</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; white-space: nowrap; }
+  .badge--sm { font-size: var(--text-2xs); padding: 0.15rem 0.5rem; }
+  .badge--purple { background: #ede9fe; color: #4c1d95; padding: 0.25rem 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0; align-self: flex-start; }
+  .badge--green  { background: #d1fae5; color: #065f46; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+  .badge--gray   { background: var(--color-surface-elevated); color: var(--color-text-tertiary); }
+
+  .new-date-panel { width: fit-content; }
+  .new-date-panel summary { list-style: none; cursor: pointer; }
+  .new-date-panel summary::-webkit-details-marker { display: none; }
+  .new-date-panel__body { margin-block-start: var(--spacing-3); padding: var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); width: 420px; max-width: 100%; }
+  .new-date-panel__title { margin: 0 0 var(--spacing-3); font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .new-date-form { display: grid; gap: var(--spacing-3); }
+  .form-group { display: grid; gap: 0.3rem; }
+  .form-label { font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-primary); }
+  .form-select, .form-input { padding: 0.55rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); width: 100%; box-sizing: border-box; }
+
+  .office-block { display: grid; gap: var(--spacing-2); }
+  .office-block__title { margin: 0; font-size: var(--text-sm); font-weight: 800; color: var(--color-text-primary); padding-inline-start: 0.25rem; }
+
+  .date-table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table thead tr { background: var(--color-surface-elevated); border-block-end: 1px solid var(--color-border-subtle); }
+  .table th { padding: 0.6rem 0.875rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); white-space: nowrap; }
+  .table tbody tr { border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .table tbody tr:last-child { border-block-end: none; }
+  .table tbody tr:hover { background: var(--color-surface-elevated); }
+  .table td { padding: 0.65rem 0.875rem; color: var(--color-text-primary); vertical-align: middle; }
+  .td--date { font-weight: 600; white-space: nowrap; }
+  .td--actions { text-align: right; white-space: nowrap; display: flex; gap: var(--spacing-1); justify-content: flex-end; align-items: center; }
+  .td-free { font-weight: 700; color: #15803d; }
+  .td-free--low  { color: #d97706; }
+  .td-free--zero { color: var(--color-text-tertiary); }
+
+  .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--sm  { padding: 0.4rem 0.875rem; font-size: var(--text-xs); }
+  .btn--xs  { padding: 0.25rem 0.6rem; font-size: var(--text-xs); border-radius: var(--radius-sm); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost   { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); border-width: 1.5px; }
+  .btn--warn-ghost { background: transparent; color: #dc2626; border-color: #dc2626; border-width: 1.5px; }
+  button.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @media (max-width: 600px) {
+    .table thead { display: none; }
+    .table tbody, .table tr, .table td { display: block; width: 100%; }
+    .table tr { padding: 0.75rem 0.875rem; border-block-end: 1px solid var(--color-border-subtle); }
+    .table td { padding: 0.2rem 0; }
+    .td--actions { justify-content: flex-start; }
+  }
+</style>

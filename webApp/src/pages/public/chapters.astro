@@ -1,17 +1,12 @@
 ---
-/**
- * Gruppi locali (lista pubblica).
- *
- * Fetch server-side della view `view_local_office`, accessibile senza
- * autenticazione — replica di `LocalOfficesApi.listAllPublic()` in KMP.
- * Cover image dal field `image`, link a `/gruppi/{slug}`.
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import {
   listPublicLocalOffices,
   pbFileUrl,
   type PublicLocalOfficeRecord,
 } from "../../lib/publicApi";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
 
 let offices: readonly PublicLocalOfficeRecord[] = [];
 let fetchError: string | null = null;
@@ -20,6 +15,16 @@ try {
 } catch (err) {
   fetchError = err instanceof Error ? err.message : "Errore di caricamento";
 }
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.chapters.read();
+
+const heroKicker = cms?.heroKicker ?? "Gruppi locali";
+const heroTitle = cms?.heroTitle ?? "Una comunità che si incontra davvero, vicino a te.";
+const heroSubtitle = cms?.heroSubtitle ?? "Venti gruppi sul territorio nazionale, dal Trentino alla Sicilia. Ognuno organizza cene mensili, conferenze, gite, weekend di giochi, gruppi di lettura. Ognuno ha un proprio team di referenti volontari.";
+const ctaKicker = cms?.ctaKicker ?? "Vuoi unirti?";
+const ctaTitle = cms?.ctaTitle ?? "Ogni socio appartiene al gruppo della sua regione.";
+const ctaBody = cms?.ctaBody ?? "Una volta diventato socio, sei automaticamente parte del gruppo della tua regione. Puoi comunque partecipare alle attività di tutti gli altri gruppi: la tessera è una sola per tutta Italia.";
 ---
 
 <PublicLayout
@@ -29,13 +34,9 @@ try {
 >
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="web.local_offices.hero.kicker">Gruppi locali</p>
-      <h1 class="hero__title" data-i18n="web.local_offices.hero.title">Una comunità che si incontra davvero, vicino a te.</h1>
-      <p class="hero__sub" data-i18n="web.local_offices.hero.sub">
-        Venti gruppi sul territorio nazionale, dal Trentino alla Sicilia.
-        Ognuno organizza cene mensili, conferenze, gite, weekend di giochi,
-        gruppi di lettura. Ognuno ha un proprio team di referenti volontari.
-      </p>
+      <p class="hero__kicker" data-i18n="web.local_offices.hero.kicker">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.local_offices.hero.title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.local_offices.hero.sub">{heroSubtitle}</p>
     </div>
   </section>
 
@@ -90,13 +91,9 @@ try {
 
   <section class="cta">
     <div class="cta__inner">
-      <p class="cta__kicker" data-i18n="web.local_offices.cta.kicker">Vuoi unirti?</p>
-      <h2 data-i18n="web.local_offices.cta.title">Ogni socio appartiene al gruppo della sua regione.</h2>
-      <p data-i18n="web.local_offices.cta.body">
-        Una volta diventato socio, sei automaticamente parte del gruppo
-        della tua regione. Puoi comunque partecipare alle attività di tutti
-        gli altri gruppi: la tessera è una sola per tutta Italia.
-      </p>
+      <p class="cta__kicker" data-i18n="web.local_offices.cta.kicker">{ctaKicker}</p>
+      <h2 data-i18n="web.local_offices.cta.title">{ctaTitle}</h2>
+      <p data-i18n="web.local_offices.cta.body">{ctaBody}</p>
       <div class="cta__btns">
         <a href="/public/iq-test" class="cta__btn cta__btn--primary" data-i18n="web.common.cta.try_test">Mettiti alla prova</a>
         <a href="/public/about" class="cta__btn cta__btn--ghost" data-i18n="web.common.cta.how_to_join">Come si entra</a>

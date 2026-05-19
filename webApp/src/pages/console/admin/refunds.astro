@@ -1,0 +1,128 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Cancellazione test — Admin Nazionale"
+  pageTitle="Cancellazione test"
+  
+  activeHref="/console/admin/refunds" scope="admin"
+  
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Cancellazione test</h1>
+        <p class="page-header__sub">Gestione rimborso e motivazione</p>
+      </div>
+      <span class="badge badge--purple">applicants_admin</span>
+    </header>
+
+    <a href="/console/admin/applicant?id=mock" class="back-link">← Torna al dettaglio aspirante</a>
+
+    <div class="test-card">
+      <h2 class="test-card__title">Test selezionato</h2>
+      <dl class="test-card__fields">
+        <div><dt>Candidato</dt><dd>Marco Rossi</dd></div>
+        <div><dt>Sede</dt><dd>Roma</dd></div>
+        <div><dt>Data e ora</dt><dd>Sab 6 Giu 2026 · 09:00</dd></div>
+        <div><dt>Prenotazione</dt><dd><code>#PRE-2026-0047</code></dd></div>
+        <div><dt>Importo pagato</dt><dd><strong>30,00 €</strong></dd></div>
+        <div><dt>Pagamento</dt><dd>3 giu 2026 · Stripe</dd></div>
+      </dl>
+    </div>
+
+    <div class="warn-banner">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.345 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/></svg>
+      <p>Azione riservata a national admin · viene registrata nel log di audit · non reversibile</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label" for="motivation">Motivazione cancellazione</label>
+        <select id="motivation" class="form-select">
+          <option value="">— Seleziona motivazione —</option>
+          <option>Errore prenotazione</option>
+          <option>Causa di forza maggiore</option>
+          <option>Sede annullata</option>
+          <option>Altro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="notes">Note interne</label>
+        <textarea id="notes" class="form-textarea" rows="3" placeholder="Descrivi la situazione per il log di audit…"></textarea>
+      </div>
+      <div class="form-actions">
+        <a href="/console/admin/applicants" class="btn btn--primary btn--lg">Cancella e rimborsa 30,00 €</a>
+        <a href="/console/admin/applicants" class="btn btn--ghost">Cancella senza rimborso</a>
+      </div>
+    </div>
+
+    <div class="audit-section">
+      <h2 class="audit-section__title">Storico operazioni</h2>
+      <div class="audit-table-wrap">
+        <table class="table">
+          <thead><tr><th>Operatore</th><th>Azione</th><th>Data / ora</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Roberto Bianchi</td>
+              <td>Prenotazione confermata · pagamento verificato 30 €</td>
+              <td class="td--date">3 giu 2026 · 14:02</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 780px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--purple { background: #ede9fe; color: #4c1d95; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .test-card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-4) var(--spacing-5); display: grid; gap: var(--spacing-3); }
+  .test-card__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .test-card__fields { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); }
+  @media (max-width: 480px) { .test-card__fields { grid-template-columns: 1fr; } }
+  .test-card__fields > div { display: flex; flex-direction: column; gap: 0.1rem; }
+  .test-card__fields dt { font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+  .test-card__fields dd { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .test-card__fields code { font-size: var(--text-xs); background: var(--color-surface-elevated); padding: 0.1rem 0.35rem; border-radius: var(--radius-sm); color: var(--color-text-secondary); }
+
+  .warn-banner { display: flex; gap: var(--spacing-2); align-items: flex-start; padding: var(--spacing-3) var(--spacing-4); background: #fff7ed; border: 1px solid #fdba74; border-radius: var(--radius-sm); font-size: var(--text-xs); color: #9a3412; font-weight: 600; }
+  .warn-banner svg { width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-block-start: 0.1rem; }
+  .warn-banner p { margin: 0; }
+
+  .form-card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .form-group { display: grid; gap: var(--spacing-1); }
+  .form-label { font-size: var(--text-2xs); font-weight: 700; color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-select, .form-textarea { padding: 0.6rem 0.875rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); width: 100%; box-sizing: border-box; }
+  .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+  .form-textarea { resize: vertical; }
+
+  .form-actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--lg { padding: 0.75rem 2rem; font-size: var(--text-base); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost   { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+
+  .audit-section { display: grid; gap: var(--spacing-3); }
+  .audit-section__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .audit-table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table th { padding: 0.6rem 0.875rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); border-block-end: 1px solid var(--color-border-subtle); }
+  .table td { padding: 0.75rem 0.875rem; color: var(--color-text-primary); }
+  .td--date { color: var(--color-text-tertiary); white-space: nowrap; }
+</style>

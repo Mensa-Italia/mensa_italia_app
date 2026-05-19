@@ -1,17 +1,11 @@
 ---
-/**
- * Quid — pagina pubblica della rivista.
- *
- * Fetch server-side della collection `quid_issues` (PB pubblica). Per ogni
- * numero: cover, titolo, numero, conteggio articoli, link al PDF (se
- * presente). I singoli articoli + audio narrazione + viewer PDF embedded
- * sono riservati ai soci nella dashboard.
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import {
   listPublicQuidIssues,
   type PublicQuidIssueRecord,
 } from "../../lib/publicApi";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
 
 let issues: readonly PublicQuidIssueRecord[] = [];
 let fetchError: string | null = null;
@@ -20,6 +14,16 @@ try {
 } catch (err) {
   fetchError = err instanceof Error ? err.message : "Errore di caricamento";
 }
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.quid.read();
+
+const heroKicker = cms?.heroKicker ?? "La rivista dei soci";
+const heroTitle = cms?.heroTitle ?? "Quid.";
+const heroSubtitle = cms?.heroSubtitle ?? "Il trimestrale dei soci, scritto dai soci stessi. Sfoglialo online su quid.mensa.it. Audio narrazione, archivio completo e viewer integrato sono nell'app per soci.";
+const ctaKicker = cms?.ctaKicker ?? "Vuoi scrivere su Quid?";
+const ctaTitle = cms?.ctaTitle ?? "I pezzi della rivista nascono dai soci.";
+const ctaBody = cms?.ctaBody ?? "Ogni numero esce con un tema (la Casa, il Tempo, la Fine…) e raccoglie saggi, narrativa, recensioni e poesia scritte direttamente dai soci. La redazione è aperta a tutti coloro che vogliono contribuire.";
 
 const dateFmt = new Intl.DateTimeFormat("it-IT", {
   year: "numeric",
@@ -46,13 +50,9 @@ const jsonLd = {
 >
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="web.quid.hero.kicker">La rivista dei soci</p>
-      <h1 class="hero__title">Quid.</h1>
-      <p class="hero__sub" data-i18n="web.quid.hero.sub">
-        Il trimestrale dei soci, scritto dai soci stessi. Sfoglialo online su
-        quid.mensa.it. Audio narrazione, archivio completo e viewer integrato
-        sono nell'app per soci.
-      </p>
+      <p class="hero__kicker" data-i18n="web.quid.hero.kicker">{heroKicker}</p>
+      <h1 class="hero__title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.quid.hero.sub">{heroSubtitle}</p>
     </div>
   </section>
 
@@ -133,14 +133,9 @@ const jsonLd = {
 
   <section class="cta">
     <div class="cta__inner">
-      <p class="cta__kicker">Vuoi scrivere su Quid?</p>
-      <h2>I pezzi della rivista nascono dai soci.</h2>
-      <p>
-        Ogni numero esce con un tema (la <em>Casa</em>, il <em>Tempo</em>, la
-        <em>Fine</em>…) e raccoglie saggi, narrativa, recensioni e poesia
-        scritte direttamente dai soci. La redazione è aperta a tutti coloro
-        che vogliono contribuire.
-      </p>
+      <p class="cta__kicker">{ctaKicker}</p>
+      <h2>{ctaTitle}</h2>
+      <p>{ctaBody}</p>
       <div class="cta__btns">
         <a href="/public/iq-test" class="cta__btn cta__btn--primary">Mettiti alla prova</a>
         <a href="/login" class="cta__btn cta__btn--ghost">Sono già socio</a>

@@ -1,0 +1,152 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Inserimento esito — Staff Sede"
+  pageTitle="Inserimento esito"
+  scope="test-assistant"
+  activeHref="/console/test-assistant/score"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Inserimento esito</h1>
+        <p class="page-header__sub">Sede Roma · Sessione 09:00 · Sab 6 Giu 2026</p>
+      </div>
+      <span class="badge badge--orange">Staff sede</span>
+    </header>
+
+    <a href="/console/test-assistant/today" class="back-link">← Torna alla lista</a>
+
+    <div class="candidate-strip">
+      <div class="candidate-strip__avatar" aria-hidden="true">MR</div>
+      <div>
+        <p class="candidate-strip__name">Marco Rossi</p>
+        <p class="candidate-strip__meta">CF: RSSMRC85A01H501Z · Slot 09:00 · Presente</p>
+      </div>
+      <span class="status status--green">Presente</span>
+    </div>
+
+    <div class="steps-bar">
+      <div class="step-item step-item--active">
+        <span class="step-num">1</span>
+        <span>Inserisci punteggio</span>
+      </div>
+      <div class="step-sep">→</div>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        <span>Conferma esito</span>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2 class="form-card__title">Punteggio e risultato</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="score-raw">Punteggio grezzo (0–35)</label>
+          <input type="number" id="score-raw" class="form-input" min="0" max="35" value="28" placeholder="Es. 28" />
+          <p class="form-hint">Numero di risposte corrette sul foglio scansionato.</p>
+        </div>
+        <div class="iq-preview">
+          <p class="iq-preview__label">IQ stimato (conversione automatica)</p>
+          <p class="iq-preview__value">128</p>
+          <p class="iq-preview__sub">Punteggio 28/35 · 98° percentile ✓</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="esito">Esito</label>
+        <select id="esito" class="form-select">
+          <option value="passato" selected>Passato</option>
+          <option value="non_passato">Non passato</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="note">Note interne (facoltativo)</label>
+        <textarea id="note" class="form-textarea" rows="3" placeholder="Eventuali annotazioni sullo svolgimento..."></textarea>
+      </div>
+
+      <div class="confirm-box">
+        <h3 class="confirm-box__title">Riepilogo da confermare</h3>
+        <dl class="confirm-box__list">
+          <div><dt>Candidato</dt><dd>Marco Rossi</dd></div>
+          <div><dt>Punteggio</dt><dd>28 / 35</dd></div>
+          <div><dt>IQ stimato</dt><dd>128</dd></div>
+          <div><dt>Esito</dt><dd><span class="status status--green">Passato</span></dd></div>
+        </dl>
+        <p class="confirm-box__audit">Questa azione viene registrata nel log · audit obbligatorio</p>
+      </div>
+
+      <div class="form-actions">
+        <a href="/console/test-assistant/upload?id=mock" class="btn btn--primary">Salva esito</a>
+        <a href="/console/test-assistant/today" class="btn btn--ghost">Annulla</a>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 780px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .candidate-strip { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); flex-wrap: wrap; }
+  .candidate-strip__avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--color-mensa-blue); color: var(--color-text-on-brand); font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .candidate-strip__name { margin: 0; font-weight: 700; color: var(--color-text-primary); font-size: var(--text-sm); }
+  .candidate-strip__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; }
+  .status--green { background: #d1fae5; color: #065f46; }
+
+  .steps-bar { display: flex; align-items: center; gap: var(--spacing-3); font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .step-item { display: flex; align-items: center; gap: var(--spacing-2); color: var(--color-text-tertiary); }
+  .step-item--active { color: var(--color-text-primary); font-weight: 700; }
+  .step-num { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--color-border-subtle); display: flex; align-items: center; justify-content: center; font-size: var(--text-2xs); font-weight: 800; flex-shrink: 0; }
+  .step-item--active .step-num { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .step-sep { color: var(--color-text-tertiary); }
+
+  .form-card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .form-card__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); padding-block-end: var(--spacing-3); border-block-end: 1px solid var(--color-border-subtle); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4); }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .form-group { display: grid; gap: var(--spacing-1); }
+  .form-label { font-size: var(--text-2xs); font-weight: 700; color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-input, .form-select, .form-textarea { padding: 0.6rem 0.875rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); width: 100%; box-sizing: border-box; transition: border-color 0.15s; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+  .form-textarea { resize: vertical; }
+  .form-hint { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .iq-preview { padding: var(--spacing-4); background: #f0fdf4; border: 1px solid #86efac; border-radius: var(--radius-md); text-align: center; }
+  .iq-preview__label { margin: 0 0 var(--spacing-1); font-size: var(--text-2xs); font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.06em; }
+  .iq-preview__value { margin: 0; font-size: 2.5rem; font-weight: 800; color: #065f46; line-height: 1; }
+  .iq-preview__sub { margin: var(--spacing-1) 0 0; font-size: var(--text-xs); color: #15803d; }
+
+  .confirm-box { background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); padding: var(--spacing-4); display: grid; gap: var(--spacing-3); }
+  .confirm-box__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .confirm-box__list { margin: 0; display: grid; gap: var(--spacing-1); }
+  .confirm-box__list > div { display: flex; gap: var(--spacing-4); font-size: var(--text-sm); }
+  .confirm-box__list dt { color: var(--color-text-tertiary); min-inline-size: 100px; }
+  .confirm-box__list dd { margin: 0; color: var(--color-text-primary); font-weight: 600; }
+  .confirm-box__audit { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); font-style: italic; }
+
+  .form-actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 0.6rem 1.5rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+</style>

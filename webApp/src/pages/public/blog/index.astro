@@ -1,0 +1,155 @@
+---
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const allNews = await reader.collections.news.all();
+
+const sorted = [...allNews].sort((a, b) => {
+  const da = a.entry.publishedAt ?? "";
+  const db = b.entry.publishedAt ?? "";
+  return db.localeCompare(da);
+});
+
+function formatDate(d: string | null | undefined) {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("it-IT", { year: "numeric", month: "long", day: "numeric" });
+}
+---
+
+<PublicLayout
+  title="Blog — Mensa Italia"
+  description="Aggiornamenti, racconti, comunicati ufficiali da Mensa Italia."
+>
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">Mensa Italia</p>
+      <h1 class="hero__title">Blog</h1>
+      <p class="hero__sub">Aggiornamenti, racconti, comunicati ufficiali da Mensa Italia.</p>
+    </div>
+  </section>
+
+  <section class="blog-list">
+    <div class="blog-list__inner">
+      {sorted.length === 0 ? (
+        <p class="blog-list__empty">Nessun articolo ancora. Torna presto.</p>
+      ) : sorted.map((item) => (
+        <a class="blog-card" href={`/public/blog/${item.slug}`}>
+          <time class="blog-card__date" datetime={item.entry.publishedAt ?? ""}>
+            {formatDate(item.entry.publishedAt)}
+          </time>
+          <h2 class="blog-card__title">{item.entry.title}</h2>
+          {item.entry.excerpt && (
+            <p class="blog-card__excerpt">{item.entry.excerpt}</p>
+          )}
+          <span class="blog-card__cta">Leggi →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</PublicLayout>
+
+<style>
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 12%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  .blog-list {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+    border-block-start: 1px solid var(--color-border-subtle);
+  }
+  .blog-list__inner {
+    max-inline-size: 760px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+  .blog-list__empty {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-tertiary);
+    text-align: center;
+    padding-block: var(--spacing-10);
+  }
+
+  .blog-card {
+    display: grid;
+    gap: var(--spacing-2);
+    padding: var(--spacing-5) var(--spacing-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--motion-fast) var(--ease-out-quart),
+                box-shadow var(--motion-fast) var(--ease-out-quart);
+  }
+  .blog-card:hover {
+    border-color: var(--color-mensa-blue);
+    box-shadow: 0 2px 16px color-mix(in oklch, var(--color-mensa-blue) 12%, transparent);
+  }
+  .blog-card__date {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .blog-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+  }
+  .blog-card__excerpt {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+  .blog-card__cta {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-mensa-blue);
+  }
+</style>

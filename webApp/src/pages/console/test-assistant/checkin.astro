@@ -1,0 +1,105 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Check-in candidato — Staff Sede"
+  pageTitle="Check-in candidato"
+  scope="test-assistant"
+  activeHref="/console/test-assistant/checkin"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Check-in candidato</h1>
+        <p class="page-header__sub">Sede Roma · Sessione 09:00 · Sab 6 Giu 2026</p>
+      </div>
+      <span class="badge badge--orange">Staff sede</span>
+    </header>
+
+    <a href="/console/test-assistant/today" class="back-link">← Torna alla lista</a>
+
+    <div class="candidate-card">
+      <div class="candidate-card__avatar" aria-hidden="true">MR</div>
+      <div class="candidate-card__info">
+        <h2 class="candidate-card__name">Marco Rossi</h2>
+        <dl class="candidate-card__fields">
+          <div><dt>Codice fiscale</dt><dd><code>RSSMRC85A01H501Z</code></dd></div>
+          <div><dt>Data di nascita</dt><dd>1 gennaio 1985</dd></div>
+          <div><dt>Slot orario</dt><dd>09:00</dd></div>
+          <div><dt>Prenotazione</dt><dd>#PRE-2026-0047</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="doc-check">
+      <h3 class="doc-check__title">Documento d'identità</h3>
+      <label class="doc-check__row">
+        <span class="checkbox-visual" role="checkbox" aria-checked="true" tabindex="0">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg>
+        </span>
+        <span>Documento d'identità valido presentato e verificato</span>
+      </label>
+      <p class="doc-check__note">Carta d'identità / passaporto / patente — deve essere in corso di validità.</p>
+    </div>
+
+    <div class="actions-box">
+      <h3 class="actions-box__title">Conferma presenza candidato</h3>
+      <p class="actions-box__sub">Seleziona l'esito del check-in per questo candidato.</p>
+      <div class="actions-box__btns">
+        <a href="/console/test-assistant/score?id=mock" class="btn btn--primary btn--large">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          Presente
+        </a>
+        <a href="/console/test-assistant/today" class="btn btn--danger btn--large">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"/></svg>
+          Assente
+        </a>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 780px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .candidate-card { display: flex; gap: var(--spacing-5); padding: var(--spacing-5); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); align-items: flex-start; flex-wrap: wrap; }
+  .candidate-card__avatar { width: 4rem; height: 4rem; border-radius: 50%; background: var(--color-mensa-blue); color: var(--color-text-on-brand); font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .candidate-card__name { margin: 0 0 var(--spacing-3); font-size: var(--text-lg); font-weight: 700; color: var(--color-text-primary); }
+  .candidate-card__fields { margin: 0; display: grid; gap: var(--spacing-2); }
+  .candidate-card__fields > div { display: flex; gap: var(--spacing-3); align-items: baseline; font-size: var(--text-sm); }
+  .candidate-card__fields dt { color: var(--color-text-tertiary); min-inline-size: 120px; font-weight: 500; flex-shrink: 0; }
+  .candidate-card__fields dd { margin: 0; color: var(--color-text-primary); font-weight: 600; }
+  .candidate-card__fields code { font-size: var(--text-xs); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-secondary); }
+
+  .doc-check { padding: var(--spacing-4) var(--spacing-5); background: #f0fdf4; border: 1px solid #86efac; border-radius: var(--radius-md); display: grid; gap: var(--spacing-2); }
+  .doc-check__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: #065f46; }
+  .doc-check__row { display: flex; align-items: center; gap: var(--spacing-3); cursor: pointer; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .checkbox-visual { width: 1.25rem; height: 1.25rem; border-radius: 0.25rem; background: #22c55e; border: 1.5px solid #16a34a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .checkbox-visual svg { width: 0.85rem; height: 0.85rem; color: #fff; }
+  .doc-check__note { margin: 0; font-size: var(--text-xs); color: #15803d; }
+
+  .actions-box { padding: var(--spacing-5); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); display: grid; gap: var(--spacing-3); }
+  .actions-box__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+  .actions-box__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+  .actions-box__btns { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+
+  .btn { display: inline-flex; align-items: center; gap: var(--spacing-2); padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--large { padding: 0.75rem 1.75rem; font-size: var(--text-base); }
+  .btn svg { width: 1.1rem; height: 1.1rem; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--danger  { background: #dc2626; color: #fff; }
+</style>

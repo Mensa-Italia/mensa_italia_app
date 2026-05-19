@@ -1,0 +1,167 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Dettaglio aspirante — Admin Nazionale"
+  pageTitle="Marco Rossi"
+  scope="admin"
+  activeHref="/console/admin/applicants"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <p class="page-header__kicker">Admin nazionale · Aspirante</p>
+        <h1 class="page-header__title">Marco Rossi</h1>
+      </div>
+      <span class="status status--orange">Test prenotato</span>
+    </header>
+
+    <a href="/console/admin/applicants" class="back-link">← Torna alla lista aspiranti</a>
+
+    <div class="action-bar">
+      <a href="/console/admin/promote?id=mock" class="btn btn--primary">Promuovi a socio</a>
+      <a href="/console/admin/refunds?id=mock"    class="btn btn--ghost btn--sm">Rimborsa test</a>
+      <a href="/console/admin/collisions?id=mock" class="btn btn--ghost btn--sm btn--warn">Vedi collisioni</a>
+    </div>
+
+    <div class="tab-nav" role="tablist">
+      <button class="tab tab--active" role="tab" aria-selected="true"  id="tab-anag"  aria-controls="panel-anag">Anagrafica</button>
+      <button class="tab"             role="tab" aria-selected="false" id="tab-tests" aria-controls="panel-tests">Storico test</button>
+      <button class="tab"             role="tab" aria-selected="false" id="tab-pay"   aria-controls="panel-pay">Pagamenti</button>
+      <button class="tab"             role="tab" aria-selected="false" id="tab-notes" aria-controls="panel-notes">Note</button>
+    </div>
+
+    <div class="panel" id="panel-anag" role="tabpanel" aria-labelledby="tab-anag">
+      <dl class="detail-grid">
+        <div><dt>Nome e cognome</dt><dd>Marco Rossi</dd></div>
+        <div><dt>Data di nascita</dt><dd>1 gennaio 1985</dd></div>
+        <div><dt>Codice fiscale</dt><dd><code>RSSMRC85A01H501Z</code></dd></div>
+        <div><dt>Email</dt><dd>marco.rossi@email.it</dd></div>
+        <div><dt>Telefono</dt><dd>+39 333 456 7890</dd></div>
+        <div><dt>Luogo di nascita</dt><dd>Roma (RM)</dd></div>
+        <div><dt>Residenza</dt><dd>Via Appia Nuova 42, Roma</dd></div>
+        <div><dt>Sede test</dt><dd>Roma</dd></div>
+        <div><dt>Registrazione</dt><dd>20 maggio 2026</dd></div>
+        <div><dt>ID interno</dt><dd><code>USR-2026-0047</code></dd></div>
+      </dl>
+    </div>
+
+    <div class="panel panel--hidden" id="panel-tests" role="tabpanel" aria-labelledby="tab-tests">
+      <table class="table">
+        <thead><tr><th>Sede</th><th>Data</th><th>Punteggio</th><th>Esito</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Roma</td><td>10 feb 2026</td><td>21 / 35</td>
+            <td><span class="status status--red">Non passato</span></td>
+          </tr>
+          <tr>
+            <td>Roma</td><td>6 giu 2026</td><td>—</td>
+            <td><span class="status status--orange">In attesa</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel panel--hidden" id="panel-pay" role="tabpanel" aria-labelledby="tab-pay">
+      <table class="table">
+        <thead><tr><th>Data</th><th>Descrizione</th><th>Importo</th><th>Stato</th><th>Ricevuta</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>3 giu 2026</td>
+            <td>Quota esame — Roma, 6 giu 2026</td>
+            <td><strong>30,00 €</strong></td>
+            <td><span class="status status--green">Pagato</span></td>
+            <td><a href="#" class="link">Scarica PDF</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel panel--hidden" id="panel-notes" role="tabpanel" aria-labelledby="tab-notes">
+      <div class="note-item">
+        <div class="note-item__meta">
+          <span class="note-item__author">Roberto Bianchi</span>
+          <span class="note-item__date">2 giu 2026 · 15:42</span>
+        </div>
+        <p class="note-item__body">Candidato ha contattato la sede per chiedere cambio orario — spostato da 10:30 a 09:00 su disponibilità.</p>
+      </div>
+      <div class="note-add">
+        <textarea class="form-textarea" rows="3" placeholder="Aggiungi una nota interna…" aria-label="Nuova nota"></textarea>
+        <button class="btn btn--sm btn--primary" disabled>Aggiungi nota</button>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 1000px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__kicker { margin: 0; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #7c3aed; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+
+  .status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-xs); font-weight: 700; }
+  .status--orange { background: #ffedd5; color: #9a3412; }
+  .status--green  { background: #d1fae5; color: #065f46; }
+  .status--red    { background: #fee2e2; color: #991b1b; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .action-bar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--sm { padding: 0.35rem 0.875rem; font-size: var(--text-xs); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost   { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+  .btn--warn    { border-color: #dc2626; color: #dc2626; }
+  button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .tab-nav { display: flex; gap: 0; border-block-end: 2px solid var(--color-border-subtle); flex-wrap: wrap; }
+  .tab { padding: 0.6rem 1.1rem; background: transparent; border: none; border-block-end: 2px solid transparent; margin-block-end: -2px; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-tertiary); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: var(--color-text-primary); }
+  .tab--active { color: var(--color-text-primary); border-block-end-color: var(--color-mensa-blue); }
+
+  .panel { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); padding: var(--spacing-5); }
+  .panel--hidden { display: none; }
+
+  .detail-grid { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4); }
+  @media (max-width: 560px) { .detail-grid { grid-template-columns: 1fr; } }
+  .detail-grid > div { display: flex; flex-direction: column; gap: 0.15rem; }
+  .detail-grid dt { font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+  .detail-grid dd { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .detail-grid code { font-size: var(--text-xs); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-secondary); }
+
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table th { padding: 0.6rem 0.75rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); border-block-end: 1px solid var(--color-border-subtle); }
+  .table td { padding: 0.75rem 0.75rem; color: var(--color-text-primary); border-block-end: 1px solid var(--color-border-subtle); }
+  .table tr:last-child td { border-block-end: none; }
+  .link { color: var(--color-mensa-blue); font-size: var(--text-xs); font-weight: 600; text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+
+  .note-item { padding: var(--spacing-4); background: var(--color-surface-elevated); border-radius: var(--radius-sm); display: grid; gap: var(--spacing-1); margin-block-end: var(--spacing-4); }
+  .note-item__meta { display: flex; gap: var(--spacing-3); align-items: center; flex-wrap: wrap; }
+  .note-item__author { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); }
+  .note-item__date   { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .note-item__body   { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.5; }
+  .note-add { display: grid; gap: var(--spacing-3); }
+  .form-textarea { padding: 0.6rem 0.875rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); width: 100%; box-sizing: border-box; resize: vertical; background: var(--color-surface); color: var(--color-text-primary); }
+</style>
+
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const panels = document.querySelectorAll('[role="tabpanel"]');
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => { t.setAttribute('aria-selected', 'false'); t.classList.remove('tab--active'); });
+      panels.forEach((p) => { p.classList.add('panel--hidden'); });
+      tab.setAttribute('aria-selected', 'true');
+      tab.classList.add('tab--active');
+      const panelId = tab.getAttribute('aria-controls');
+      if (panelId) { document.getElementById(panelId)?.classList.remove('panel--hidden'); }
+    });
+  });
+</script>

@@ -1,0 +1,198 @@
+---
+/**
+ * Registrazione aspirante — form mock, CTA naviga a verify-email. Demo MVP.
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  title="Crea account — MensaTesting"
+  description="Registrati per prenotare il test di ammissione a Mensa Italia."
+>
+  <section class="page">
+    <div class="page__inner">
+      <div class="form-card">
+        <div class="form-card__head">
+          <p class="form-card__kicker">MensaTesting</p>
+          <h1 class="form-card__title">Crea il tuo account</h1>
+          <p class="form-card__sub">Gratuito. Nessuna carta richiesta per registrarsi.</p>
+        </div>
+
+        <form class="form" onsubmit="event.preventDefault()">
+          <div class="form__row form__row--2">
+            <div class="form__field">
+              <label for="nome">Nome</label>
+              <input type="text" id="nome" name="nome" placeholder="Marco" autocomplete="given-name" />
+            </div>
+            <div class="form__field">
+              <label for="cognome">Cognome</label>
+              <input type="text" id="cognome" name="cognome" placeholder="Rossi" autocomplete="family-name" />
+            </div>
+          </div>
+
+          <div class="form__field">
+            <label for="email">Indirizzo email</label>
+            <input type="email" id="email" name="email" placeholder="marco.rossi@example.com" autocomplete="email" />
+          </div>
+
+          <div class="form__row form__row--2">
+            <div class="form__field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" />
+            </div>
+            <div class="form__field">
+              <label for="confirm-password">Conferma password</label>
+              <input type="password" id="confirm-password" name="confirm-password" placeholder="••••••••" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div class="form__field">
+            <label for="cf">Codice fiscale</label>
+            <input type="text" id="cf" name="cf" placeholder="RSSMRC85T10H501Z" autocomplete="off" style="text-transform:uppercase" />
+          </div>
+
+          <label class="form__check">
+            <input type="checkbox" name="privacy" />
+            <span>Ho letto e accetto la <a href="https://www.mensa.it/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+          </label>
+
+          <a href="/public/mvp/verify-email" class="btn btn--primary btn--full">Crea account</a>
+        </form>
+
+        <p class="form-card__foot">
+          Hai già un account?
+          <a href="/login">Accedi →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-hub"><a href="/public/mvp/hub">← Hub demo MVP</a></div>
+</PublicLayout>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--full { inline-size: 100%; }
+
+  .page {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+    background:
+      radial-gradient(50% 40% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 8%, transparent), transparent 70%),
+      var(--color-surface);
+  }
+  .page__inner {
+    max-inline-size: 520px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-6));
+  }
+
+  .form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6) var(--spacing-6);
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .form-card__head { display: grid; gap: var(--spacing-2); }
+  .form-card__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .form-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .form-card__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+  .form-card__foot {
+    margin: 0;
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .form-card__foot a { color: var(--color-mensa-blue); text-decoration: none; }
+
+  .form { display: grid; gap: var(--spacing-4); }
+  .form__row--2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-3);
+    min-inline-size: 0;
+  }
+  @media (max-width: 480px) { .form__row--2 { grid-template-columns: 1fr; } }
+
+  .form__field { display: grid; gap: var(--spacing-1); min-inline-size: 0; }
+  .form__field label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .form__field input {
+    padding: 9px var(--spacing-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color var(--motion-fast) var(--ease-out-quart);
+    font-family: inherit;
+    box-sizing: border-box;
+    inline-size: 100%;
+  }
+  .form__field input:focus {
+    border-color: var(--color-mensa-blue);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent);
+  }
+  .form__field input::placeholder { color: var(--color-text-tertiary); }
+
+  .form__check {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .form__check input[type="checkbox"] {
+    margin-block-start: 2px;
+    accent-color: var(--color-mensa-blue);
+    flex-shrink: 0;
+  }
+  .form__check a { color: var(--color-mensa-blue); text-decoration: none; }
+
+  .demo-hub {
+    max-inline-size: 520px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-6));
+    padding-block: var(--spacing-5);
+    font-size: var(--text-xs);
+  }
+  .demo-hub a { color: var(--color-text-tertiary); text-decoration: none; }
+  .demo-hub a:hover { color: var(--color-text-primary); }
+</style>

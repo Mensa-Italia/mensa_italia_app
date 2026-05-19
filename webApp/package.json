@@ -13,9 +13,12 @@
     "build:shared": "cd .. && ./gradlew :shared:jsBrowserProductionLibraryDistribution --no-daemon"
   },
   "dependencies": {
+    "@astrojs/markdoc": "^1.0.5",
     "@astrojs/node": "^10.1.1",
     "@cashapp/sqldelight-sqljs-worker": "2.1.0",
     "@js-joda/core": "3.2.0",
+    "@keystatic/astro": "^5.0.6",
+    "@keystatic/core": "^0.5.50",
     "@tailwindcss/vite": "^4.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -27,6 +30,7 @@
     "qrcode-generator": "1.4.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-email-editor": "^1.8.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sql.js": "1.10.3",

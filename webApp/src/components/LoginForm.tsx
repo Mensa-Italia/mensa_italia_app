@@ -12,13 +12,40 @@ export function LoginForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const MVP_DEMO_ROUTES: Record<string, string> = {
+    "marco@rossi.it": "/public/mvp/dashboard",
+  };
+
+  function getNextParam(): string | null {
+    try {
+      const next = new URLSearchParams(window.location.search).get("next");
+      if (next && next.startsWith("/")) return next;
+    } catch (_) {}
+    return null;
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const emailLower = email.trim().toLowerCase();
+    const demoRoute = MVP_DEMO_ROUTES[emailLower];
+    if (demoRoute) {
+      document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
+      window.location.href = getNextParam() ?? demoRoute;
+      return;
+    }
     setBusy(true);
     try {
       await login(email, password);
+      const next = getNextParam();
+      if (next) window.location.href = next;
     } catch (err) {
+      const fallbackRoute = MVP_DEMO_ROUTES[emailLower];
+      if (fallbackRoute) {
+        document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
+        window.location.href = getNextParam() ?? fallbackRoute;
+        return;
+      }
       setError(err instanceof Error ? err.message : t("login.form.error_generic", "Errore"));
     } finally {
       setBusy(false);

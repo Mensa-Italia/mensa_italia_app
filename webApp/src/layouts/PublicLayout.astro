@@ -19,7 +19,7 @@ interface Props {
   title?: string;
   description?: string;
   /** Active nav item slug — used to highlight the right link */
-  active?: "home" | "chi-siamo" | "eventi" | "gruppi" | "test-qi" | "podcasts" | "quid";
+  active?: "home" | "chi-siamo" | "eventi" | "gruppi" | "test-qi" | "podcasts" | "quid" | "blog";
   /** Optional Open Graph / Twitter image URL (absolute) */
   ogImage?: string;
   /** Optional JSON-LD payload to inject in <head> */
@@ -43,6 +43,7 @@ const navItems: NavItem[] = [
   { href: "/public/chapters",           label: "Gruppi locali", key: "gruppi",    i18n: "web.nav.local_offices" },
   { href: "/public/podcasts",label: "Podcast",       key: "podcasts",  i18n: "web.nav.podcasts" },
   { href: "/public/quid",    label: "Quid",          key: "quid",      i18n: "web.nav.quid" },
+  { href: "/public/blog",   label: "Blog",          key: "blog",      i18n: "web.nav.blog" },
   { href: "/public/iq-test",          label: "Test QI",       key: "test-qi",   i18n: "web.nav.iq_test" },
 ];
 ---
@@ -117,6 +118,7 @@ const navItems: NavItem[] = [
         </nav>
 
         <div class="pub__cta">
+          <a href="/public/mvp/register" class="pub__cta-btn pub__cta-btn--secondary">Iscriviti</a>
           <a href="/login" class="pub__cta-btn" data-i18n="web.nav.member_login">Accedi come socio</a>
         </div>
       </div>
@@ -277,6 +279,11 @@ const navItems: NavItem[] = [
     font-weight: 600;
   }
 
+  .pub__cta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
   .pub__cta-btn {
     display: inline-flex;
     align-items: center;
@@ -288,10 +295,22 @@ const navItems: NavItem[] = [
     border-radius: var(--radius-sm);
     text-decoration: none;
     letter-spacing: -0.005em;
-    transition: background var(--motion-fast) var(--ease-out-quart);
+    transition: background var(--motion-fast) var(--ease-out-quart),
+                border-color var(--motion-fast) var(--ease-out-quart),
+                color var(--motion-fast) var(--ease-out-quart);
   }
   .pub__cta-btn:hover {
     background: var(--color-mensa-blue-deep);
+  }
+  .pub__cta-btn--secondary {
+    background: transparent;
+    color: var(--color-mensa-blue);
+    border: 1px solid var(--color-mensa-blue);
+  }
+  .pub__cta-btn--secondary:hover {
+    background: color-mix(in oklch, var(--color-mensa-blue) 8%, transparent);
+    border-color: var(--color-mensa-blue-deep);
+    color: var(--color-mensa-blue-deep);
   }
 
   /* ── Main ─────────────────────────────────────────────────────── */

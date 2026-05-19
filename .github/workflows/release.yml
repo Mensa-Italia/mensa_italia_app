@@ -1,13 +1,15 @@
 name: Release
 
-# Strategia: un push a master con `[release]` nel messaggio del commit
-# (oppure un workflow_dispatch manuale) bumpa la patch in `VERSION`,
-# builda l'immagine Docker della web app, la pubblica su GHCR con i tag
-# `latest` + `vX.Y.Z`, infine committa il bump versione e crea il tag git.
+# Strategia:
+#   - push a master con `[release]` nel messaggio (o workflow_dispatch) →
+#     bumpa la patch in `VERSION`, builda l'immagine, la pubblica su GHCR
+#     con i tag `latest` + `vX.Y.Z`, committa il bump e crea il tag git.
+#   - push a feat/mvp-testing-public → builda e pubblica l'immagine con il
+#     solo tag `dev` (nessun bump versione, nessun tag git, nessuna release).
 
 on:
   push:
-    branches: [master]
+    branches: [master, feat/mvp-testing-public]
   workflow_dispatch:
     inputs:
       bump:
@@ -18,7 +20,7 @@ on:
         options: [patch, minor, major]
 
 concurrency:
-  group: release
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -29,7 +31,8 @@ jobs:
   release:
     if: |
       github.event_name == 'workflow_dispatch' ||
-      contains(github.event.head_commit.message, '[release]')
+      contains(github.event.head_commit.message, '[release]') ||
+      github.ref == 'refs/heads/feat/mvp-testing-public'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,8 +45,20 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Determine build mode
+        id: mode
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/feat/mvp-testing-public" ]; then
+            echo "is_mvp=true"     >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_mvp=false"    >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Bump version
         id: bump
+        if: steps.mode.outputs.is_release == 'true'
         run: |
           set -euo pipefail
           [ -f VERSION ] || echo "0.0.0" > VERSION
@@ -85,20 +100,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compute image tags
+        id: tags
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.mode.outputs.is_mvp }}" = "true" ]; then
+            {
+              echo "tags<<EOF"
+              echo "${REGISTRY}/${IMAGE_NAME}:dev"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "tags<<EOF"
+              echo "${REGISTRY}/${IMAGE_NAME}:latest"
+              echo "${REGISTRY}/${IMAGE_NAME}:v${{ steps.bump.outputs.version }}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build & push image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.web
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.bump.outputs.version }}
+          tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Commit version bump & create tag
+        if: steps.mode.outputs.is_release == 'true'
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
         run: |
@@ -111,6 +144,7 @@ jobs:
           git push origin master --follow-tags
 
       - name: Create GitHub Release
+        if: steps.mode.outputs.is_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.bump.outputs.version }}

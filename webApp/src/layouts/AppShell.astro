@@ -34,6 +34,10 @@ import {
   Receipt,
   Ticket,
   Bell,
+  ClipboardCheck,
+  ShieldCheck,
+  FileEdit,
+  Mail,
 } from "lucide-react";
 
 interface Props {
@@ -80,7 +84,17 @@ const sections: NavSection[] = [
       { href: "/notifications", label: "Notifiche", icon: Bell },
     ],
   },
+  {
+    label: "Gestione",
+    items: [
+      { href: "/console/test-assistant/today", label: "Assistente al test", icon: ClipboardCheck },
+      { href: "/console/admin/applicants",     label: "Amministrazione",    icon: ShieldCheck    },
+      { href: "/console/newsletter",           label: "Newsletter",         icon: Mail           },
+      { href: "/keystatic",                   label: "Mensa Blogging",     icon: FileEdit       },
+    ],
+  },
 ];
+
 ---
 
 <BaseLayout title={title}>
@@ -347,6 +361,7 @@ const sections: NavSection[] = [
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
+    margin-inline-start: auto;
   }
   .shell__icon-btn {
     position: relative;

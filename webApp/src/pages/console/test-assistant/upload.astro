@@ -1,0 +1,124 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Carica scansione — Staff Sede"
+  pageTitle="Carica scansione test"
+  scope="test-assistant"
+  activeHref="/console/test-assistant/upload"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Carica scansione test</h1>
+        <p class="page-header__sub">Sede Roma · Sessione 09:00 · Sab 6 Giu 2026</p>
+      </div>
+      <span class="badge badge--orange">Staff sede</span>
+    </header>
+
+    <a href="/console/test-assistant/today" class="back-link">← Torna alla lista</a>
+
+    <div class="candidate-strip">
+      <div class="candidate-strip__avatar" aria-hidden="true">MR</div>
+      <div>
+        <p class="candidate-strip__name">Marco Rossi</p>
+        <p class="candidate-strip__meta">CF: RSSMRC85A01H501Z · Slot 09:00</p>
+      </div>
+      <span class="status status--green">Esito salvato ✓</span>
+    </div>
+
+    <div class="drop-zone" role="region" aria-label="Zona di caricamento PDF">
+      <div class="drop-zone__inner">
+        <div class="drop-zone__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 16V4m0 0L8 8m4-4 4 4"/>
+            <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+          </svg>
+        </div>
+        <p class="drop-zone__title">Trascina qui il foglio scansionato</p>
+        <p class="drop-zone__sub">Solo PDF · massimo 10 MB per file</p>
+        <label class="btn btn--ghost btn--sm">
+          Scegli file
+          <input type="file" accept=".pdf" disabled style="display:none" />
+        </label>
+        <p class="drop-zone__note">Input disabilitato in modalità demo</p>
+      </div>
+    </div>
+
+    <div class="uploaded-section">
+      <h2 class="uploaded-section__title">Già caricati</h2>
+      <ul class="uploaded-list">
+        <li class="uploaded-item">
+          <div class="uploaded-item__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M10 12h4M10 16h4"/>
+            </svg>
+          </div>
+          <div class="uploaded-item__info">
+            <p class="uploaded-item__name">marco_rossi_test_06giu2026.pdf</p>
+            <p class="uploaded-item__meta">2.1 MB · caricato 14:32</p>
+          </div>
+          <span class="status status--green">Caricato</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="cta-bar">
+      <a href="/console/test-assistant/today" class="btn btn--primary">Conferma e chiudi candidato</a>
+      <a href="/console/test-assistant/today" class="btn btn--ghost">Annulla</a>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 780px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .candidate-strip { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); flex-wrap: wrap; }
+  .candidate-strip__avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--color-mensa-blue); color: var(--color-text-on-brand); font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .candidate-strip__name { margin: 0; font-weight: 700; color: var(--color-text-primary); font-size: var(--text-sm); }
+  .candidate-strip__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; }
+  .status--green { background: #d1fae5; color: #065f46; }
+
+  .drop-zone { border: 2px dashed var(--color-border-subtle); border-radius: var(--radius-md); background: var(--color-surface); transition: border-color 0.2s, background 0.2s; cursor: pointer; }
+  .drop-zone:hover { border-color: var(--color-mensa-blue); background: color-mix(in oklch, var(--color-mensa-blue) 4%, var(--color-surface)); }
+  .drop-zone__inner { padding: 3rem 2rem; display: flex; flex-direction: column; align-items: center; gap: var(--spacing-3); text-align: center; }
+  .drop-zone__icon { width: 3.5rem; height: 3.5rem; color: var(--color-text-tertiary); }
+  .drop-zone__icon svg { width: 100%; height: 100%; }
+  .drop-zone__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+  .drop-zone__sub { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+  .drop-zone__note { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); font-style: italic; }
+
+  .uploaded-section { display: grid; gap: var(--spacing-3); }
+  .uploaded-section__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .uploaded-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--spacing-2); }
+  .uploaded-item { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); flex-wrap: wrap; }
+  .uploaded-item__icon { width: 2rem; height: 2rem; color: #ef4444; flex-shrink: 0; }
+  .uploaded-item__icon svg { width: 100%; height: 100%; }
+  .uploaded-item__info { flex: 1; }
+  .uploaded-item__name { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .uploaded-item__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .cta-bar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 0.6rem 1.5rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--sm { padding: 0.4rem 1rem; font-size: var(--text-xs); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+</style>

@@ -1,0 +1,230 @@
+---
+/**
+ * FAQ test di ammissione Mensa — domande frequenti, demo MVP.
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  title="FAQ — Test di ammissione Mensa Italia"
+  description="Risposte alle domande più frequenti sul test di ammissione a Mensa Italia."
+>
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">MensaTesting</p>
+      <h1 class="hero__title">Domande frequenti</h1>
+      <p class="hero__sub">Tutto quello che vuoi sapere prima di prenotare il test.</p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="faq__inner">
+      <dl class="faq__list">
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Quanto dura il test?</summary>
+            <p class="faq__a">Il test dura 90 minuti netti. Ti consigliamo di arrivare almeno 15 minuti prima per le procedure di accredito. Porta con te un documento d'identità valido.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Quanto costa?</summary>
+            <p class="faq__a">La quota di partecipazione al test è di <strong>30 €</strong>, non rimborsabili. Se superi il test e vuoi iscriverti a Mensa Italia, la quota associativa annuale è di 75 € (ridotta per under 26 e over 65).</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Cosa devo portare il giorno del test?</summary>
+            <p class="faq__a">Un documento d'identità valido (carta d'identità o passaporto) e la conferma di prenotazione (stampa o schermata). Niente calcolatrici, dizionari o dispositivi elettronici — non servono.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Posso riprovare se non passo?</summary>
+            <p class="faq__a">Sì. Dopo un esito negativo devi aspettare <strong>6 mesi</strong> prima di poter prenotare una nuova sessione. Non c'è limite al numero di tentativi nel corso della vita.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Il test si può fare online?</summary>
+            <p class="faq__a">No. Il test ufficiale di Mensa si svolge sempre in presenza, in una delle sedi autorizzate, con supervisori accreditati. Esistono test dimostrativi online (come quello nell'app), ma non hanno valore ai fini dell'ammissione.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">Quali documenti sono richiesti?</summary>
+            <p class="faq__a">Per la registrazione online: codice fiscale e indirizzo email. Il giorno del test: documento d'identità con foto. Non è richiesta alcuna certificazione scolastica o lavorativa.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">In quanto tempo arriva l'esito?</summary>
+            <p class="faq__a">L'esito viene comunicato entro <strong>due settimane</strong> dalla data del test, via email e attraverso questa piattaforma. Riceverai anche il tuo punteggio e il percentile di riferimento.</p>
+          </details>
+        </div>
+
+        <div class="faq__item">
+          <details>
+            <summary class="faq__q">C'è un cooldown tra un tentativo e l'altro?</summary>
+            <p class="faq__a">Sì: devi aspettare <strong>6 mesi</strong> tra un tentativo e il successivo. Questo periodo vale per tutte le sessioni Mensa a livello nazionale, indipendentemente dalla sede scelta.</p>
+          </details>
+        </div>
+
+      </dl>
+
+      <div class="faq__cta">
+        <p>Hai ancora dubbi? Scrivici a <a href="mailto:info@mensa.it">info@mensa.it</a></p>
+        <a href="/public/mvp/register" class="btn btn--primary">Inizia — Crea account</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-hub"><a href="/public/mvp/hub">← Hub demo MVP</a></div>
+</PublicLayout>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 10%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, 4rem);
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 640px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+  .hero__sub {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+  }
+
+  .faq {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .faq__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .faq__list {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .faq__item {
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .faq__item:last-child { border-block-end: none; }
+  details { padding: 0; }
+  .faq__q {
+    padding: var(--spacing-4) var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__q::after {
+    content: "+";
+    font-size: var(--text-base);
+    color: var(--color-mensa-blue);
+    flex-shrink: 0;
+    transition: transform var(--motion-fast) var(--ease-out-quart);
+  }
+  details[open] .faq__q::after {
+    content: "−";
+  }
+  .faq__q:hover { background: var(--color-surface-elevated); }
+  .faq__a {
+    margin: 0;
+    padding: 0 var(--spacing-5) var(--spacing-4) var(--spacing-5);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .faq__cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .faq__cta p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+  .faq__cta a[href^="mailto"] {
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+  }
+
+  .demo-hub {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    padding-block: var(--spacing-6);
+    font-size: var(--text-xs);
+  }
+  .demo-hub a { color: var(--color-text-tertiary); text-decoration: none; }
+  .demo-hub a:hover { color: var(--color-text-primary); }
+</style>

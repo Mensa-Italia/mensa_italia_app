@@ -1,13 +1,17 @@
 ---
-/**
- * Chi siamo — pagina informativa pubblica.
- *
- * Tutti i testi usano le chiavi Tolgee `public.chi_siamo.*` già definite
- * per la versione iOS (ChiSiamoView.swift). I fallback in italiano sono
- * identici a quelli del codice Swift — quando l'i18n hydrator gira lato
- * client sostituisce con la traduzione attiva.
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const about = await reader.singletons.about.read();
+
+const heroKicker = about?.heroKicker ?? "Mensa Italia";
+const heroTitle = about?.heroTitle ?? "Persone curiose. Un test in comune.";
+const heroSubtitle = about?.heroSubtitle ?? "The High I.Q. Society";
+
+const bodyContent = about ? await about.body() : null;
+const bodyNodes: any[] = bodyContent?.children ?? [];
 ---
 
 <PublicLayout
@@ -18,11 +22,11 @@ import PublicLayout from "../../layouts/PublicLayout.astro";
   <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker">Mensa Italia</p>
+      <p class="hero__kicker">{heroKicker}</p>
       <h1 class="hero__title" data-i18n="public.chi_siamo.hero.tagline">
-        Persone curiose. Un test in comune.
+        {heroTitle}
       </h1>
-      <p class="hero__sub">The High I.Q. Society</p>
+      <p class="hero__sub">{heroSubtitle}</p>
     </div>
   </section>
 
@@ -55,22 +59,32 @@ import PublicLayout from "../../layouts/PublicLayout.astro";
   <section class="prose">
     <div class="prose__inner">
       <article>
-        <h2 data-i18n="public.chi_siamo.section.what_is">Cos'è il Mensa</h2>
-        <p data-i18n="public.chi_siamo.what_is.body">
-          Mensa è un club internazionale di persone curiose. L'unico requisito
-          per entrare è un test di logica: se rientri nel 2% più alto della
-          popolazione, sei dentro. Da lì in poi non conta più cosa hai
-          studiato, che lavoro fai o quanti anni hai. Il nome viene dal latino
-          mensa, la tavola rotonda: tra soci si sta tutti allo stesso livello.
-        </p>
-
-        <h2>Mensa Italia</h2>
-        <p data-i18n="public.chi_siamo.mensa_italia.body">
-          Dal 1983 siamo la sezione italiana di Mensa. Oltre 2.600 soci in
-          venti gruppi locali, dal Trentino alla Sicilia, che si incontrano
-          per cene, conferenze, weekend di giochi e progetti comuni. Niente
-          politica, niente religione, niente scopo di lucro.
-        </p>
+        {bodyNodes.length > 0 ? bodyNodes.map((node: any) => {
+          if (node.type === "paragraph") {
+            return <p>{node.children?.map((c: any) => c.text ?? "").join("") ?? ""}</p>;
+          }
+          if (node.type === "heading") {
+            const text = node.children?.map((c: any) => c.text ?? "").join("") ?? "";
+            if (node.level === 2) return <h2>{text}</h2>;
+            if (node.level === 3) return <h3>{text}</h3>;
+            return <h4>{text}</h4>;
+          }
+          if (node.type === "unordered-list") {
+            return (
+              <ul>
+                {node.children?.map((li: any) => (
+                  <li>{li.children?.flatMap((c: any) => c.children ?? [c]).map((c: any) => c.text ?? "").join("")}</li>
+                ))}
+              </ul>
+            );
+          }
+          return null;
+        }) : (
+          <>
+            <h2>Cos'è il Mensa</h2>
+            <p>Mensa è un club internazionale di persone curiose. L'unico requisito per entrare è un test di logica: se rientri nel 2% più alto della popolazione, sei dentro.</p>
+          </>
+        )}
       </article>
     </div>
   </section>
@@ -188,12 +202,10 @@ import PublicLayout from "../../layouts/PublicLayout.astro";
             <p class="join__row-meta" data-i18n="web.chi_siamo.real_test_meta">Sessioni d'esame supervisionate, ammissione formale</p>
           </div>
           <a
-            href="https://www.mensa.it/ammissione-tramite-test-ufficiale/"
-            target="_blank"
-            rel="noopener"
+            href="/public/mvp/register"
             class="join__row-cta join__row-cta--ghost"
           >
-            <span data-i18n="web.chi_siamo.real_test_cta">Apri mensa.it ↗</span>
+            <span data-i18n="web.chi_siamo.real_test_cta">Iscriviti →</span>
           </a>
         </div>
       </div>

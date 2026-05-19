@@ -1,5 +1,21 @@
 ---
 import PublicLayout from "../layouts/PublicLayout.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.home.read();
+
+const heroKicker = cms?.heroKicker ?? "Mensa Italia · dal 1983 · The High I.Q. Society";
+const heroTitle = cms?.heroTitle ?? "Persone curiose. Un test in comune.";
+const heroSubtitle = cms?.heroSubtitle ?? "Mensa è un club internazionale di persone curiose. L'unico requisito per entrare è un test di logica: se rientri nel 2% più alto della popolazione, sei dentro. Dal latino mensa, la tavola rotonda: tra soci si sta tutti allo stesso livello.";
+const featuresKicker = cms?.featuresKicker ?? "Cosa facciamo";
+const featuresTitle = cms?.featuresTitle ?? "Comunità, cultura, conversazione.";
+const joinKicker = cms?.joinKicker ?? "Come entrare";
+const joinTitle = cms?.joinTitle ?? "Due strade, una porta.";
+const endKicker = cms?.endKicker ?? "Sei già socio?";
+const endTitle = cms?.endTitle ?? "Accedi alla tua area personale.";
+const endSubtitle = cms?.endSubtitle ?? "Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -39,16 +55,9 @@ const organizationJsonLd = {
   <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="web.home.hero.kicker">Mensa Italia · dal 1983 · The High I.Q. Society</p>
-      <h1 class="hero__title" data-i18n="web.home.hero.title">
-        Persone <em>curiose</em>.<br/>Un test in comune.
-      </h1>
-      <p class="hero__sub" data-i18n="web.home.hero.sub">
-        Mensa è un club internazionale di persone curiose. L'unico requisito
-        per entrare è un test di logica: se rientri nel 2% più alto della
-        popolazione, sei dentro. Dal latino <em>mensa</em>, la tavola rotonda:
-        tra soci si sta tutti allo stesso livello.
-      </p>
+      <p class="hero__kicker" data-i18n="web.home.hero.kicker">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.home.hero.title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.home.hero.sub">{heroSubtitle}</p>
       <div class="hero__cta">
         <a href="/public/iq-test" class="hero__btn hero__btn--primary" data-i18n="web.home.hero.cta_primary">
           Mettiti alla prova
@@ -90,8 +99,8 @@ const organizationJsonLd = {
   <section class="features">
     <div class="features__inner">
       <header class="features__head">
-        <p class="features__kicker" data-i18n="web.home.features.kicker">Cosa facciamo</p>
-        <h2 class="features__title" data-i18n="web.home.features.title">Comunità, cultura, conversazione.</h2>
+        <p class="features__kicker" data-i18n="web.home.features.kicker">{featuresKicker}</p>
+        <h2 class="features__title" data-i18n="web.home.features.title">{featuresTitle}</h2>
       </header>
 
       <div class="features__grid">
@@ -167,8 +176,8 @@ const organizationJsonLd = {
   <section class="join">
     <div class="join__inner">
       <header>
-        <p class="join__kicker" data-i18n="web.home.join.kicker">Come entrare</p>
-        <h2 class="join__title" data-i18n="web.home.join.title">Due strade, una porta.</h2>
+        <p class="join__kicker" data-i18n="web.home.join.kicker">{joinKicker}</p>
+        <h2 class="join__title" data-i18n="web.home.join.title">{joinTitle}</h2>
       </header>
 
       <ol class="join__steps">
@@ -210,11 +219,9 @@ const organizationJsonLd = {
   <!-- ═══ CTA finale ══════════════════════════════════════════ -->
   <section class="end">
     <div class="end__inner">
-      <p class="end__kicker" data-i18n="web.home.end.kicker">Sei già socio?</p>
-      <h2 data-i18n="web.home.end.title">Accedi alla tua area personale.</h2>
-      <p class="end__sub" data-i18n="web.home.end.body">
-        Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.
-      </p>
+      <p class="end__kicker" data-i18n="web.home.end.kicker">{endKicker}</p>
+      <h2 data-i18n="web.home.end.title">{endTitle}</h2>
+      <p class="end__sub" data-i18n="web.home.end.body">{endSubtitle}</p>
       <a href="/login" class="end__btn" data-i18n="web.home.end.cta">Accedi come socio</a>
     </div>
   </section>

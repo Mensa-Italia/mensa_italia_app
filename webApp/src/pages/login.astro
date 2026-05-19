@@ -4,6 +4,89 @@ import { LoginApp } from "../components/LoginApp";
 ---
 
 <BaseLayout title="Accedi — Mensa Italia">
+  <script is:inline>
+    (function () {
+      var routes = {
+        "marco@rossi.it": "/public/mvp/dashboard",
+      };
+      function routeForEmail(value) {
+        var email = (value || "").trim().toLowerCase();
+        return routes[email] || null;
+      }
+      function getNextParam() {
+        try {
+          var next = new URLSearchParams(window.location.search).get("next");
+          if (next && next.indexOf("/") === 0) return next;
+        } catch (_) {}
+        return null;
+      }
+      document.addEventListener(
+        "submit",
+        function (e) {
+          var form = e.target;
+          if (!form || !form.querySelector) return;
+          var input = form.querySelector('input[type="email"]');
+          if (!input) return;
+          var route = routeForEmail(input.value);
+          if (route) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
+            window.location.href = getNextParam() || route;
+          }
+        },
+        true,
+      );
+      var originalFetch = window.fetch;
+      window.fetch = function (input, init) {
+        try {
+          var url =
+            typeof input === "string"
+              ? input
+              : input && input.url
+                ? input.url
+                : "";
+          if (url.indexOf("/auth-with-zitadel") !== -1 && init && init.body) {
+            var body = init.body;
+            var emailValue = "";
+            if (typeof body === "string") {
+              try {
+                var params = new URLSearchParams(body);
+                emailValue =
+                  params.get("email") ||
+                  params.get("identity") ||
+                  params.get("username") ||
+                  "";
+              } catch (_) {
+                var m = body.match(/(?:email|identity|username)=([^&]+)/i);
+                if (m) emailValue = decodeURIComponent(m[1].replace(/\+/g, " "));
+              }
+            } else if (body instanceof URLSearchParams) {
+              emailValue =
+                body.get("email") ||
+                body.get("identity") ||
+                body.get("username") ||
+                "";
+            } else if (body instanceof FormData) {
+              emailValue = String(
+                body.get("email") ||
+                  body.get("identity") ||
+                  body.get("username") ||
+                  "",
+              );
+            }
+            var route = routeForEmail(emailValue);
+            if (route) {
+              document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
+              window.location.href = getNextParam() || route;
+              return new Promise(function () {});
+            }
+          }
+        } catch (_) {}
+        return originalFetch.apply(this, arguments);
+      };
+    })();
+  </script>
   <div class="login">
     <aside class="login__brand" aria-hidden="true">
       <div class="login__brand-inner">

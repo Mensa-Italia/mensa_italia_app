@@ -1,0 +1,167 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Prenotazione confermata — MensaTesting"
+  pageTitle="Prenotazione confermata"
+  audience="applicant"
+  activeHref="/public/mvp/my-tests"
+>
+  <div class="page-content" id="confirmed-container">
+
+    <div class="success-head" style="transition-delay: 0ms">
+      <div class="success-icon" aria-hidden="true" id="check-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="success-title" style="transition-delay: 200ms">Pagamento ricevuto.</h1>
+        <p class="success-sub" style="transition-delay: 200ms">Ti aspettiamo sabato. Porta il biglietto e un documento d'identità.</p>
+      </div>
+    </div>
+
+    <div class="ticket" style="transition-delay: 400ms">
+      <div class="ticket__left">
+        <p class="ticket__org">Mensa Italia</p>
+        <h2 class="ticket__event">Test di ammissione</h2>
+        <div class="ticket__rows">
+          <div class="ticket__row"><span class="ticket__row-label">Data</span><span class="ticket__row-value">Sabato 6 Giugno 2026</span></div>
+          <div class="ticket__row"><span class="ticket__row-label">Orario</span><span class="ticket__row-value">10:00 — accredito dalle 9:45</span></div>
+          <div class="ticket__row"><span class="ticket__row-label">Sede</span><span class="ticket__row-value">Roma · Via Nazionale, 91</span></div>
+          <div class="ticket__row"><span class="ticket__row-label">Codice</span><span class="ticket__row-value ticket__row-value--code" id="booking-ref">MN-2026-0042</span></div>
+        </div>
+      </div>
+      <div class="ticket__divider" aria-hidden="true">
+        <div class="ticket__notch ticket__notch--top"></div>
+        <div class="ticket__notch ticket__notch--bottom"></div>
+      </div>
+      <div class="ticket__right">
+        <div class="qr-placeholder" aria-label="QR code prenotazione">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+            <rect x="4" y="4" width="24" height="24" rx="3" fill="currentColor" opacity="0.15"/>
+            <rect x="7" y="7" width="18" height="18" rx="2" fill="currentColor" opacity="0.2"/>
+            <rect x="11" y="11" width="10" height="10" rx="1" fill="currentColor"/>
+            <rect x="52" y="4" width="24" height="24" rx="3" fill="currentColor" opacity="0.15"/>
+            <rect x="55" y="7" width="18" height="18" rx="2" fill="currentColor" opacity="0.2"/>
+            <rect x="59" y="11" width="10" height="10" rx="1" fill="currentColor"/>
+            <rect x="4" y="52" width="24" height="24" rx="3" fill="currentColor" opacity="0.15"/>
+            <rect x="7" y="55" width="18" height="18" rx="2" fill="currentColor" opacity="0.2"/>
+            <rect x="11" y="59" width="10" height="10" rx="1" fill="currentColor"/>
+            <rect x="34" y="4" width="4" height="4" fill="currentColor"/>
+            <rect x="40" y="4" width="4" height="4" fill="currentColor"/>
+            <rect x="34" y="10" width="4" height="4" fill="currentColor"/>
+            <rect x="34" y="16" width="8" height="4" fill="currentColor"/>
+            <rect x="46" y="10" width="4" height="4" fill="currentColor"/>
+            <rect x="52" y="34" width="4" height="4" fill="currentColor"/>
+            <rect x="58" y="34" width="8" height="4" fill="currentColor"/>
+            <rect x="64" y="40" width="4" height="4" fill="currentColor"/>
+            <rect x="58" y="46" width="4" height="4" fill="currentColor"/>
+            <rect x="64" y="52" width="4" height="8" fill="currentColor"/>
+            <rect x="70" y="46" width="4" height="4" fill="currentColor"/>
+            <rect x="4" y="34" width="4" height="4" fill="currentColor"/>
+            <rect x="10" y="34" width="8" height="4" fill="currentColor"/>
+            <rect x="4" y="40" width="4" height="4" fill="currentColor"/>
+            <rect x="10" y="46" width="4" height="8" fill="currentColor"/>
+            <rect x="16" y="40" width="4" height="4" fill="currentColor"/>
+            <rect x="34" y="34" width="4" height="4" fill="currentColor"/>
+            <rect x="40" y="40" width="8" height="4" fill="currentColor"/>
+            <rect x="34" y="46" width="4" height="4" fill="currentColor"/>
+            <rect x="40" y="52" width="4" height="4" fill="currentColor"/>
+            <rect x="34" y="58" width="8" height="4" fill="currentColor"/>
+            <rect x="46" y="58" width="4" height="8" fill="currentColor"/>
+          </svg>
+          <p class="qr-code" id="qr-ref">MN-2026-0042</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions" style="transition-delay: 600ms">
+      <a href="/public/mvp/dashboard" class="btn btn--primary">Vai alla dashboard</a>
+      <a href="/public/mvp/my-tests" class="btn btn--ghost">I miei test</a>
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<script is:inline>
+(function () {
+  var ref = new URLSearchParams(window.location.search).get("ref");
+  if (ref) {
+    var els = document.querySelectorAll("#booking-ref, #qr-ref");
+    els.forEach(function (el) { el.textContent = ref; });
+    var aria = document.querySelector(".qr-placeholder");
+    if (aria) aria.setAttribute("aria-label", "QR code prenotazione " + ref);
+  }
+
+  var container = document.getElementById("confirmed-container");
+  var checkIcon = document.getElementById("check-icon");
+
+  checkIcon.classList.add("icon-pulse");
+
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      container.classList.add("is-loaded");
+    });
+  });
+})();
+</script>
+
+<style>
+  .page-content { max-inline-size: 640px; display: grid; gap: var(--spacing-6); }
+
+  #confirmed-container > * {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 400ms ease-out, transform 400ms ease-out;
+  }
+  #confirmed-container.is-loaded > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px var(--spacing-5); font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; transition: background var(--motion-fast) var(--ease-out-quart), border-color var(--motion-fast) var(--ease-out-quart); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+
+  .success-head { display: flex; align-items: center; gap: var(--spacing-4); }
+  @media (max-width: 480px) { .success-head { flex-direction: column; align-items: flex-start; } }
+  .success-icon { inline-size: 52px; block-size: 52px; color: #16a34a; flex-shrink: 0; }
+  .success-icon svg { inline-size: 100%; block-size: 100%; }
+  .success-title { margin: 0 0 var(--spacing-1) 0; font-family: var(--font-display); font-size: clamp(var(--text-xl), 4vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .success-sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  @keyframes icon-pulse {
+    0% { transform: scale(0.8); }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  .icon-pulse { animation: icon-pulse 300ms ease-out both; }
+
+  .ticket { display: flex; background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 4px 24px color-mix(in oklch, var(--color-mensa-blue) 8%, transparent); }
+  @media (max-width: 520px) { .ticket { flex-direction: column; } }
+  .ticket__left { flex: 1; padding: var(--spacing-5); display: grid; gap: var(--spacing-3); align-content: start; }
+  .ticket__org { margin: 0; font-size: var(--text-2xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-mensa-blue); }
+  .ticket__event { margin: 0; font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.015em; color: var(--color-text-primary); }
+  .ticket__rows { display: grid; gap: var(--spacing-2); }
+  .ticket__row { display: flex; flex-direction: column; gap: 1px; }
+  .ticket__row-label { font-size: var(--text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); }
+  .ticket__row-value { font-size: var(--text-sm); color: var(--color-text-primary); font-weight: 500; }
+  .ticket__row-value--code { font-family: ui-monospace, monospace; font-size: var(--text-base); font-weight: 700; color: var(--color-mensa-blue); letter-spacing: 0.05em; }
+  .ticket__divider { inline-size: 1px; background: var(--color-border-subtle); position: relative; flex-shrink: 0; }
+  @media (max-width: 520px) { .ticket__divider { inline-size: 100%; block-size: 1px; } .ticket__notch { display: none; } }
+  .ticket__notch { position: absolute; inline-size: 16px; block-size: 16px; background: var(--color-surface-elevated); border-radius: 50%; inset-inline-start: 50%; transform: translateX(-50%); border: 1px solid var(--color-border-subtle); }
+  .ticket__notch--top { inset-block-start: -8px; }
+  .ticket__notch--bottom { inset-block-end: -8px; }
+  .ticket__right { inline-size: 160px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: var(--spacing-4); }
+  @media (max-width: 520px) { .ticket__right { inline-size: 100%; } }
+  .qr-placeholder { display: grid; gap: var(--spacing-2); place-items: center; color: var(--color-text-primary); }
+  .qr-placeholder svg { inline-size: 96px; block-size: 96px; }
+  .qr-code { margin: 0; font-family: ui-monospace, monospace; font-size: var(--text-2xs); font-weight: 700; color: var(--color-text-secondary); letter-spacing: 0.08em; }
+
+  .actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+</style>
