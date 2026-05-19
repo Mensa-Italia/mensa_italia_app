@@ -46,7 +46,7 @@ firebase-bom-version = "33.7.0"
 google-services = "4.4.2"
 
 # Stripe
-stripe-android = "21.5.0"
+stripe-android = "21.19.0"
 
 # ML Kit & Camera
 mlkit-barcode = "17.3.0"

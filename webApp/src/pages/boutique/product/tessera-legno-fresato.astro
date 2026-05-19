@@ -302,19 +302,19 @@ const product = {
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
-    var slug  = 'tessera-legno-fresato';
-    var name  = 'Tessera in legno fresato (numerata)';
-    var price = 120.00;
-    var cat   = 'Edizione limitata';
-    var qty   = 1;
+    const CART_KEY = 'mensa_boutique_cart';
+    const slug  = 'tessera-legno-fresato';
+    const name  = 'Tessera in legno fresato (numerata)';
+    const price = 120.00;
+    const cat   = 'Edizione limitata';
+    let qty   = 1;
 
     function getCart() {
       try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; }
     }
     function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
 
-    var qtyVal = document.getElementById('pd-qty-val');
+    const qtyVal = document.getElementById('pd-qty-val');
     document.getElementById('pd-qty-minus').addEventListener('click', function () {
       if (qty > 1) { qty--; qtyVal.textContent = qty; }
     });
@@ -324,8 +324,8 @@ const product = {
     });
 
     function addToCart() {
-      var cart = getCart();
-      var existing = cart.find(function (i) { return i.slug === slug; });
+      const cart = getCart();
+      const existing = cart.find(function (i) { return i.slug === slug; });
       if (existing) {
         existing.qty = (existing.qty || 1) + qty;
       } else {
@@ -335,7 +335,7 @@ const product = {
     }
 
     function showToast() {
-      var t = document.getElementById('pd-toast');
+      const t = document.getElementById('pd-toast');
       if (!t) return;
       t.classList.add('is-visible');
       setTimeout(function () { t.classList.remove('is-visible'); }, 2500);

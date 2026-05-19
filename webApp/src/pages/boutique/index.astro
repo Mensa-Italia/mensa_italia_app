@@ -628,7 +628,7 @@ import AppShell from "../../layouts/AppShell.astro";
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
+    const CART_KEY = 'mensa_boutique_cart';
 
     function getCart() {
       try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; }
@@ -640,15 +640,15 @@ import AppShell from "../../layouts/AppShell.astro";
       return cart.reduce(function (s, i) { return s + (i.qty || 1); }, 0);
     }
     function updateCounter() {
-      var badge = document.getElementById('cart-count');
+      const badge = document.getElementById('cart-count');
       if (!badge) return;
-      var n = totalQty(getCart());
+      const n = totalQty(getCart());
       badge.textContent = String(n);
       badge.dataset.empty = n === 0 ? 'true' : 'false';
     }
 
     function showToast() {
-      var toast = document.getElementById('bq-toast');
+      const toast = document.getElementById('bq-toast');
       if (!toast) return;
       toast.classList.add('is-visible');
       setTimeout(function () { toast.classList.remove('is-visible'); }, 2500);
@@ -660,12 +660,12 @@ import AppShell from "../../layouts/AppShell.astro";
       btn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var cart = getCart();
-        var slug  = btn.dataset.slug;
-        var name  = btn.dataset.name;
-        var price = parseFloat(btn.dataset.price || '0');
-        var cat   = btn.dataset.cat || '';
-        var existing = cart.find(function (i) { return i.slug === slug; });
+        const cart = getCart();
+        const slug  = btn.dataset.slug;
+        const name  = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price || '0');
+        const cat   = btn.dataset.cat || '';
+        const existing = cart.find(function (i) { return i.slug === slug; });
         if (existing) {
           existing.qty = (existing.qty || 1) + 1;
         } else {
@@ -681,9 +681,9 @@ import AppShell from "../../layouts/AppShell.astro";
       btn.addEventListener('click', function () {
         document.querySelectorAll('.bq-filter').forEach(function (b) { b.classList.remove('bq-filter--active'); });
         btn.classList.add('bq-filter--active');
-        var filter = btn.dataset.filter;
+        const filter = btn.dataset.filter;
         document.querySelectorAll('.bq-card').forEach(function (card) {
-          var cat = card.dataset.cat || '';
+          const cat = card.dataset.cat || '';
           card.style.display = (filter === 'tutto' || cat === filter) ? '' : 'none';
         });
       });
@@ -693,7 +693,7 @@ import AppShell from "../../layouts/AppShell.astro";
       btn.addEventListener('click', function () {
         document.querySelectorAll('.bq-view-btn').forEach(function (b) { b.classList.remove('bq-view-btn--active'); });
         btn.classList.add('bq-view-btn--active');
-        var grid = document.getElementById('products-grid');
+        const grid = document.getElementById('products-grid');
         if (!grid) return;
         if (btn.dataset.view === 'list') {
           grid.style.gridTemplateColumns = '1fr';

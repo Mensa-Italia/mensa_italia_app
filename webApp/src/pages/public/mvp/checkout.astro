@@ -107,13 +107,13 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
 
 <script is:inline>
 (function () {
-  var VENUE_LABELS = {
+  const VENUE_LABELS = {
     roma: "Roma · Via Nazionale, 91",
     milano: "Milano · Viale Lunigiana, 7",
     bologna: "Bologna · Via dell'Indipendenza, 25",
     napoli: "Napoli · Via Toledo, 148"
   };
-  var SLOT_LABELS = {
+  const SLOT_LABELS = {
     "rm-060626-1000": "Sab 6 Giu 2026 · 10:00 — 11:30",
     "rm-060626-1400": "Sab 6 Giu 2026 · 14:00 — 15:30",
     "rm-200626-1000": "Sab 20 Giu 2026 · 10:00 — 11:30",
@@ -129,18 +129,18 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
     "na-060726-1000": "Lun 6 Lug 2026 · 10:00 — 11:30"
   };
 
-  var params = new URLSearchParams(window.location.search);
-  var sedeId = params.get("sede") || "roma";
-  var slotId = params.get("slot") || "rm-060626-1000";
+  const params = new URLSearchParams(window.location.search);
+  const sedeId = params.get("sede") || "roma";
+  const slotId = params.get("slot") || "rm-060626-1000";
 
-  var venueLabel = VENUE_LABELS[sedeId] || "Roma · Via Nazionale, 91";
-  var slotLabel = SLOT_LABELS[slotId] || "Sab 6 Giu 2026 · 10:00 — 11:30";
+  const venueLabel = VENUE_LABELS[sedeId] || "Roma · Via Nazionale, 91";
+  const slotLabel = SLOT_LABELS[slotId] || "Sab 6 Giu 2026 · 10:00 — 11:30";
   document.getElementById("co-venue").textContent = venueLabel;
   document.getElementById("co-slot").textContent = slotLabel;
 
   function updateStepper(current) {
-    for (var i = 1; i <= 3; i++) {
-      var el = document.getElementById("step-indicator-" + i);
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById("step-indicator-" + i);
       el.classList.remove("is-current", "is-done", "is-future");
       if (i < current) el.classList.add("is-done");
       else if (i === current) { el.classList.add("is-current"); el.setAttribute("aria-current", "step"); }
@@ -149,8 +149,8 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
   }
 
   function goToStep(from, to) {
-    var fromEl = document.getElementById("step-" + from);
-    var toEl = document.getElementById("step-" + to);
+    const fromEl = document.getElementById("step-" + from);
+    const toEl = document.getElementById("step-" + to);
     fromEl.hidden = true;
     toEl.removeAttribute("hidden");
     requestAnimationFrame(function () {
@@ -170,7 +170,7 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
     startProcessing();
   });
 
-  var STEPS = [
+  const STEPS = [
     "Verifica dati carta…",
     "Autorizzazione bancaria…",
     "Conferma pagamento…",
@@ -178,17 +178,17 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
   ];
 
   function startProcessing() {
-    var list = document.getElementById("processing-list");
+    const list = document.getElementById("processing-list");
     list.innerHTML = "";
-    var astroCid = null;
-    for (var i = 0; i < list.attributes.length; i++) {
-      var a = list.attributes[i];
+    let astroCid = null;
+    for (let i = 0; i < list.attributes.length; i++) {
+      const a = list.attributes[i];
       if (a.name.indexOf("data-astro-cid-") === 0) { astroCid = a.name; break; }
     }
-    var cidAttr = astroCid ? " " + astroCid : "";
-    var rows = [];
+    const cidAttr = astroCid ? " " + astroCid : "";
+    const rows = [];
     STEPS.forEach(function (text, i) {
-      var row = document.createElement("div");
+      const row = document.createElement("div");
       row.className = "proc-row proc-row--pending";
       if (astroCid) row.setAttribute(astroCid, "");
       row.innerHTML =
@@ -199,7 +199,7 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
     });
 
     rows.forEach(function (row, i) {
-      var delay = i * 650;
+      const delay = i * 650;
       setTimeout(function () {
         row.classList.remove("proc-row--pending");
         row.classList.add("proc-row--active");

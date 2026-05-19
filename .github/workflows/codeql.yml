@@ -1,0 +1,65 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '23 4 * * 1'  # ogni lunedì alle 04:23 UTC
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  analyze:
+    name: CodeQL ${{ matrix.language }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript-typescript
+            os: ubuntu-latest
+          - language: java-kotlin
+            os: ubuntu-latest
+          - language: swift
+            os: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 21 (per java-kotlin)
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+
+      - name: Setup Gradle (per java-kotlin)
+        if: matrix.language == 'java-kotlin'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # build-mode autobuild per kotlin (gradle), none per il resto
+          build-mode: ${{ matrix.language == 'java-kotlin' && 'autobuild' || 'none' }}
+
+      - name: Build (kotlin)
+        if: matrix.language == 'java-kotlin'
+        run: |
+          # Workaround gradle.properties Mac-hardcoded JAVA_HOME
+          ./gradlew :shared:compileKotlinAndroid :androidApp:compileDebugKotlin \
+            -Dorg.gradle.java.home="$JAVA_HOME" \
+            --no-daemon || echo "Build best-effort; CodeQL prosegue con quello che ha"
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'

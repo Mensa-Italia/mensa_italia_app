@@ -17,7 +17,7 @@ function getQrcode() {
   // Vite bundles CJS modules transparently; access via globalThis.require shim
   // or fall back to the bundled version exposed on the window after Vite processes it.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     return (globalThis as any).__qrcode_generator__ ?? require("qrcode-generator");
   } catch {
     return null;

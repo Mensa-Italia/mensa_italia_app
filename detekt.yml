@@ -1,0 +1,64 @@
+# Config minimo detekt — partiamo permissivi (solo bug reali), poi alziamo asticella.
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+  exclude:
+    - 'ProjectStatisticsReport'
+    - 'ComplexityReport'
+    - 'NotificationReport'
+
+complexity:
+  LongParameterList:
+    active: false
+  TooManyFunctions:
+    active: false
+  LongMethod:
+    active: false
+  LargeClass:
+    active: false
+  CyclomaticComplexMethod:
+    active: false
+  CognitiveComplexMethod:
+    active: false
+  NestedBlockDepth:
+    active: false
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+  WildcardImport:
+    active: false
+  MaxLineLength:
+    active: false
+  FunctionOnlyReturningConstant:
+    active: false
+  UnusedPrivateMember:
+    active: true
+  UnusedParameter:
+    active: false  # noisy in Compose
+  ForbiddenComment:
+    active: false
+
+naming:
+  TopLevelPropertyNaming:
+    active: false
+  FunctionNaming:
+    active: false  # Compose @Composable usa PascalCase
+
+empty-blocks:
+  EmptyFunctionBlock:
+    active: false
+
+# Tieni attivi: potentialBugs (default), errorProne (default), exceptions (default).

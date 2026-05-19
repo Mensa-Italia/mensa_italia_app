@@ -208,38 +208,38 @@ import AppShell from "../../layouts/AppShell.astro";
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
-    var GRADIENTS = [
-      'linear-gradient(135deg,oklch(42% 0.18 263),oklch(28% 0.14 263))',
-      'linear-gradient(135deg,oklch(40% 0.06 240),oklch(26% 0.04 240))',
-      'linear-gradient(135deg,oklch(52% 0.14 190),oklch(36% 0.10 190))',
-      'linear-gradient(135deg,oklch(48% 0.18 310),oklch(32% 0.14 310))',
-      'linear-gradient(135deg,oklch(56% 0.10 54),oklch(40% 0.08 48))',
-    ];
+    const CART_KEY = 'mensa_boutique_cart';
+    const GRADIENTS = [
+    'linear-gradient(135deg,oklch(42% 0.18 263),oklch(28% 0.14 263))',
+    'linear-gradient(135deg,oklch(40% 0.06 240),oklch(26% 0.04 240))',
+    'linear-gradient(135deg,oklch(52% 0.14 190),oklch(36% 0.10 190))',
+    'linear-gradient(135deg,oklch(48% 0.18 310),oklch(32% 0.14 310))',
+    'linear-gradient(135deg,oklch(56% 0.10 54),oklch(40% 0.08 48))',
+  ];
 
     function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; } }
     function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
     function fmt(n) { return '€ ' + n.toFixed(2).replace('.', ','); }
 
     function render() {
-      var cart = getCart();
-      var rowsEl   = document.getElementById('cart-rows');
-      var emptyEl  = document.getElementById('cart-empty');
-      var demoBtn  = document.getElementById('cart-demo-btn');
-      var countEl  = document.getElementById('cart-header-count');
-      var checkBtn = document.getElementById('cart-checkout-btn');
+      const cart = getCart();
+      const rowsEl   = document.getElementById('cart-rows');
+      const emptyEl  = document.getElementById('cart-empty');
+      const demoBtn  = document.getElementById('cart-demo-btn');
+      const countEl  = document.getElementById('cart-header-count');
+      const checkBtn = document.getElementById('cart-checkout-btn');
 
-      var astroCid = null;
-      for (var ai = 0; ai < rowsEl.attributes.length; ai++) {
-        var attr = rowsEl.attributes[ai];
+      let astroCid = null;
+      for (let ai = 0; ai < rowsEl.attributes.length; ai++) {
+        const attr = rowsEl.attributes[ai];
         if (attr.name.indexOf('data-astro-cid-') === 0) { astroCid = attr.name; break; }
       }
-      var cidAttr = astroCid ? ' ' + astroCid : '';
+      const cidAttr = astroCid ? ' ' + astroCid : '';
 
-      var total = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
-      var shipping = (cart.length === 0 || total >= 60) ? 0 : 4.90;
-      var grand = total + shipping;
-      var nItems = cart.reduce(function (s, i) { return s + (i.qty || 1); }, 0);
+      const total = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
+      const shipping = (cart.length === 0 || total >= 60) ? 0 : 4.90;
+      const grand = total + shipping;
+      const nItems = cart.reduce(function (s, i) { return s + (i.qty || 1); }, 0);
 
       document.getElementById('summary-subtotal').textContent = fmt(total);
       document.getElementById('summary-shipping').textContent = shipping === 0 ? 'Gratuita' : fmt(shipping);
@@ -258,11 +258,11 @@ import AppShell from "../../layouts/AppShell.astro";
 
       rowsEl.innerHTML = '';
       cart.forEach(function (item, idx) {
-        var row = document.createElement('div');
+        const row = document.createElement('div');
         row.className = 'cart-row';
         if (astroCid) row.setAttribute(astroCid, '');
-        var grad = GRADIENTS[idx % GRADIENTS.length];
-        var variant = item.size ? 'Taglia: ' + item.size : (item.cat || '');
+        const grad = GRADIENTS[idx % GRADIENTS.length];
+        const variant = item.size ? 'Taglia: ' + item.size : (item.cat || '');
         row.innerHTML = '<div class="cart-row__thumb"' + cidAttr + ' style="background:' + grad + '"></div>'
           + '<div class="cart-row__info"' + cidAttr + '>'
           +   '<p class="cart-row__name"' + cidAttr + '>' + item.name + '</p>'
@@ -282,9 +282,9 @@ import AppShell from "../../layouts/AppShell.astro";
 
       rowsEl.querySelectorAll('[data-action]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          var cart2 = getCart();
-          var i = parseInt(btn.dataset.idx, 10);
-          var action = btn.dataset.action;
+          const cart2 = getCart();
+          const i = parseInt(btn.dataset.idx, 10);
+          const action = btn.dataset.action;
           if (action === 'inc') {
             cart2[i].qty = (cart2[i].qty || 1) + 1;
           } else if (action === 'dec') {
@@ -308,8 +308,8 @@ import AppShell from "../../layouts/AppShell.astro";
     });
 
     document.getElementById('discount-btn').addEventListener('click', function () {
-      var val = (document.getElementById('discount-input').value || '').trim().toUpperCase();
-      var msg = document.getElementById('discount-msg');
+      const val = (document.getElementById('discount-input').value || '').trim().toUpperCase();
+      const msg = document.getElementById('discount-msg');
       if (val === 'MENSA10') {
         msg.textContent = 'Codice applicato: 10% di sconto!';
         msg.style.color = '#22c55e';

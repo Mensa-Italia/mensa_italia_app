@@ -123,25 +123,25 @@ import ConsoleShell from "../../../layouts/ConsoleShell.astro";
   });
 
   document.getElementById('download-btn').addEventListener('click', function() {
-    var rows = [
-      ['Data','Tipo','Categoria','Riferimento','Importo','Stato'],
-      ['18/05/2026','Entrata','Quote soci','Marco Rossi','50.00','Confermato'],
-      ['17/05/2026','Entrata','Test','MN-2026-0124','30.00','Confermato'],
-      ['16/05/2026','Uscita','Spese','Cartoleria Bottega','-124.30','Confermato'],
-      ['15/05/2026','Entrata','Quote soci','Lorenzo Bianchi','50.00','In sospeso'],
-      ['14/05/2026','Entrata','Donazioni','Anonimo','200.00','Confermato'],
-      ['12/05/2026','Uscita','Spese','Mensa Roma','-480.00','Confermato'],
-      ['11/05/2026','Entrata','Test','MN-2026-0120','30.00','Confermato'],
-      ['10/05/2026','Entrata','Quote soci','Sara Conti','50.00','Fallito'],
-      ['09/05/2026','Uscita','Spese','Tipografia Aldo','-67.80','Confermato'],
-      ['08/05/2026','Entrata','Boutique','Boutique','15.00','Confermato'],
-      ['06/05/2026','Entrata','Quote soci','Valentina Esposito','50.00','Rimborsato'],
-      ['05/05/2026','Uscita','Spese','La Spiga','-320.00','Confermato'],
-    ];
-    var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
-    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
+    const rows = [
+    ['Data','Tipo','Categoria','Riferimento','Importo','Stato'],
+    ['18/05/2026','Entrata','Quote soci','Marco Rossi','50.00','Confermato'],
+    ['17/05/2026','Entrata','Test','MN-2026-0124','30.00','Confermato'],
+    ['16/05/2026','Uscita','Spese','Cartoleria Bottega','-124.30','Confermato'],
+    ['15/05/2026','Entrata','Quote soci','Lorenzo Bianchi','50.00','In sospeso'],
+    ['14/05/2026','Entrata','Donazioni','Anonimo','200.00','Confermato'],
+    ['12/05/2026','Uscita','Spese','Mensa Roma','-480.00','Confermato'],
+    ['11/05/2026','Entrata','Test','MN-2026-0120','30.00','Confermato'],
+    ['10/05/2026','Entrata','Quote soci','Sara Conti','50.00','Fallito'],
+    ['09/05/2026','Uscita','Spese','Tipografia Aldo','-67.80','Confermato'],
+    ['08/05/2026','Entrata','Boutique','Boutique','15.00','Confermato'],
+    ['06/05/2026','Entrata','Quote soci','Valentina Esposito','50.00','Rimborsato'],
+    ['05/05/2026','Uscita','Spese','La Spiga','-320.00','Confermato'],
+  ];
+    const csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url;
     a.download = 'mensa-ledger-export.csv';
     a.click();

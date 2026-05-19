@@ -262,35 +262,35 @@ import AppShell from "../../layouts/AppShell.astro";
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
+    const CART_KEY = 'mensa_boutique_cart';
 
     function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; } }
     function fmt(n) { return '€ ' + n.toFixed(2).replace('.', ','); }
 
     function calcTotals() {
-      var cart = getCart();
-      var sub = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
-      var ship = (cart.length === 0 || sub >= 60) ? 0 : 4.90;
+      const cart = getCart();
+      const sub = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
+      const ship = (cart.length === 0 || sub >= 60) ? 0 : 4.90;
       return { sub: sub, ship: ship, total: sub + ship, cart: cart };
     }
 
     function fillSummary() {
-      var t = calcTotals();
-      var itemsEl = document.getElementById('co-summary-items');
+      const t = calcTotals();
+      const itemsEl = document.getElementById('co-summary-items');
       if (itemsEl) {
         itemsEl.innerHTML = '';
         t.cart.forEach(function (item) {
-          var d = document.createElement('div');
+          const d = document.createElement('div');
           d.className = 'co-order-summary__item';
           d.innerHTML = '<span class="co-order-summary__item-name">' + item.name + ' ×' + (item.qty||1) + '</span>'
             + '<span>' + fmt(item.price * (item.qty||1)) + '</span>';
           itemsEl.appendChild(d);
         });
       }
-      var subEl = document.getElementById('co-sub');
-      var shipEl = document.getElementById('co-ship');
-      var totalEl = document.getElementById('co-total');
-      var payEl = document.getElementById('pay-amount');
+      const subEl = document.getElementById('co-sub');
+      const shipEl = document.getElementById('co-ship');
+      const totalEl = document.getElementById('co-total');
+      const payEl = document.getElementById('pay-amount');
       if (subEl) subEl.textContent = fmt(t.sub);
       if (shipEl) shipEl.textContent = t.ship === 0 ? 'Gratuita' : fmt(t.ship);
       if (totalEl) totalEl.textContent = fmt(t.total);
@@ -300,8 +300,8 @@ import AppShell from "../../layouts/AppShell.astro";
 
     function goToStep(n) {
       [1,2,3].forEach(function (i) {
-        var step = document.getElementById('co-step-' + i);
-        var ind  = document.getElementById('step-ind-' + i);
+        const step = document.getElementById('co-step-' + i);
+        const ind  = document.getElementById('step-ind-' + i);
         if (!step || !ind) return;
         if (i === n) {
           step.hidden = false;
@@ -332,25 +332,25 @@ import AppShell from "../../layouts/AppShell.astro";
     });
 
     function runProcessing() {
-      var steps = [
-        'Verifica carta',
-        'Autorizzazione',
-        'Conferma pagamento',
-        'Generazione ricevuta',
-      ];
-      var listEl = document.getElementById('co-processing-list');
+      const steps = [
+      'Verifica carta',
+      'Autorizzazione',
+      'Conferma pagamento',
+      'Generazione ricevuta',
+    ];
+      const listEl = document.getElementById('co-processing-list');
       listEl.innerHTML = '';
-      var rows = steps.map(function (label) {
-        var row = document.createElement('div');
-        row.className = 'co-processing-row';
-        row.innerHTML = '<span class="co-processing-icon"><span class="co-spinner"></span></span>'
-          + '<span>' + label + '</span>';
-        row.style.opacity = '0.3';
-        listEl.appendChild(row);
-        return row;
-      });
+      const rows = steps.map(function (label) {
+      const row = document.createElement('div');
+      row.className = 'co-processing-row';
+      row.innerHTML = '<span class="co-processing-icon"><span class="co-spinner"></span></span>'
+        + '<span>' + label + '</span>';
+      row.style.opacity = '0.3';
+      listEl.appendChild(row);
+      return row;
+    });
 
-      var idx = 0;
+      let idx = 0;
       function next() {
         if (idx >= rows.length) {
           setTimeout(function () {
@@ -358,7 +358,7 @@ import AppShell from "../../layouts/AppShell.astro";
           }, 600);
           return;
         }
-        var row = rows[idx];
+        const row = rows[idx];
         row.style.opacity = '1';
         row.className = 'co-processing-row is-active';
         setTimeout(function () {

@@ -10,7 +10,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "build:shared": "cd .. && ./gradlew :shared:jsBrowserProductionLibraryDistribution --no-daemon"
+    "build:shared": "cd .. && ./gradlew :shared:jsBrowserProductionLibraryDistribution --no-daemon",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.astro --max-warnings=0",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx,.astro --fix"
   },
   "dependencies": {
     "@astrojs/markdoc": "^1.0.5",
@@ -43,6 +45,9 @@
     "@astrojs/check": "^0.9.9",
     "@astrojs/react": "^5.0.5",
     "@types/node": "^25.8.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-astro": "^1.3.1",
+    "typescript-eslint": "^8.20.0",
     "ws": "8.18.0"
   }
 }

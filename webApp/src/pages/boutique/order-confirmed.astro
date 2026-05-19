@@ -203,52 +203,52 @@ import AppShell from "../../layouts/AppShell.astro";
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
-    var GRADIENTS = [
-      'linear-gradient(135deg,oklch(42% 0.18 263),oklch(28% 0.14 263))',
-      'linear-gradient(135deg,oklch(40% 0.06 240),oklch(26% 0.04 240))',
-      'linear-gradient(135deg,oklch(52% 0.14 190),oklch(36% 0.10 190))',
-      'linear-gradient(135deg,oklch(48% 0.18 310),oklch(32% 0.14 310))',
-      'linear-gradient(135deg,oklch(56% 0.10 54),oklch(40% 0.08 48))',
-    ];
+    const CART_KEY = 'mensa_boutique_cart';
+    const GRADIENTS = [
+    'linear-gradient(135deg,oklch(42% 0.18 263),oklch(28% 0.14 263))',
+    'linear-gradient(135deg,oklch(40% 0.06 240),oklch(26% 0.04 240))',
+    'linear-gradient(135deg,oklch(52% 0.14 190),oklch(36% 0.10 190))',
+    'linear-gradient(135deg,oklch(48% 0.18 310),oklch(32% 0.14 310))',
+    'linear-gradient(135deg,oklch(56% 0.10 54),oklch(40% 0.08 48))',
+  ];
 
     function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; } }
     function fmt(n) { return '€ ' + n.toFixed(2).replace('.', ','); }
 
-    var params = new URLSearchParams(window.location.search);
-    var ref = params.get('ref') || 'BQ-2026-0042';
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref') || 'BQ-2026-0042';
     document.getElementById('oc-ref').textContent = ref;
 
-    var cart = getCart();
-    var sub = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
-    var ship = (cart.length === 0 || sub >= 60) ? 0 : 4.90;
-    var total = sub + ship;
+    const cart = getCart();
+    const sub = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
+    const ship = (cart.length === 0 || sub >= 60) ? 0 : 4.90;
+    const total = sub + ship;
 
     document.getElementById('oc-sub-val').textContent   = fmt(sub);
     document.getElementById('oc-ship-val').textContent  = ship === 0 ? 'Gratuita' : fmt(ship);
     document.getElementById('oc-total-val').textContent = fmt(total);
 
-    var eta = new Date();
+    const eta = new Date();
     eta.setDate(eta.getDate() + 7);
-    var days = ['dom','lun','mar','mer','gio','ven','sab'];
-    var months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+    const days = ['dom','lun','mar','mer','gio','ven','sab'];
+    const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
     document.getElementById('oc-eta').textContent = days[eta.getDay()] + ' ' + eta.getDate() + ' ' + months[eta.getMonth()];
 
-    var itemsEl = document.getElementById('oc-items');
+    const itemsEl = document.getElementById('oc-items');
 
-    var astroCid = null;
-    for (var ai = 0; ai < itemsEl.attributes.length; ai++) {
-      var attr = itemsEl.attributes[ai];
+    let astroCid = null;
+    for (let ai = 0; ai < itemsEl.attributes.length; ai++) {
+      const attr = itemsEl.attributes[ai];
       if (attr.name.indexOf('data-astro-cid-') === 0) { astroCid = attr.name; break; }
     }
-    var cidAttr = astroCid ? ' ' + astroCid : '';
+    const cidAttr = astroCid ? ' ' + astroCid : '';
 
     if (cart.length === 0) {
       itemsEl.innerHTML = '<p class="oc-items__placeholder">Nessun articolo (carrello vuoto al momento del caricamento).</p>';
     } else {
       itemsEl.innerHTML = '';
       cart.forEach(function (item, i) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.className = 'oc-item';
         if (astroCid) div.setAttribute(astroCid, '');
         div.innerHTML = '<div class="oc-item__thumb"' + cidAttr + ' style="background:' + GRADIENTS[i % GRADIENTS.length] + '"></div>'

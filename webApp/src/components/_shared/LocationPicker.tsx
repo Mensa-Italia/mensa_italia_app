@@ -17,7 +17,7 @@ import { useTranslator } from "../../lib/i18n";
 // Ambient declaration: google.maps viene caricato a runtime tramite script tag.
 // Non installiamo @types/google.maps per non pesare sul bundle di dev;
 // usiamo `any` per la parte non tipata e cast espliciti dove necessario.
-declare const google: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+declare const google: any;  
 
 // ─── Tipi pubblici ────────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ function loadGoogleMapsScript(): Promise<void> {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function extractNameFromResult(result: any): string {
   // Cerca un nome "sensato": point_of_interest, premise, establishment, route.
   const priorities = [
@@ -132,7 +132,7 @@ export function LocationPicker({
   // Stati principali
   const [mapsState, setMapsState] = useState<"loading" | "ready" | "error">("loading");
   const [searchQuery, setSearchQuery] = useState(value?.name ?? "");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -145,15 +145,15 @@ export function LocationPicker({
 
   // Refs Maps (any: google.maps non è tipizzato senza @types/google.maps)
   const mapDivRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const markerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const autocompleteServiceRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const geocoderRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const sessionTokenRef = useRef<any>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
 
@@ -195,7 +195,7 @@ export function LocationPicker({
     });
 
     // Click sulla mappa → sposta il pin
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     map.addListener("click", (e: any) => {
       if (!e.latLng) return;
       marker.setPosition(e.latLng);
@@ -238,11 +238,11 @@ export function LocationPicker({
 
   // ── Geocoding inverso ─────────────────────────────────────────────────────
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   function reverseGeocode(latLng: any) {
     const geocoder = geocoderRef.current;
     if (!geocoder) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     geocoder.geocode({ location: latLng }, (results: any[] | null, status: string) => {
       if (status === "OK" && results && results[0]) {
         const r = results[0];
@@ -284,7 +284,7 @@ export function LocationPicker({
           sessionToken: sessionTokenRef.current ?? undefined,
           componentRestrictions: { country: "it" },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (preds: any[] | null, status: string) => {
           if (status === "OK" && preds) {
             setSuggestions(preds);
@@ -298,7 +298,7 @@ export function LocationPicker({
     }, 280);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   function handleSelectSuggestion(pred: any) {
     setShowSuggestions(false);
     setSearchQuery(pred.structured_formatting.main_text);
@@ -310,7 +310,7 @@ export function LocationPicker({
     // Nuova session token per la prossima ricerca
     sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     geocoder.geocode({ placeId: pred.place_id }, (results: any[] | null, status: string) => {
       if (status === "OK" && results && results[0]) {
         const r = results[0];

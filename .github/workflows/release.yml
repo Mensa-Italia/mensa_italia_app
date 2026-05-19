@@ -77,15 +77,21 @@ jobs:
           should_publish_play=false; should_publish_ios=false
           should_finalize=false
 
+          # IMPORTANTE: matchare SOLO sulla prima riga del commit (subject),
+          # NON sul body. Altrimenti un messaggio che DESCRIVE i token (es.
+          # "Architettura con [ALPHA]/[BETA]/[RELEASE]") triggera un release
+          # production reale.
+          subject=$(printf '%s' "$MSG" | head -n 1)
+
           if [ "$EVENT" = "workflow_dispatch" ]; then
             mode="release"; track="${INPUT_TRACK:-alpha}"
           elif [ "$REF" = "refs/heads/feat/mvp-testing-public" ]; then
             mode="mvp"; track="none"
-          elif printf '%s' "$MSG" | grep -qE '\[RELEASE\]'; then
+          elif printf '%s' "$subject" | grep -qE '(^|[[:space:]])\[RELEASE\]([[:space:]]|$)'; then
             mode="release"; track="production"
-          elif printf '%s' "$MSG" | grep -qE '\[BETA\]'; then
+          elif printf '%s' "$subject" | grep -qE '(^|[[:space:]])\[BETA\]([[:space:]]|$)'; then
             mode="release"; track="beta"
-          elif printf '%s' "$MSG" | grep -qE '\[ALPHA\]'; then
+          elif printf '%s' "$subject" | grep -qE '(^|[[:space:]])\[ALPHA\]([[:space:]]|$)'; then
             mode="release"; track="alpha"
           fi
 

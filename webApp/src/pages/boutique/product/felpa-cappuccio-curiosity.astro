@@ -435,13 +435,13 @@ const product = {
 
 <script is:inline>
   (function () {
-    var CART_KEY = 'mensa_boutique_cart';
-    var slug  = 'felpa-cappuccio-curiosity';
-    var name  = 'Felpa "Curiosity above all"';
-    var price = 52.00;
-    var cat   = 'Abbigliamento';
-    var qty   = 1;
-    var size  = 'M';
+    const CART_KEY = 'mensa_boutique_cart';
+    const slug  = 'felpa-cappuccio-curiosity';
+    const name  = 'Felpa "Curiosity above all"';
+    const price = 52.00;
+    const cat   = 'Abbigliamento';
+    let qty   = 1;
+    let size  = 'M';
 
     function getCart() {
       try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; }
@@ -456,7 +456,7 @@ const product = {
       });
     });
 
-    var qtyVal = document.getElementById('pd-qty-val');
+    const qtyVal = document.getElementById('pd-qty-val');
     document.getElementById('pd-qty-minus').addEventListener('click', function () {
       if (qty > 1) { qty--; qtyVal.textContent = qty; }
     });
@@ -466,8 +466,8 @@ const product = {
     });
 
     function addToCart() {
-      var cart = getCart();
-      var existing = cart.find(function (i) { return i.slug === slug && i.size === size; });
+      const cart = getCart();
+      const existing = cart.find(function (i) { return i.slug === slug && i.size === size; });
       if (existing) {
         existing.qty = (existing.qty || 1) + qty;
       } else {
@@ -477,7 +477,7 @@ const product = {
     }
 
     function showToast() {
-      var t = document.getElementById('pd-toast');
+      const t = document.getElementById('pd-toast');
       if (!t) return;
       t.classList.add('is-visible');
       setTimeout(function () { t.classList.remove('is-visible'); }, 2500);

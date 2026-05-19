@@ -117,7 +117,7 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
 
 <script is:inline>
 (function () {
-  var SLOTS = {
+  const SLOTS = {
     roma: [
       { id: "rm-060626-1000", date: "Sab 6 Giu 2026", time: "10:00 — 11:30", spots: 4 },
       { id: "rm-060626-1400", date: "Sab 6 Giu 2026", time: "14:00 — 15:30", spots: 7 },
@@ -141,11 +141,11 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
     ]
   };
 
-  var state = { venueId: null, venueLabel: null, slotId: null, slotDate: null, slotTime: null };
+  const state = { venueId: null, venueLabel: null, slotId: null, slotDate: null, slotTime: null };
 
   function goToStep(from, to) {
-    var fromEl = document.getElementById("step-" + from);
-    var toEl = document.getElementById("step-" + to);
+    const fromEl = document.getElementById("step-" + from);
+    const toEl = document.getElementById("step-" + to);
     fromEl.hidden = true;
     toEl.removeAttribute("hidden");
     requestAnimationFrame(function () {
@@ -159,8 +159,8 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
   }
 
   function updateStepper(current) {
-    for (var i = 1; i <= 3; i++) {
-      var el = document.getElementById("step-indicator-" + i);
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById("step-indicator-" + i);
       el.classList.remove("is-current", "is-done", "is-future");
       if (i < current) el.classList.add("is-done");
       else if (i === current) { el.classList.add("is-current"); el.setAttribute("aria-current", "step"); }
@@ -169,18 +169,18 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
   }
 
   function renderSlots(venueId, venueLabel) {
-    var list = document.getElementById("slots-list");
-    var sub = document.getElementById("step-2-venue-label");
+    const list = document.getElementById("slots-list");
+    const sub = document.getElementById("step-2-venue-label");
     sub.innerHTML = "Disponibilità per <strong>" + venueLabel + "</strong>";
-    var slots = SLOTS[venueId] || [];
+    const slots = SLOTS[venueId] || [];
     list.innerHTML = "";
-    var astroCid = null;
-    for (var i = 0; i < list.attributes.length; i++) {
-      var a = list.attributes[i];
+    let astroCid = null;
+    for (let i = 0; i < list.attributes.length; i++) {
+      const a = list.attributes[i];
       if (a.name.indexOf("data-astro-cid-") === 0) { astroCid = a.name; break; }
     }
     slots.forEach(function (s) {
-      var el = document.createElement("div");
+      const el = document.createElement("div");
       el.className = "slot";
       el.setAttribute("role", "radio");
       el.setAttribute("aria-checked", "false");
@@ -189,7 +189,7 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
       el.setAttribute("data-slot-date", s.date);
       el.setAttribute("data-slot-time", s.time);
       if (astroCid) el.setAttribute(astroCid, "");
-      var lowClass = s.spots <= 3 ? " slot__spots--low" : "";
+      const lowClass = s.spots <= 3 ? " slot__spots--low" : "";
       el.innerHTML =
         '<div class="slot__body"' + (astroCid ? " " + astroCid : "") + '><p class="slot__date"' + (astroCid ? " " + astroCid : "") + '>' + s.date + "</p>" +
         '<p class="slot__time"' + (astroCid ? " " + astroCid : "") + '>' + s.time + "</p></div>" +
@@ -254,7 +254,7 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
   });
 
   document.getElementById("btn-step3-pay").addEventListener("click", function () {
-    var params = new URLSearchParams({ sede: state.venueId, slot: state.slotId });
+    const params = new URLSearchParams({ sede: state.venueId, slot: state.slotId });
     window.location.href = "/public/mvp/checkout?" + params.toString();
   });
 })();

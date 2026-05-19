@@ -1,0 +1,38 @@
+included:
+  - iosApp/iosApp
+
+excluded:
+  - iosApp/iosApp/Generated
+  - iosApp/iosApp.xcodeproj
+  - iosApp/iosApp.xcworkspace
+  - "**/*.generated.swift"
+
+# Partiamo con solo regole opt-out delle più rumorose. Inalziamo nel tempo.
+disabled_rules:
+  - line_length
+  - file_length
+  - type_body_length
+  - function_body_length
+  - cyclomatic_complexity
+  - identifier_name        # Swift HIG: spesso 1-letter va bene (es. `_`, `i`)
+  - nesting
+  - todo                   # FIXME/TODO ammessi
+  - large_tuple
+  - trailing_whitespace    # gestito da formatter
+
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - force_unwrapping
+  - implicit_return
+  - last_where
+  - private_action
+  - private_outlet
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unused_import
+
+force_unwrapping:
+  severity: warning

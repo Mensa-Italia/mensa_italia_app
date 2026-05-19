@@ -157,10 +157,10 @@ const sections = audience === "applicant" ? applicantSections : memberFullSectio
         (function () {
           function applySuperVisibility() {
             try {
-              var raw = localStorage.getItem("mensa.auth.user");
+              const raw = localStorage.getItem("mensa.auth.user");
               if (!raw) return;
-              var user = JSON.parse(raw);
-              var powers = user && user.powers;
+              const user = JSON.parse(raw);
+              const powers = user && user.powers;
               if (!Array.isArray(powers)) return;
               if (powers.indexOf("super") === -1 && powers.indexOf("admin") === -1) return;
               document.querySelectorAll("[data-super-only]").forEach(function (el) {

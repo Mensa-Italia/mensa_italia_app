@@ -88,16 +88,16 @@ import MvpAppShell from "../../../layouts/MvpAppShell.astro";
 
 <script is:inline>
 (function () {
-  var ref = new URLSearchParams(window.location.search).get("ref");
+  const ref = new URLSearchParams(window.location.search).get("ref");
   if (ref) {
-    var els = document.querySelectorAll("#booking-ref, #qr-ref");
+    const els = document.querySelectorAll("#booking-ref, #qr-ref");
     els.forEach(function (el) { el.textContent = ref; });
-    var aria = document.querySelector(".qr-placeholder");
+    const aria = document.querySelector(".qr-placeholder");
     if (aria) aria.setAttribute("aria-label", "QR code prenotazione " + ref);
   }
 
-  var container = document.getElementById("confirmed-container");
-  var checkIcon = document.getElementById("check-icon");
+  const container = document.getElementById("confirmed-container");
+  const checkIcon = document.getElementById("check-icon");
 
   checkIcon.classList.add("icon-pulse");
 
