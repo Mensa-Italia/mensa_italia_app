@@ -883,3 +883,62 @@ jobs:
           else
             echo "::error::Quality gate ROSSO su track=$TRACK — publish BLOCCATO."
           fi
+
+  # ─── Cleanup: elimina i workflow run più vecchi di 24h ─────────────────────
+  # Gira alla fine di ogni esecuzione, indipendentemente dall'esito. Serve a
+  # tenere pulita la timeline Actions e a non far esplodere la storia dei run.
+  cleanup-old-runs:
+    name: Cleanup old runs
+    needs:
+      - prepare
+      - web
+      - android
+      - ios
+      - play-publish
+      - testflight-publish
+      - finalize
+      - lint-web
+      - typecheck-web
+      - lint-kotlin
+      - lint-swift
+      - lint-dockerfile
+      - scan-secrets
+      - scan-vulns
+      - codeql-js
+      - codeql-kotlin
+      - codeql-swift
+      - gate-summary
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete runs older than 24h
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cutoff=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ')
+          echo "Soglia: elimino tutti i run created_at < $cutoff"
+
+          deleted=0; scanned=0; page=1
+          while [ $page -le 10 ]; do
+            page_json=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page" --jq '.workflow_runs[] | "\(.id)|\(.created_at)|\(.status)"' || true)
+            [ -z "$page_json" ] && break
+            while IFS='|' read -r id created status; do
+              scanned=$((scanned+1))
+              # Salta il run corrente per evitare di auto-eliminarsi
+              if [ "$id" = "${{ github.run_id }}" ]; then continue; fi
+              # Salta i run in corso (devono finire prima)
+              if [ "$status" = "in_progress" ] || [ "$status" = "queued" ] || [ "$status" = "waiting" ]; then continue; fi
+              # Confronto ISO8601 lessicografico (funziona perché tutti UTC con stesso formato)
+              if [ "$created" \< "$cutoff" ]; then
+                if gh api -X DELETE "repos/$REPO/actions/runs/$id" --silent 2>/dev/null; then
+                  deleted=$((deleted+1))
+                fi
+              fi
+            done <<< "$page_json"
+            page=$((page+1))
+          done
+          echo "Scansionati: $scanned, eliminati: $deleted"
