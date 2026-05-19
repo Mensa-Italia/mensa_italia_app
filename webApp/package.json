@@ -25,6 +25,7 @@
     "astro": "^6.3.3",
     "clsx": "^2.1.1",
     "format-util": "1.0.5",
+    "gsap": "^3.15.0",
     "lucide-react": "^1.16.0",
     "mensa-shared": "file:../shared/build/dist/js/productionLibrary",
     "qrcode-generator": "1.4.4",

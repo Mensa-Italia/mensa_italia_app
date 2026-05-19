@@ -6,6 +6,11 @@ build/
 !**/gradle-wrapper.jar
 local.properties
 
+# Signing artifacts (CI scrive qui, non vanno committate)
+androidApp/keystore/
+*.jks
+*.keystore
+
 # IntelliJ / Android Studio
 .idea/
 *.iml

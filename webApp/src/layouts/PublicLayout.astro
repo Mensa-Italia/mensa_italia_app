@@ -210,6 +210,14 @@ const navItems: NavItem[] = [
   </div>
 </BaseLayout>
 
+<!-- ═══ MOTION: site-wide scroll reveal (respects prefers-reduced-motion) ═══ -->
+<script>
+  import { setupScrollReveal } from "../lib/motion";
+  // Run after DOM is ready. Astro modules are deferred so DOM is already
+  // parsed at this point.
+  setupScrollReveal();
+</script>
+
 <style>
   .pub {
     min-block-size: 100dvh;

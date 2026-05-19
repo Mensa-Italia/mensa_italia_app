@@ -344,3 +344,100 @@ function orderLabel(n: number): string {
     user-select: none;
   }
 </style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from "../../../../lib/motion";
+
+  if (!prefersReducedMotion()) {
+    // ── Pre-hide elements immediately to prevent FOUC ──────────────────────
+    const kicker = document.querySelector<HTMLElement>(".hero__kicker");
+    const title  = document.querySelector<HTMLElement>(".hero__title");
+    const lead   = document.querySelector<HTMLElement>(".hero__lead");
+    const featured = document.querySelector<HTMLElement>(".card--featured");
+    const gridItems = document.querySelectorAll<HTMLElement>(".card-grid > li");
+    const pills = document.querySelectorAll<HTMLElement>(".other__pill");
+
+    if (kicker) gsap.set(kicker, { opacity: 0, y: 8 });
+    if (title)  gsap.set(title,  { opacity: 0, y: 24 });
+    if (lead)   gsap.set(lead,   { opacity: 0, y: 18 });
+    if (featured) gsap.set(featured, { opacity: 0, y: 28 });
+    if (gridItems.length) gsap.set(gridItems, { opacity: 0, y: 24 });
+    if (pills.length) gsap.set(pills, { opacity: 0, y: 6 });
+
+    // ── 1. Hero entrance (load-time, not scroll) ───────────────────────────
+    const heroTl = gsap.timeline();
+    if (kicker) heroTl.to(kicker, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+    if (title)  heroTl.to(title,  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+    if (lead)   heroTl.to(lead,   { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.45);
+
+    // ── 2. Featured card scroll-in ─────────────────────────────────────────
+    if (featured) {
+      ScrollTrigger.create({
+        trigger: featured,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          gsap.to(featured, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          });
+        },
+      });
+    }
+
+    // ── 3. Regular cards stagger ───────────────────────────────────────────
+    const cardGrid = document.querySelector<HTMLElement>(".card-grid");
+    if (cardGrid && gridItems.length) {
+      const arrows = document.querySelectorAll<HTMLElement>(".card-grid .card__arrow");
+      if (arrows.length) gsap.set(arrows, { x: -4 });
+
+      ScrollTrigger.create({
+        trigger: cardGrid,
+        start: "top 80%",
+        once: true,
+        onEnter: () => {
+          gsap.to(gridItems, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            stagger: 0.08,
+            clearProps: "transform,opacity",
+          });
+          if (arrows.length) {
+            gsap.to(arrows, {
+              x: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              stagger: 0.08,
+              clearProps: "transform",
+            });
+          }
+        },
+      });
+    }
+
+    // ── 4. "Altre sezioni" pills stagger ──────────────────────────────────
+    const pillsNav = document.querySelector<HTMLElement>(".other__pills");
+    if (pillsNav && pills.length) {
+      ScrollTrigger.create({
+        trigger: pillsNav,
+        start: "top 90%",
+        once: true,
+        onEnter: () => {
+          gsap.to(pills, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: "power2.out",
+            stagger: 0.04,
+            clearProps: "transform,opacity",
+          });
+        },
+      });
+    }
+  }
+</script>

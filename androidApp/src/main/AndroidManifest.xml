@@ -68,6 +68,10 @@
         </service>
 
         <!-- Firebase Cloud Messaging -->
+        <!--
+          Disabilitato finché Firebase non è attiva (google-services.json mancante).
+          La classe MensaMessagingService non estende Service in questo stato,
+          quindi lasciarlo registrato fa fallire lintVitalRelease.
         <service
             android:name=".services.push.MensaMessagingService"
             android:exported="false">
@@ -75,6 +79,8 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        -->
+
 
         <!-- Google Maps API key -->
         <meta-data

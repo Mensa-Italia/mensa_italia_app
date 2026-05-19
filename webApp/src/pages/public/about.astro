@@ -41,19 +41,19 @@ const bodyNodes: any[] = bodyContent?.children ?? [];
       <dl class="numbers__grid">
         <div>
           <dt data-i18n="public.chi_siamo.stat.population">della popolazione</dt>
-          <dd>2<span>%</span></dd>
+          <dd><span class="numbers__value" data-count="2">2</span><span class="numbers__unit">%</span></dd>
         </div>
         <div>
           <dt data-i18n="public.chi_siamo.stat.members_world">soci nel mondo</dt>
-          <dd>150.000<span>+</span></dd>
+          <dd><span class="numbers__value" data-count="150000" data-format="thousands">150.000</span><span class="numbers__unit">+</span></dd>
         </div>
         <div>
           <dt data-i18n="public.chi_siamo.stat.countries">Paesi</dt>
-          <dd>100<span>+</span></dd>
+          <dd><span class="numbers__value" data-count="100">100</span><span class="numbers__unit">+</span></dd>
         </div>
         <div>
           <dt data-i18n="public.chi_siamo.stat.founded">anno di fondazione</dt>
-          <dd>1946</dd>
+          <dd><span class="numbers__value" data-count="1946">1946</span></dd>
         </div>
       </dl>
     </div>
@@ -367,7 +367,8 @@ const bodyNodes: any[] = bodyContent?.children ?? [];
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
-  .numbers__grid dd span { color: var(--color-mensa-blue); }
+  .numbers__grid dd .numbers__unit { color: var(--color-mensa-blue); }
+  .numbers__value { font-variant-numeric: tabular-nums; }
 
   /* ═══ PROSE ═══════════════════════════════════════════════════ */
   .prose {
@@ -673,3 +674,16 @@ const bodyNodes: any[] = bodyContent?.children ?? [];
     color: var(--color-text-tertiary);
   }
 </style>
+
+<script>
+  import { countUp } from "../../lib/motion";
+
+  document.querySelectorAll<HTMLElement>('.numbers__value').forEach((el) => {
+    const target = Number(el.dataset.count ?? "0");
+    if (Number.isNaN(target)) return;
+    countUp(el, target, {
+      duration: target >= 1000 ? 2.0 : 1.4,
+      locale: el.dataset.format === "thousands" ? "it-IT" : "en-US",
+    });
+  });
+</script>

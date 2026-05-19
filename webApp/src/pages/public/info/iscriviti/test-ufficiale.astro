@@ -514,3 +514,96 @@ const faq = [
   }
   .source-footer__link:hover { color: var(--color-mensa-blue); text-decoration: underline; }
 </style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from "../../../../lib/motion";
+
+  // ─── Reduced-motion gate ───────────────────────────────────────────────────
+  if (!prefersReducedMotion()) {
+
+    // ─── Pre-hide elements that will animate in ──────────────────────────────
+    gsap.set(".hero__kicker, .hero__title, .hero__lead", { opacity: 0, y: 24 });
+    gsap.set(".step__number", { opacity: 0, scale: 0.85 });
+    gsap.set(".step__title", { opacity: 0, y: 18 });
+    gsap.set(".step__desc", { opacity: 0, y: 14 });
+
+    const connectors = gsap.utils.toArray<HTMLElement>(".step__connector");
+    if (connectors.length) {
+      connectors.forEach((c) => {
+        gsap.set(c, { scaleX: 0, transformOrigin: "left center" });
+      });
+    }
+
+    gsap.set(".bring__card", { opacity: 0, y: 20 });
+    gsap.set(".faq-inline__item", { opacity: 0, y: 16 });
+
+    // ─── Hero entrance (on load, not scroll) ─────────────────────────────────
+    const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+    heroTl
+      .to(".hero__kicker", { opacity: 1, y: 0, duration: 0.6 })
+      .to(".hero__title",  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
+      .to(".hero__lead",   { opacity: 1, y: 0, duration: 0.6 }, "-=0.45");
+
+    // ─── Timeline steps scroll-in ─────────────────────────────────────────────
+    const steps = gsap.utils.toArray<HTMLElement>(".step");
+    ScrollTrigger.create({
+      trigger: ".timeline__list",
+      start: "top 80%",
+      onEnter: () => {
+        steps.forEach((step, i) => {
+          const offset = i * 0.18;
+          const num   = step.querySelector(".step__number");
+          const title = step.querySelector(".step__title");
+          const desc  = step.querySelector(".step__desc");
+          const conn  = step.querySelector<HTMLElement>(".step__connector");
+
+          if (num) {
+            gsap.to(num, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)", delay: offset });
+          }
+          if (title) {
+            gsap.to(title, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", delay: offset + 0.1 });
+          }
+          if (desc) {
+            gsap.to(desc, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", delay: offset + 0.2 });
+          }
+          // Connector draws left-to-right midway through preceding step
+          if (conn) {
+            gsap.to(conn, {
+              scaleX: 1,
+              duration: 0.35,
+              ease: "power2.out",
+              delay: offset + 0.15,
+            });
+          }
+        });
+      },
+    });
+
+    // ─── "Cosa portare" callout card ─────────────────────────────────────────
+    gsap.to(".bring__card", {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: ".bring__card",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    // ─── FAQ pairs stagger ────────────────────────────────────────────────────
+    gsap.to(".faq-inline__item", {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out",
+      stagger: 0.08,
+      scrollTrigger: {
+        trigger: ".faq-inline__list",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+  }
+</script>
