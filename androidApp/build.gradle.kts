@@ -10,10 +10,13 @@ plugins {
 // condivisa con la pipeline web). versionCode derivato come MAJOR*10000 + MINOR*100 + PATCH.
 val versionFile = rootProject.file("VERSION")
 val appVersionName: String = if (versionFile.exists()) versionFile.readText().trim() else "0.0.0"
-val appVersionCode: Int = appVersionName.split(".").let { parts ->
-    val (maj, min, pat) = (parts + listOf("0", "0", "0")).take(3).map { it.toIntOrNull() ?: 0 }
-    maj * 10000 + min * 100 + pat
-}.coerceAtLeast(1)
+// versionCode: CI passa -PandroidVersionCodeOverride=<int> (30000000 + commitCount)
+// per stare sopra al legacy Flutter (~21M). Fallback locale: schema major*10000 + minor*100 + patch.
+val appVersionCode: Int = (project.findProperty("androidVersionCodeOverride") as String?)?.toIntOrNull()
+    ?: appVersionName.split(".").let { parts ->
+        val (maj, min, pat) = (parts + listOf("0", "0", "0")).take(3).map { it.toIntOrNull() ?: 0 }
+        maj * 10000 + min * 100 + pat
+    }.coerceAtLeast(1)
 
 // Signing release: legge da gradle properties o env. Se manca lo store, il
 // buildType release riusa il signing di debug così sviluppo locale e CI senza

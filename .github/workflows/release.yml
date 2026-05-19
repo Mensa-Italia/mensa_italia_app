@@ -1,23 +1,36 @@
 name: Release
 
-# Strategia:
-#   - push a master con `[release]` nel messaggio (o workflow_dispatch) →
-#     bumpa la patch in `VERSION`, builda l'immagine, la pubblica su GHCR
-#     con i tag `latest` + `vX.Y.Z`, committa il bump e crea il tag git.
-#   - push a feat/mvp-testing-public → builda e pubblica l'immagine con il
-#     solo tag `dev` (nessun bump versione, nessun tag git, nessuna release).
+# Mode/track determinato dal messaggio di commit:
+#   [ALPHA]   → web :alpha,  Play internal,    TestFlight internal
+#   [BETA]    → web :beta,   Play beta,        TestFlight + gruppo "Test open"
+#   [RELEASE] → web :latest, Play production,  TestFlight + submit for review
+#   push su feat/mvp-testing-public → solo web :dev (niente native)
+#
+# Workflow_dispatch: scegli il track dalla UI Actions.
+#
+# DAG:
+#   prepare ─┬─> web        ─┐
+#            ├─> android  ─┐ │
+#            │             ↓ │
+#            │      play-publish (gated)
+#            │                ↓
+#            ├─> ios          │
+#            │    ↓           │
+#            │  testflight-publish (gated)
+#            │                ↓
+#            └─────> finalize (tag + GitHub Release con artefatti)
 
 on:
   push:
     branches: [master, feat/mvp-testing-public]
   workflow_dispatch:
     inputs:
-      bump:
-        description: 'Quale segmento bumpare'
-        required: false
-        default: 'patch'
+      track:
+        description: 'Track di pubblicazione (ignorato se branch = feat/mvp-testing-public)'
+        required: true
+        default: 'alpha'
         type: choice
-        options: [patch, minor, major]
+        options: [alpha, beta, production]
 
 concurrency:
   group: release-${{ github.ref }}
@@ -28,54 +41,144 @@ env:
   IMAGE_NAME: mensa-italia/mensa-web
 
 jobs:
-  release:
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      contains(github.event.head_commit.message, '[release]') ||
-      github.ref == 'refs/heads/feat/mvp-testing-public'
+  # ─── Prepare: determina mode/track/versione, fa da fonte di verità ─────────
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
     outputs:
-      version: ${{ steps.bump.outputs.version }}
-      is_release: ${{ steps.mode.outputs.is_release }}
+      mode: ${{ steps.mode.outputs.mode }}
+      track: ${{ steps.mode.outputs.track }}
+      version: ${{ steps.version.outputs.version }}
+      version_code: ${{ steps.version.outputs.version_code }}
+      docker_tags: ${{ steps.tags.outputs.tags }}
+      should_build_web: ${{ steps.mode.outputs.should_build_web }}
+      should_build_native: ${{ steps.mode.outputs.should_build_native }}
+      should_publish_play: ${{ steps.mode.outputs.should_publish_play }}
+      should_publish_ios: ${{ steps.mode.outputs.should_publish_ios }}
+      should_finalize: ${{ steps.mode.outputs.should_finalize }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine build mode
+      - name: Determine mode & track
         id: mode
-        run: |
-          if [ "${{ github.ref }}" = "refs/heads/feat/mvp-testing-public" ]; then
-            echo "is_mvp=true"     >> "$GITHUB_OUTPUT"
-            echo "is_release=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_mvp=false"    >> "$GITHUB_OUTPUT"
-            echo "is_release=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Bump version
-        id: bump
-        if: steps.mode.outputs.is_release == 'true'
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+          REF: ${{ github.ref }}
+          EVENT: ${{ github.event_name }}
+          INPUT_TRACK: ${{ github.event.inputs.track }}
         run: |
           set -euo pipefail
-          [ -f VERSION ] || echo "0.0.0" > VERSION
-          current=$(tr -d '[:space:]' < VERSION)
-          IFS='.' read -r major minor patch <<< "$current"
-          case "${{ github.event.inputs.bump || 'patch' }}" in
-            major) major=$((major + 1)); minor=0; patch=0 ;;
-            minor) minor=$((minor + 1)); patch=0 ;;
-            *)     patch=$((patch + 1)) ;;
+          mode="none"; track="none"
+          should_build_web=false; should_build_native=false
+          should_publish_play=false; should_publish_ios=false
+          should_finalize=false
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            mode="release"; track="${INPUT_TRACK:-alpha}"
+          elif [ "$REF" = "refs/heads/feat/mvp-testing-public" ]; then
+            mode="mvp"; track="none"
+          elif printf '%s' "$MSG" | grep -qE '\[RELEASE\]'; then
+            mode="release"; track="production"
+          elif printf '%s' "$MSG" | grep -qE '\[BETA\]'; then
+            mode="release"; track="beta"
+          elif printf '%s' "$MSG" | grep -qE '\[ALPHA\]'; then
+            mode="release"; track="alpha"
+          fi
+
+          case "$mode" in
+            release)
+              should_build_web=true
+              should_build_native=true
+              should_publish_play=true
+              should_publish_ios=true
+              should_finalize=true
+              ;;
+            mvp)
+              should_build_web=true
+              ;;
           esac
-          new="${major}.${minor}.${patch}"
-          echo "$new" > VERSION
-          echo "version=$new" >> "$GITHUB_OUTPUT"
-          echo "Bumped: $current -> $new"
+
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "track=$track" >> "$GITHUB_OUTPUT"
+          echo "should_build_web=$should_build_web" >> "$GITHUB_OUTPUT"
+          echo "should_build_native=$should_build_native" >> "$GITHUB_OUTPUT"
+          echo "should_publish_play=$should_publish_play" >> "$GITHUB_OUTPUT"
+          echo "should_publish_ios=$should_publish_ios" >> "$GITHUB_OUTPUT"
+          echo "should_finalize=$should_finalize" >> "$GITHUB_OUTPUT"
+
+          echo "::notice::Mode=$mode track=$track"
+
+      - name: Determine version & versionCode
+        id: version
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          set -euo pipefail
+          # versionCode comune a tutti i modi: monotonico, sopra al legacy Flutter (~21M)
+          commit_count=$(git rev-list --count HEAD)
+          version_code=$((30000000 + commit_count))
+
+          if [ "$MODE" = "release" ]; then
+            # Trova l'ultimo tag vX.Y.Z (anche orfani) e bumpa patch.
+            git fetch --tags --force --quiet
+            last_tag=$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+            last_version="${last_tag#v}"
+            [ -z "$last_version" ] && last_version="0.0.0"
+            IFS='.' read -r maj min pat <<< "$last_version"
+            pat=$((pat + 1))
+            version="${maj}.${min}.${pat}"
+          elif [ "$MODE" = "mvp" ]; then
+            version="dev-$(git rev-parse --short HEAD)"
+          else
+            version="0.0.0-skipped"
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "::notice::version=$version versionCode=$version_code"
+
+      - name: Compute Docker tags
+        id: tags
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+          TRACK: ${{ steps.mode.outputs.track }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$MODE" = "mvp" ]; then
+            tags="${REGISTRY}/${IMAGE_NAME}:dev"
+          elif [ "$MODE" = "release" ]; then
+            case "$TRACK" in
+              production) tags="${REGISTRY}/${IMAGE_NAME}:latest"$'\n'"${REGISTRY}/${IMAGE_NAME}:v${VERSION}" ;;
+              beta)       tags="${REGISTRY}/${IMAGE_NAME}:beta"$'\n'"${REGISTRY}/${IMAGE_NAME}:v${VERSION}" ;;
+              alpha)      tags="${REGISTRY}/${IMAGE_NAME}:alpha"$'\n'"${REGISTRY}/${IMAGE_NAME}:v${VERSION}" ;;
+              *)          tags="" ;;
+            esac
+          else
+            tags=""
+          fi
+          {
+            echo "tags<<EOF"
+            echo "$tags"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  # ─── Web: build & push immagine GHCR ───────────────────────────────────────
+  web:
+    name: Web
+    needs: prepare
+    if: needs.prepare.outputs.should_build_web == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Setup JDK 21
         uses: actions/setup-java@v4
@@ -88,7 +191,6 @@ jobs:
 
       - name: Build shared JS library
         run: |
-          # Override del path JDK hardcoded in gradle.properties (è un path Mac locale)
           ./gradlew :shared:jsBrowserProductionLibraryDistribution \
             -Dorg.gradle.java.home="$JAVA_HOME" \
             --no-daemon --stacktrace
@@ -103,48 +205,51 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compute image tags
-        id: tags
-        run: |
-          set -euo pipefail
-          if [ "${{ steps.mode.outputs.is_mvp }}" = "true" ]; then
-            {
-              echo "tags<<EOF"
-              echo "${REGISTRY}/${IMAGE_NAME}:dev"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          else
-            {
-              echo "tags<<EOF"
-              echo "${REGISTRY}/${IMAGE_NAME}:latest"
-              echo "${REGISTRY}/${IMAGE_NAME}:v${{ steps.bump.outputs.version }}"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Build & push image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.web
           push: true
-          tags: ${{ steps.tags.outputs.tags }}
+          tags: ${{ needs.prepare.outputs.docker_tags }}
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # ─── Android build (solo in modalità release) ────────────────────────────
-      - name: Decode signing keystore
-        if: steps.mode.outputs.is_release == 'true'
+  # ─── Android: AAB + APK firmati ────────────────────────────────────────────
+  android:
+    name: Android
+    needs: prepare
+    if: needs.prepare.outputs.should_build_native == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      VERSION_CODE: ${{ needs.prepare.outputs.version_code }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write VERSION file (per gradle)
         run: |
-          set -euo pipefail
+          echo "$VERSION" > VERSION
+          echo "Building Android v$VERSION (versionCode $VERSION_CODE)"
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode signing keystore
+        run: |
           mkdir -p androidApp/keystore
           echo "${{ secrets.KEY_JKS }}" | base64 -d > androidApp/keystore/release.jks
-          # sanity check sul file
           file androidApp/keystore/release.jks
 
-      - name: Build Android AAB + APK
-        if: steps.mode.outputs.is_release == 'true'
+      - name: Build AAB + APK
         env:
           ANDROID_STORE_FILE: ${{ github.workspace }}/androidApp/keystore/release.jks
           ANDROID_STORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -153,125 +258,77 @@ jobs:
         run: |
           ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease \
             -Dorg.gradle.java.home="$JAVA_HOME" \
+            -PandroidVersionCodeOverride="$VERSION_CODE" \
             --no-daemon --stacktrace
 
-      - name: Rename Android artifacts
-        if: steps.mode.outputs.is_release == 'true'
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.version }}
+      - name: Rename artifacts
         run: |
-          set -euo pipefail
-          cp androidApp/build/outputs/bundle/release/androidApp-release.aab "mensa-italia-v${NEW_VERSION}.aab"
-          cp androidApp/build/outputs/apk/release/androidApp-release.apk "mensa-italia-v${NEW_VERSION}.apk"
-          ls -la mensa-italia-v*.aab mensa-italia-v*.apk
+          cp androidApp/build/outputs/bundle/release/androidApp-release.aab "mensa-italia-v${VERSION}.aab"
+          cp androidApp/build/outputs/apk/release/androidApp-release.apk "mensa-italia-v${VERSION}.apk"
 
       - name: Cleanup keystore
-        if: always() && steps.mode.outputs.is_release == 'true'
+        if: always()
         run: rm -f androidApp/keystore/release.jks
 
-      - name: Commit version bump & create tag
-        if: steps.mode.outputs.is_release == 'true'
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.version }}
-        run: |
-          set -euo pipefail
-          git config user.name "Sipioteo"
-          git config user.email "matteo@sipio.it"
-          git add VERSION
-          git commit -m "Release v${NEW_VERSION} [skip ci]"
-          git tag "v${NEW_VERSION}"
-          git push origin master --follow-tags
-
-      - name: Create GitHub Release
-        if: steps.mode.outputs.is_release == 'true'
-        uses: softprops/action-gh-release@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: v${{ steps.bump.outputs.version }}
-          name: v${{ steps.bump.outputs.version }}
-          generate_release_notes: true
-          files: |
-            mensa-italia-v${{ steps.bump.outputs.version }}.aab
-            mensa-italia-v${{ steps.bump.outputs.version }}.apk
+          name: android-artifacts
+          path: |
+            mensa-italia-v*.aab
+            mensa-italia-v*.apk
+          if-no-files-found: error
+          retention-days: 7
 
-  release-ios:
-    needs: release
-    if: needs.release.outputs.is_release == 'true'
+  # ─── iOS: .ipa firmato per App Store ───────────────────────────────────────
+  ios:
+    name: iOS
+    needs: prepare
+    if: needs.prepare.outputs.should_build_native == 'true'
     runs-on: macos-14
-    permissions:
-      contents: write
     env:
-      VERSION: ${{ needs.release.outputs.version }}
+      VERSION: ${{ needs.prepare.outputs.version }}
+      VERSION_CODE: ${{ needs.prepare.outputs.version_code }}
 
     steps:
-      - name: Check iOS signing config
-        id: ios_check
-        env:
-          P12: ${{ secrets.APPLE_CERT_P12_BASE64 }}
-          PROFILE: ${{ secrets.APPLE_PROVISION_PROFILE_BASE64 }}
-        run: |
-          if [ -z "${P12:-}" ] || [ -z "${PROFILE:-}" ]; then
-            echo "iOS secrets non configurati (manca APPLE_CERT_P12_BASE64 e/o APPLE_PROVISION_PROFILE_BASE64): skip job"
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Checkout (post-bump master)
-        if: steps.ios_check.outputs.configured == 'true'
-        uses: actions/checkout@v4
-        with:
-          ref: master
-          fetch-depth: 1
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
 
       - name: Setup JDK 21
-        if: steps.ios_check.outputs.configured == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Setup Gradle
-        if: steps.ios_check.outputs.configured == 'true'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Install xcodegen
-        if: steps.ios_check.outputs.configured == 'true'
         run: brew install xcodegen
 
       - name: Build shared Release XCFramework
-        if: steps.ios_check.outputs.configured == 'true'
         run: |
           ./gradlew :shared:assembleSharedReleaseXCFramework \
             -Dorg.gradle.java.home="$JAVA_HOME" \
             --no-daemon --stacktrace
 
       - name: Point project.yml to Release XCFramework
-        if: steps.ios_check.outputs.configured == 'true'
-        # project.yml hardcodea il path debug per l'ambiente di sviluppo locale.
-        # Per la CI in modalità Release, swap debug -> release prima di xcodegen.
         run: |
           /usr/bin/sed -i '' \
             -e 's|/XCFrameworks/debug|/XCFrameworks/release|g' \
             -e 's|assembleSharedDebugXCFramework|assembleSharedReleaseXCFramework|g' \
             iosApp/project.yml
-          grep -nE "XCFrameworks|assembleShared" iosApp/project.yml
 
       - name: Generate xcodeproj
-        if: steps.ios_check.outputs.configured == 'true'
-        run: |
-          cd iosApp
-          xcodegen generate
+        working-directory: iosApp
+        run: xcodegen generate
 
       - name: Setup signing keychain
-        if: steps.ios_check.outputs.configured == 'true'
         env:
           P12_BASE64: ${{ secrets.APPLE_CERT_P12_BASE64 }}
           P12_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
           PROFILE_BASE64: ${{ secrets.APPLE_PROVISION_PROFILE_BASE64 }}
         run: |
           set -euo pipefail
-          # 1) Crea un keychain temporaneo isolato (così non tocchiamo il login.keychain)
           KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
           KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
           echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
@@ -280,47 +337,33 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          # Aggiungi al search-list senza droppare quelli esistenti
           security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
 
-          # 2) Importa il .p12
           CERT_PATH="$RUNNER_TEMP/dist.p12"
           echo "$P12_BASE64" | base64 -d > "$CERT_PATH"
-          security import "$CERT_PATH" \
-            -P "$P12_PASSWORD" \
-            -k "$KEYCHAIN_PATH" \
-            -A -t cert -f pkcs12
+          security import "$CERT_PATH" -P "$P12_PASSWORD" -k "$KEYCHAIN_PATH" -A -t cert -f pkcs12
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" >/dev/null
 
-          # 3) Installa il provisioning profile
           PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROFILE_DIR"
           PROFILE_PATH="$PROFILE_DIR/build.mobileprovision"
           echo "$PROFILE_BASE64" | base64 -d > "$PROFILE_PATH"
 
-          # Estrai UUID e Name dal profile (servono a xcodebuild)
-          /usr/libexec/PlistBuddy -c "Print :UUID" \
-            /dev/stdin <<< "$(security cms -D -i "$PROFILE_PATH")" > "$RUNNER_TEMP/profile.uuid"
-          /usr/libexec/PlistBuddy -c "Print :Name" \
-            /dev/stdin <<< "$(security cms -D -i "$PROFILE_PATH")" > "$RUNNER_TEMP/profile.name"
+          UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$(security cms -D -i "$PROFILE_PATH")")
+          NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /dev/stdin <<< "$(security cms -D -i "$PROFILE_PATH")")
+          mv "$PROFILE_PATH" "$PROFILE_DIR/${UUID}.mobileprovision"
 
-          echo "PROFILE_UUID=$(cat "$RUNNER_TEMP/profile.uuid")" >> "$GITHUB_ENV"
-          echo "PROFILE_NAME=$(cat "$RUNNER_TEMP/profile.name")" >> "$GITHUB_ENV"
-
-          # Rename profile in posizione canonica per Xcode (UUID.mobileprovision)
-          mv "$PROFILE_PATH" "$PROFILE_DIR/$(cat "$RUNNER_TEMP/profile.uuid").mobileprovision"
-
-          echo "Installed profile: $(cat "$RUNNER_TEMP/profile.name") ($(cat "$RUNNER_TEMP/profile.uuid"))"
+          echo "PROFILE_UUID=$UUID" >> "$GITHUB_ENV"
+          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "::notice::Installed profile $NAME ($UUID)"
 
       - name: Resolve SPM dependencies
-        if: steps.ios_check.outputs.configured == 'true'
         run: |
           xcodebuild -resolvePackageDependencies \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp
 
       - name: Archive
-        if: steps.ios_check.outputs.configured == 'true'
         run: |
           xcodebuild archive \
             -project iosApp/iosApp.xcodeproj \
@@ -333,11 +376,10 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             MARKETING_VERSION="$VERSION" \
-            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            CURRENT_PROJECT_VERSION="$VERSION_CODE" \
             -allowProvisioningUpdates=NO
 
       - name: Export IPA
-        if: steps.ios_check.outputs.configured == 'true'
         run: |
           cat > "$RUNNER_TEMP/export-options.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -357,54 +399,233 @@ jobs:
           </dict>
           </plist>
           EOF
-
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/iosApp.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/export-options.plist" \
             -exportPath "$RUNNER_TEMP/ipa"
-
-          ls -la "$RUNNER_TEMP/ipa"
-          # Rename per consistenza con android
           cp "$RUNNER_TEMP/ipa"/*.ipa "mensa-italia-v${VERSION}.ipa"
 
-      - name: Attach .ipa to GitHub Release
-        if: steps.ios_check.outputs.configured == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload "v${VERSION}" "mensa-italia-v${VERSION}.ipa" --clobber --repo "${{ github.repository }}"
-
-      - name: Check TestFlight config
-        if: steps.ios_check.outputs.configured == 'true'
-        id: tf_check
-        env:
-          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-        run: |
-          if [ -n "${KEY_ID:-}" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "TestFlight non configurato (manca APP_STORE_CONNECT_KEY_ID): skip upload"
-          fi
-
-      - name: Upload to TestFlight
-        if: steps.ios_check.outputs.configured == 'true' && steps.tf_check.outputs.configured == 'true'
-        env:
-          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          KEY_B64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
-        run: |
-          set -euo pipefail
-          mkdir -p ~/private_keys
-          echo "$KEY_B64" | base64 -d > "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
-          xcrun altool --upload-app \
-            --type ios \
-            -f "mensa-italia-v${VERSION}.ipa" \
-            --apiKey "$KEY_ID" \
-            --apiIssuer "$ISSUER_ID"
-
       - name: Cleanup keychain
-        if: always() && steps.ios_check.outputs.configured == 'true'
+        if: always()
         run: |
           [ -n "${KEYCHAIN_PATH:-}" ] && security delete-keychain "$KEYCHAIN_PATH" || true
-          rm -f "$RUNNER_TEMP/dist.p12" "$HOME/private_keys/AuthKey_"*.p8
+          rm -f "$RUNNER_TEMP/dist.p12"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: mensa-italia-v*.ipa
+          if-no-files-found: error
+          retention-days: 7
+
+  # ─── Play Store: upload AAB sul track scelto ───────────────────────────────
+  play-publish:
+    name: Play (${{ needs.prepare.outputs.track }})
+    needs: [prepare, android]
+    if: needs.prepare.outputs.should_publish_play == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: android-artifacts
+
+      - name: Map track for Play
+        id: track_map
+        env:
+          TRACK: ${{ needs.prepare.outputs.track }}
+        run: |
+          case "$TRACK" in
+            alpha)      play_track="internal" ;;
+            beta)       play_track="beta" ;;
+            production) play_track="production" ;;
+            *)          echo "Unknown track $TRACK"; exit 1 ;;
+          esac
+          echo "play_track=$play_track" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: it.mensa.app
+          releaseFiles: mensa-italia-v${{ needs.prepare.outputs.version }}.aab
+          track: ${{ steps.track_map.outputs.play_track }}
+          status: completed
+          inAppUpdatePriority: 2
+
+  # ─── TestFlight / App Store: upload + distribuzione ────────────────────────
+  testflight-publish:
+    name: iOS publish (${{ needs.prepare.outputs.track }})
+    needs: [prepare, ios]
+    if: needs.prepare.outputs.should_publish_ios == 'true'
+    runs-on: macos-14
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      TRACK: ${{ needs.prepare.outputs.track }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-ipa
+
+      - name: Setup ASC API key
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          KEY_B64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          mkdir -p ~/private_keys
+          echo "$KEY_B64" | base64 -d > "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
+
+      - name: Install fastlane
+        run: gem install fastlane --no-document
+
+      - name: Write Fastfile
+        run: |
+          mkdir -p fastlane
+          cat > fastlane/Fastfile <<'RUBY'
+          default_platform(:ios)
+
+          platform :ios do
+            before_all do
+              app_store_connect_api_key(
+                key_id: ENV['ASC_KEY_ID'],
+                issuer_id: ENV['ASC_ISSUER_ID'],
+                key_filepath: ENV['ASC_KEY_PATH'],
+                duration: 1200,
+                in_house: false
+              )
+            end
+
+            desc "Upload to TestFlight (internal only)"
+            lane :alpha do
+              upload_to_testflight(
+                ipa: ENV['IPA_PATH'],
+                skip_waiting_for_build_processing: false,
+                skip_submission: true,
+                changelog: "Build automatica #{ENV['VERSION']} (alpha)"
+              )
+            end
+
+            desc "Upload to TestFlight + Test open group"
+            lane :beta do
+              upload_to_testflight(
+                ipa: ENV['IPA_PATH'],
+                skip_waiting_for_build_processing: false,
+                distribute_external: true,
+                groups: ["Test open"],
+                changelog: "Build automatica #{ENV['VERSION']} (beta pubblica)",
+                notify_external_testers: true
+              )
+            end
+
+            desc "Upload + submit to App Store review"
+            lane :production do
+              upload_to_testflight(
+                ipa: ENV['IPA_PATH'],
+                skip_waiting_for_build_processing: false,
+                skip_submission: true,
+                changelog: "Build automatica #{ENV['VERSION']} (production)"
+              )
+              deliver(
+                submit_for_review: true,
+                automatic_release: true,
+                force: true,
+                skip_screenshots: true,
+                skip_metadata: true,
+                skip_app_version_update: false,
+                precheck_include_in_app_purchases: false,
+                submission_information: {
+                  add_id_info_uses_idfa: false,
+                  export_compliance_uses_encryption: false,
+                  content_rights_contains_third_party_content: false
+                }
+              )
+            end
+          end
+          RUBY
+
+      - name: Run fastlane (${{ env.TRACK }})
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ env.HOME }}/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+          IPA_PATH: ${{ github.workspace }}/mensa-italia-v${{ needs.prepare.outputs.version }}.ipa
+          FASTLANE_HIDE_CHANGELOG: '1'
+          FASTLANE_DISABLE_COLORS: '1'
+        run: |
+          fastlane ios "$TRACK"
+
+      - name: Cleanup ASC key
+        if: always()
+        run: rm -f "$HOME/private_keys/AuthKey_"*.p8
+
+  # ─── Finalize: tag + GitHub Release con tutti gli artefatti ────────────────
+  finalize:
+    name: Finalize
+    needs: [prepare, web, android, ios, play-publish, testflight-publish]
+    if: |
+      always() && needs.prepare.outputs.should_finalize == 'true' &&
+      needs.web.result == 'success' &&
+      needs.android.result == 'success' &&
+      needs.ios.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      VERSION_CODE: ${{ needs.prepare.outputs.version_code }}
+      TRACK: ${{ needs.prepare.outputs.track }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Commit VERSION bump & tag
+        run: |
+          set -euo pipefail
+          git config user.name "Sipioteo"
+          git config user.email "matteo@sipio.it"
+          echo "$VERSION" > VERSION
+          git add VERSION
+          if git diff --cached --quiet; then
+            echo "VERSION non cambiato, skip commit"
+          else
+            git commit -m "Release v${VERSION} (${TRACK}) [skip ci]"
+          fi
+          git tag "v${VERSION}"
+          git push origin master --follow-tags
+
+      - name: Locate artifacts
+        id: paths
+        run: |
+          aab=$(find artifacts -name '*.aab' | head -1)
+          apk=$(find artifacts -name '*.apk' | head -1)
+          ipa=$(find artifacts -name '*.ipa' | head -1)
+          echo "aab=$aab" >> "$GITHUB_OUTPUT"
+          echo "apk=$apk" >> "$GITHUB_OUTPUT"
+          echo "ipa=$ipa" >> "$GITHUB_OUTPUT"
+          ls -la "$aab" "$apk" "$ipa"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }} (${{ env.TRACK }})
+          generate_release_notes: true
+          prerelease: ${{ env.TRACK != 'production' }}
+          files: |
+            ${{ steps.paths.outputs.aab }}
+            ${{ steps.paths.outputs.apk }}
+            ${{ steps.paths.outputs.ipa }}
