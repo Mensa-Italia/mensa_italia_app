@@ -1,0 +1,266 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+---
+
+<AppShell title="Ordine confermato — Boutique Mensa" pageTitle="Boutique">
+  <div class="oc">
+
+    <div class="oc-hero">
+      <div class="oc-hero__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" width="40" height="40">
+          <circle cx="24" cy="24" r="22" stroke="#22c55e" fill="rgba(34,197,94,0.1)"/>
+          <polyline points="14 24 21 31 34 18" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="oc-hero__title">Ordine confermato</h1>
+        <p class="oc-hero__sub" id="oc-sub">Ti aspetta a casa entro 5–7 giorni lavorativi.</p>
+      </div>
+    </div>
+
+    <div class="oc-ref-row">
+      <span class="oc-ref-label">Numero ordine</span>
+      <span class="oc-ref-val" id="oc-ref">BQ-2026-0042</span>
+    </div>
+
+    <div class="oc-layout">
+
+      <div class="oc-main">
+        <section class="oc-section" aria-labelledby="oc-items-title">
+          <h2 class="oc-section__title" id="oc-items-title">Articoli ordinati</h2>
+          <div id="oc-items" class="oc-items">
+            <p class="oc-items__placeholder">Caricamento…</p>
+          </div>
+        </section>
+
+        <section class="oc-section" aria-labelledby="oc-addr-title">
+          <h2 class="oc-section__title" id="oc-addr-title">Indirizzo di spedizione</h2>
+          <p class="oc-addr">Via Roma, 12 · 20121 Milano (MI)</p>
+        </section>
+
+        <section class="oc-section" aria-labelledby="oc-timeline-title">
+          <h2 class="oc-section__title" id="oc-timeline-title">Cosa succede ora?</h2>
+          <div class="oc-timeline">
+            {[
+              { label: 'Ordine ricevuto',  sub: 'Il tuo ordine è confermato.', done: true, active: false },
+              { label: 'In preparazione',  sub: 'Il magazzino sta raccogliendo gli articoli.', done: false, active: true },
+              { label: 'In spedizione',    sub: 'Il pacco è in transito.', done: false, active: false },
+              { label: 'Consegnato',       sub: 'Arriverà entro 5–7 giorni lavorativi.', done: false, active: false },
+            ].map((step, i) => (
+              <div class={`oc-timeline__step${step.done ? ' is-done' : ''}${step.active ? ' is-active' : ''}`}>
+                <div class="oc-timeline__dot" aria-hidden="true">{step.done ? '✓' : (i + 1)}</div>
+                <div class="oc-timeline__content">
+                  <p class="oc-timeline__label">{step.label}</p>
+                  <p class="oc-timeline__sub">{step.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <aside class="oc-sidebar">
+        <div class="oc-card">
+          <h3 class="oc-card__title">Riepilogo</h3>
+          <div class="oc-totals" id="oc-totals">
+            <div class="oc-totals__row"><span>Subtotale</span><span id="oc-sub-val">—</span></div>
+            <div class="oc-totals__row"><span>Spedizione</span><span id="oc-ship-val">—</span></div>
+            <div class="oc-totals__row oc-totals__row--total"><span>Totale pagato</span><span id="oc-total-val">—</span></div>
+          </div>
+          <div class="oc-eta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="16" height="16" aria-hidden="true">
+              <rect x="1" y="3" width="15" height="13" rx="2"/>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <span>Consegna stimata: <strong id="oc-eta">—</strong></span>
+          </div>
+        </div>
+
+        <div class="oc-actions">
+          <a href="#" class="oc-action-btn oc-action-btn--secondary" aria-label="Traccia spedizione (non disponibile nella demo)">
+            Traccia spedizione
+          </a>
+          <a href="#" class="oc-action-btn oc-action-btn--ghost" aria-label="Scarica ricevuta PDF (non disponibile nella demo)">
+            Scarica ricevuta PDF
+          </a>
+          <a href="/boutique" class="oc-action-btn oc-action-btn--primary">
+            Torna alla boutique
+          </a>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+</AppShell>
+
+<style>
+  .oc { display: grid; gap: var(--spacing-6); }
+
+  .oc-hero {
+    display: flex; align-items: center; gap: var(--spacing-4);
+    padding: var(--spacing-6); background: var(--color-surface-elevated);
+    border: 1px solid color-mix(in oklch, #22c55e 25%, transparent);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, color-mix(in oklch, #22c55e 6%, var(--color-surface)), var(--color-surface-elevated));
+  }
+  .oc-hero__icon { flex-shrink: 0; }
+  .oc-hero__title { margin: 0; font-size: clamp(1.4rem, 2.5vw, 1.8rem); font-weight: 700; color: var(--color-text-primary); }
+  .oc-hero__sub { margin: 4px 0 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+  .oc-ref-row {
+    display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap;
+    padding: var(--spacing-3) var(--spacing-4); background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);
+  }
+  .oc-ref-label { font-size: var(--text-xs); color: var(--color-text-tertiary); font-weight: 500; }
+  .oc-ref-val { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+
+  .oc-layout { display: grid; grid-template-columns: 1fr 300px; gap: var(--spacing-6); align-items: start; }
+  @media (max-width: 900px) { .oc-layout { grid-template-columns: 1fr; } }
+
+  .oc-main { display: grid; gap: var(--spacing-5); }
+  .oc-section {
+    background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg); padding: var(--spacing-5);
+  }
+  .oc-section__title { margin: 0 0 var(--spacing-4) 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+
+  .oc-items { display: grid; gap: var(--spacing-3); }
+  .oc-items__placeholder { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .oc-item { display: flex; align-items: center; gap: var(--spacing-3); }
+  .oc-item__thumb {
+    width: 48px; height: 48px; border-radius: var(--radius-sm); flex-shrink: 0;
+  }
+  .oc-item__info { flex: 1; }
+  .oc-item__name { margin: 0; font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .oc-item__meta { margin: 0; font-size: var(--text-2xs); color: var(--color-text-tertiary); }
+  .oc-item__price { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .oc-addr { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; }
+
+  .oc-timeline { display: grid; gap: 0; }
+  .oc-timeline__step {
+    display: flex; gap: var(--spacing-3); padding: var(--spacing-3) 0; position: relative;
+  }
+  .oc-timeline__step:not(:last-child)::after {
+    content: ''; position: absolute; left: 13px; top: calc(var(--spacing-3) + 26px);
+    width: 1px; height: calc(100% - 8px); background: var(--color-border-subtle);
+  }
+  .oc-timeline__step.is-done::after { background: #22c55e; }
+  .oc-timeline__dot {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    background: var(--color-border-subtle); color: var(--color-text-tertiary);
+  }
+  .oc-timeline__step.is-done .oc-timeline__dot { background: #22c55e; color: #fff; }
+  .oc-timeline__step.is-active .oc-timeline__dot { background: var(--color-mensa-blue); color: #fff; }
+  .oc-timeline__content { padding-top: 4px; }
+  .oc-timeline__label { margin: 0; font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .oc-timeline__step:not(.is-done):not(.is-active) .oc-timeline__label { color: var(--color-text-tertiary); }
+  .oc-timeline__sub { margin: 0; font-size: var(--text-2xs); color: var(--color-text-tertiary); margin-top: 2px; }
+
+  .oc-sidebar { display: grid; gap: var(--spacing-4); position: sticky; top: 72px; }
+  .oc-card {
+    background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg); padding: var(--spacing-4); display: grid; gap: var(--spacing-4);
+  }
+  .oc-card__title { margin: 0; font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); }
+  .oc-totals { display: grid; gap: var(--spacing-2); }
+  .oc-totals__row {
+    display: flex; justify-content: space-between; font-size: var(--text-xs);
+    color: var(--color-text-secondary); font-variant-numeric: tabular-nums;
+  }
+  .oc-totals__row--total {
+    padding-top: var(--spacing-2); border-top: 1px solid var(--color-border-subtle);
+    font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary);
+  }
+  .oc-eta {
+    display: flex; align-items: center; gap: var(--spacing-2);
+    font-size: var(--text-xs); color: var(--color-text-secondary);
+    padding: var(--spacing-3); background: color-mix(in oklch, var(--color-mensa-blue) 6%, var(--color-surface));
+    border-radius: var(--radius-sm); border: 1px solid color-mix(in oklch, var(--color-mensa-blue) 15%, transparent);
+  }
+
+  .oc-actions { display: grid; gap: var(--spacing-2); }
+  .oc-action-btn {
+    display: block; width: 100%; padding: 10px var(--spacing-4); border-radius: var(--radius-md);
+    font-size: var(--text-xs); font-weight: 600; text-align: center; text-decoration: none; cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-out-quart); border: 2px solid transparent;
+  }
+  .oc-action-btn--primary { background: var(--color-mensa-blue); color: #fff; border-color: var(--color-mensa-blue); }
+  .oc-action-btn--primary:hover { opacity: 0.88; }
+  .oc-action-btn--secondary {
+    background: transparent; border-color: var(--color-mensa-blue); color: var(--color-mensa-blue);
+  }
+  .oc-action-btn--secondary:hover { background: color-mix(in oklch, var(--color-mensa-blue) 8%, var(--color-surface)); }
+  .oc-action-btn--ghost {
+    background: transparent; border-color: var(--color-border-subtle); color: var(--color-text-secondary);
+  }
+  .oc-action-btn--ghost:hover { border-color: var(--color-text-secondary); color: var(--color-text-primary); }
+</style>
+
+<script is:inline>
+  (function () {
+    var CART_KEY = 'mensa_boutique_cart';
+    var GRADIENTS = [
+      'linear-gradient(135deg,oklch(42% 0.18 263),oklch(28% 0.14 263))',
+      'linear-gradient(135deg,oklch(40% 0.06 240),oklch(26% 0.04 240))',
+      'linear-gradient(135deg,oklch(52% 0.14 190),oklch(36% 0.10 190))',
+      'linear-gradient(135deg,oklch(48% 0.18 310),oklch(32% 0.14 310))',
+      'linear-gradient(135deg,oklch(56% 0.10 54),oklch(40% 0.08 48))',
+    ];
+
+    function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; } }
+    function fmt(n) { return '€ ' + n.toFixed(2).replace('.', ','); }
+
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref') || 'BQ-2026-0042';
+    document.getElementById('oc-ref').textContent = ref;
+
+    var cart = getCart();
+    var sub = cart.reduce(function (s, i) { return s + i.price * (i.qty || 1); }, 0);
+    var ship = (cart.length === 0 || sub >= 60) ? 0 : 4.90;
+    var total = sub + ship;
+
+    document.getElementById('oc-sub-val').textContent   = fmt(sub);
+    document.getElementById('oc-ship-val').textContent  = ship === 0 ? 'Gratuita' : fmt(ship);
+    document.getElementById('oc-total-val').textContent = fmt(total);
+
+    var eta = new Date();
+    eta.setDate(eta.getDate() + 7);
+    var days = ['dom','lun','mar','mer','gio','ven','sab'];
+    var months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+    document.getElementById('oc-eta').textContent = days[eta.getDay()] + ' ' + eta.getDate() + ' ' + months[eta.getMonth()];
+
+    var itemsEl = document.getElementById('oc-items');
+
+    var astroCid = null;
+    for (var ai = 0; ai < itemsEl.attributes.length; ai++) {
+      var attr = itemsEl.attributes[ai];
+      if (attr.name.indexOf('data-astro-cid-') === 0) { astroCid = attr.name; break; }
+    }
+    var cidAttr = astroCid ? ' ' + astroCid : '';
+
+    if (cart.length === 0) {
+      itemsEl.innerHTML = '<p class="oc-items__placeholder">Nessun articolo (carrello vuoto al momento del caricamento).</p>';
+    } else {
+      itemsEl.innerHTML = '';
+      cart.forEach(function (item, i) {
+        var div = document.createElement('div');
+        div.className = 'oc-item';
+        if (astroCid) div.setAttribute(astroCid, '');
+        div.innerHTML = '<div class="oc-item__thumb"' + cidAttr + ' style="background:' + GRADIENTS[i % GRADIENTS.length] + '"></div>'
+          + '<div class="oc-item__info"' + cidAttr + '>'
+          +   '<p class="oc-item__name"' + cidAttr + '>' + item.name + '</p>'
+          +   '<p class="oc-item__meta"' + cidAttr + '>Qty ' + (item.qty || 1) + (item.size ? ' · Taglia ' + item.size : '') + '</p>'
+          + '</div>'
+          + '<span class="oc-item__price"' + cidAttr + '>' + fmt(item.price * (item.qty || 1)) + '</span>';
+        itemsEl.appendChild(div);
+      });
+    }
+
+    localStorage.removeItem(CART_KEY);
+  })();
+</script>

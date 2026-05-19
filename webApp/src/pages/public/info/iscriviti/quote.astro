@@ -1,0 +1,447 @@
+---
+import PublicLayout from "../../../../layouts/PublicLayout.astro";
+
+const tiers = [
+  {
+    id: "nuovi",
+    label: "Nuovi soci",
+    price: "25",
+    note: "/ primo anno",
+    desc: "Lettera di benvenuto, tessera Mensa e spilla ufficiale incluse. Contributo spese una tantum di €20 già compreso.",
+    highlight: false,
+  },
+  {
+    id: "ordinaria",
+    label: "Quota ordinaria",
+    price: "50",
+    note: "/ anno",
+    desc: "Per i soci che rinnovano annualmente. Un anno solare esatto dalla data di ricezione del versamento.",
+    highlight: true,
+  },
+  {
+    id: "giovani",
+    label: "Quota giovani",
+    price: "25",
+    note: "/ anno",
+    desc: "Per chi ha meno di 26 anni nell'annualità pagata. Stesso accesso, stesso club.",
+    highlight: false,
+  },
+];
+
+const includes = [
+  { icon: "card", label: "Tessera Mensa Italia", desc: "Valida per tutto l'anno associativo" },
+  { icon: "badge", label: "Spilla ufficiale", desc: "Solo per i nuovi iscritti al primo anno" },
+  { icon: "lock", label: "Accesso area soci", desc: "Alias @mensa.it e comunicazioni interne" },
+];
+---
+
+<PublicLayout
+  active="chi-siamo"
+  title="Quote associative — Mensa Italia"
+  description="Le quote annuali del Mensa Italia: €25 primo anno, €50 quota ordinaria, €25 per gli under 26. Una sola quota, valida ovunque in Italia."
+>
+  <!-- ═══ BREADCRUMB ═══════════════════════════════════════════════ -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="breadcrumb__inner">
+      <ol class="breadcrumb__list">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li><a href="/public/info/iscriviti/">Iscriviti</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li aria-current="page">Quote associative</li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker" data-i18n="public.iscriviti.kicker">ISCRIVITI</p>
+      <h1 class="hero__title">Quote associative</h1>
+      <p class="hero__lead">Una sola quota all'anno. Stesso prezzo da Trento alla Sicilia.</p>
+    </div>
+  </section>
+
+  <!-- ═══ TIER CARDS ═══════════════════════════════════════════════ -->
+  <section class="tiers">
+    <div class="tiers__inner">
+      <div class="tiers__grid">
+        {tiers.map((tier) => (
+          <article class={`tier ${tier.highlight ? "tier--featured" : ""}`}>
+            {tier.highlight && <span class="tier__badge">Più comune</span>}
+            <p class="tier__label">{tier.label}</p>
+            <div class="tier__pricing">
+              <span class="tier__currency">€</span>
+              <span class="tier__price">{tier.price}</span>
+              <span class="tier__unit">{tier.note}</span>
+            </div>
+            <p class="tier__desc">{tier.desc}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COSA INCLUDE ═════════════════════════════════════════════ -->
+  <section class="includes">
+    <div class="includes__inner">
+      <h2 class="includes__title" data-i18n="public.iscriviti.includes.heading">Cosa include l'iscrizione</h2>
+      <ul class="includes__list">
+        {includes.map((item) => (
+          <li class="includes__item">
+            <span class="includes__check" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 10l4.5 4.5L16 6"/>
+              </svg>
+            </span>
+            <div class="includes__body">
+              <span class="includes__item-label">{item.label}</span>
+              <span class="includes__item-desc">{item.desc}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ COME SI PAGA ═════════════════════════════════════════════ -->
+  <section class="payment">
+    <div class="payment__inner">
+      <h2 class="payment__title" data-i18n="public.iscriviti.payment.heading">Come si paga</h2>
+      <div class="payment__prose">
+        <p>
+          L'iscrizione può essere effettuata in qualunque momento dopo aver superato il test d'ingresso.
+          Per iscriverti o rinnovare accedi al tuo profilo nell'area soci su <a href="https://www.mensa.it" target="_blank" rel="noopener">mensa.it</a> e segui la procedura di acquisto.
+        </p>
+        <p>
+          La scadenza dello status di socio attivo è sempre un anno solare esatto dalla data di ricezione del versamento.
+          I servizi essenziali (alias @mensa.it, accesso al sito e alle comunicazioni) vengono disattivati due settimane dopo la scadenza.
+          Per chiarimenti scrivi a <a href="mailto:soci@mensa.it">soci@mensa.it</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ══════════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="cta-section__inner">
+      <div class="cta-section__body">
+        <p class="cta-section__label" data-i18n="public.iscriviti.cta.label">Pronto a entrare?</p>
+        <p class="cta-section__sub">Prima il test ufficiale, poi l'iscrizione.</p>
+      </div>
+      <a href="/public/mvp/register" class="cta-section__btn" data-i18n="public.iscriviti.cta.btn">
+        Iscriviti al test →
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ FONTE ══════════════════════════════════════════════════ -->
+</PublicLayout>
+
+<style>
+  /* ═══ BREADCRUMB ════════════════════════════════════════════════ */
+  .breadcrumb {
+    padding-block: var(--spacing-3);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .breadcrumb__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .breadcrumb__list {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .breadcrumb__list a {
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .breadcrumb__list a:hover { color: var(--color-mensa-blue); }
+  .breadcrumb__list [aria-current="page"] { color: var(--color-text-primary); font-weight: 500; }
+  .breadcrumb__sep { color: var(--color-border-subtle); }
+
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 10%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 680px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__lead {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ═══ TIERS ═══════════════════════════════════════════════════ */
+  .tiers {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .tiers__inner {
+    max-inline-size: 1000px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .tiers__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+    align-items: start;
+  }
+  @media (max-width: 680px) {
+    .tiers__grid { grid-template-columns: 1fr; }
+  }
+  .tier {
+    position: relative;
+    padding: var(--spacing-6) var(--spacing-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .tier--featured {
+    background: var(--color-surface-elevated);
+    border-color: var(--color-mensa-blue);
+    box-shadow: 0 0 0 1px var(--color-mensa-blue);
+    padding-block-start: calc(var(--spacing-6) + 10px);
+  }
+  .tier__badge {
+    position: absolute;
+    inset-block-start: -1px;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    background: var(--color-mensa-blue);
+    color: #fff;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    white-space: nowrap;
+  }
+  .tier__label {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .tier__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-1);
+  }
+  .tier__currency {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1;
+    font-family: var(--font-display);
+  }
+  .tier__price {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 800;
+    color: var(--color-text-primary);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .tier--featured .tier__price { color: var(--color-mensa-blue); }
+  .tier__unit {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    align-self: flex-end;
+    padding-block-end: 4px;
+  }
+  .tier__desc {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ═══ INCLUDES ═══════════════════════════════════════════════ */
+  .includes {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .includes__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .includes__title {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .includes__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .includes__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+  }
+  .includes__check {
+    flex-shrink: 0;
+    inline-size: 22px;
+    block-size: 22px;
+    background: color-mix(in oklch, var(--color-mensa-blue) 12%, transparent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-mensa-blue);
+    margin-block-start: 1px;
+  }
+  .includes__check svg { inline-size: 13px; block-size: 13px; }
+  .includes__body { display: grid; gap: 2px; }
+  .includes__item-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .includes__item-desc {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+  }
+
+  /* ═══ PAYMENT ════════════════════════════════════════════════ */
+  .payment {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .payment__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .payment__title {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .payment__prose p {
+    margin: 0 0 var(--spacing-4) 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+  .payment__prose p:last-child { margin-block-end: 0; }
+  .payment__prose a { color: var(--color-mensa-blue); }
+
+  /* ═══ CTA SECTION ════════════════════════════════════════════ */
+  .cta-section {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-6), 6vh, var(--spacing-8));
+  }
+  .cta-section__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-6);
+  }
+  @media (max-width: 560px) {
+    .cta-section__inner { flex-direction: column; align-items: stretch; }
+  }
+  .cta-section__body { display: grid; gap: 2px; }
+  .cta-section__label {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .cta-section__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+  .cta-section__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-6);
+    background: var(--color-mensa-blue);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .cta-section__btn:hover { background: var(--color-mensa-blue-deep, #1e40af); }
+
+  /* ═══ SOURCE FOOTER ═════════════════════════════════════════ */
+  .source-footer {
+    padding-block: var(--spacing-5);
+  }
+  .source-footer__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    text-align: center;
+  }
+  .source-footer__link {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .source-footer__link:hover { color: var(--color-mensa-blue); text-decoration: underline; }
+</style>

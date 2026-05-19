@@ -5,7 +5,7 @@ import ConsoleShell from "../../../layouts/ConsoleShell.astro";
 <ConsoleShell
   title="Carica scansione — Staff Sede"
   pageTitle="Carica scansione test"
-  scope="test-assistant"
+  scope="test"
   activeHref="/console/test-assistant/upload"
 >
   <div class="page-content">
@@ -26,7 +26,7 @@ import ConsoleShell from "../../../layouts/ConsoleShell.astro";
         <p class="candidate-strip__name">Marco Rossi</p>
         <p class="candidate-strip__meta">CF: RSSMRC85A01H501Z · Slot 09:00</p>
       </div>
-      <span class="status status--green">Esito salvato ✓</span>
+      <span class="status status--green">Check-in confermato ✓</span>
     </div>
 
     <div class="drop-zone" role="region" aria-label="Zona di caricamento PDF">
@@ -67,8 +67,12 @@ import ConsoleShell from "../../../layouts/ConsoleShell.astro";
       </ul>
     </div>
 
+    <div class="info-box">
+      <p>Documento inviato. Lo psicologo nazionale valuterà il test entro 14 giorni.</p>
+    </div>
+
     <div class="cta-bar">
-      <a href="/console/test-assistant/today" class="btn btn--primary">Conferma e chiudi candidato</a>
+      <a href="/console/test-assistant/today" class="btn btn--primary">Chiudi e torna alla lista</a>
       <a href="/console/test-assistant/today" class="btn btn--ghost">Annulla</a>
     </div>
 
@@ -114,6 +118,9 @@ import ConsoleShell from "../../../layouts/ConsoleShell.astro";
   .uploaded-item__info { flex: 1; }
   .uploaded-item__name { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
   .uploaded-item__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .info-box { padding: var(--spacing-3) var(--spacing-4); background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-sm); font-size: var(--text-sm); color: #075985; font-weight: 500; }
+  .info-box p { margin: 0; }
 
   .cta-bar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
   .btn { display: inline-block; padding: 0.6rem 1.5rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }

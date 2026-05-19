@@ -42,6 +42,38 @@ export default config({
       },
     }),
 
+    staticPages: collection({
+      label: "Pagine istituzionali",
+      slugField: "slug",
+      path: "src/content/staticPages/*",
+      format: { contentField: "body" },
+      schema: {
+        slug: fields.slug({ name: { label: "Slug locale", validation: { isRequired: true } } }),
+        title: fields.text({ label: "Titolo", validation: { length: { min: 1 } } }),
+        cluster: fields.select({
+          label: "Cluster",
+          defaultValue: "chi-siamo",
+          options: [
+            { label: "Chi siamo", value: "chi-siamo" },
+            { label: "Iscriviti", value: "iscriviti" },
+            { label: "Concorsi", value: "concorsi" },
+            { label: "Intelligenza", value: "intelligenza" },
+            { label: "Pubblicazioni", value: "pubblicazioni" },
+            { label: "Contatti", value: "contatti" },
+            { label: "Note legali", value: "legal" },
+            { label: "News", value: "news" },
+          ],
+        }),
+        kicker: fields.text({ label: "Kicker (mini-etichetta sopra al titolo)" }),
+        intro: fields.text({ label: "Introduzione (1–2 frasi sotto al titolo)", multiline: true }),
+        order: fields.integer({ label: "Ordine nel cluster", defaultValue: 100 }),
+        seoTitle: fields.text({ label: "SEO title (opzionale)" }),
+        seoDescription: fields.text({ label: "SEO description (opzionale)", multiline: true }),
+        sourceUrl: fields.url({ label: "URL originale (mensa.it)" }),
+        body: fields.markdoc({ label: "Corpo" }),
+      },
+    }),
+
     faq: collection({
       label: "FAQ",
       slugField: "question",
@@ -154,7 +186,10 @@ export default config({
       format: { data: "yaml" },
       schema: {
         heroKicker: fields.text({ label: "Hero kicker" }),
-        heroTitle: fields.text({ label: "Hero titolo" }),
+        heroTitle: fields.text({
+          label: "Hero titolo",
+          description: "Racchiudi una parola tra _underscore_ per renderla in corsivo blu (es. \"Persone _curiose_.\").",
+        }),
         heroSubtitle: fields.text({ label: "Hero sottotitolo" }),
         featuresKicker: fields.text({ label: "Features kicker" }),
         featuresTitle: fields.text({ label: "Features titolo" }),

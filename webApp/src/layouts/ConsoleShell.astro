@@ -21,12 +21,13 @@ import {
   Link2,
   PlusCircle,
   Download,
+  CheckCircle2,
 } from "lucide-react";
 
 interface Props {
   title: string;
   pageTitle?: string;
-  scope: "test-assistant" | "admin" | "blog" | "newsletter" | "ledger";
+  scope: "test" | "blog" | "newsletter" | "ledger";
   activeHref?: string;
   roleBadge?: string;
 }
@@ -36,45 +37,36 @@ const {
   pageTitle,
   scope,
   activeHref,
-  roleBadge = scope === "admin" ? "Admin nazionale" : scope === "newsletter" ? "Editor newsletter" : scope === "ledger" ? "Tesoreria" : "Assistente sede",
+  roleBadge = scope === "newsletter" ? "Editor newsletter" : scope === "ledger" ? "Tesoreria" : scope === "test" ? "Console test" : undefined,
 } = Astro.props;
 
 type NavItem = { href: string; label: string; icon: any };
 type NavSection = { label: string; items: NavItem[] };
 
-const testAssistantSections: NavSection[] = [
+const testSections: NavSection[] = [
   {
-    label: "Assistenza test",
+    label: "Assistente al test",
     items: [
-      { href: "/console/test-assistant/today",   label: "Test del giorno",   icon: ClipboardCheck },
-      { href: "/console/test-assistant/checkin", label: "Check-in",          icon: UserCheck      },
-      { href: "/console/test-assistant/score",   label: "Inserimento esito", icon: ClipboardList  },
-      { href: "/console/test-assistant/upload",  label: "Upload PDF",        icon: Upload         },
+      { href: "/console/test-assistant/today",   label: "Test del giorno",       icon: ClipboardCheck },
+      { href: "/console/test-assistant/checkin", label: "Check-in",              icon: UserCheck      },
+      { href: "/console/test-assistant/upload",  label: "Carica documento test", icon: Upload         },
     ],
   },
-];
-
-const adminSections: NavSection[] = [
   {
-    label: "Aspiranti soci",
+    label: "Psicologo",
+    items: [
+      { href: "/console/psychologist/pending",  label: "Test da valutare", icon: ClipboardList  },
+      { href: "/console/psychologist/reviewed", label: "Test valutati",    icon: CheckCircle2   },
+    ],
+  },
+  {
+    label: "Amministrazione",
     items: [
       { href: "/console/admin/applicants", label: "Aspiranti",        icon: Users         },
       { href: "/console/admin/collisions", label: "Collisioni",       icon: AlertTriangle  },
       { href: "/console/admin/refunds",    label: "Rimborsi",         icon: Banknote       },
       { href: "/console/admin/dates",      label: "Date sessioni",    icon: CalendarRange  },
       { href: "/console/admin/promote",    label: "Promozione socio", icon: UserPlus       },
-    ],
-  },
-  {
-    label: "Operatività",
-    items: [
-      { href: "/console/test-assistant/today", label: "Console assistenti", icon: ClipboardCheck },
-    ],
-  },
-  {
-    label: "Contenuti",
-    items: [
-      { href: "/keystatic", label: "Mensa Blogging", icon: FileEdit },
     ],
   },
 ];
@@ -119,8 +111,7 @@ const ledgerSections: NavSection[] = [
 ];
 
 const sections =
-  scope === "test-assistant" ? testAssistantSections
-  : scope === "admin" ? adminSections
+  scope === "test" ? testSections
   : scope === "newsletter" ? newsletterSections
   : scope === "ledger" ? ledgerSections
   : blogSections;

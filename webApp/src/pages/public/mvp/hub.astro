@@ -99,11 +99,11 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
         </div>
       </section>
 
-      <!-- SEZIONE: Staff sede -->
+      <!-- SEZIONE: Assistente al test (Console test) -->
       <section class="hub__section">
         <p class="hub__note">Queste pagine sono raggiungibili anche dalla sidebar dell'area soci dopo il login normale.</p>
         <div class="hub__section-header">
-          <h2 class="hub__section-title">Staff sede (loggato)</h2>
+          <h2 class="hub__section-title">Assistente al test (Console test)</h2>
           <span class="badge badge--orange">Staff sede</span>
         </div>
         <div class="hub__grid">
@@ -115,21 +115,35 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
             <span class="hub__card-name">Check-in candidato</span>
             <span class="hub__card-desc">Verifica documento e conferma presenza</span>
           </a>
-          <a href="/console/test-assistant/score" class="hub__card hub__card--staff">
-            <span class="hub__card-name">Inserimento esito</span>
-            <span class="hub__card-desc">Registrazione punteggio e esito test</span>
-          </a>
           <a href="/console/test-assistant/upload" class="hub__card hub__card--staff">
-            <span class="hub__card-name">Upload PDF test</span>
-            <span class="hub__card-desc">Caricamento scansione foglio risposte</span>
+            <span class="hub__card-name">Carica documento test</span>
+            <span class="hub__card-desc">Caricamento scansione foglio risposte — lo psicologo valuta a posteriori</span>
           </a>
         </div>
       </section>
 
-      <!-- SEZIONE: Admin nazionale -->
+      <!-- SEZIONE: Psicologo (Console test) -->
       <section class="hub__section">
         <div class="hub__section-header">
-          <h2 class="hub__section-title">Admin nazionale (loggato)</h2>
+          <h2 class="hub__section-title">Psicologo (Console test)</h2>
+          <span class="badge badge--gray">Psicologo</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/console/psychologist/pending" class="hub__card hub__card--psych">
+            <span class="hub__card-name">Test da valutare</span>
+            <span class="hub__card-desc">Documenti caricati dagli assistenti, in attesa di valutazione</span>
+          </a>
+          <a href="/console/psychologist/reviewed" class="hub__card hub__card--psych">
+            <span class="hub__card-name">Test valutati</span>
+            <span class="hub__card-desc">Storico completo delle valutazioni effettuate</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEZIONE: Amministrazione (Console test) -->
+      <section class="hub__section">
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Amministrazione (Console test)</h2>
           <span class="badge badge--purple">Admin</span>
         </div>
         <div class="hub__grid">
@@ -296,6 +310,7 @@ import PublicLayout from "../../../layouts/PublicLayout.astro";
     transform: translateY(-1px);
   }
   .hub__card--staff:hover { border-color: #f97316; box-shadow: 0 2px 12px rgba(249,115,22,0.12); }
+  .hub__card--psych:hover { border-color: #0891b2; box-shadow: 0 2px 12px rgba(8,145,178,0.12); }
   .hub__card--admin:hover { border-color: #7c3aed; box-shadow: 0 2px 12px rgba(124,58,237,0.12); }
   .hub__card-name {
     font-size: 0.9rem;

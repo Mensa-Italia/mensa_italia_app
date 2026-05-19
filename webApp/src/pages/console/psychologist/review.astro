@@ -1,0 +1,213 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const id = Astro.url.searchParams.get("id") ?? "mock";
+
+const aspirante = {
+  nome: "Marco Rossi",
+  email: "marco.rossi@email.it",
+  cf: "RSSMRC85A01H501Z",
+  nascita: "1 gennaio 1985",
+  sede: "Roma",
+};
+
+const sessione = {
+  data: "17 maggio 2026",
+  ora: "09:00",
+  sede: "Roma",
+  codice: "MN-2026-0124",
+  assistente: "Roberto Bianchi",
+};
+
+const docFile = "marco_rossi_test_17mag.pdf";
+const docSize = "2.1 MB";
+const docCaricato = "17/05/2026 alle 16:42";
+---
+
+<ConsoleShell
+  title="Console test · Valuta"
+  pageTitle="Valuta test"
+  scope="test"
+  activeHref="/console/psychologist/pending"
+>
+  <div class="page-content">
+
+    <a href="/console/psychologist/pending" class="back-link">← Torna ai test in attesa</a>
+
+    <div class="review-grid">
+
+      <div class="col-doc">
+        <div class="card">
+          <div class="card__header">
+            <div class="card__file-info">
+              <span class="card__filename">{docFile}</span>
+              <span class="card__meta">{docSize}</span>
+            </div>
+            <span class="badge badge--gray">Caricato il {docCaricato} da {sessione.assistente} (Sede {sessione.sede})</span>
+          </div>
+          <div class="pdf-preview" role="img" aria-label="Anteprima documento PDF">
+            <div class="pdf-preview__inner">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <rect width="48" height="48" rx="8" fill="#fee2e2"/>
+                <path d="M12 8h18l8 8v24a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z" fill="#ef4444" opacity=".8"/>
+                <path d="M30 8v8h8" fill="none" stroke="#fff" stroke-width="1.5"/>
+                <text x="24" y="32" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">PDF</text>
+              </svg>
+              <p class="pdf-preview__label">Anteprima documento</p>
+              <a href="#" class="btn btn--ghost btn--sm">Apri in nuova scheda</a>
+            </div>
+          </div>
+          <div class="card__footer">
+            <a href="#" class="btn btn--ghost">Scarica PDF originale</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-form">
+
+        <div class="card">
+          <h3 class="card__title">Aspirante</h3>
+          <dl class="fields">
+            <div><dt>Nome</dt><dd>{aspirante.nome}</dd></div>
+            <div><dt>Email</dt><dd>{aspirante.email}</dd></div>
+            <div><dt>Codice fiscale</dt><dd><code>{aspirante.cf}</code></dd></div>
+            <div><dt>Data di nascita</dt><dd>{aspirante.nascita}</dd></div>
+            <div><dt>Sede</dt><dd>{aspirante.sede}</dd></div>
+          </dl>
+        </div>
+
+        <div class="card">
+          <h3 class="card__title">Sessione</h3>
+          <dl class="fields">
+            <div><dt>Data</dt><dd>{sessione.data}</dd></div>
+            <div><dt>Ora</dt><dd>{sessione.ora}</dd></div>
+            <div><dt>Sede</dt><dd>{sessione.sede}</dd></div>
+            <div><dt>Codice prenotazione</dt><dd><code>{sessione.codice}</code></dd></div>
+            <div><dt>Assistente</dt><dd>{sessione.assistente}</dd></div>
+          </dl>
+        </div>
+
+        <div class="card card--form">
+          <h3 class="card__title">Valutazione</h3>
+
+          <div class="form-group">
+            <label class="form-label" for="punteggio">Punteggio raw <span class="form-label__hint">su 45 quesiti</span></label>
+            <input type="number" id="punteggio" class="form-input" min="0" max="45" placeholder="0–45" />
+            <p class="form-hint">IQ stimato: <strong>132</strong></p>
+          </div>
+
+          <fieldset class="form-fieldset">
+            <legend class="form-label">Esito</legend>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="esito" value="passato" />
+                <span class="radio-option__label radio-option__label--green">Passato</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="esito" value="non-passato" />
+                <span class="radio-option__label radio-option__label--red">Non passato</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-group">
+            <label class="form-label" for="note">Note interne</label>
+            <textarea id="note" class="form-textarea" rows="4" placeholder="Annotazioni cliniche, comportamento durante la sessione, ecc."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" class="checkbox-input" />
+              <span>Condividi note con l'aspirante</span>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <a href="/console/psychologist/pending" class="btn btn--primary">Conferma valutazione</a>
+            <a href="/console/psychologist/pending" class="btn btn--ghost">Salva bozza</a>
+          </div>
+
+          <div class="form-warning">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.345 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/></svg>
+            <span>La valutazione è definitiva: una volta confermata viene comunicata all'aspirante e diventa visibile in "Test valutati".</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { display: grid; gap: var(--spacing-5); }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .review-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--spacing-5);
+    align-items: start;
+  }
+
+  .card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+  .card--form { padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .card__header { padding: var(--spacing-4) var(--spacing-5); border-block-end: 1px solid var(--color-border-subtle); display: grid; gap: var(--spacing-2); }
+  .card__file-info { display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap; }
+  .card__filename { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .card__meta { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .card__footer { padding: var(--spacing-4) var(--spacing-5); border-block-start: 1px solid var(--color-border-subtle); }
+  .card__title { margin: 0 0 var(--spacing-3); font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); padding: var(--spacing-4) var(--spacing-5) 0; }
+
+  .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 600; white-space: normal; line-height: 1.4; }
+  .badge--gray { background: var(--color-surface-elevated); color: var(--color-text-secondary); }
+
+  .pdf-preview { background: #f8fafc; min-block-size: 400px; max-block-size: 600px; display: flex; align-items: center; justify-content: center; }
+  .pdf-preview__inner { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-3); padding: var(--spacing-6); text-align: center; }
+  .pdf-preview__inner svg { width: 4rem; height: 4rem; }
+  .pdf-preview__label { margin: 0; font-size: var(--text-sm); color: var(--color-text-tertiary); font-weight: 500; }
+
+  .fields { margin: 0; padding: 0 var(--spacing-5) var(--spacing-4); display: grid; gap: var(--spacing-2); }
+  .fields > div { display: flex; gap: var(--spacing-3); align-items: baseline; font-size: var(--text-sm); }
+  .fields dt { color: var(--color-text-tertiary); min-inline-size: 130px; font-weight: 500; flex-shrink: 0; font-size: var(--text-xs); }
+  .fields dd { margin: 0; color: var(--color-text-primary); font-weight: 600; }
+  .fields code { font-size: var(--text-xs); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); color: var(--color-text-secondary); }
+
+  .form-group { display: grid; gap: var(--spacing-2); }
+  .form-label { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-label__hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--color-text-tertiary); font-size: var(--text-2xs); margin-inline-start: var(--spacing-1); }
+  .form-input { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); inline-size: 100%; max-inline-size: 160px; }
+  .form-hint { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+  .form-hint strong { color: var(--color-mensa-blue); }
+  .form-textarea { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); inline-size: 100%; resize: vertical; font-family: inherit; }
+  .form-fieldset { border: none; padding: 0; margin: 0; display: grid; gap: var(--spacing-2); }
+  .form-fieldset legend { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-block-end: var(--spacing-2); }
+
+  .radio-group { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .radio-option { display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer; }
+  .radio-option input { accent-color: var(--color-mensa-blue); }
+  .radio-option__label { font-size: var(--text-sm); font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 9999px; }
+  .radio-option__label--green { background: #d1fae5; color: #065f46; }
+  .radio-option__label--red { background: #fee2e2; color: #991b1b; }
+
+  .checkbox-label { display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer; font-size: var(--text-sm); color: var(--color-text-primary); font-weight: 500; }
+  .checkbox-input { accent-color: var(--color-mensa-blue); }
+
+  .form-actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+
+  .form-warning { display: flex; align-items: flex-start; gap: var(--spacing-2); padding: var(--spacing-3) var(--spacing-4); background: #fef9c3; border: 1px solid #f59e0b; border-radius: var(--radius-sm); font-size: var(--text-xs); color: #92400e; font-weight: 500; }
+  .form-warning svg { width: 1rem; height: 1rem; flex-shrink: 0; color: #d97706; margin-block-start: 1px; }
+
+  .btn { display: inline-block; padding: 0.6rem 1.5rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--sm { padding: 0.35rem 0.875rem; font-size: var(--text-xs); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+
+  @media (max-width: 959px) {
+    .review-grid { grid-template-columns: 1fr; }
+    .col-form { order: -1; }
+  }
+</style>

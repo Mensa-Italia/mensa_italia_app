@@ -2,9 +2,13 @@
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import { createReader } from "@keystatic/core/reader";
 import keystaticConfig from "../../../keystatic.config";
+import { loadAllStaticPages, pageHref } from "../../lib/staticPages";
 
 const reader = createReader(process.cwd(), keystaticConfig);
 const about = await reader.singletons.about.read();
+const deepDivePages = (await loadAllStaticPages())
+  .filter((p) => p.cluster === "chi-siamo")
+  .sort((a, b) => a.order - b.order);
 
 const heroKicker = about?.heroKicker ?? "Mensa Italia";
 const heroTitle = about?.heroTitle ?? "Persone curiose. Un test in comune.";
@@ -211,6 +215,27 @@ const bodyNodes: any[] = bodyContent?.children ?? [];
       </div>
     </div>
   </section>
+
+  <!-- ═══ APPROFONDISCI ═══════════════════════════════════════════ -->
+  {deepDivePages.length > 0 && (
+    <section class="deepdive">
+      <div class="deepdive__inner">
+        <h2 class="deepdive__title">Approfondisci</h2>
+        <p class="deepdive__sub">Ogni sezione raccolta dal sito storico mensa.it, riorganizzata per essere più scorrevole.</p>
+        <ul class="deepdive__grid">
+          {deepDivePages.map((p) => (
+            <li>
+              <a href={pageHref(p.cluster, p.pageSlug)} class="deepdive__card">
+                <span class="deepdive__card-title">{p.title}</span>
+                {p.intro?.trim() && <span class="deepdive__card-intro">{p.intro}</span>}
+                <span class="deepdive__card-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
   <!-- ═══ CONTATTI ════════════════════════════════════════════════ -->
   <section class="contact">
@@ -516,6 +541,76 @@ const bodyNodes: any[] = bodyContent?.children ?? [];
       gap: var(--spacing-3);
     }
     .join__row-value, .join__row-cta { align-self: flex-end; }
+  }
+
+  /* ═══ DEEPDIVE ═══════════════════════════════════════════════ */
+  .deepdive {
+    background: var(--color-surface);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .deepdive__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .deepdive__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .deepdive__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    max-inline-size: 60ch;
+  }
+  .deepdive__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-3);
+  }
+  .deepdive__card {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-1);
+    padding: var(--spacing-4) var(--spacing-5);
+    padding-inline-end: var(--spacing-8);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color var(--motion-fast) var(--ease-out-quart), transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .deepdive__card:hover {
+    border-color: var(--color-mensa-blue);
+    transform: translateY(-1px);
+  }
+  .deepdive__card-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .deepdive__card-intro {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.55;
+  }
+  .deepdive__card-arrow {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: var(--spacing-4);
+    transform: translateY(-50%);
+    color: var(--color-mensa-blue);
+    font-size: var(--text-lg);
+    line-height: 1;
   }
 
   /* ═══ CONTACT ════════════════════════════════════════════════ */

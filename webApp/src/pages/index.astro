@@ -7,7 +7,17 @@ const reader = createReader(process.cwd(), keystaticConfig);
 const cms = await reader.singletons.home.read();
 
 const heroKicker = cms?.heroKicker ?? "Mensa Italia · dal 1983 · The High I.Q. Society";
-const heroTitle = cms?.heroTitle ?? "Persone curiose. Un test in comune.";
+const heroTitle = cms?.heroTitle ?? "Persone _curiose_. Un test in comune.";
+
+/** Render a CMS title with `_word_` markers converted to italic-accent `<em>`. */
+function renderTitleWithAccent(text: string): string {
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return escaped.replace(/_([^_]+)_/g, '<em>$1</em>');
+}
+const heroTitleHtml = renderTitleWithAccent(heroTitle);
 const heroSubtitle = cms?.heroSubtitle ?? "Mensa è un club internazionale di persone curiose. L'unico requisito per entrare è un test di logica: se rientri nel 2% più alto della popolazione, sei dentro. Dal latino mensa, la tavola rotonda: tra soci si sta tutti allo stesso livello.";
 const featuresKicker = cms?.featuresKicker ?? "Cosa facciamo";
 const featuresTitle = cms?.featuresTitle ?? "Comunità, cultura, conversazione.";
@@ -56,7 +66,7 @@ const organizationJsonLd = {
   <section class="hero">
     <div class="hero__inner">
       <p class="hero__kicker" data-i18n="web.home.hero.kicker">{heroKicker}</p>
-      <h1 class="hero__title" data-i18n="web.home.hero.title">{heroTitle}</h1>
+      <h1 class="hero__title" data-i18n="web.home.hero.title" set:html={heroTitleHtml}></h1>
       <p class="hero__sub" data-i18n="web.home.hero.sub">{heroSubtitle}</p>
       <div class="hero__cta">
         <a href="/public/iq-test" class="hero__btn hero__btn--primary" data-i18n="web.home.hero.cta_primary">
@@ -265,7 +275,9 @@ const organizationJsonLd = {
     text-wrap: balance;
     max-inline-size: 18ch;
   }
-  .hero__title em {
+  /* :global(em) needed because <em> is injected via set:html and so doesn't
+     carry the Astro scoped-style data-attribute. */
+  .hero__title :global(em) {
     font-style: italic;
     font-weight: 500;
     color: var(--color-mensa-blue);

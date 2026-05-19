@@ -1,0 +1,181 @@
+---
+/**
+ * Renders a Keystatic markdoc body — Markdoc AST shape:
+ *   { node: { children: [{ $$mdtype: "Node", type, attributes, children }, ...] } }
+ * Build-time only; produces an HTML string and injects via set:html.
+ *
+ * Props:
+ *   nodes                       — array of Markdoc block nodes
+ *   dropFirstParagraphIfMatches — if the first paragraph text matches this
+ *                                 (case-insensitive, trimmed, whitespace-normalised),
+ *                                 it is dropped (avoids duplicating the hero intro).
+ *   The first *kept* paragraph gets class="lead".
+ */
+type MdNode = {
+  type?: string;
+  attributes?: Record<string, any>;
+  children?: MdNode[];
+};
+
+interface Props {
+  nodes: MdNode[] | null | undefined;
+  dropFirstParagraphIfMatches?: string;
+}
+
+const { nodes, dropFirstParagraphIfMatches } = Astro.props as Props;
+
+function esc(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
+
+function safeHref(h: string): string {
+  if (!h) return "#";
+  const t = h.trim();
+  if (/^javascript:/i.test(t)) return "#";
+  return esc(t);
+}
+
+function renderInline(n: MdNode): string {
+  const t = n.type;
+  if (t === "text") return esc(String(n.attributes?.content ?? ""));
+  if (t === "softbreak") return " ";
+  if (t === "hardbreak") return "<br />";
+  if (t === "inline") return (n.children ?? []).map(renderInline).join("");
+  if (t === "strong") return `<strong>${(n.children ?? []).map(renderInline).join("")}</strong>`;
+  if (t === "em") return `<em>${(n.children ?? []).map(renderInline).join("")}</em>`;
+  if (t === "s") return `<s>${(n.children ?? []).map(renderInline).join("")}</s>`;
+  if (t === "code") return `<code>${esc(String(n.attributes?.content ?? ""))}</code>`;
+  if (t === "link") {
+    const href = safeHref(String(n.attributes?.href ?? ""));
+    const inner = (n.children ?? []).map(renderInline).join("");
+    const external = /^https?:\/\//.test(href) && !href.includes("mensa.it") && !href.startsWith("/");
+    const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : "";
+    return `<a href="${href}"${attrs}>${inner}</a>`;
+  }
+  if (t === "image") {
+    const src = safeHref(String(n.attributes?.src ?? ""));
+    const alt = esc(String(n.attributes?.alt ?? ""));
+    return `<img src="${src}" alt="${alt}" loading="lazy" />`;
+  }
+  return (n.children ?? []).map(renderInline).join("");
+}
+
+function inlineFor(n: MdNode): string {
+  return (n.children ?? []).map(renderInline).join("");
+}
+
+function renderBlock(n: MdNode): string {
+  const t = n.type;
+  switch (t) {
+    case "paragraph": {
+      const inner = inlineFor(n).trim();
+      return inner ? `<p>${inner}</p>` : "";
+    }
+    case "heading": {
+      const lvl = Math.max(2, Math.min(4, Number(n.attributes?.level ?? 2)));
+      return `<h${lvl}>${inlineFor(n)}</h${lvl}>`;
+    }
+    case "list": {
+      const ordered = !!n.attributes?.ordered;
+      const Tag = ordered ? "ol" : "ul";
+      const items = (n.children ?? [])
+        .map((li) => `<li>${(li.children ?? []).map(renderBlockOrLooseItem).join("")}</li>`)
+        .join("");
+      return `<${Tag}>${items}</${Tag}>`;
+    }
+    case "blockquote":
+      return `<blockquote>${(n.children ?? []).map(renderBlock).join("")}</blockquote>`;
+    case "fence":
+    case "code_block": {
+      const content = String(n.attributes?.content ?? "");
+      return `<pre><code>${esc(content)}</code></pre>`;
+    }
+    case "hr":
+    case "thematic_break":
+      return "<hr />";
+    case "image":
+      return n.attributes?.src
+        ? `<figure><img src="${safeHref(String(n.attributes.src))}" alt="${esc(String(n.attributes?.alt ?? ""))}" loading="lazy" />${n.attributes?.alt ? `<figcaption>${esc(String(n.attributes.alt))}</figcaption>` : ""}</figure>`
+        : "";
+    case "inline":
+    case "text":
+    case "link":
+    case "strong":
+    case "em":
+    case "code":
+    case "softbreak":
+    case "hardbreak": {
+      const inner = renderInline(n).trim();
+      return inner ? `<p>${inner}</p>` : "";
+    }
+    default:
+      if (n.children?.length) return n.children.map(renderBlock).join("");
+      return "";
+  }
+}
+
+function renderBlockOrLooseItem(n: MdNode): string {
+  if (n.type === "paragraph") {
+    const inner = inlineFor(n).trim();
+    return inner;
+  }
+  return renderBlock(n);
+}
+
+/** Normalise text for comparison: trim + collapse whitespace + lowercase */
+function normalise(s: string): string {
+  return s.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** Extract plain text from inline children of a paragraph node */
+function paragraphText(n: MdNode): string {
+  function extractText(node: MdNode): string {
+    if (node.type === "text") return String(node.attributes?.content ?? "");
+    if (node.type === "softbreak") return " ";
+    return (node.children ?? []).map(extractText).join("");
+  }
+  return (n.children ?? []).map(extractText).join("");
+}
+
+const dropNorm = dropFirstParagraphIfMatches ? normalise(dropFirstParagraphIfMatches) : null;
+
+// Process nodes: drop matching first paragraph, tag first kept paragraph as lead
+const blockNodes = nodes ?? [];
+let leadEmitted = false;
+let firstParagraphDropped = !dropNorm; // if no drop rule, don't need to track
+
+const parts: string[] = [];
+for (const node of blockNodes) {
+  if (node.type === "paragraph") {
+    const inner = inlineFor(node).trim();
+    if (!inner) continue;
+
+    // Check if we should drop this first paragraph
+    if (dropNorm && !firstParagraphDropped) {
+      const text = normalise(paragraphText(node));
+      firstParagraphDropped = true;
+      if (text === dropNorm) continue; // drop it
+    }
+
+    // First kept paragraph → lead
+    if (!leadEmitted) {
+      leadEmitted = true;
+      parts.push(`<p class="lead">${inner}</p>`);
+    } else {
+      parts.push(`<p>${inner}</p>`);
+    }
+    continue;
+  }
+
+  // Non-paragraph: once we've seen at least one paragraph, lead is done
+  if (!leadEmitted && node.type !== "hr" && node.type !== "thematic_break") {
+    // heading/list before any paragraph — no lead in this doc
+    leadEmitted = true;
+  }
+  parts.push(renderBlock(node));
+}
+
+const html = parts.join("\n");
+---
+
+<Fragment set:html={html} />

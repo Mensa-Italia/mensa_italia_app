@@ -115,6 +115,11 @@ const navItems: NavItem[] = [
               </li>
             ))}
           </ul>
+
+          <div class="pub__nav-cta">
+            <a href="/public/mvp/register" class="pub__nav-cta-btn pub__nav-cta-btn--primary">Iscriviti</a>
+            <a href="/login" class="pub__nav-cta-btn">Accedi come socio</a>
+          </div>
         </nav>
 
         <div class="pub__cta">
@@ -134,6 +139,7 @@ const navItems: NavItem[] = [
           <span class="pub__brand-mark pub__brand-mark--sm" aria-hidden="true">
             <svg viewBox="0 0 86 86" fill="currentColor" focusable="false">
               <path fill-rule="evenodd" d="M6.5,23.03v41.69l7.81,4.73l7.81,-4.73v-16.96l13.43,7.76v25.99l7.48,4.43l7.48,-4.2v-26.22s13.87,-7.76 13.87,-7.76v16.96l7.56,4.73l7.56,-4.73V23.03s-36.46,19.45 -36.46,19.45L6.5,23.03Z"/>
+              <path d="M43,0.05C33.35,0.05 25.5,7.84 25.5,17.42s7.85,17.36 17.5,17.36s17.5,-7.79 17.5,-17.36S52.65,0.05 43,0.05ZM42.45,4.68s0.11,-0.01 0.17,-0.01v12.25h-5.77c0.07,-3.73 1.17,-7.09 2.87,-9.52c0.81,-1.14 1.73,-2.06 2.73,-2.72ZM40.58,4.89c-0.71,0.61 -1.35,1.34 -1.92,2.15c-1.8,2.57 -2.93,6.04 -3,9.88h-5.53c0.23,-5.99 4.65,-10.94 10.45,-12.03ZM30.13,17.91h5.53c0.1,3.79 1.22,7.21 3,9.76c0.62,0.88 1.32,1.65 2.09,2.3c-5.88,-1.02 -10.4,-6.01 -10.62,-12.06ZM39.72,27.31c-1.69,-2.4 -2.77,-5.72 -2.87,-9.4h5.77v12.23c-1.07,-0.67 -2.05,-1.63 -2.9,-2.83ZM55.87,16.92h-5.31c-0.07,-3.84 -1.19,-7.31 -2.99,-9.88c-0.56,-0.79 -1.18,-1.5 -1.87,-2.09c5.66,1.19 9.95,6.08 10.17,11.97ZM43.61,4.68c0.07,0 0.13,0 0.19,0c0.99,0.66 1.91,1.58 2.71,2.71c1.7,2.43 2.8,5.79 2.87,9.52h-5.77V4.68ZM43.61,30.14v-12.23h5.77c-0.1,3.68 -1.19,7 -2.87,9.4c-0.85,1.2 -1.84,2.16 -2.9,2.83ZM45.52,29.92c0.76,-0.62 1.44,-1.39 2.05,-2.25c1.78,-2.55 2.89,-5.97 2.99,-9.76h5.31c-0.22,5.96 -4.6,10.88 -10.35,12.01Z"/>
             </svg>
           </span>
           <div>
@@ -143,23 +149,60 @@ const navItems: NavItem[] = [
         </div>
 
         <nav class="pub__footer-nav" aria-label="Footer" data-i18n-aria-label="web.footer.nav_aria">
-          <ul>
-            <li><a href="/public/about" data-i18n="web.nav.about">Chi siamo</a></li>
-            <li><a href="/public/events" data-i18n="web.nav.events">Eventi</a></li>
-            <li><a href="/public/chapters" data-i18n="web.nav.local_offices">Gruppi locali</a></li>
-            <li><a href="/public/iq-test" data-i18n="web.nav.iq_test">Test del QI</a></li>
-            <li><a href="/login" data-i18n="web.footer.member_area">Area soci</a></li>
-          </ul>
+          <div class="pub__footer-col">
+            <p class="pub__footer-head">Mensa Italia</p>
+            <ul>
+              <li><a href="/public/about" data-i18n="web.nav.about">Chi siamo</a></li>
+              <li><a href="/public/info/chi-siamo/storia">Storia</a></li>
+              <li><a href="/public/info/chi-siamo/statuto">Statuto</a></li>
+              <li><a href="/public/info/chi-siamo/domande-frequenti">Domande frequenti</a></li>
+            </ul>
+          </div>
+          <div class="pub__footer-col">
+            <p class="pub__footer-head">Diventa socio</p>
+            <ul>
+              <li><a href="/public/info/iscriviti/panoramica">Iscriviti</a></li>
+              <li><a href="/public/info/iscriviti/test-ufficiale">Test ufficiale</a></li>
+              <li><a href="/public/info/iscriviti/prova-idoneita">Prova di idoneità</a></li>
+              <li><a href="/public/info/iscriviti/quote">Quote associative</a></li>
+            </ul>
+          </div>
+          <div class="pub__footer-col">
+            <p class="pub__footer-head">Attività</p>
+            <ul>
+              <li><a href="/public/events" data-i18n="web.nav.events">Eventi</a></li>
+              <li><a href="/public/chapters" data-i18n="web.nav.local_offices">Gruppi locali</a></li>
+              <li><a href="/public/info/concorsi/panoramica">Concorsi</a></li>
+              <li><a href="/public/podcasts">Podcast</a></li>
+            </ul>
+          </div>
+          <div class="pub__footer-col">
+            <p class="pub__footer-head">Cultura</p>
+            <ul>
+              <li><a href="/public/quid">QUID</a></li>
+              <li><a href="/public/info/pubblicazioni/panoramica">Pubblicazioni</a></li>
+              <li><a href="/public/info/intelligenza/misurare">Intelligenza</a></li>
+              <li><a href="/public/blog" data-i18n="web.nav.blog">Blog</a></li>
+            </ul>
+          </div>
+          <div class="pub__footer-col">
+            <p class="pub__footer-head">Servizio</p>
+            <ul>
+              <li><a href="/public/iq-test" data-i18n="web.nav.iq_test">Test del QI</a></li>
+              <li><a href="/public/info/contatti/contatti">Contatti</a></li>
+              <li><a href="/login" data-i18n="web.footer.member_area">Area soci</a></li>
+            </ul>
+          </div>
         </nav>
 
         <div class="pub__footer-legal">
-          <p data-i18n="web.footer.copy" data-i18n-params={JSON.stringify({ year: String(new Date().getFullYear()) })}>
-            &copy; {new Date().getFullYear()} Mensa Italia APS
+          <p>
+            &copy; {new Date().getFullYear()} Associazione Mensa Italia · P.IVA 06628870484
           </p>
           <p>
-            <a href="https://www.mensa.it/privacy" target="_blank" rel="noopener" data-i18n="web.footer.privacy">Privacy</a>
+            <a href="/public/info/legal/privacy" data-i18n="web.footer.privacy">Privacy</a>
             <span aria-hidden="true">·</span>
-            <a href="https://www.mensa.it/termini" target="_blank" rel="noopener" data-i18n="web.footer.terms">Termini</a>
+            <a href="/public/info/legal/cookie">Cookie</a>
           </p>
         </div>
       </div>
@@ -274,6 +317,9 @@ const navItems: NavItem[] = [
     color: var(--color-text-primary);
     background: var(--color-surface-elevated);
   }
+  /* Desktop: hide the mobile-only in-nav CTA block (we use .pub__cta in topbar). */
+  .pub__nav-cta { display: none; }
+
   .pub__nav-link--active {
     color: var(--color-mensa-blue);
     font-weight: 600;
@@ -329,9 +375,8 @@ const navItems: NavItem[] = [
     margin-inline: auto;
     padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: var(--spacing-6);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-8);
   }
   .pub__footer-brand {
     display: inline-flex;
@@ -351,24 +396,43 @@ const navItems: NavItem[] = [
     letter-spacing: 0.02em;
   }
 
+  .pub__footer-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-6);
+  }
+  .pub__footer-col { display: grid; gap: var(--spacing-2); }
+  .pub__footer-head {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
   .pub__footer-nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-4);
+    display: grid;
+    gap: var(--spacing-1);
   }
   .pub__footer-nav a {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
     text-decoration: none;
+    line-height: 1.5;
   }
   .pub__footer-nav a:hover { color: var(--color-mensa-blue); }
 
   .pub__footer-legal {
-    text-align: end;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+    padding-block-start: var(--spacing-5);
+    border-block-start: 1px solid var(--color-border-subtle);
   }
   .pub__footer-legal p {
     margin: 0;
@@ -406,6 +470,29 @@ const navItems: NavItem[] = [
     .pub__nav-link {
       padding: var(--spacing-3) var(--spacing-4);
       font-size: var(--text-sm);
+    }
+    .pub__nav-cta {
+      display: grid;
+      gap: var(--spacing-2);
+      padding: var(--spacing-3) var(--spacing-2) var(--spacing-2);
+      margin-block-start: var(--spacing-2);
+      border-block-start: 1px solid var(--color-border-subtle);
+    }
+    .pub__nav-cta-btn {
+      display: block;
+      padding: var(--spacing-3) var(--spacing-4);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-strong, var(--color-border-subtle));
+      color: var(--color-text-primary);
+    }
+    .pub__nav-cta-btn--primary {
+      background: var(--color-mensa-blue);
+      color: var(--color-text-on-brand, #fff);
+      border-color: var(--color-mensa-blue);
     }
     .pub__mobile-toggle:checked ~ .pub__topbar .pub__nav {
       display: flex;

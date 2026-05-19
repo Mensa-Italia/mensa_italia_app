@@ -1,0 +1,200 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+
+const orders = [
+  {
+    ref: 'BQ-2026-0042',
+    date: '19 mag 2026',
+    items: 2,
+    total: '176,90 €',
+    status: 'in-transit',
+    statusLabel: 'In transito',
+    products: [
+      'Felpa "Curiosity above all" · Taglia M',
+      'Tessera in legno fresato (numerata)',
+    ],
+    tracking: 'GLS · IT9382017644',
+    eta: 'ven 24 mag 2026',
+  },
+  {
+    ref: 'BQ-2025-0189',
+    date: '3 nov 2025',
+    items: 1,
+    total: '28,90 €',
+    status: 'delivered',
+    statusLabel: 'Consegnato',
+    products: ['Storia di Mensa Italia 1983–2023'],
+    tracking: 'Poste Italiane · AO334812IT',
+    eta: '10 nov 2025',
+  },
+  {
+    ref: 'BQ-2025-0054',
+    date: '14 apr 2025',
+    items: 3,
+    total: '67,90 €',
+    status: 'delivered',
+    statusLabel: 'Consegnato',
+    products: ['Set 4 tazze da caffè', 'Quaderno A5 logo a secco', 'Borsa di tela'],
+    tracking: 'GLS · IT8811203421',
+    eta: '19 apr 2025',
+  },
+  {
+    ref: 'BQ-2024-0321',
+    date: '2 dic 2024',
+    items: 1,
+    total: '24,90 €',
+    status: 'cancelled',
+    statusLabel: 'Annullato',
+    products: ['T-shirt Mensa Italia logo'],
+    tracking: null,
+    eta: null,
+  },
+];
+---
+
+<AppShell title="I miei ordini — Boutique Mensa" pageTitle="Boutique">
+  <div class="ord">
+
+    <header class="ord-header">
+      <h1 class="ord-header__title">I miei ordini</h1>
+      <a href="/boutique" class="ord-header__cta">Vai alla boutique →</a>
+    </header>
+
+    <div class="ord-list">
+      {orders.map((order) => (
+        <details class="ord-item">
+          <summary class="ord-item__summary">
+            <div class="ord-item__main">
+              <span class="ord-item__ref">{order.ref}</span>
+              <span class="ord-item__date">{order.date}</span>
+              <span class="ord-item__count">{order.items} {order.items === 1 ? 'articolo' : 'articoli'}</span>
+              <span class="ord-item__total">{order.total}</span>
+              <span class={`ord-badge ord-badge--${order.status}`}>{order.statusLabel}</span>
+            </div>
+            <span class="ord-item__chevron" aria-hidden="true">▸</span>
+          </summary>
+
+          <div class="ord-item__detail">
+            <div class="ord-detail-grid">
+
+              <div class="ord-detail-section">
+                <p class="ord-detail-label">Articoli</p>
+                <ul class="ord-detail-list">
+                  {order.products.map((p) => <li>{p}</li>)}
+                </ul>
+              </div>
+
+              {order.tracking && (
+                <div class="ord-detail-section">
+                  <p class="ord-detail-label">Tracciamento</p>
+                  <p class="ord-detail-val">{order.tracking}</p>
+                </div>
+              )}
+
+              {order.eta && (
+                <div class="ord-detail-section">
+                  <p class="ord-detail-label">{order.status === 'delivered' ? 'Consegnato il' : 'ETA consegna'}</p>
+                  <p class="ord-detail-val">{order.eta}</p>
+                </div>
+              )}
+
+            </div>
+
+            <div class="ord-detail-actions">
+              {order.status !== 'cancelled' && (
+                <a href="#" class="ord-detail-btn ord-detail-btn--ghost">Scarica ricevuta</a>
+              )}
+              {order.status === 'in-transit' && (
+                <a href="#" class="ord-detail-btn ord-detail-btn--secondary">Traccia spedizione</a>
+              )}
+              <a href="/boutique" class="ord-detail-btn ord-detail-btn--primary">Riacquista</a>
+            </div>
+          </div>
+        </details>
+      ))}
+    </div>
+
+  </div>
+</AppShell>
+
+<style>
+  .ord { display: grid; gap: var(--spacing-6); }
+
+  .ord-header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-3);
+  }
+  .ord-header__title { margin: 0; font-size: clamp(1.4rem, 2.5vw, 1.8rem); font-weight: 700; color: var(--color-text-primary); }
+  .ord-header__cta {
+    font-size: var(--text-xs); font-weight: 600; color: var(--color-mensa-blue); text-decoration: none;
+  }
+  .ord-header__cta:hover { text-decoration: underline; }
+
+  .ord-list { display: grid; gap: var(--spacing-3); }
+
+  .ord-item {
+    background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+  .ord-item[open] { border-color: color-mix(in oklch, var(--color-mensa-blue) 25%, transparent); }
+  .ord-item__summary {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5); cursor: pointer; list-style: none;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .ord-item__summary::-webkit-details-marker { display: none; }
+  .ord-item__summary:hover { background: color-mix(in oklch, var(--color-mensa-blue) 4%, var(--color-surface)); }
+
+  .ord-item__main {
+    display: flex; align-items: center; gap: var(--spacing-4); flex: 1; flex-wrap: wrap;
+  }
+  .ord-item__ref { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); font-variant-numeric: tabular-nums; min-width: 120px; }
+  .ord-item__date { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .ord-item__count { font-size: var(--text-xs); color: var(--color-text-secondary); }
+  .ord-item__total { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); font-variant-numeric: tabular-nums; margin-left: auto; }
+
+  .ord-badge {
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-full);
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .ord-badge--delivered  { background: color-mix(in oklch, #22c55e 15%, transparent); color: #15803d; border: 1px solid color-mix(in oklch, #22c55e 30%, transparent); }
+  .ord-badge--in-transit { background: color-mix(in oklch, #f59e0b 15%, transparent); color: #b45309; border: 1px solid color-mix(in oklch, #f59e0b 30%, transparent); }
+  .ord-badge--preparation { background: color-mix(in oklch, var(--color-mensa-blue) 12%, transparent); color: var(--color-mensa-blue); border: 1px solid color-mix(in oklch, var(--color-mensa-blue) 25%, transparent); }
+  .ord-badge--cancelled  { background: color-mix(in oklch, var(--color-text-tertiary) 12%, transparent); color: var(--color-text-tertiary); border: 1px solid color-mix(in oklch, var(--color-text-tertiary) 20%, transparent); }
+
+  .ord-item__chevron {
+    color: var(--color-text-tertiary); font-size: 12px; flex-shrink: 0;
+    transition: transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .ord-item[open] .ord-item__chevron { transform: rotate(90deg); }
+
+  .ord-item__detail {
+    padding: var(--spacing-4) var(--spacing-5) var(--spacing-5);
+    border-top: 1px solid var(--color-border-subtle);
+    background: color-mix(in oklch, var(--color-mensa-blue) 2%, var(--color-surface));
+    display: grid; gap: var(--spacing-4);
+  }
+  .ord-detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--spacing-4); }
+  .ord-detail-section { display: grid; gap: var(--spacing-2); }
+  .ord-detail-label { margin: 0; font-size: var(--text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+  .ord-detail-val { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+  .ord-detail-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  .ord-detail-list li { font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+  .ord-detail-actions { display: flex; gap: var(--spacing-2); flex-wrap: wrap; }
+  .ord-detail-btn {
+    padding: 7px 16px; border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600;
+    text-decoration: none; cursor: pointer; border: 1.5px solid transparent;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+  }
+  .ord-detail-btn--primary { background: var(--color-mensa-blue); color: #fff; border-color: var(--color-mensa-blue); }
+  .ord-detail-btn--primary:hover { opacity: 0.88; }
+  .ord-detail-btn--secondary { border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); background: transparent; }
+  .ord-detail-btn--secondary:hover { background: color-mix(in oklch, var(--color-mensa-blue) 8%, var(--color-surface)); }
+  .ord-detail-btn--ghost { border-color: var(--color-border-subtle); color: var(--color-text-secondary); background: transparent; }
+  .ord-detail-btn--ghost:hover { border-color: var(--color-text-secondary); color: var(--color-text-primary); }
+
+  @media (max-width: 600px) {
+    .ord-item__main { flex-direction: column; align-items: flex-start; gap: var(--spacing-2); }
+    .ord-item__total { margin-left: 0; }
+  }
+</style>

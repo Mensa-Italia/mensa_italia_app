@@ -1,0 +1,496 @@
+---
+import AppShell from "../../../layouts/AppShell.astro";
+const product = {
+  slug: "felpa-cappuccio-curiosity",
+  name: 'Felpa con cappuccio "Curiosity above all"',
+  category: "Abbigliamento",
+  price: 52.00,
+  priceFull: 65.00,
+  desc: "Cotone organico 340g · unisex · stampa serigrafata su fronte e dietro. Vestibilità regolare. Lavabile a 30°.",
+  avail: "Disponibile",
+  details: [
+    "Materiale: 100% cotone organico GOTS certificato, 340 g/m²",
+    "Stampa: serigrafia ad acqua su fronte e retro",
+    "Colore: grigio antracite melange",
+    "Taglia: XS – XXL (consulta la guida taglie)",
+    "Prodotto in: Portogallo",
+  ],
+  reviews: [
+    { author: "Luca B.", stars: 5, text: "Qualità eccellente, il tessuto è morbidissimo. Indosso la M e calza perfetto." },
+    { author: "Sara M.", stars: 4, text: "Ottima felpa, stampa curata. Solo la spedizione ha impiegato qualche giorno in più del previsto." },
+    { author: "Marco T.", stars: 5, text: "Finalmente un merchandising Mensa all'altezza. La porto ai raduni nazionali." },
+  ]
+};
+---
+
+<AppShell title={`${product.name} — Boutique Mensa`} pageTitle="Boutique">
+  <div class="pd">
+
+    <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+      <a href="/boutique">Boutique</a>
+      <span aria-hidden="true">›</span>
+      <a href="/boutique">{product.category}</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">{product.name}</span>
+    </nav>
+
+    <div class="pd-layout">
+
+      <div class="pd-gallery">
+        <div class="pd-gallery__main pd-img--slate">
+          <svg viewBox="0 0 160 160" width="120" height="120" aria-hidden="true">
+            <path d="M40 130 L40 70 Q40 50 60 44 L80 38 L100 44 Q120 50 120 70 L120 130 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+            <path d="M60 44 Q70 60 80 60 Q90 60 100 44" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+            <text x="80" y="100" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.5)" font-family="sans-serif" letter-spacing="1">CURIOSITY</text>
+            <text x="80" y="113" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.35)" font-family="sans-serif" letter-spacing="2">ABOVE ALL</text>
+          </svg>
+        </div>
+        <div class="pd-gallery__thumbs">
+          {[1,2,3,4].map((n) => (
+            <div class={`pd-gallery__thumb pd-img--${['slate','gray','navy','indigo'][n-1]}`} role="button" tabindex="0" aria-label={`Vista ${n}`}>
+              <svg viewBox="0 0 40 40" width="24" height="24" aria-hidden="true">
+                <rect x="4" y="4" width="32" height="32" rx="4" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+              </svg>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="pd-info">
+        <p class="pd-info__eyebrow">{product.category}</p>
+        <h1 class="pd-info__title">{product.name}</h1>
+
+        <div class="pd-rating">
+          <span class="pd-rating__stars" aria-label="4.6 stelle su 5">★★★★☆</span>
+          <span class="pd-rating__score">4.6</span>
+          <span class="pd-rating__count">· 87 recensioni</span>
+        </div>
+
+        <div class="pd-price">
+          <span class="pd-price__now">€ {product.price.toFixed(2).replace('.',',')}</span>
+          <span class="pd-price__was">€ {product.priceFull.toFixed(2).replace('.',',')}</span>
+          <span class="pd-price__badge">-20%</span>
+        </div>
+
+        <div class="pd-avail pd-avail--ok">
+          <span class="pd-avail__dot"></span>
+          Disponibile · spedizione in 2–3 giorni lavorativi
+        </div>
+
+        <div class="pd-section">
+          <p class="pd-section__label">Taglia</p>
+          <div class="pd-sizes" id="pd-sizes">
+            {['XS','S','M','L','XL','XXL'].map((s) => (
+              <button class={`pd-size-btn${s === 'M' ? ' pd-size-btn--sel' : ''}`} data-size={s}>{s}</button>
+            ))}
+          </div>
+        </div>
+
+        <div class="pd-section">
+          <p class="pd-section__label">Quantità</p>
+          <div class="pd-qty" id="pd-qty">
+            <button class="pd-qty__btn" id="pd-qty-minus" aria-label="Diminuisci">−</button>
+            <span class="pd-qty__val" id="pd-qty-val">1</span>
+            <button class="pd-qty__btn" id="pd-qty-plus" aria-label="Aumenta">+</button>
+          </div>
+        </div>
+
+        <div class="pd-actions">
+          <button class="pd-btn pd-btn--primary" id="pd-add-cart">Aggiungi al carrello</button>
+          <button class="pd-btn pd-btn--ghost" id="pd-buy-now">Acquista ora</button>
+        </div>
+
+        <details class="pd-accordion">
+          <summary class="pd-accordion__title">Dettagli prodotto</summary>
+          <ul class="pd-accordion__list">
+            {product.details.map((d) => <li>{d}</li>)}
+          </ul>
+        </details>
+
+        <details class="pd-accordion" open>
+          <summary class="pd-accordion__title">Spedizione & resi</summary>
+          <div class="pd-shipping">
+            <p>Spedizione standard <strong>4,90 €</strong> · gratuita per ordini sopra <strong>60 €</strong>.</p>
+            <p>Consegna stimata in 5–7 giorni lavorativi. Resi accettati entro 30 giorni dalla ricezione, articolo integro e non lavato.</p>
+          </div>
+        </details>
+
+        <div class="pd-payment-icons" aria-label="Metodi di pagamento accettati">
+          {['VISA','MC','PayPal','Apple Pay'].map((m) => (
+            <span class="pd-payment-icon">{m}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <section class="pd-reviews" aria-labelledby="reviews-title">
+      <h2 class="pd-reviews__title" id="reviews-title">Recensioni recenti</h2>
+      <div class="pd-reviews__list">
+        {product.reviews.map((r) => (
+          <div class="pd-review">
+            <div class="pd-review__header">
+              <div class="pd-review__avatar">{r.author[0]}</div>
+              <div>
+                <p class="pd-review__name">{r.author}</p>
+                <p class="pd-review__stars">{'★'.repeat(r.stars)}{'☆'.repeat(5-r.stars)}</p>
+              </div>
+            </div>
+            <p class="pd-review__text">{r.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="pd-toast" id="pd-toast" role="alert" aria-live="assertive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Aggiunto al carrello</span>
+      <a href="/boutique/cart" class="pd-toast__link">Vedi carrello →</a>
+    </div>
+
+  </div>
+</AppShell>
+
+<style>
+  .pd { display: grid; gap: var(--spacing-6); }
+
+  .pd-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    flex-wrap: wrap;
+  }
+  .pd-breadcrumb a { color: var(--color-text-secondary); text-decoration: none; }
+  .pd-breadcrumb a:hover { color: var(--color-mensa-blue); text-decoration: underline; }
+  .pd-breadcrumb [aria-current="page"] { color: var(--color-text-primary); font-weight: 500; }
+
+  .pd-layout {
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    gap: var(--spacing-8);
+    align-items: start;
+  }
+  @media (max-width: 768px) {
+    .pd-layout { grid-template-columns: 1fr; }
+  }
+
+  .pd-gallery { display: grid; gap: var(--spacing-3); }
+  .pd-gallery__main {
+    aspect-ratio: 4/5;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pd-gallery__thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-2);
+  }
+  .pd-gallery__thumb {
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color var(--motion-fast) var(--ease-out-quart);
+  }
+  .pd-gallery__thumb:first-child { border-color: var(--color-mensa-blue); }
+  .pd-gallery__thumb:hover { border-color: var(--color-mensa-blue); }
+
+  .pd-img--slate  { background: linear-gradient(135deg, oklch(40% 0.06 240) 0%, oklch(26% 0.04 240) 100%); }
+  .pd-img--gray   { background: linear-gradient(135deg, oklch(50% 0.02 240) 0%, oklch(34% 0.02 240) 100%); }
+  .pd-img--navy   { background: linear-gradient(135deg, oklch(30% 0.14 245) 0%, oklch(18% 0.10 245) 100%); }
+  .pd-img--indigo { background: linear-gradient(135deg, oklch(45% 0.18 280) 0%, oklch(32% 0.14 280) 100%); }
+
+  .pd-info { display: grid; gap: var(--spacing-4); align-content: start; }
+  .pd-info__eyebrow {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-mensa-blue);
+  }
+  .pd-info__title {
+    margin: 0;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+  }
+
+  .pd-rating { display: flex; align-items: center; gap: var(--spacing-2); }
+  .pd-rating__stars { color: #f59e0b; font-size: var(--text-sm); letter-spacing: 2px; }
+  .pd-rating__score { font-size: var(--text-xs); font-weight: 700; color: var(--color-text-primary); }
+  .pd-rating__count { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .pd-price { display: flex; align-items: baseline; gap: var(--spacing-3); }
+  .pd-price__now {
+    font-size: clamp(1.4rem, 2vw, 1.7rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .pd-price__was {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: line-through;
+    font-variant-numeric: tabular-nums;
+  }
+  .pd-price__badge {
+    background: #e53e3e;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+  }
+
+  .pd-avail {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+  .pd-avail__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pd-avail--ok   .pd-avail__dot { background: #22c55e; }
+  .pd-avail--low  .pd-avail__dot { background: #f59e0b; }
+  .pd-avail--ltd  .pd-avail__dot { background: #7c3aed; }
+
+  .pd-section { display: grid; gap: var(--spacing-2); }
+  .pd-section__label { margin: 0; font-size: var(--text-xs); font-weight: 600; color: var(--color-text-secondary); }
+
+  .pd-sizes { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  .pd-size-btn {
+    min-width: 44px;
+    height: 36px;
+    padding: 0 var(--spacing-2);
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--color-border-subtle);
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+  }
+  .pd-size-btn:hover { border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); }
+  .pd-size-btn--sel { background: var(--color-mensa-blue); border-color: var(--color-mensa-blue); color: #fff; }
+
+  .pd-qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border: 1.5px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    width: fit-content;
+  }
+  .pd-qty__btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .pd-qty__btn:hover { background: color-mix(in oklch, var(--color-mensa-blue) 10%, var(--color-surface)); color: var(--color-mensa-blue); }
+  .pd-qty__val {
+    min-width: 40px;
+    text-align: center;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    border-left: 1px solid var(--color-border-subtle);
+    border-right: 1px solid var(--color-border-subtle);
+    padding: 0 var(--spacing-3);
+    line-height: 36px;
+  }
+
+  .pd-actions { display: grid; gap: var(--spacing-2); }
+  .pd-btn {
+    width: 100%;
+    padding: 12px var(--spacing-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+    border: 2px solid transparent;
+  }
+  .pd-btn--primary { background: var(--color-mensa-blue); color: #fff; border-color: var(--color-mensa-blue); }
+  .pd-btn--primary:hover { opacity: 0.88; }
+  .pd-btn--ghost { background: transparent; color: var(--color-mensa-blue); border-color: var(--color-mensa-blue); }
+  .pd-btn--ghost:hover { background: color-mix(in oklch, var(--color-mensa-blue) 8%, var(--color-surface)); }
+
+  .pd-accordion {
+    border-top: 1px solid var(--color-border-subtle);
+    padding-top: var(--spacing-3);
+  }
+  .pd-accordion__title {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--spacing-3);
+  }
+  .pd-accordion__title::after { content: '▸'; transition: transform var(--motion-fast); }
+  details[open] .pd-accordion__title::after { transform: rotate(90deg); }
+  .pd-accordion__list {
+    margin: 0;
+    padding-left: var(--spacing-4);
+    display: grid;
+    gap: var(--spacing-2);
+  }
+  .pd-accordion__list li { font-size: var(--text-xs); color: var(--color-text-secondary); }
+  .pd-shipping p { margin: 0 0 var(--spacing-2) 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+  .pd-payment-icons { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  .pd-payment-icon {
+    padding: 4px 10px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    background: var(--color-surface-elevated);
+    letter-spacing: 0.02em;
+  }
+
+  .pd-reviews { display: grid; gap: var(--spacing-4); }
+  .pd-reviews__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+  .pd-reviews__list { display: grid; gap: var(--spacing-4); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .pd-review {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .pd-review__header { display: flex; gap: var(--spacing-3); align-items: center; }
+  .pd-review__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--color-mensa-blue) 15%, var(--color-surface));
+    color: var(--color-mensa-blue);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pd-review__name { margin: 0; font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .pd-review__stars { margin: 0; color: #f59e0b; font-size: var(--text-xs); letter-spacing: 1px; }
+  .pd-review__text { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; }
+
+  .pd-toast {
+    position: fixed;
+    bottom: var(--spacing-6);
+    right: var(--spacing-6);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: var(--color-text-primary);
+    color: var(--color-surface);
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    box-shadow: 0 8px 32px -4px rgba(0,0,0,0.3);
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .pd-toast.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .pd-toast__link { color: oklch(75% 0.18 263); text-decoration: none; font-weight: 600; margin-left: var(--spacing-2); }
+</style>
+
+<script is:inline>
+  (function () {
+    var CART_KEY = 'mensa_boutique_cart';
+    var slug  = 'felpa-cappuccio-curiosity';
+    var name  = 'Felpa "Curiosity above all"';
+    var price = 52.00;
+    var cat   = 'Abbigliamento';
+    var qty   = 1;
+    var size  = 'M';
+
+    function getCart() {
+      try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; }
+    }
+    function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+
+    document.querySelectorAll('.pd-size-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.pd-size-btn').forEach(function (b) { b.classList.remove('pd-size-btn--sel'); });
+        btn.classList.add('pd-size-btn--sel');
+        size = btn.dataset.size;
+      });
+    });
+
+    var qtyVal = document.getElementById('pd-qty-val');
+    document.getElementById('pd-qty-minus').addEventListener('click', function () {
+      if (qty > 1) { qty--; qtyVal.textContent = qty; }
+    });
+    document.getElementById('pd-qty-plus').addEventListener('click', function () {
+      qty++;
+      qtyVal.textContent = qty;
+    });
+
+    function addToCart() {
+      var cart = getCart();
+      var existing = cart.find(function (i) { return i.slug === slug && i.size === size; });
+      if (existing) {
+        existing.qty = (existing.qty || 1) + qty;
+      } else {
+        cart.push({ slug: slug, name: name, price: price, cat: cat, qty: qty, size: size });
+      }
+      saveCart(cart);
+    }
+
+    function showToast() {
+      var t = document.getElementById('pd-toast');
+      if (!t) return;
+      t.classList.add('is-visible');
+      setTimeout(function () { t.classList.remove('is-visible'); }, 2500);
+    }
+
+    document.getElementById('pd-add-cart').addEventListener('click', function () {
+      addToCart();
+      showToast();
+    });
+
+    document.getElementById('pd-buy-now').addEventListener('click', function () {
+      addToCart();
+      window.location.href = '/boutique/cart';
+    });
+  })();
+</script>

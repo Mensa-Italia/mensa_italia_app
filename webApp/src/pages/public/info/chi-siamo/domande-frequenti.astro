@@ -1,0 +1,473 @@
+---
+import PublicLayout from "../../../../layouts/PublicLayout.astro";
+
+/**
+ * FAQ content derived from chi-siamo-domande-frequenti.mdoc
+ * The source entry is mostly a list of links; we expand them into real Q&A
+ * grouped by topic, grounded in the mensa.it source material.
+ */
+
+const groups = [
+  {
+    id: "iscrizione",
+    label: "Iscrizione",
+    items: [
+      {
+        q: "Come posso entrare nel Mensa?",
+        a: "Per entrare nel Mensa devi superare un test di logica figurale supervisionato. Prima registrati sul sito mensa.it, poi acquista il test (€15 di contributo spese) dall'area soci e contatta un Assistente al Test nella tua regione per fissare la sessione.",
+      },
+      {
+        q: "Qual è l'età minima per fare il test?",
+        a: "È necessario aver compiuto 16 anni. I candidati di 16/17 anni devono essere accompagnati da un genitore o tutore legale, che firma anche il modulo di consenso informato per i minori.",
+      },
+      {
+        q: "Ho già un test del QI riconosciuto. Posso entrare senza rifarlo?",
+        a: "Sì. Se hai già sostenuto un test del QI riconosciuto (somministrato da uno psicologo psicometrista abilitato) che attesta un punteggio nel 98° percentile o superiore, puoi richiedere l'ammissione diretta senza ripetere il test Mensa.",
+      },
+      {
+        q: "Quando posso iscrivermi dopo aver superato il test?",
+        a: "Puoi iscriverti in qualunque momento dopo aver ricevuto l'esito positivo. Accedi all'area soci su mensa.it e segui il percorso Acquisti > Prima Iscrizione.",
+      },
+    ],
+  },
+  {
+    id: "test",
+    label: "Test",
+    items: [
+      {
+        q: "Come funziona il test ufficiale?",
+        a: "Il test dura circa 20 minuti ed è composto da 45 sequenze di figure (logica figurale). Non sono richieste abilità matematiche né conoscenze culturali. La sessione è supervisionata da un Assistente al Test dell'associazione.",
+      },
+      {
+        q: "Come ottengo il valore esatto del mio QI?",
+        a: "Il test Mensa non comunica il punteggio di QI: indica solo se hai superato la soglia del 98° percentile (equivalente a QI 131 scala Wechsler, 133 Stanford-Binet, 149 Cattell). Per conoscere il valore esatto rivolgiti a uno psicologo psicometrista abilitato iscritto all'albo.",
+      },
+      {
+        q: "Posso allenarmi prima del test?",
+        a: "L'allenamento può ridurre l'ansia ma non migliora significativamente il risultato, poiché la logica figurale è strettamente legata alle capacità innate. Ti consigliamo di fare qualche prova con il test preliminare gratuito su test.mensa.no.",
+      },
+      {
+        q: "Quante volte posso ripetere il test?",
+        a: "Puoi ripetere il test una sola volta, dopo almeno 6 mesi dal primo tentativo. Acquista nuovamente il test dall'area soci e informa un Assistente al Test prima di fissare l'appuntamento.",
+      },
+      {
+        q: "Quanto tempo ci vuole per avere l'esito?",
+        a: "L'esito arriva generalmente via mail entro 2 settimane dalla sessione. In caso di superamento ricevi anche le indicazioni per iscriverti; la tessera e la spilla arrivano a casa entro poche settimane.",
+      },
+    ],
+  },
+  {
+    id: "quote",
+    label: "Quote",
+    items: [
+      {
+        q: "Quali sono le quote associative del Mensa Italia?",
+        a: "Le quote annuali sono: €25 per i nuovi soci (primo anno, include lettera di benvenuto, tessera e spilla), €50 quota ordinaria, €25 quota giovani per chi ha meno di 26 anni nell'annualità pagata. Sono accette anche quote da Socio Sostenitore superiori alla quota ordinaria.",
+      },
+      {
+        q: "Quando scade l'iscrizione?",
+        a: "La scadenza è sempre un anno solare esatto dalla data di ricezione del versamento. I servizi essenziali (alias @mensa.it, accesso all'area soci e alle comunicazioni) vengono disattivati due settimane dopo la scadenza se non si rinnova.",
+      },
+      {
+        q: "Come si rinnova l'iscrizione?",
+        a: "Accedi al tuo profilo nell'area soci su mensa.it prima della scadenza e segui la procedura di rinnovo. Per chiarimenti scrivi a soci@mensa.it.",
+      },
+    ],
+  },
+  {
+    id: "generali",
+    label: "Generali",
+    items: [
+      {
+        q: "Cos'è il Mensa?",
+        a: "Mensa è il club internazionale per persone con alto quoziente intellettivo, fondato nel 1946 in Inghilterra. L'unico requisito è rientrare nel 2% più alto della popolazione in un test di intelligenza. Ha oltre 150.000 soci in più di 100 Paesi.",
+      },
+      {
+        q: "Cosa significa 'mensa' nel nome?",
+        a: "Il nome latino 'mensa' ha un doppio significato: 'tavolo' (un luogo di incontro fra pari) e 'mente'. Fu scelto dai fondatori Roland Berrill e Lancelot Ware per evocare un consesso intellettuale aperto e orizzontale.",
+      },
+      {
+        q: "Chi sono i soci Mensa nel mondo?",
+        a: "I soci Mensa sono persone di ogni età, professione e provenienza. L'unica cosa in comune è il punteggio nel test. Ci sono medici, artigiani, insegnanti, studenti, imprenditori: la diversità è uno dei punti di forza del club.",
+      },
+      {
+        q: "Ci sono persone famose iscritte al Mensa?",
+        a: "Sì, anche se il club tutela la riservatezza dei soci. Tra i membri noti nel tempo: Isaac Asimov, Geena Davis, Jodie Foster, Steve Martin. In Italia molti soci sono attivi ma preferiscono mantenere la propria adesione privata.",
+      },
+    ],
+  },
+];
+
+const totalItems = groups.reduce((acc, g) => acc + g.items.length, 0);
+---
+
+<PublicLayout
+  active="chi-siamo"
+  title="Domande frequenti — Mensa Italia"
+  description="Risposte alle domande più comuni su Mensa Italia: come iscriversi, il test di ammissione, le quote, la storia dell'associazione."
+>
+  <!-- ═══ BREADCRUMB ═══════════════════════════════════════════════ -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="breadcrumb__inner">
+      <ol class="breadcrumb__list">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li><a href="/public/about">Chi siamo</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li aria-current="page">Domande frequenti</li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">CHI SIAMO</p>
+      <h1 class="hero__title">Domande frequenti</h1>
+      <p class="hero__lead">Risposte brevi, dirette. Se non trovi la tua, scrivi a <a href="mailto:info@mensa.it">info@mensa.it</a>.</p>
+    </div>
+  </section>
+
+  <!-- ═══ TOPIC FILTER STRIP ════════════════════════════════════════ -->
+  <nav class="topics" aria-label="Sezioni FAQ">
+    <div class="topics__inner">
+      <span class="topics__total">{totalItems} risposte</span>
+      <ul class="topics__list">
+        {groups.map((g) => (
+          <li>
+            <a href={`#${g.id}`} class="topics__link">
+              {g.label} <span class="topics__count">{g.items.length}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══ FAQ ACCORDION GROUPS ═════════════════════════════════════ -->
+  <main class="faq">
+    <div class="faq__inner">
+      {groups.map((group) => (
+        <section class="faq__group" id={group.id}>
+          <h2 class="faq__group-title">
+            <span class="faq__group-label">{group.label}</span>
+            <span class="faq__group-count">{group.items.length}</span>
+          </h2>
+          <dl class="faq__list">
+            {group.items.map((item) => (
+              <details class="faq__item">
+                <summary class="faq__question">
+                  <span class="faq__question-text">{item.q}</span>
+                  <span class="faq__icon" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M4 6l4 4 4-4"/>
+                    </svg>
+                  </span>
+                </summary>
+                <dd class="faq__answer">
+                  <p>{item.a}</p>
+                </dd>
+              </details>
+            ))}
+          </dl>
+        </section>
+      ))}
+    </div>
+  </main>
+
+  <!-- ═══ BOTTOM CTA ════════════════════════════════════════════════ -->
+  <section class="no-answer">
+    <div class="no-answer__inner">
+      <p class="no-answer__label" data-i18n="public.faq.no_answer.label">Non hai trovato la risposta?</p>
+      <p class="no-answer__sub">Il team di Mensa Italia risponde di solito entro 2 giorni lavorativi.</p>
+      <a href="mailto:info@mensa.it" class="no-answer__btn">Scrivi a info@mensa.it</a>
+    </div>
+  </section>
+
+  <!-- ═══ FONTE ══════════════════════════════════════════════════ -->
+</PublicLayout>
+
+<style>
+  /* ═══ BREADCRUMB ════════════════════════════════════════════════ */
+  .breadcrumb {
+    padding-block: var(--spacing-3);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .breadcrumb__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .breadcrumb__list {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .breadcrumb__list a { color: var(--color-text-tertiary); text-decoration: none; }
+  .breadcrumb__list a:hover { color: var(--color-mensa-blue); }
+  .breadcrumb__list [aria-current="page"] { color: var(--color-text-primary); font-weight: 500; }
+  .breadcrumb__sep { color: var(--color-border-subtle); }
+
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 10%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 680px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__lead {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .hero__lead a { color: var(--color-mensa-blue); }
+
+  /* ═══ TOPICS STRIP ════════════════════════════════════════════ */
+  .topics {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: var(--spacing-3);
+  }
+  .topics__inner {
+    max-inline-size: 800px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    flex-wrap: wrap;
+  }
+  .topics__total {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .topics__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+  .topics__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 100px;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: border-color var(--motion-fast) var(--ease-out-quart), color var(--motion-fast) var(--ease-out-quart);
+  }
+  .topics__link:hover { border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); }
+  .topics__count {
+    background: var(--color-surface-elevated);
+    padding: 1px 5px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-tertiary);
+  }
+
+  /* ═══ FAQ ════════════════════════════════════════════════════ */
+  .faq {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .faq__inner {
+    max-inline-size: 800px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: clamp(var(--spacing-8), 6vh, var(--spacing-12));
+  }
+  .faq__group { display: grid; gap: var(--spacing-1); }
+  .faq__group-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin: 0 0 var(--spacing-3) 0;
+  }
+  .faq__group-label {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .faq__group-count {
+    font-size: var(--text-2xs);
+    color: var(--color-mensa-blue);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .faq__list {
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  /* ─── ACCORDION ITEM ─────────────────────────────────────── */
+  .faq__item {
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .faq__item:last-child { border-block-end: none; }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    cursor: pointer;
+    list-style: none;
+    background: var(--color-surface);
+    transition: background var(--motion-fast) var(--ease-out-quart);
+    user-select: none;
+  }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question::marker { display: none; }
+  .faq__question:hover { background: var(--color-surface-elevated); }
+
+  .faq__item[open] > .faq__question {
+    background: color-mix(in oklch, var(--color-mensa-blue) 5%, var(--color-surface));
+  }
+
+  .faq__question-text {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .faq__icon {
+    inline-size: 20px;
+    block-size: 20px;
+    color: var(--color-mensa-blue);
+    flex-shrink: 0;
+    transition: transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .faq__icon svg { inline-size: 100%; block-size: 100%; }
+  .faq__item[open] > .faq__question .faq__icon { transform: rotate(180deg); }
+
+  .faq__answer {
+    margin: 0;
+    padding: 0 var(--spacing-5) var(--spacing-5) var(--spacing-5);
+    background: var(--color-surface);
+    border-block-start: 1px solid var(--color-border-subtle);
+    /* CSS-only open animation */
+    animation: faq-open 200ms var(--ease-out-quart, ease-out) both;
+  }
+  .faq__answer p {
+    margin: var(--spacing-4) 0 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  @keyframes faq-open {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══ NO ANSWER CTA ══════════════════════════════════════════ */
+  .no-answer {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+    text-align: center;
+  }
+  .no-answer__inner {
+    max-inline-size: 520px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+    justify-items: center;
+  }
+  .no-answer__label {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .no-answer__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    line-height: 1.55;
+  }
+  .no-answer__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-6);
+    background: var(--color-mensa-blue);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    margin-block-start: var(--spacing-2);
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .no-answer__btn:hover { background: var(--color-mensa-blue-deep, #1e40af); }
+
+  /* ═══ SOURCE FOOTER ═════════════════════════════════════════ */
+  .source-footer {
+    padding-block: var(--spacing-5);
+  }
+  .source-footer__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    text-align: center;
+  }
+  .source-footer__link {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .source-footer__link:hover { color: var(--color-mensa-blue); text-decoration: underline; }
+</style>
