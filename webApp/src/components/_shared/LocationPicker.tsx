@@ -47,14 +47,16 @@ export interface LocationPickerProps {
 
 // ─── Singleton per il caricamento dello script ────────────────────────────────
 
-const FALLBACK_KEY = "AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE";
-
 function getApiKey(): string {
   try {
     // @ts-ignore — import.meta.env è disponibile in Astro/Vite
-    return (import.meta as any).env?.PUBLIC_GOOGLE_MAPS_API_KEY || FALLBACK_KEY;
+    const key = (import.meta as any).env?.PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!key) {
+      console.warn("[LocationPicker] PUBLIC_GOOGLE_MAPS_API_KEY non configurata: la mappa non caricherà");
+    }
+    return key ?? "";
   } catch {
-    return FALLBACK_KEY;
+    return "";
   }
 }
 
