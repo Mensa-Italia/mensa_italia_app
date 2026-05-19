@@ -114,7 +114,7 @@ export function IqTestApp() {
       });
     }, 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [phase.kind, payload]);
 
   async function doSubmit(

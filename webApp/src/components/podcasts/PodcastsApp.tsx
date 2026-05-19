@@ -7,7 +7,7 @@
  * dialog "Apri nell'app Mensa" con link diretti agli store: usiamo
  * l'ascolto come hook per spingere il download dell'app mobile.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mensa, type MensaWebPodcast } from "../../lib/mensa";
 import { useListLoader } from "../../lib/useListLoader";
 import { formatHMS } from "../audio/formatDuration";

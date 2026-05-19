@@ -217,7 +217,7 @@ export function LocationPicker({
     sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
 
     setMapsState("ready");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // ── Carica script + inizializza ───────────────────────────────────────────

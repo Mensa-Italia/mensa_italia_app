@@ -7,7 +7,7 @@ import keystaticConfig from "../../../../../keystatic.config";
 const reader = createReader(process.cwd(), keystaticConfig);
 const entry = await reader.collections.staticPages.read("iscriviti-test-ufficiale");
 const bodyContent = entry ? await entry.body() : null;
-const bodyNodes: any[] = bodyContent?.children ?? [];
+const bodyNodes: any[] = (bodyContent?.node as any)?.children ?? [];
 
 const steps = [
   {

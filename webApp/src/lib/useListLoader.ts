@@ -70,7 +70,7 @@ export function useListLoader<T>({
       cancelled = true;
       cancel();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   async function manualRefresh() {

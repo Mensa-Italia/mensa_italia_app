@@ -15,7 +15,7 @@ const heroTitle = about?.heroTitle ?? "Persone curiose. Un test in comune.";
 const heroSubtitle = about?.heroSubtitle ?? "The High I.Q. Society";
 
 const bodyContent = about ? await about.body() : null;
-const bodyNodes: any[] = bodyContent?.children ?? [];
+const bodyNodes: any[] = (bodyContent?.node as any)?.children ?? [];
 ---
 
 <PublicLayout
