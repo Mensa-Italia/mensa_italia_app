@@ -1,0 +1,31 @@
+name: QA — Kotlin
+
+on:
+  push:
+    branches-ignore: ['dependabot/**']
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: qa-kotlin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detekt:
+    name: detekt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - name: Install detekt-cli
+        run: |
+          curl -sSLO https://github.com/detekt/detekt/releases/download/v1.23.6/detekt-cli-1.23.6.zip
+          unzip -q detekt-cli-1.23.6.zip
+      - name: Run detekt
+        run: |
+          ./detekt-cli-1.23.6/bin/detekt-cli \
+            --input shared/src/commonMain,shared/src/androidMain,shared/src/jsMain,androidApp/src/main \
+            --config detekt.yml \
+            --build-upon-default-config

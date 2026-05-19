@@ -1,0 +1,49 @@
+name: QA — Web
+
+on:
+  push:
+    branches-ignore: ['dependabot/**']
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: qa-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: Astro check (TS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :shared:jsBrowserProductionLibraryDistribution -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        working-directory: webApp
+      - run: bun astro check
+        working-directory: webApp
+
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stub mensa-shared (lint non ha bisogno del codice reale)
+        run: |
+          mkdir -p shared/build/dist/js/productionLibrary
+          cat > shared/build/dist/js/productionLibrary/package.json <<'EOF'
+          {"name":"shared","version":"0.0.0","main":"shared.mjs","types":"shared.d.ts"}
+          EOF
+          echo "// stub" > shared/build/dist/js/productionLibrary/shared.mjs
+          echo "export {};" > shared/build/dist/js/productionLibrary/shared.d.ts
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        working-directory: webApp
+      - run: bun run lint
+        working-directory: webApp

@@ -1,9 +1,47 @@
 # Mensa Italia — App
 
+### Pipeline
+
 [![Release](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml)
-[![Quality](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/quality.yml)
+[![Notify](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/notify.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/notify.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
 [![Web image](https://img.shields.io/badge/ghcr.io-mensa--web-2496ED?logo=docker&logoColor=white)](https://github.com/Mensa-Italia/mensa_italia_app/pkgs/container/mensa-web)
+[![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
+
+### Quality per area
+
+[![Web](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml)
+[![Kotlin](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml)
+[![Swift](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml)
+[![Docker](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml)
+[![Secrets](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml)
+
+### Stack
+
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=white)
+![Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-007AFF?logo=swift&logoColor=white)
+![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=white)
+![React](https://img.shields.io/badge/React%2019-61DAFB?logo=react&logoColor=black)
+![Tailwind](https://img.shields.io/badge/Tailwind%204-06B6D4?logo=tailwindcss&logoColor=white)
+![Bun](https://img.shields.io/badge/Bun-000?logo=bun&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-02303A?logo=gradle&logoColor=white)
+![Ktor](https://img.shields.io/badge/Ktor-087CFA?logo=kotlin&logoColor=white)
+![SQLDelight](https://img.shields.io/badge/SQLDelight-003545?logo=sqlite&logoColor=white)
+![Koin](https://img.shields.io/badge/Koin-FFD700?logoColor=black)
+![Keystatic](https://img.shields.io/badge/Keystatic-000?logo=markdown&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-635BFF?logo=stripe&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
+![PocketBase](https://img.shields.io/badge/PocketBase-B8DBE4?logo=pocketbase&logoColor=black)
+![Traefik](https://img.shields.io/badge/Traefik-24A1C1?logo=traefikproxy&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+
+### Platforms
+
+![iOS 26+](https://img.shields.io/badge/iOS-26+-000?logo=apple&logoColor=white)
+![Android 7+](https://img.shields.io/badge/Android-7+%20(SDK%2024)-3DDC84?logo=android&logoColor=white)
+![Web](https://img.shields.io/badge/Web-app.mensa.it-blue)
 
 App ufficiale di **Mensa Italia**: tessera digitale, eventi, sedi locali, notifiche, area pubblica, console editoriale, autenticazione e onboarding nuovi soci.
 
@@ -90,20 +128,20 @@ I dieci job sopra alimentano `gate-summary`: se anche solo uno fallisce il publi
 
 ## Quality & Security
 
-Due flussi distinti.
+Due livelli.
 
-### `quality.yml` — radar su ogni push
+### Workflow QA per area — radar su ogni push
 
-Triggera su ogni `push` (incluso `feat/mvp-testing-public`) e su PR a `master`. Modalità **blanda**: ogni job ha `continue-on-error: true`, riporta warning senza far diventare rosso il workflow.
+Ogni area ha il **proprio workflow**, quindi il proprio badge in cima al README. Se uno chip diventa rosso sai subito **dove guardare**. Triggerano su ogni push e PR a `master`.
 
-| Job | Cosa controlla | Linguaggio |
-|---|---|---|
-| `web-typecheck` | `astro check` con `@astrojs/check` | TS/Astro |
-| `web-lint` | ESLint 9 flat config | JS/TS/TSX/Astro |
-| `kotlin-lint` | detekt 1.23 (default config + custom) | Kotlin |
-| `swift-lint` | SwiftLint (regole opt-in) | Swift |
-| `dockerfile-lint` | Hadolint | `Dockerfile.web` |
-| `secret-scan` | Gitleaks (org-licensed) | tutta la repo |
+| Workflow file | Job | Tool | Area |
+|---|---|---|---|
+| [`qa-web.yml`](.github/workflows/qa-web.yml) | `typecheck` | `astro check` + `@astrojs/check` | TS/Astro/React |
+| [`qa-web.yml`](.github/workflows/qa-web.yml) | `lint` | ESLint 9 flat config + typescript-eslint + plugin-astro + react-hooks | JS/TS/TSX/Astro |
+| [`qa-kotlin.yml`](.github/workflows/qa-kotlin.yml) | `detekt` | detekt 1.23 (default + custom config) | shared/ + androidApp/ |
+| [`qa-swift.yml`](.github/workflows/qa-swift.yml) | `swiftlint` | SwiftLint (opt-in rules) | iosApp/ |
+| [`qa-docker.yml`](.github/workflows/qa-docker.yml) | `hadolint` | Hadolint | Dockerfile.web |
+| [`qa-secrets.yml`](.github/workflows/qa-secrets.yml) | `gitleaks` | Gitleaks (org-licensed) | tutta la repo |
 
 ### `release.yml` — gate strict
 

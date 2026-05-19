@@ -1,0 +1,21 @@
+name: QA — Swift
+
+on:
+  push:
+    branches-ignore: ['dependabot/**']
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: qa-swift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swiftlint:
+    name: SwiftLint
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install swiftlint
+      - run: swiftlint lint --quiet iosApp/iosApp
