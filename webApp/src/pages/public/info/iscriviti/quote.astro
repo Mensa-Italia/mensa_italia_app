@@ -452,6 +452,9 @@ const includes = [
   // ─── Reduced-motion gate ───────────────────────────────────────────────────
   if (!prefersReducedMotion()) {
 
+    // Kill any stale tweens from a previous View Transition navigation
+    gsap.killTweensOf(".hero__kicker, .hero__title, .hero__lead, .tier, .tier__badge, .includes__item, .payment__prose, .cta-section__btn");
+
     // ─── Pre-hide elements that will animate in ──────────────────────────────
     gsap.set(".hero__kicker, .hero__title, .hero__lead", { opacity: 0, y: 24 });
 
@@ -470,7 +473,7 @@ const includes = [
     gsap.set(".cta-section__btn", { opacity: 0, scale: 0.95 });
 
     // ─── Hero entrance (on load) ──────────────────────────────────────────────
-    const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+    const heroTl = gsap.timeline({ defaults: { ease: "power2.out", overwrite: true }, delay: 0.05 });
     heroTl
       .to(".hero__kicker", { opacity: 1, y: 0, duration: 0.6 })
       .to(".hero__title",  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")

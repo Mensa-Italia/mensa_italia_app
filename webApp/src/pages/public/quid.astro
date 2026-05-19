@@ -38,7 +38,7 @@ const jsonLd = {
   "publisher": { "@type": "Organization", "name": "Mensa Italia" },
   "description":
     "Trimestrale dei soci Mensa Italia. Saggi, racconti, recensioni — scritti dai soci stessi.",
-  "url": "https://app.mensa.it/public/quid",
+  "url": new URL("/public/quid", Astro.site ?? Astro.url).toString(),
 };
 ---
 

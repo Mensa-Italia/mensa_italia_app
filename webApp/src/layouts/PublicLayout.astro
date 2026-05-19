@@ -36,6 +36,11 @@ const {
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 
+// Default OG cover for link previews (Telegram, WhatsApp, X, LinkedIn, ecc.)
+// Resolved to an absolute URL — most platforms require absolute URLs.
+const resolvedOgImage = ogImage
+  ?? new URL("/og-cover.png", Astro.site ?? Astro.url).toString();
+
 type NavItem = { href: string; label: string; key: Props["active"]; i18n: string };
 const navItems: NavItem[] = [
   { href: "/public/about",        label: "Chi siamo",     key: "chi-siamo", i18n: "web.nav.about" },
@@ -57,11 +62,14 @@ const navItems: NavItem[] = [
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mensa Italia — Persone curiose. Un test in comune." />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="theme-color" content="#0f1d3b" />
     {jsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
