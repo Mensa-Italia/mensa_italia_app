@@ -20,7 +20,7 @@ compose-multiplatform = "1.8.2"
 
 # Navigation & Lifecycle
 androidx-navigation = "2.8.4"
-androidx-lifecycle = "2.8.7"
+androidx-lifecycle = "2.10.0"
 # JetBrains fork of navigation-compose — multiplatform (wasmJs + Android + iOS)
 jetbrains-navigation-compose = "2.8.0-alpha13"
 
