@@ -388,8 +388,7 @@ jobs:
           fi
 
       - name: Upload to TestFlight
-        if: steps.ios_check.outputs.configured == 'true'
-        if: steps.tf_check.outputs.configured == 'true'
+        if: steps.ios_check.outputs.configured == 'true' && steps.tf_check.outputs.configured == 'true'
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
