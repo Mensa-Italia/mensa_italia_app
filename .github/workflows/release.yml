@@ -774,7 +774,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: aquasecurity/trivy-action@0.28.0
+      - uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -825,8 +825,36 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Build shared Release XCFramework (CodeQL needs the framework)
+        run: |
+          ./gradlew :shared:assembleSharedReleaseXCFramework \
+            -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
+      - name: Point project.yml to Release XCFramework
+        run: |
+          /usr/bin/sed -i '' \
+            -e 's|/XCFrameworks/debug|/XCFrameworks/release|g' \
+            -e 's|assembleSharedDebugXCFramework|assembleSharedReleaseXCFramework|g' \
+            iosApp/project.yml
+      - name: Generate xcodeproj
+        working-directory: iosApp
+        run: xcodegen generate
       - uses: github/codeql-action/init@v3
-        with: { languages: 'swift', build-mode: 'none' }
+        with: { languages: 'swift', build-mode: 'manual' }
+      - name: Build iOS (manual mode for CodeQL)
+        run: |
+          xcodebuild build \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -allowProvisioningUpdates=NO || true
       - uses: github/codeql-action/analyze@v3
         with: { category: '/language:swift' }
 
