@@ -126,7 +126,7 @@ struct PublicMemberContactView: View {
             (tr("public.member.label.region", fallback: "Regione"), region),
             (tr("public.member.label.area", fallback: "Area"), area),
             (tr("public.member.label.province", fallback: "Provincia"), state),
-            (tr("public.member.label.city", fallback: "Città"), city),
+            (tr("public.member.label.city", fallback: "Città"), city)
         ]
         var seen: [String] = []   // valori gia' usati (lowercased + trimmed)
         var out: [LocationRow] = []

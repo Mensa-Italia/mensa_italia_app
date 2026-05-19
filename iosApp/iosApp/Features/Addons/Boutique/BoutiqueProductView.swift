@@ -6,9 +6,9 @@ import Shared
 struct BoutiqueProductView: View {
     let productId: String
 
-    @State private var product: BoutiqueModel? = nil
-    @State private var sub: Closeable? = nil
-    @State private var showSafari: URL? = nil
+    @State private var product: BoutiqueModel?
+    @State private var sub: Closeable?
+    @State private var showSafari: URL?
     @State private var showContactAlert = false
 
     var body: some View {

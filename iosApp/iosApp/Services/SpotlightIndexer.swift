@@ -135,16 +135,16 @@ enum SpotlightIndexer {
     /// Mappa categorie italiane → (SF Symbol, tint). Renderizzata a 96×96
     /// PNG (~1KB) e cached pre-batch.
     private static let categoryStyle: [String: (symbol: String, tint: UIColor)] = [
-        "statuto":       ("building.columns.fill", .systemIndigo),
-        "regolamento":   ("text.book.closed.fill", .systemBlue),
-        "verbale":       ("doc.text.fill",         .systemTeal),
-        "circolare":     ("megaphone.fill",        .systemOrange),
-        "modulo":        ("square.and.pencil",     .systemGreen),
-        "manuale":       ("book.fill",             .systemPurple),
+        "statuto": ("building.columns.fill", .systemIndigo),
+        "regolamento": ("text.book.closed.fill", .systemBlue),
+        "verbale": ("doc.text.fill", .systemTeal),
+        "circolare": ("megaphone.fill", .systemOrange),
+        "modulo": ("square.and.pencil", .systemGreen),
+        "manuale": ("book.fill", .systemPurple),
         "presentazione": ("rectangle.on.rectangle", .systemPink),
-        "bilancio":      ("chart.pie.fill",        .systemYellow),
-        "contratto":     ("signature",             .systemBrown),
-        "privacy":       ("lock.shield.fill",      .systemRed)
+        "bilancio": ("chart.pie.fill", .systemYellow),
+        "contratto": ("signature", .systemBrown),
+        "privacy": ("lock.shield.fill", .systemRed)
     ]
 
     private static func renderCategoryIcon(category: String) -> Data? {

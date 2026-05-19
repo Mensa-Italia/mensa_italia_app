@@ -190,10 +190,10 @@ private struct PaymentMethodRow: View {
 final class PaymentMethodPickerViewModel {
     var loading = true
     var methods: [PaymentMethodModel] = []
-    var defaultId: String? = nil
+    var defaultId: String?
     var showPicker = false
     var adding = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     func load() async {
         loading = true

@@ -3,9 +3,9 @@ import Shared
 
 @MainActor @Observable
 final class MemberDetailViewModel {
-    var member: RegSociModel? = nil
+    var member: RegSociModel?
     var loading = false
-    var error: String? = nil
+    var error: String?
     private var sub: Closeable?
 
     func start(id: String) {

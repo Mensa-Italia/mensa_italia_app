@@ -4,10 +4,10 @@ import Shared
 
 @MainActor @Observable
 final class EventDetailViewModel {
-    var event: EventModel? = nil
+    var event: EventModel?
     var schedules: [EventScheduleModel] = []
     var loading = false
-    var error: String? = nil
+    var error: String?
     private var sub: Closeable?
 
     func start(id: String) {
@@ -53,7 +53,7 @@ final class EventDetailViewModel {
 struct EventDetailView: View {
     let eventId: String
     @State private var vm = EventDetailViewModel()
-    @State private var calendarError: String? = nil
+    @State private var calendarError: String?
     @State private var calendarSuccess = false
     @State private var showBooking = false
     @State private var scrollOffset: CGFloat = 0

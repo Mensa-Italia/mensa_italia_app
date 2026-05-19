@@ -6,7 +6,7 @@ struct TodayView: View {
     @State private var vm = TodayViewModel()
     @State private var notificationRoute: NotificationTarget?
     @State private var showAllNotifications = false
-    var onSearchTap: (() -> Void)? = nil
+    var onSearchTap: (() -> Void)?
 
     var body: some View {
         ZStack {

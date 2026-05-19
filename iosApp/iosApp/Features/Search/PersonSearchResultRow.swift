@@ -40,7 +40,7 @@ struct PersonSearchResultRow: View {
     /// practice (the avatar would only appear after opening the detail).
     /// Owning the fetched record at the row level decouples the avatar from
     /// upstream cache propagation entirely.
-    @State private var fetchedMember: RegSociModel? = nil
+    @State private var fetchedMember: RegSociModel?
 
     /// Render-time member: prefer the locally-fetched record (if any), fall
     /// back to whatever the upstream gave us.

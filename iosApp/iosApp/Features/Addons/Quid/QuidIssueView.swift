@@ -13,8 +13,8 @@ struct QuidIssueView: View {
     @State private var resolvedName: String
     @State private var refreshing = false
     @State private var appeared = false
-    @State private var sub: Closeable? = nil
-    @State private var issuesSub: Closeable? = nil
+    @State private var sub: Closeable?
+    @State private var issuesSub: Closeable?
     @State private var query: String = ""
     @State private var loadingPlaylist = false
 

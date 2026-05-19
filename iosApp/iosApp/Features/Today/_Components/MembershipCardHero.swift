@@ -40,8 +40,8 @@ final class TesseraMotionManager: ObservableObject {
             let newPitch = m.attitude.pitch
             let newRoll = m.attitude.roll
             Task { @MainActor in
-                self.pitch = self.pitch + (newPitch - self.pitch) * self.alpha
-                self.roll = self.roll + (newRoll - self.roll) * self.alpha
+                self.pitch += (newPitch - self.pitch) * self.alpha
+                self.roll += (newRoll - self.roll) * self.alpha
             }
         }
         #endif
@@ -66,7 +66,7 @@ struct MembershipCardHero: View {
     var memberSince: String
     var expiry: String
     var memberId: String
-    var avatarURL: URL? = nil          // accepted for source compat; unused
+    var avatarURL: URL?          // accepted for source compat; unused
     var isFullScreen: Bool = false
     var avatarSize: CGFloat = 72       // accepted for source compat; unused
 

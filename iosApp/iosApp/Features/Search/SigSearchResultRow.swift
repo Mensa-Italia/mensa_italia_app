@@ -22,16 +22,16 @@ struct SigSearchResultRow: View {
     private var typeIcon: String {
         let lower = sig.groupType.lowercased()
         if lower.contains("facebook") { return "f.cursive.circle.fill" }
-        if lower.contains("chat")     { return "paperplane.fill" }
-        if lower.contains("local")    { return "mappin.and.ellipse" }
+        if lower.contains("chat") { return "paperplane.fill" }
+        if lower.contains("local") { return "mappin.and.ellipse" }
         return "person.3.fill"
     }
 
     private var typeLabel: String? {
         let lower = sig.groupType.lowercased()
-        if lower.contains("chat")     { return tr("community.filter.telegram", fallback: "Gruppi Telegram") } // i18n
-        if lower.contains("local")    { return tr("community.filter.local", fallback: "Gruppi ufficiali") }  // i18n
-        if lower.contains("sig")      { return tr("community.filter.sig", fallback: "SIG") } // i18n
+        if lower.contains("chat") { return tr("community.filter.telegram", fallback: "Gruppi Telegram") } // i18n
+        if lower.contains("local") { return tr("community.filter.local", fallback: "Gruppi ufficiali") }  // i18n
+        if lower.contains("sig") { return tr("community.filter.sig", fallback: "SIG") } // i18n
         return sig.groupType.isEmpty ? nil : sig.groupType.replacingOccurrences(of: "_", with: " ").capitalized
     }
 

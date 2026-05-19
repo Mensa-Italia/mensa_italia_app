@@ -6,7 +6,7 @@ final class MembersDirectoryViewModel {
     var members: [RegSociModel] = []
     var query: String = ""
     var loading = false
-    var error: String? = nil
+    var error: String?
 
     private var sub: Closeable?
     private var searchTask: Task<Void, Never>?
@@ -185,7 +185,7 @@ private struct AlphabetIndex: View {
     let letters: [String]
     let onSelect: (String) -> Void
 
-    @State private var lastLetter: String? = nil
+    @State private var lastLetter: String?
 
     var body: some View {
         GeometryReader { geo in

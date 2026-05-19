@@ -30,7 +30,7 @@ struct PodcastEpisodesView: View {
 
     @State private var episodes: [PodcastEpisode] = []
     @State private var refreshing = false
-    @State private var sub: Closeable? = nil
+    @State private var sub: Closeable?
     @ObservedObject private var audioService = AudioPlayerService.shared
 
     var body: some View {

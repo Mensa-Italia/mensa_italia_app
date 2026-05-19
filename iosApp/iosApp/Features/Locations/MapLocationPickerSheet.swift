@@ -29,9 +29,9 @@ struct MapLocationPickerSheet: View {
     @State private var showResults = false
 
     @State private var saving = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
 
-    @State private var reverseGeocodeTask: Task<Void, Never>? = nil
+    @State private var reverseGeocodeTask: Task<Void, Never>?
     @State private var addressEditedByUser = false
 
     @StateObject private var searchHelper = LocalSearchCompleterHelper()

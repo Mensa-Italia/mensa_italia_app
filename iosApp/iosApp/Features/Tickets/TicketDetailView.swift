@@ -4,9 +4,9 @@ import Shared
 @MainActor
 @Observable
 final class TicketDetailViewModel {
-    var ticket: TicketModel? = nil
+    var ticket: TicketModel?
     var loading = true
-    var error: String? = nil
+    var error: String?
 
     func load(id: String) async {
         loading = true

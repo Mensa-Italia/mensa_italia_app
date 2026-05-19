@@ -14,8 +14,8 @@ enum EventType: String, CaseIterable, Identifiable, Codable, Hashable {
     var label: String {
         switch self {
         case .national: return tr("events.type.national", fallback: "Nazionale")
-        case .local:    return tr("events.type.local",    fallback: "Locale")
-        case .online:   return tr("events.type.online",   fallback: "Online")
+        case .local:    return tr("events.type.local", fallback: "Locale")
+        case .online:   return tr("events.type.online", fallback: "Online")
         }
     }
 
@@ -34,7 +34,7 @@ enum ItalianRegions {
         "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
         "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
         "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana",
-        "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto",
+        "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
     ]
 }
 
@@ -57,12 +57,12 @@ struct EventFilterState: Equatable, Codable {
     var types: Set<EventType> = []
     var regions: Set<String> = []
     /// `nil` => unlimited.
-    var maxDistanceKm: Int? = nil
+    var maxDistanceKm: Int?
     var useMyLocation: Bool = false
 
     // Transient (not encoded): live location updates from CLLocationManager.
-    var userLatitude: Double? = nil
-    var userLongitude: Double? = nil
+    var userLatitude: Double?
+    var userLongitude: Double?
 
     enum CodingKeys: String, CodingKey {
         case types, regions, maxDistanceKm, useMyLocation

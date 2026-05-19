@@ -10,7 +10,7 @@ import SwiftUI
 /// up the view tree.
 struct LanguagePickerView: View {
     @ObservedObject private var locale = LocaleManager.shared
-    @State private var switching: String? = nil
+    @State private var switching: String?
 
     var body: some View {
         List {

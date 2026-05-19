@@ -22,7 +22,7 @@ enum ThemeChoice: String, CaseIterable, Identifiable {
 @Observable
 final class ProfileViewModel {
     var loggingOut = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
     var selectedTheme: ThemeChoice = .system
     var notificationsEnabled = true
 

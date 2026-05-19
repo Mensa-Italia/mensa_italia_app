@@ -3,12 +3,12 @@ import Shared
 
 @MainActor @Observable
 final class DocumentDetailViewModel {
-    var document: DocumentModel? = nil
-    var summary: String? = nil
+    var document: DocumentModel?
+    var summary: String?
     var loading = true
     var summaryLoading = false
     var summaryFailed = false
-    var error: String? = nil
+    var error: String?
 
     func load(id: String) async {
         loading = true

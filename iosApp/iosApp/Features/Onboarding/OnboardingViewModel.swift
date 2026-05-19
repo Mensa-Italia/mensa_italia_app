@@ -33,7 +33,7 @@ final class OnboardingViewModel {
             icon: "magnifyingglass",
             title: tr("onboarding.search.title", fallback: "Una ricerca per tutto"),
             subtitle: tr("onboarding.search.subtitle", fallback: "Persone, eventi, convenzioni, documenti. Un solo posto per trovare quello che ti serve.")
-        ),
+        )
     ]
 
     var isLastPage: Bool { currentPage == pages.count - 1 }

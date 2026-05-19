@@ -6,7 +6,7 @@ struct BoutiqueView: View {
     @State private var products: [BoutiqueModel] = []
     @State private var refreshing = false
     @State private var appeared = false
-    @State private var sub: Closeable? = nil
+    @State private var sub: Closeable?
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),

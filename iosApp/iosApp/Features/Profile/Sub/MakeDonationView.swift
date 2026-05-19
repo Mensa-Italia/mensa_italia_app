@@ -280,9 +280,9 @@ final class MakeDonationViewModel {
     var customAmountText: String = ""
     var usingCustom = false
     var methods: [PaymentMethodModel] = []
-    var selectedMethodId: String? = nil
+    var selectedMethodId: String?
     var submitting = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     var amountString: String { "€\(amount)" }
 

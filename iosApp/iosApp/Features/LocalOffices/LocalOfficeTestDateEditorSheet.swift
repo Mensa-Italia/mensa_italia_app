@@ -36,7 +36,7 @@ struct LocalOfficeTestDateEditorSheet: View {
 
     // UI state
     @State private var saving = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
     @State private var showError = false
 
     @Environment(\.dismiss) private var dismiss

@@ -18,8 +18,7 @@ enum EventKitHelper {
         } else {
             granted = try await withCheckedThrowingContinuation { cont in
                 store.requestAccess(to: .event) { ok, err in
-                    if let err = err { cont.resume(throwing: err) }
-                    else { cont.resume(returning: ok) }
+                    if let err = err { cont.resume(throwing: err) } else { cont.resume(returning: ok) }
                 }
             }
         }

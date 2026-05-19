@@ -36,7 +36,7 @@ private func _i18nDynamicKeysRegistry() {
         tr("news_pubblicazioni", fallback: "News e Pubblicazioni"),
         tr("normativa_interna", fallback: "Normativa Interna"),
         tr("tesoreria_contabilita", fallback: "Tesoreria e Contabilità"),
-        tr("verbali_delibere", fallback: "Verbali e Delibere"),
+        tr("verbali_delibere", fallback: "Verbali e Delibere")
     ]
     _ = registered
 }

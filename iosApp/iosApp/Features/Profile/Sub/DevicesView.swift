@@ -118,7 +118,7 @@ private struct DeviceRow: View {
 final class DevicesViewModel {
     var devices: [DeviceModel] = []
     var loading = true
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     private var sub: Closeable?
 

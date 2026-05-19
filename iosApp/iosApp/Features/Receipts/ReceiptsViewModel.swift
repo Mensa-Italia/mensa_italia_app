@@ -63,7 +63,7 @@ extension ReceiptModel {
 final class ReceiptsListViewModel {
     var receipts: [ReceiptModel] = []
     var loading = true
-    var error: String? = nil
+    var error: String?
 
     private var sub: Closeable?
 
@@ -81,7 +81,6 @@ final class ReceiptsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.receipts.refresh() }
-        catch { self.error = error.localizedDescription }
+        do { try await koin.receipts.refresh() } catch { self.error = error.localizedDescription }
     }
 }

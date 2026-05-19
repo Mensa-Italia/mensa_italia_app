@@ -113,7 +113,7 @@ class RealtimeClient(
             ?: run {
                 job.cancel()
                 streamScope.cancel()
-                throw IllegalStateException("PB realtime: missing clientId after timeout")
+                error("PB realtime: missing clientId after timeout")
             }
 
         return clientId to events.onCompletion { job.cancel(); streamScope.cancel() }

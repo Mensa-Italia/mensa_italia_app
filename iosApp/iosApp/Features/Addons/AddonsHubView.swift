@@ -7,7 +7,7 @@ struct AddonsHubView: View {
     @State private var addons: [AddonModel] = []
     @State private var refreshing = false
     @State private var appeared = false
-    @State private var addonsSub: Closeable? = nil
+    @State private var addonsSub: Closeable?
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -195,4 +195,3 @@ private struct AddonGridCell: View {
         }
     }
 }
-

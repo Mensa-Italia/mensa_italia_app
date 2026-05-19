@@ -13,9 +13,9 @@ final class TodayViewModel {
     /// then snapping to populated content is far less jarring. The flag
     /// remains in case we want to re-introduce a spinner for a slow path.
     var loading = false
-    var nextEvent: EventModel? = nil
+    var nextEvent: EventModel?
     var notifications: [NotificationModel] = []
-    var user: UserModel? = nil
+    var user: UserModel?
 
     /// Snapshot eventi (chronological, ascending start) — cached così
     /// quando la posizione utente arriva possiamo ricalcolare `nextEvent`
@@ -163,9 +163,9 @@ final class TodayViewModel {
     var greeting: String {
         let h = Calendar.current.component(.hour, from: Date())
         switch h {
-        case 5..<12:  return tr("today.greeting.morning",   fallback: "Buongiorno")
+        case 5..<12:  return tr("today.greeting.morning", fallback: "Buongiorno")
         case 12..<18: return tr("today.greeting.afternoon", fallback: "Buon pomeriggio")
-        default:      return tr("today.greeting.evening",   fallback: "Buonasera")
+        default:      return tr("today.greeting.evening", fallback: "Buonasera")
         }
     }
 

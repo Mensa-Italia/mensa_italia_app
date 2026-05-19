@@ -43,7 +43,6 @@ struct IQTestView: View {
     @State private var secondsRemaining: Int = 1500
     @State private var timerSub: AnyCancellable?
 
-
     private var client: MensaTestClient { koin.mensaTest }
 
     var body: some View {

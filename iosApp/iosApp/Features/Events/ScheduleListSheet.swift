@@ -8,7 +8,7 @@ struct ScheduleListSheet: View {
     var onClose: () -> Void = {}
 
     @State private var addingNew: Bool = false
-    @State private var editing: EventScheduleDraftSwift? = nil
+    @State private var editing: EventScheduleDraftSwift?
 
     private static let dayHeaderFormatter: DateFormatter = {
         let f = DateFormatter()

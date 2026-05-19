@@ -16,7 +16,7 @@ private extension Data {
 final class SigListViewModel {
     var sigs: [SigModel] = []
     var loading = false
-    var error: String? = nil
+    var error: String?
 
     /// Session-stable: il potere "sigs" non cambia in-session. Letto sincrono
     /// dall'auth così il `+` in toolbar appare al primo frame.
@@ -61,8 +61,7 @@ final class SigListViewModel {
             imageFilename: payload.imageData != nil ? (payload.imageFilename ?? "cover.jpg") : nil,
             imageContentType: payload.imageContentType ?? "image/jpeg"
         )
-        do { _ = try await koin.sigs.create(draft: draft) }
-        catch { self.error = (error as NSError).localizedDescription }
+        do { _ = try await koin.sigs.create(draft: draft) } catch { self.error = (error as NSError).localizedDescription }
     }
 
     func update(id: String, payload: SigDraftPayload) async {
@@ -75,13 +74,11 @@ final class SigListViewModel {
             imageFilename: payload.imageData != nil ? (payload.imageFilename ?? "cover.jpg") : nil,
             imageContentType: payload.imageContentType ?? "image/jpeg"
         )
-        do { _ = try await koin.sigs.update(id: id, draft: draft) }
-        catch { self.error = (error as NSError).localizedDescription }
+        do { _ = try await koin.sigs.update(id: id, draft: draft) } catch { self.error = (error as NSError).localizedDescription }
     }
 
     func delete(id: String) async {
-        do { try await koin.sigs.delete(id: id) }
-        catch { self.error = (error as NSError).localizedDescription }
+        do { try await koin.sigs.delete(id: id) } catch { self.error = (error as NSError).localizedDescription }
     }
 }
 
@@ -138,26 +135,26 @@ private enum CommunityType {
     /// Short chip label shown overlaid on each tile.
     static func shortLabel(forGroupType raw: String) -> String {
         let lower = raw.lowercased()
-        if lower.contains("chat")  { return tr("community.filter.telegram", fallback: "Gruppi Telegram") }
+        if lower.contains("chat") { return tr("community.filter.telegram", fallback: "Gruppi Telegram") }
         if lower.contains("local") { return tr("community.filter.local", fallback: "Gruppi ufficiali") }
-        if lower.contains("sig")   { return tr("community.filter.sig", fallback: "SIG") }
+        if lower.contains("sig") { return tr("community.filter.sig", fallback: "SIG") }
         return raw.replacingOccurrences(of: "_", with: " ").capitalized
     }
 
     static func systemIcon(forGroupType raw: String) -> String {
         let lower = raw.lowercased()
         if lower.contains("facebook") { return "f.cursive.circle.fill" }
-        if lower.contains("chat")     { return "paperplane.fill" }
-        if lower.contains("local")    { return "mappin.and.ellipse" }
+        if lower.contains("chat") { return "paperplane.fill" }
+        if lower.contains("local") { return "mappin.and.ellipse" }
         return "person.3.fill"
     }
 
     /// Canonical filter key for a raw group_type ("sig_facebook" → "sig").
     static func canonicalKey(forGroupType raw: String) -> String? {
         let lower = raw.lowercased()
-        if lower.contains("chat")  { return "chat" }
+        if lower.contains("chat") { return "chat" }
         if lower.contains("local") { return "local" }
-        if lower.contains("sig")   { return "sig" }
+        if lower.contains("sig") { return "sig" }
         guard !lower.isEmpty else { return nil }
         return lower
     }
@@ -169,8 +166,8 @@ struct SigListView: View {
     @State private var filter: CommunityFilter = .all
     @State private var query: String = ""
     @State private var showCreate: Bool = false
-    @State private var editingSig: EditingSig? = nil
-    @State private var pendingDelete: PendingDelete? = nil
+    @State private var editingSig: EditingSig?
+    @State private var pendingDelete: PendingDelete?
 
     /// Stable, ordered list of filter keys present in the current dataset.
     /// "sig" / "chat" / "local" surface first (in that order); anything

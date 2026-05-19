@@ -26,7 +26,7 @@ final class AddDealViewModel {
     var vatNumber: String = ""
     var link: String = ""
 
-    var position: LocationModel? = nil
+    var position: LocationModel?
 
     var hasValidity: Bool = false
     var startDate: Date = .now
@@ -39,7 +39,7 @@ final class AddDealViewModel {
     var selectedEligibility: String = "active_members"
 
     // Contact (single primary contact)
-    var contactId: String? = nil
+    var contactId: String?
     var contactName: String = ""
     var contactEmail: String = ""
     var contactPhone: String = ""
@@ -47,7 +47,7 @@ final class AddDealViewModel {
 
     var saving: Bool = false
     var deleting: Bool = false
-    var error: String? = nil
+    var error: String?
     var dismissed: Bool = false
 
     init(deal: DealModel?) {

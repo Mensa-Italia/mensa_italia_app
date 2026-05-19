@@ -130,7 +130,7 @@ final class SpotlightSinkImpl: NSObject, SpotlightSink {
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceShouldCacheImmediately: false,
-            kCGImageSourceThumbnailMaxPixelSize: thumbnailPixelSize,
+            kCGImageSourceThumbnailMaxPixelSize: thumbnailPixelSize
         ]
         guard let thumb = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, opts as CFDictionary) else {
             return nil

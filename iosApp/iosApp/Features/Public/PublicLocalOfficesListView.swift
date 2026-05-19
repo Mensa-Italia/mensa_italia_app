@@ -7,7 +7,7 @@ import Shared
 struct PublicLocalOfficesListView: View {
     @State private var offices: [LocalOfficeModel] = []
     @State private var refreshing = false
-    @State private var sub: Closeable? = nil
+    @State private var sub: Closeable?
     @State private var query: String = ""
 
     private var filtered: [LocalOfficeModel] {

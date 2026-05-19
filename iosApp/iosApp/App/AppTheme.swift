@@ -11,13 +11,13 @@ import UIKit
 enum AppTheme {
     enum Colors {
         // Brandbook 2020 — official colors
-        static let mensaBlue       = Color(red: 24/255,  green: 66/255,  blue: 149/255)   // #184295
-        static let mensaBlueDeep   = Color(red: 12/255,  green: 34/255,  blue:  95/255)   // shaded for depth
+        static let mensaBlue       = Color(red: 24/255, green: 66/255, blue: 149/255)   // #184295
+        static let mensaBlueDeep   = Color(red: 12/255, green: 34/255, blue: 95/255)   // shaded for depth
         static let mensaCyan       = Color(red: 106/255, green: 201/255, blue: 240/255)   // #6AC9F0
-        static let mensaInk        = Color(red:  87/255, green:  86/255, blue:  86/255)   // #575656
+        static let mensaInk        = Color(red: 87/255, green: 86/255, blue: 86/255)   // #575656
 
         // Backdrop neutrals
-        static let backdropDark    = Color(red:   6/255, green:  17/255, blue:  46/255)   // night
+        static let backdropDark    = Color(red: 6/255, green: 17/255, blue: 46/255)   // night
         static let parchment       = Color(red: 252/255, green: 251/255, blue: 247/255)
 
         // Semantic aliases
@@ -49,7 +49,7 @@ enum AppTheme {
                 case .dark:
                     return UIColor(red: 106/255, green: 201/255, blue: 240/255, alpha: 1) // mensaCyan
                 default:
-                    return UIColor(red:  24/255, green:  66/255, blue: 149/255, alpha: 1) // mensaBlue
+                    return UIColor(red: 24/255, green: 66/255, blue: 149/255, alpha: 1) // mensaBlue
                 }
             })
             #else
@@ -60,9 +60,9 @@ enum AppTheme {
 
     enum Spacing {
         static let xs: CGFloat = 4
-        static let s:  CGFloat = 8
-        static let m:  CGFloat = 16
-        static let l:  CGFloat = 24
+        static let s: CGFloat = 8
+        static let m: CGFloat = 16
+        static let l: CGFloat = 24
         static let xl: CGFloat = 32
         static let xxl: CGFloat = 48
     }

@@ -6,7 +6,7 @@ final class EventListViewModel {
     var events: [EventModel] = []
     var loading = false
     var refreshing = false
-    var error: String? = nil
+    var error: String?
     var query: String = ""
 
     /// Active filter state, set by the host view. Kept as a value to avoid

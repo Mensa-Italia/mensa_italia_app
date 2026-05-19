@@ -27,11 +27,11 @@ struct TableportStampView: View {
 /// Skeuomorphic passport view with hero entrance, cover-open 3D rotation, and stamp stagger.
 struct PassportView: View {
     @State private var stamps: [StampUserModel] = []
-    @State private var stampsSub: Closeable? = nil
+    @State private var stampsSub: Closeable?
 
     @State private var showScanner = false
-    @State private var confirmPayload: ScanPayload? = nil
-    @State private var selectedStamp: StampSelection? = nil
+    @State private var confirmPayload: ScanPayload?
+    @State private var selectedStamp: StampSelection?
 
     // Animation state
     @State private var heroIn = false          // initial hero entrance

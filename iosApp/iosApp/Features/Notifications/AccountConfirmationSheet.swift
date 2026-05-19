@@ -13,10 +13,10 @@ struct AccountConfirmationSheet: View {
     let notificationId: String?
     let onDismiss: () -> Void
 
-    @State private var exApp: ExAppModel? = nil
+    @State private var exApp: ExAppModel?
     @State private var loading = true
     @State private var submitting = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {

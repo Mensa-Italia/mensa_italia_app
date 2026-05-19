@@ -7,7 +7,7 @@ import StripePaymentSheet
 struct PaymentMethodsView: View {
     @State private var vm = PaymentMethodsViewModel()
     @State private var appeared = false
-    @State private var stripeMessage: String? = nil
+    @State private var stripeMessage: String?
 
     var body: some View {
         List {
@@ -175,10 +175,10 @@ private struct PaymentMethodRow: View {
 @Observable
 final class PaymentMethodsViewModel {
     var methods: [PaymentMethodModel] = []
-    var defaultId: String? = nil
+    var defaultId: String?
     var loading = true
     var adding = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     func load() async {
         await refresh()

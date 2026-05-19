@@ -4,8 +4,8 @@ import SwiftUI
 struct ProfileRow: View {
     let icon: String
     let title: String
-    var value: String? = nil
-    var action: (() -> Void)? = nil
+    var value: String?
+    var action: (() -> Void)?
     var disabled: Bool = false
 
     var body: some View {

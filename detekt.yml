@@ -1,4 +1,4 @@
-# Config minimo detekt — partiamo permissivi (solo bug reali), poi alziamo asticella.
+# Config detekt: silenziamo lo style noise, teniamo attivi i bug-prone.
 build:
   maxIssues: 0
   excludeCorrectable: false
@@ -18,47 +18,41 @@ console-reports:
     - 'NotificationReport'
 
 complexity:
-  LongParameterList:
-    active: false
-  TooManyFunctions:
-    active: false
-  LongMethod:
-    active: false
-  LargeClass:
-    active: false
-  CyclomaticComplexMethod:
-    active: false
-  CognitiveComplexMethod:
-    active: false
-  NestedBlockDepth:
-    active: false
+  LongParameterList: { active: false }
+  TooManyFunctions: { active: false }
+  LongMethod: { active: false }
+  LargeClass: { active: false }
+  CyclomaticComplexMethod: { active: false }
+  CognitiveComplexMethod: { active: false }
+  NestedBlockDepth: { active: false }
+  ComplexCondition: { active: false }
 
 style:
-  MagicNumber:
-    active: false
-  ReturnCount:
-    active: false
-  WildcardImport:
-    active: false
-  MaxLineLength:
-    active: false
-  FunctionOnlyReturningConstant:
-    active: false
-  UnusedPrivateMember:
-    active: true
-  UnusedParameter:
-    active: false  # noisy in Compose
-  ForbiddenComment:
-    active: false
+  MagicNumber: { active: false }
+  ReturnCount: { active: false }
+  WildcardImport: { active: false }
+  MaxLineLength: { active: false }
+  FunctionOnlyReturningConstant: { active: false }
+  UnusedPrivateMember: { active: true }
+  UnusedParameter: { active: false }
+  UnusedPrivateProperty: { active: false }
+  ForbiddenComment: { active: false }
+  LoopWithTooManyJumpStatements: { active: false }
+  ExplicitItLambdaParameter: { active: false }
+  ThrowsCount: { active: false }
+
+exceptions:
+  TooGenericExceptionCaught: { active: false }
+  SwallowedException: { active: false }
+  RethrowCaughtException: { active: false }
+  # Manteniamo attivi: TooGenericExceptionThrown, UseCheckOrError (bug-prone)
 
 naming:
-  TopLevelPropertyNaming:
-    active: false
-  FunctionNaming:
-    active: false  # Compose @Composable usa PascalCase
+  TopLevelPropertyNaming: { active: false }
+  FunctionNaming: { active: false }  # Compose @Composable usa PascalCase
+  PackageNaming: { active: false }   # legacy package structure
+  MatchingDeclarationName: { active: false }
+  ConstructorParameterNaming: { active: false }
 
 empty-blocks:
-  EmptyFunctionBlock:
-    active: false
-
-# Tieni attivi: potentialBugs (default), errorProne (default), exceptions (default).
+  EmptyFunctionBlock: { active: false }

@@ -101,7 +101,7 @@ final class SearchViewModel {
     // MARK: - Observable state
 
     var query: String = ""
-    var selectedType: String? = nil   // nil = all
+    var selectedType: String?   // nil = all
     var phase: Phase = .idle
     var recent: [String] = []
 

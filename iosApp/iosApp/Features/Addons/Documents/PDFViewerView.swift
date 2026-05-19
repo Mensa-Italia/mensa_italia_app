@@ -3,7 +3,7 @@ import PDFKit
 
 struct PDFViewerView: View {
     let url: URL
-    @State private var document: PDFDocument? = nil
+    @State private var document: PDFDocument?
     @State private var loading = true
 
     var body: some View {

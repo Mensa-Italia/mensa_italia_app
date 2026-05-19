@@ -7,7 +7,7 @@ struct PodcastsListView: View {
     @State private var podcasts: [Podcast] = []
     @State private var refreshing = false
     @State private var appeared = false
-    @State private var sub: Closeable? = nil
+    @State private var sub: Closeable?
 
     var body: some View {
         ScrollView {

@@ -16,7 +16,7 @@ struct LocationPickerSheet: View {
 
     @State private var vm = LocationPickerViewModel()
     @State private var showingMapPicker = false
-    @State private var pendingDelete: LocationModel? = nil
+    @State private var pendingDelete: LocationModel?
 
     var body: some View {
         NavigationStack {
@@ -144,7 +144,7 @@ private struct LocationRow: View {
 final class LocationPickerViewModel {
     var locations: [LocationModel] = []
     var hasLoaded = false
-    var error: String? = nil
+    var error: String?
 
     private var sub: Closeable?
 

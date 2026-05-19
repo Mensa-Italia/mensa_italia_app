@@ -4,11 +4,11 @@ import Shared
 @MainActor
 @Observable
 final class DealDetailViewModel {
-    var deal: DealModel? = nil
+    var deal: DealModel?
     var contacts: [DealsContactModel] = []
     var loading = false
     var loadingContacts = false
-    var error: String? = nil
+    var error: String?
     var deleting = false
 
     private var listSub: Closeable?

@@ -164,8 +164,7 @@ struct EventFiltersSheet: View {
         Binding(
             get: { draft.types.contains(type) },
             set: { newValue in
-                if newValue { draft.types.insert(type) }
-                else { draft.types.remove(type) }
+                if newValue { draft.types.insert(type) } else { draft.types.remove(type) }
             }
         )
     }

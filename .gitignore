@@ -67,3 +67,7 @@ node_modules/
 # Editor / OS
 .DS_Store
 **/.DS_Store
+
+# Detekt CLI scaricato manualmente per test locale
+detekt-cli-*.zip
+detekt-cli-*/

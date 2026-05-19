@@ -49,7 +49,7 @@ extension TicketModel {
 final class TicketsListViewModel {
     var tickets: [TicketModel] = []
     var loading = true
-    var error: String? = nil
+    var error: String?
 
     private var sub: Closeable?
 
@@ -67,7 +67,6 @@ final class TicketsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.tickets.refresh() }
-        catch { self.error = error.localizedDescription }
+        do { try await koin.tickets.refresh() } catch { self.error = error.localizedDescription }
     }
 }

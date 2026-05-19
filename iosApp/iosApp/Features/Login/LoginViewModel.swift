@@ -6,7 +6,7 @@ final class LoginViewModel {
     var email: String = ""
     var password: String = ""
     var loading: Bool = false
-    var error: String? = nil
+    var error: String?
 
     init() {
         // Debug seed for visual iteration only.

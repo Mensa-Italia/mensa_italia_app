@@ -7,10 +7,10 @@ import Shared
 struct QuidArticleView: View {
     let articleId: Int64
 
-    @State private var article: QuidArticle? = nil
-    @State private var loadError: String? = nil
+    @State private var article: QuidArticle?
+    @State private var loadError: String?
     @State private var blocks: [QuidBodyBlock] = []
-    @State private var audio: QuidArticleAudio? = nil
+    @State private var audio: QuidArticleAudio?
 
     /// Shared player singleton — drives the toolbar play/pause glyph state.
     @ObservedObject private var audioService = AudioPlayerService.shared

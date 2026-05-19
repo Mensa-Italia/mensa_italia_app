@@ -6,9 +6,9 @@ import Shared
 final class DocumentsListViewModel {
     var items: [DocumentModel] = []
     var loading = true
-    var error: String? = nil
+    var error: String?
     var searchText: String = ""
-    var selectedCategory: String? = nil
+    var selectedCategory: String?
 
     private var sub: Closeable?
 
@@ -26,8 +26,7 @@ final class DocumentsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.documents.refresh() }
-        catch { self.error = (error as NSError).localizedDescription }
+        do { try await koin.documents.refresh() } catch { self.error = (error as NSError).localizedDescription }
     }
 
     var categories: [String] {
@@ -209,7 +208,7 @@ struct DocumentRow: View {
 /// `materiale_comunicazione`). Mirror `OrgChartView.localizedGroupTitle`:
 /// look up Tolgee with a prettified fallback so the user never sees the raw
 /// snake_case key (underscores → spaces, Title Case).
-fileprivate func localizedCategory(_ raw: String) -> String {
+private func localizedCategory(_ raw: String) -> String {
     guard !raw.isEmpty else { return "" }
     let pretty = raw
         .replacingOccurrences(of: "_", with: " ")

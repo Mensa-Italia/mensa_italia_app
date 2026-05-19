@@ -75,7 +75,7 @@ struct CardView: View {
     @State private var vm = CardViewModel()
     @State private var showWalletSheet = false
     @State private var walletLoading = false
-    @State private var walletError: String? = nil
+    @State private var walletError: String?
 
     private var renewalURL: URL? {
         URL(string: "https://cloud32.mensa.it/rinnovo")

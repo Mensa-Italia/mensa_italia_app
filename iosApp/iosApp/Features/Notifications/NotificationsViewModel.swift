@@ -7,7 +7,7 @@ final class NotificationsListViewModel {
     var notifications: [NotificationModel] = []
     var loading = true
     var refreshing = false
-    var error: String? = nil
+    var error: String?
 
     private var sub: Closeable?
 

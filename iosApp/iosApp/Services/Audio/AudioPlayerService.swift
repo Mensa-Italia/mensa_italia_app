@@ -363,7 +363,7 @@ final class AudioNowPlayingCenter {
             MPMediaItemPropertyArtist: track.subtitle,
             MPMediaItemPropertyPlaybackDuration: track.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime,
-            MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? 1.0 : 0.0
         ]
         if let cachedImage = artworkCache {
             let artwork = MPMediaItemArtwork(boundsSize: CGSize(width: 600, height: 600)) { _ in cachedImage }

@@ -19,10 +19,10 @@ final class NotificationManagerViewModel {
     }
 
     static let regions: [String] = [
-        "Abruzzo","Basilicata","Calabria","Campania","Emilia-Romagna",
-        "Friuli-Venezia Giulia","Lazio","Liguria","Lombardia","Marche",
-        "Molise","Piemonte","Puglia","Sardegna","Sicilia","Toscana",
-        "Trentino-Alto Adige","Umbria","Valle d'Aosta","Veneto"
+        "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
+        "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
+        "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana",
+        "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
     ]
 
     func load() async {
@@ -58,8 +58,7 @@ final class NotificationManagerViewModel {
     }
 
     func toggleRegion(_ region: String, enabled: Bool) {
-        if enabled { selectedRegions.insert(region) }
-        else { selectedRegions.remove(region) }
+        if enabled { selectedRegions.insert(region) } else { selectedRegions.remove(region) }
         let json = Self.encodeRegions(selectedRegions)
         Task { await save(key: "notify_me_events", value: json) }
     }

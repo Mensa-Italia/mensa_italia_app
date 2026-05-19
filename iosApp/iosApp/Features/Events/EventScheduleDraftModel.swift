@@ -8,7 +8,7 @@ import Foundation
 ///   - "DELETE:xxx"  → existing schedule xxx, marked for DELETE on save
 ///   - any other     → existing schedule, will be UPDATEd on save
 struct EventScheduleDraftSwift: Identifiable, Hashable {
-    var id: String? = nil       // PB id (or nil/DELETE: marker)
+    var id: String?       // PB id (or nil/DELETE: marker)
     var stableId: UUID = UUID() // for SwiftUI ForEach diffing
     var title: String = ""
     var description: String = ""

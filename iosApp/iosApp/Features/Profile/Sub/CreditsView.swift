@@ -105,7 +105,7 @@ struct CreditsView: View {
                         LinearGradient(
                             colors: [
                                 AppTheme.Colors.brandPrimary,
-                                AppTheme.Colors.brandSecondary,
+                                AppTheme.Colors.brandSecondary
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing

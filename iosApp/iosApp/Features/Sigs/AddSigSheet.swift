@@ -17,12 +17,12 @@ enum SigGroupType: String, CaseIterable, Identifiable {
     /// Human-readable label (Italian fallback) — uses `tr(key, fallback:)`.
     var label: String {
         switch self {
-        case .sigFacebook:  return tr("sigs.type.sig_facebook",  fallback: "SIG Facebook")
-        case .sigGeneric:   return tr("sigs.type.sig",           fallback: "SIG Generic")
-        case .local:        return tr("sigs.type.local",         fallback: "Gruppo locale")
+        case .sigFacebook:  return tr("sigs.type.sig_facebook", fallback: "SIG Facebook")
+        case .sigGeneric:   return tr("sigs.type.sig", fallback: "SIG Generic")
+        case .local:        return tr("sigs.type.local", fallback: "Gruppo locale")
         case .chatWhatsapp: return tr("sigs.type.chat_whatsapp", fallback: "Chat WhatsApp")
         case .chatTelegram: return tr("sigs.type.chat_telegram", fallback: "Chat Telegram")
-        case .chat:         return tr("sigs.type.chat",          fallback: "Chat")
+        case .chat:         return tr("sigs.type.chat", fallback: "Chat")
         }
     }
 

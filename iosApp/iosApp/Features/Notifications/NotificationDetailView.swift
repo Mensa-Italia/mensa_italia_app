@@ -28,7 +28,7 @@ struct NotificationDetailView: View {
         case .singleDocument:     return tr("notifications.go_document", fallback: "Apri documento")
         case .multipleDocuments:  return tr("notifications.go_documents", fallback: "Vai ai documenti")
         case .ticketPurchase:     return tr("notifications.go_tickets", fallback: "Vai ai biglietti")
-        case .paymentUpdateStatus:return tr("notifications.go_receipts", fallback: "Vai alle ricevute")
+        case .paymentUpdateStatus: return tr("notifications.go_receipts", fallback: "Vai alle ricevute")
         case .quid:               return tr("notifications.go_quid", fallback: "Apri Quid")
         case .quidArticle:        return tr("notifications.go_quid_article", fallback: "Leggi articolo")
         case .quidPdf:            return tr("notifications.go_quid_pdf", fallback: "Apri PDF Quid")

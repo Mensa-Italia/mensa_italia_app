@@ -13,26 +13,26 @@ struct LocalOfficeLinktreeView: View {
     let officeId: String
 
     // Resolved office (for hero)
-    @State private var office: LocalOfficeModel? = nil
+    @State private var office: LocalOfficeModel?
 
     // Per-office data
-    @State private var linktree:   [LocalOfficeLinktreeRowModel] = []
-    @State private var admins:     [LocalOfficeAdminModel]       = []
+    @State private var linktree: [LocalOfficeLinktreeRowModel] = []
+    @State private var admins: [LocalOfficeAdminModel]       = []
     @State private var assistants: [LocalOfficeAssistantModel]   = []
 
     // Editor state
-    @State private var creatingLinkMode: LinkEditorMode? = nil
-    @State private var editingLink: LocalOfficeLinktreeRowModel? = nil
-    @State private var linkToDelete: LocalOfficeLinktreeRowModel? = nil
+    @State private var creatingLinkMode: LinkEditorMode?
+    @State private var editingLink: LocalOfficeLinktreeRowModel?
+    @State private var linkToDelete: LocalOfficeLinktreeRowModel?
     @State private var showDeleteLinkConfirm = false
 
     // Edit mode for drag-to-reorder
     @State private var editMode: EditMode = .inactive
 
     // Flow subscriptions
-    @State private var linktreeSub:     Closeable? = nil
-    @State private var adminsSub:       Closeable? = nil
-    @State private var assistantsSub:   Closeable? = nil
+    @State private var linktreeSub: Closeable?
+    @State private var adminsSub: Closeable?
+    @State private var assistantsSub: Closeable?
 
     // MARK: - Permission gate
 

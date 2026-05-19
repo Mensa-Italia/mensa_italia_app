@@ -33,7 +33,7 @@ struct CalendarLinkerView: View {
         "Trentino-Alto Adige",
         "Umbria",
         "Valle d'Aosta",
-        "Veneto",
+        "Veneto"
     ]
 
     var body: some View {
@@ -257,9 +257,9 @@ struct CalendarLinkerView: View {
 @MainActor
 @Observable
 final class CalendarLinkerViewModel {
-    var link: CalendarLinkModel? = nil
+    var link: CalendarLinkModel?
     var loading = true
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     private var sub: Closeable?
 

@@ -6,7 +6,7 @@ import Shared
 struct PublicEventsView: View {
     @State private var events: [EventModel] = []
     @State private var isLoading = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
 
     var body: some View {
         Group {

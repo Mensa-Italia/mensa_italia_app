@@ -58,8 +58,8 @@ class PdfViewerViewModel(private val url: String) : ViewModel() {
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
         client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw Exception("HTTP ${response.code}")
-            val body = response.body ?: throw Exception("Empty response body")
+            if (!response.isSuccessful) error("HTTP ${response.code}")
+            val body = response.body ?: error("Empty response body")
             FileOutputStream(file).use { out -> body.byteStream().copyTo(out) }
         }
         return file

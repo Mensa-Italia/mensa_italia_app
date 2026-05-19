@@ -28,7 +28,7 @@ final class EventMapViewModel {
 
 struct EventMapView: View {
     @State private var vm = EventMapViewModel()
-    @State private var selected: EventModel? = nil
+    @State private var selected: EventModel?
     @Environment(\.dismiss) private var dismiss
 
     @State private var camera: MapCameraPosition = .region(

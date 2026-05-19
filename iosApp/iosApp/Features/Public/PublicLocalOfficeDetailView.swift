@@ -9,16 +9,16 @@ import Shared
 struct PublicLocalOfficeDetailView: View {
     let officeId: String
 
-    @State private var resolvedOffice: LocalOfficeModel? = nil
-    @State private var admins:     [LocalOfficeAdminModel]     = []
+    @State private var resolvedOffice: LocalOfficeModel?
+    @State private var admins: [LocalOfficeAdminModel]     = []
     @State private var assistants: [LocalOfficeAssistantModel] = []
-    @State private var testDates:  [LocalOfficeTestDateModel]  = []
+    @State private var testDates: [LocalOfficeTestDateModel]  = []
 
-    @State private var error: String? = nil
+    @State private var error: String?
 
-    @State private var adminsSub:     Closeable? = nil
-    @State private var assistantsSub: Closeable? = nil
-    @State private var testDatesSub:  Closeable? = nil
+    @State private var adminsSub: Closeable?
+    @State private var assistantsSub: Closeable?
+    @State private var testDatesSub: Closeable?
 
     var body: some View {
         Group {

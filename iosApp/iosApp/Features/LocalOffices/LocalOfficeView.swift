@@ -33,18 +33,18 @@ struct LocalOfficeView: View {
     let officeId: String
 
     // Resolved from slug (may be pre-populated via the convenience init)
-    @State private var resolvedOffice: LocalOfficeModel? = nil
+    @State private var resolvedOffice: LocalOfficeModel?
 
     // Per-office data
-    @State private var linktree:   [LocalOfficeLinktreeRowModel] = []
-    @State private var admins:     [LocalOfficeAdminModel]       = []
+    @State private var linktree: [LocalOfficeLinktreeRowModel] = []
+    @State private var admins: [LocalOfficeAdminModel]       = []
     @State private var assistants: [LocalOfficeAssistantModel]   = []
-    @State private var testDates:  [LocalOfficeTestDateModel]    = []
-    @State private var events:     [EventModel]                  = []
-    @State private var sigs:       [SigModel]                    = []
+    @State private var testDates: [LocalOfficeTestDateModel]    = []
+    @State private var events: [EventModel]                  = []
+    @State private var sigs: [SigModel]                    = []
 
     @State private var loading = false
-    @State private var error: String? = nil
+    @State private var error: String?
     @State private var appeared = false
     /// Same opt-in pattern as the global search Eventi chip: past events are
     /// hidden by default and surfaced via a toggle row at the bottom of the
@@ -58,23 +58,23 @@ struct LocalOfficeView: View {
 
     // Editor sheets — test dates
     @State private var creatingTestDate = false
-    @State private var editingTestDate: LocalOfficeTestDateModel? = nil
-    @State private var testDateToDelete: LocalOfficeTestDateModel? = nil
+    @State private var editingTestDate: LocalOfficeTestDateModel?
+    @State private var testDateToDelete: LocalOfficeTestDateModel?
     @State private var showDeleteTestDateConfirm = false
 
     // Editor sheets — linktree
-    @State private var creatingLinkMode: LinkEditorMode? = nil
-    @State private var editingLink: LocalOfficeLinktreeRowModel? = nil
-    @State private var linkToDelete: LocalOfficeLinktreeRowModel? = nil
+    @State private var creatingLinkMode: LinkEditorMode?
+    @State private var editingLink: LocalOfficeLinktreeRowModel?
+    @State private var linkToDelete: LocalOfficeLinktreeRowModel?
     @State private var showDeleteLinkConfirm = false
 
     // Flow subscriptions (6)
-    @State private var linktreeSub:   Closeable? = nil
-    @State private var adminsSub:     Closeable? = nil
-    @State private var assistantsSub: Closeable? = nil
-    @State private var testDatesSub:  Closeable? = nil
-    @State private var eventsSub:     Closeable? = nil
-    @State private var sigsSub:       Closeable? = nil
+    @State private var linktreeSub: Closeable?
+    @State private var adminsSub: Closeable?
+    @State private var assistantsSub: Closeable?
+    @State private var testDatesSub: Closeable?
+    @State private var eventsSub: Closeable?
+    @State private var sigsSub: Closeable?
 
     // MARK: - Permission gate
 
@@ -525,11 +525,10 @@ struct LocalOfficeView: View {
     /// the backend ordering inside each bucket.
     private var splitEvents: (upcoming: [EventModel], past: [EventModel]) {
         var upcoming: [EventModel] = []
-        var past:     [EventModel] = []
+        var past: [EventModel] = []
         let now = nowSeconds
         for ev in events {
-            if ev.whenEnd.epochSeconds >= now { upcoming.append(ev) }
-            else                              { past.append(ev) }
+            if ev.whenEnd.epochSeconds >= now { upcoming.append(ev) } else { past.append(ev) }
         }
         return (upcoming, past)
     }
@@ -985,8 +984,8 @@ struct LocalOfficeView: View {
 struct LocalOfficeBySlugLoader: View {
     let slug: String
 
-    @State private var officeId: String? = nil
-    @State private var error: String? = nil
+    @State private var officeId: String?
+    @State private var error: String?
 
     var body: some View {
         Group {

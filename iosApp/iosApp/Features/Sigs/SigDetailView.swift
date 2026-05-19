@@ -15,9 +15,9 @@ private extension Data {
 
 @MainActor @Observable
 final class SigDetailViewModel {
-    var sig: SigModel? = nil
+    var sig: SigModel?
     var loading = false
-    var error: String? = nil
+    var error: String?
     var deleting = false
     private var sub: Closeable?
 

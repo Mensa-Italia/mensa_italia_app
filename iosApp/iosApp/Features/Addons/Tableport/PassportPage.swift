@@ -27,7 +27,7 @@ struct PassportInside: View {
     @State private var isDragging: Bool = false
     @State private var hasInteracted: Bool = false
     @State private var hintPhase: Int = 0       // 0 idle, 1 peek up
-    @State private var hintTask: Task<Void, Never>? = nil
+    @State private var hintTask: Task<Void, Never>?
     @State private var didHapticAt90: Bool = false
 
     private var pages: [[StampUserModel]] {

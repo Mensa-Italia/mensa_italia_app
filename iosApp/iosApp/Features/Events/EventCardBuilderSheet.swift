@@ -22,8 +22,8 @@ struct EventCardBuilderSheet: View {
     // MARK: - Generation state
 
     @State private var isGenerating = false
-    @State private var generatedImage: Data? = nil
-    @State private var error: String? = nil
+    @State private var generatedImage: Data?
+    @State private var error: String?
 
     private static let templateURL = URL(string: "https://svc.mensa.it/static/event_card_template.png")!
     private static let endpoint = "https://svc.mensa.it/api/cs/generate-event-card"

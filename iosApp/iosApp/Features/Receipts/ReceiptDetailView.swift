@@ -5,11 +5,11 @@ import SafariServices
 @MainActor
 @Observable
 final class ReceiptDetailViewModel {
-    var receipt: ReceiptModel? = nil
+    var receipt: ReceiptModel?
     var loading = true
-    var error: String? = nil
+    var error: String?
     var downloadingPDF = false
-    var pdfURL: URL? = nil
+    var pdfURL: URL?
 
     func load(id: String) async {
         loading = true

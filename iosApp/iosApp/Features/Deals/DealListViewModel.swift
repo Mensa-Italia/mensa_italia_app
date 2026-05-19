@@ -10,10 +10,10 @@ final class DealListViewModel {
     /// True only when we have nothing on screen yet AND a refresh is in flight.
     /// Cache-first: if `allDeals` is non-empty we never show a spinner.
     var refreshing = false
-    var error: String? = nil
+    var error: String?
 
     /// Active sector chip (`nil` = "all").
-    var selectedSector: String? = nil
+    var selectedSector: String?
     var searchText: String = ""
 
     /// Current authenticated user — letto sincrono dall'auth (session-stable,

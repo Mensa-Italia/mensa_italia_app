@@ -352,9 +352,9 @@ private struct AnimatedBackdrop: View {
         return MeshGradient(
             width: 3, height: 3,
             points: [
-                .init(0.0, 0.0),                       .init(0.5, 0.0),                       .init(1.0, 0.0),
-                .init(0.0, Float(0.42 + s * 0.05)),    .init(Float(0.5 + c * 0.06), 0.45),    .init(1.0, Float(0.42 - s * 0.05)),
-                .init(0.0, 1.0),                       .init(0.5, 1.0),                       .init(1.0, 1.0)
+                .init(0.0, 0.0), .init(0.5, 0.0), .init(1.0, 0.0),
+                .init(0.0, Float(0.42 + s * 0.05)), .init(Float(0.5 + c * 0.06), 0.45), .init(1.0, Float(0.42 - s * 0.05)),
+                .init(0.0, 1.0), .init(0.5, 1.0), .init(1.0, 1.0)
             ],
             colors: [
                 ink, blue.opacity(0.55), ink,
@@ -446,7 +446,7 @@ private struct HeroWelcome: View {
                     }
                 }
 
-            // Mark
+            // MARK:
             MensaMark(size: 180, inBlueBadge: true)
                 .shadow(color: AppTheme.Colors.mensaBlue.opacity(0.5), radius: 24, y: 12)
                 .scaleEffect(active ? 1 : 0.65)
@@ -615,7 +615,7 @@ private struct QRMesh: View {
         [false, false, false, true, false, true, true],
         [true, false, true, true, true, false, false],
         [false, true, false, false, false, true, true],
-        [true, true, true, false, true, true, false],
+        [true, true, true, false, true, true, false]
     ]
 
     var body: some View {
@@ -702,9 +702,9 @@ private struct HeroSearch: View {
 
     private var chipResults: some View {
         VStack(alignment: .leading, spacing: 8) {
-            chip(label: tr("onboarding.search.chip.events",  fallback: "Eventi · 12"),     iconColor: AppTheme.Colors.mensaCyan, delay: 0.32)
-            chip(label: tr("onboarding.search.chip.deals",   fallback: "Convenzioni · 7"), iconColor: .white.opacity(0.9),       delay: 0.42)
-            chip(label: tr("onboarding.search.chip.people",  fallback: "Persone · 3"),     iconColor: AppTheme.Colors.mensaCyan, delay: 0.52)
+            chip(label: tr("onboarding.search.chip.events", fallback: "Eventi · 12"), iconColor: AppTheme.Colors.mensaCyan, delay: 0.32)
+            chip(label: tr("onboarding.search.chip.deals", fallback: "Convenzioni · 7"), iconColor: .white.opacity(0.9), delay: 0.42)
+            chip(label: tr("onboarding.search.chip.people", fallback: "Persone · 3"), iconColor: AppTheme.Colors.mensaCyan, delay: 0.52)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 6)

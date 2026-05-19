@@ -401,7 +401,7 @@ private struct HeroCardContent: View {
         LinearGradient(
             colors: [
                 AppTheme.Colors.brandPrimary,
-                AppTheme.Colors.brandSecondary,
+                AppTheme.Colors.brandSecondary
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -418,7 +418,7 @@ private struct HeroCardContent: View {
                 stops: [
                     .init(color: .black.opacity(0.05), location: 0.0),
                     .init(color: .black.opacity(0.35), location: 0.45),
-                    .init(color: .black.opacity(0.75), location: 1.0),
+                    .init(color: .black.opacity(0.75), location: 1.0)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -537,7 +537,7 @@ private struct OrgAvatar: View {
 final class OrgChartViewModel {
     var groups: [OrgChartGroup] = []
     var loading = true
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     func load() async {
         if groups.isEmpty { loading = true }

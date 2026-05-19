@@ -20,10 +20,10 @@ struct SearchView: View {
     // Wrapped Hashable navigation values so each detail destination is
     // resolved by an unambiguous type and we don't collide with global
     // `String.self` destinations from other navigation stacks.
-    private struct EventRoute: Hashable    { let id: String }
-    private struct DealRoute: Hashable     { let id: String }
+    private struct EventRoute: Hashable { let id: String }
+    private struct DealRoute: Hashable { let id: String }
     private struct DocumentRoute: Hashable { let id: String }
-    private struct SigRoute: Hashable      { let id: String }
+    private struct SigRoute: Hashable { let id: String }
     /// Navigazione verso l'organigramma con la search interna pre-popolata
     /// sul titolo del gruppo selezionato.
     private struct OrgGroupRoute: Hashable { let groupTitle: String }
@@ -50,7 +50,7 @@ struct SearchView: View {
             // Organigramma — tipo composito: gruppi e cariche convivono nella
             // stessa sezione perché concettualmente sono la stessa entità
             // ("chi fa cosa in Mensa"). Vedi `SearchViewModel.orgMatches`.
-            FilterChip(id: "org", label: tr("app.search.filter.org", fallback: "Organigramma"), key: "org", systemImage: "rectangle.connected.to.line.below"), // i18n
+            FilterChip(id: "org", label: tr("app.search.filter.org", fallback: "Organigramma"), key: "org", systemImage: "rectangle.connected.to.line.below") // i18n
         ]
     }
 
@@ -238,10 +238,10 @@ struct SearchView: View {
     /// per non confondere l'utente con un'aspettativa di rilevanza.
     private var searchExamplesRow: some View {
         let examples: [String] = [
-            tr("app.search.empty.example.council",   fallback: "consiglio"),
-            tr("app.search.empty.example.city",      fallback: "milano"),
-            tr("app.search.empty.example.card",      fallback: "tessera"),
-            tr("app.search.empty.example.balance",   fallback: "bilancio"),
+            tr("app.search.empty.example.council", fallback: "consiglio"),
+            tr("app.search.empty.example.city", fallback: "milano"),
+            tr("app.search.empty.example.card", fallback: "tessera"),
+            tr("app.search.empty.example.balance", fallback: "bilancio")
         ]
         return VStack(alignment: .leading, spacing: 8) {
             Text(tr("app.search.empty.examples.title", fallback: "Prova a cercare"))

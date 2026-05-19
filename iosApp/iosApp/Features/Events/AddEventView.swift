@@ -59,20 +59,20 @@ final class AddEventViewModel {
     var infoLink: String = ""
     var startDate: Date
     var endDate: Date
-    var position: LocationModel? = nil
+    var position: LocationModel?
 
     var isOnline: Bool = false
     var isNational: Bool = false
     var isSpot: Bool = false
 
-    var imageData: Data? = nil
-    var imageFilename: String? = nil
-    var imageContentType: String? = nil
+    var imageData: Data?
+    var imageFilename: String?
+    var imageContentType: String?
 
     var schedules: [EventScheduleDraftSwift] = []
 
     var saving = false
-    var error: String? = nil
+    var error: String?
     var dismissed = false
 
     init(event: EventModel?) {
@@ -222,7 +222,7 @@ final class AddEventViewModel {
 // MARK: - View
 
 struct AddEventView: View {
-    var event: EventModel? = nil
+    var event: EventModel?
 
     @State private var vm: AddEventViewModel
     @State private var permissions: EventPermissions
@@ -233,7 +233,7 @@ struct AddEventView: View {
     @State private var showCardBuilder = false
     @State private var showImageOptions = false
     @State private var showPhotoPicker = false
-    @State private var pickerItem: PhotosPickerItem? = nil
+    @State private var pickerItem: PhotosPickerItem?
     @State private var showDeleteConfirm = false
 
     @Environment(\.dismiss) private var dismiss

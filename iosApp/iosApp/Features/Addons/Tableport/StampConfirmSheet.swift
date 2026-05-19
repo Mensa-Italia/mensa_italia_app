@@ -9,10 +9,10 @@ struct StampConfirmSheet: View {
     let code: String
     let onDone: () -> Void
 
-    @State private var stamp: StampModel? = nil
+    @State private var stamp: StampModel?
     @State private var loading = true
     @State private var saving = false
-    @State private var errorMessage: String? = nil
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {
