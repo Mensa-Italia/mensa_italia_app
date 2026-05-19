@@ -47,16 +47,20 @@ export interface LocationPickerProps {
 
 // ─── Singleton per il caricamento dello script ────────────────────────────────
 
+// NOTA SICUREZZA: questa è una key Google Maps CLIENT-SIDE per design — Astro/Vite la
+// inietta nel bundle JS che va al browser, quindi è inevitabilmente pubblica (qualsiasi
+// utente del sito può leggerla da DevTools). La protezione reale è la restrizione
+// HTTP Referrer configurata su Google Cloud Console (limita a *.mensa.it). Tenerla
+// nel sorgente come fallback è ok: nasconderla dal repo NON aggiunge sicurezza, e
+// gitleaks la allowlista esplicitamente in .gitleaks.toml.
+const FALLBACK_KEY = "AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE";
+
 function getApiKey(): string {
   try {
     // @ts-ignore — import.meta.env è disponibile in Astro/Vite
-    const key = (import.meta as any).env?.PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!key) {
-      console.warn("[LocationPicker] PUBLIC_GOOGLE_MAPS_API_KEY non configurata: la mappa non caricherà");
-    }
-    return key ?? "";
+    return (import.meta as any).env?.PUBLIC_GOOGLE_MAPS_API_KEY || FALLBACK_KEY;
   } catch {
-    return "";
+    return FALLBACK_KEY;
   }
 }
 

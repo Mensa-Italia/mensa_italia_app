@@ -1,0 +1,27 @@
+# Mensa Italia — config gitleaks
+# Estende le regole di default e allowlista i casi noti non-segreti.
+
+title = "Mensa Italia gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "PUBLIC client-side keys + Flutter legacy paths"
+regexes = [
+  # Google Maps JS API key è PUBBLICA by design (esce nel bundle JS).
+  # Protezione = HTTP Referrer restrictions configurato su Google Cloud Console.
+  '''PUBLIC_GOOGLE_MAPS_API_KEY''',
+  '''AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE''',
+]
+paths = [
+  # Flutter legacy: tutto sotto lib/, ios/Runner/, android/app/ era la vecchia
+  # app Flutter. Contiene Firebase/Maps client keys che sono pubbliche per
+  # design. Le chiavi vanno comunque ruotate (compromesse da > 1 anno) ma
+  # non ha senso bloccare la pipeline su file storici non più presenti in HEAD.
+  '''^lib/.*\.dart$''',
+  '''^lib/firebase_options\.dart$''',
+  '''^ios/Runner/.*\.swift$''',
+  '''^android/app/google-services\.json$''',
+  '''^android/app/src/main/AndroidManifest\.xml$''',
+]

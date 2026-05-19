@@ -691,6 +691,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Build shared JS library
         run: ./gradlew :shared:jsBrowserProductionLibraryDistribution -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
         working-directory: webApp
