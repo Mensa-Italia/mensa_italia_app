@@ -65,13 +65,14 @@ const endKicker = cms?.endKicker ?? "Sei già socio?";
 const endTitle = cms?.endTitle ?? "Accedi alla tua area personale.";
 const endSubtitle = cms?.endSubtitle ?? "Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.";
 
+const siteOrigin = (Astro.site ?? new URL("/", Astro.url)).toString().replace(/\/$/, "");
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "NGO",
   "name": "Mensa Italia",
-  "alternateName": "Mensa Italia APS",
-  "url": "https://app.mensa.it",
-  "logo": "https://www.mensa.it/wp-content/uploads/2022/01/logo-mensa-italia.png",
+  "alternateName": "Associazione Mensa Italia",
+  "url": siteOrigin,
+  "logo": `${siteOrigin}/og-cover.png`,
   "foundingDate": "1983",
   "founder": [
     { "@type": "Organization", "name": "Mensa International (Oxford, 1946)" },

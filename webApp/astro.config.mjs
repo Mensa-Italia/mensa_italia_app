@@ -11,7 +11,7 @@ export default defineConfig({
   // Canonical site URL used to compute absolute URLs (canonical link, sitemap,
   // OG meta). Override at build time via `ASTRO_SITE` if deploying to staging.
   // (cache-bust: write-ops wave)
-  site: process.env.ASTRO_SITE ?? "https://app.mensa.it",
+  site: process.env.ASTRO_SITE ?? "https://web.svc.mensa.it",
   // Server-side rendering with Node so dynamic routes like /soci/[id] /eventi/[id]
   // /notifiche/[id] etc. work without per-id getStaticPaths. Static pages
   // (landing, /tessera, /today shell, the placeholder pages) are still
