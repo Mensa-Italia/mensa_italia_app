@@ -23,6 +23,8 @@ name: Release
 on:
   push:
     branches: [master, feat/mvp-testing-public]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
     inputs:
       track:
@@ -35,6 +37,12 @@ on:
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  security-events: write
+  actions: read
 
 env:
   REGISTRY: ghcr.io
@@ -635,3 +643,152 @@ jobs:
             ${{ steps.paths.outputs.aab }}
             ${{ steps.paths.outputs.apk }}
             ${{ steps.paths.outputs.ipa }}
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Quality & Security — paralleli a tutto il resto, non bloccano la pipeline
+  # release. Stesso file workflow per avere un unico grafo DAG nell'UI.
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  lint-web:
+    name: Lint web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        working-directory: webApp
+      - name: ESLint
+        run: bun run lint
+        working-directory: webApp
+
+  typecheck-web:
+    name: Typecheck web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build shared JS library
+        run: ./gradlew :shared:jsBrowserProductionLibraryDistribution -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        working-directory: webApp
+      - name: Astro check
+        run: bun astro check
+        working-directory: webApp
+
+  lint-kotlin:
+    name: Lint Kotlin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - name: Install detekt-cli
+        run: |
+          curl -sSLO https://github.com/detekt/detekt/releases/download/v1.23.6/detekt-cli-1.23.6.zip
+          unzip -q detekt-cli-1.23.6.zip
+      - name: Run detekt
+        run: |
+          ./detekt-cli-1.23.6/bin/detekt-cli \
+            --input shared/src/commonMain,shared/src/androidMain,shared/src/jsMain,androidApp/src/main \
+            --config detekt.yml \
+            --report sarif:detekt.sarif.json \
+            --build-upon-default-config || echo "issues detekt (non bloccante)"
+      - name: Upload SARIF
+        if: always() && hashFiles('detekt.sarif.json') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with: { sarif_file: detekt.sarif.json, category: detekt }
+
+  lint-swift:
+    name: Lint Swift
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install swiftlint
+      - name: Run SwiftLint
+        run: swiftlint lint --reporter sarif --output swiftlint.sarif iosApp/iosApp || true
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('swiftlint.sarif') != ''
+        with: { sarif_file: swiftlint.sarif, category: swiftlint }
+
+  lint-dockerfile:
+    name: Lint Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile.web
+          format: sarif
+          output-file: hadolint.sarif
+          no-fail: true
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('hadolint.sarif') != ''
+        with: { sarif_file: hadolint.sarif, category: hadolint }
+
+  scan-secrets:
+    name: Scan secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  scan-vulns:
+    name: Scan vulns
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+          skip-dirs: 'node_modules,webApp/node_modules,.gradle,.kotlin,build,webApp/build,shared/build,androidApp/build'
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('trivy.sarif') != ''
+        with: { sarif_file: trivy.sarif, category: trivy }
+
+  codeql-js:
+    name: CodeQL JS/TS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: 'javascript-typescript', build-mode: 'none' }
+      - uses: github/codeql-action/analyze@v3
+        with: { category: '/language:javascript-typescript' }
+
+  codeql-kotlin:
+    name: CodeQL Kotlin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: 'java-kotlin', build-mode: 'autobuild' }
+      - name: Build kotlin (best-effort)
+        run: |
+          ./gradlew :shared:compileKotlinAndroid :androidApp:compileDebugKotlin \
+            -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon || true
+      - uses: github/codeql-action/analyze@v3
+        with: { category: '/language:java-kotlin' }
+
+  codeql-swift:
+    name: CodeQL Swift
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: 'swift', build-mode: 'none' }
+      - uses: github/codeql-action/analyze@v3
+        with: { category: '/language:swift' }
