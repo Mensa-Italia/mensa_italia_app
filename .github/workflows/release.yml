@@ -23,8 +23,6 @@ name: Release
 on:
   push:
     branches: [master, feat/mvp-testing-public]
-  pull_request:
-    branches: [master]
   workflow_dispatch:
     inputs:
       track:
@@ -436,8 +434,12 @@ jobs:
   # ─── Play Store: upload AAB sul track scelto ───────────────────────────────
   play-publish:
     name: Play (${{ needs.prepare.outputs.track }})
-    needs: [prepare, android]
-    if: needs.prepare.outputs.should_publish_play == 'true'
+    needs: [prepare, android, gate-summary]
+    if: |
+      always() &&
+      needs.prepare.outputs.should_publish_play == 'true' &&
+      needs.android.result == 'success' &&
+      (needs.gate-summary.outputs.quality_passed == 'true' || needs.prepare.outputs.track == 'alpha')
     runs-on: ubuntu-latest
 
     steps:
@@ -472,8 +474,12 @@ jobs:
   # ─── TestFlight / App Store: upload + distribuzione ────────────────────────
   testflight-publish:
     name: iOS publish (${{ needs.prepare.outputs.track }})
-    needs: [prepare, ios]
-    if: needs.prepare.outputs.should_publish_ios == 'true'
+    needs: [prepare, ios, gate-summary]
+    if: |
+      always() &&
+      needs.prepare.outputs.should_publish_ios == 'true' &&
+      needs.ios.result == 'success' &&
+      (needs.gate-summary.outputs.quality_passed == 'true' || needs.prepare.outputs.track == 'alpha')
     runs-on: macos-14
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
@@ -581,12 +587,13 @@ jobs:
   # ─── Finalize: tag + GitHub Release con tutti gli artefatti ────────────────
   finalize:
     name: Finalize
-    needs: [prepare, web, android, ios, play-publish, testflight-publish]
+    needs: [prepare, web, android, ios, play-publish, testflight-publish, gate-summary]
     if: |
       always() && needs.prepare.outputs.should_finalize == 'true' &&
       needs.web.result == 'success' &&
       needs.android.result == 'success' &&
-      needs.ios.result == 'success'
+      needs.ios.result == 'success' &&
+      (needs.gate-summary.outputs.quality_passed == 'true' || needs.prepare.outputs.track == 'alpha')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -645,12 +652,15 @@ jobs:
             ${{ steps.paths.outputs.ipa }}
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # Quality & Security — paralleli a tutto il resto, non bloccano la pipeline
-  # release. Stesso file workflow per avere un unico grafo DAG nell'UI.
+  # Quality gate — strict. Sono cancello del publish: se uno solo fallisce
+  # niente AAB su Play, niente IPA su TestFlight, niente GitHub Release.
+  # Eccezione: track=alpha bypassa il gate (per testing rapido).
   # ═══════════════════════════════════════════════════════════════════════════
 
   lint-web:
     name: Lint web
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -663,6 +673,8 @@ jobs:
 
   typecheck-web:
     name: Typecheck web
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -680,6 +692,8 @@ jobs:
 
   lint-kotlin:
     name: Lint Kotlin
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -703,6 +717,8 @@ jobs:
 
   lint-swift:
     name: Lint Swift
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -715,6 +731,8 @@ jobs:
 
   lint-dockerfile:
     name: Lint Dockerfile
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -730,6 +748,8 @@ jobs:
 
   scan-secrets:
     name: Scan secrets
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -740,6 +760,8 @@ jobs:
 
   scan-vulns:
     name: Scan vulns
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -758,6 +780,8 @@ jobs:
 
   codeql-js:
     name: CodeQL JS/TS
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -768,6 +792,8 @@ jobs:
 
   codeql-kotlin:
     name: CodeQL Kotlin
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -785,6 +811,8 @@ jobs:
 
   codeql-swift:
     name: CodeQL Swift
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'release'
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -792,3 +820,57 @@ jobs:
         with: { languages: 'swift', build-mode: 'none' }
       - uses: github/codeql-action/analyze@v3
         with: { category: '/language:swift' }
+
+  # ─── Gate summary: aggrega gli esiti dei quality job ───────────────────────
+  # Output `quality_passed` = true sse TUTTI passano. Letto da play-publish,
+  # testflight-publish, finalize per gating. Alpha bypassa il gate.
+  gate-summary:
+    name: Gate summary
+    needs:
+      - prepare
+      - lint-web
+      - typecheck-web
+      - lint-kotlin
+      - lint-swift
+      - lint-dockerfile
+      - scan-secrets
+      - scan-vulns
+      - codeql-js
+      - codeql-kotlin
+      - codeql-swift
+    if: always() && needs.prepare.outputs.mode == 'release'
+    runs-on: ubuntu-latest
+    outputs:
+      quality_passed: ${{ steps.summary.outputs.quality_passed }}
+
+    steps:
+      - id: summary
+        env:
+          R_LINT_WEB: ${{ needs.lint-web.result }}
+          R_TYPECHECK_WEB: ${{ needs.typecheck-web.result }}
+          R_LINT_KOTLIN: ${{ needs.lint-kotlin.result }}
+          R_LINT_SWIFT: ${{ needs.lint-swift.result }}
+          R_LINT_DOCKERFILE: ${{ needs.lint-dockerfile.result }}
+          R_SCAN_SECRETS: ${{ needs.scan-secrets.result }}
+          R_SCAN_VULNS: ${{ needs.scan-vulns.result }}
+          R_CODEQL_JS: ${{ needs.codeql-js.result }}
+          R_CODEQL_KOTLIN: ${{ needs.codeql-kotlin.result }}
+          R_CODEQL_SWIFT: ${{ needs.codeql-swift.result }}
+          TRACK: ${{ needs.prepare.outputs.track }}
+        run: |
+          set -euo pipefail
+          all_pass=true
+          for v in "$R_LINT_WEB" "$R_TYPECHECK_WEB" "$R_LINT_KOTLIN" "$R_LINT_SWIFT" \
+                   "$R_LINT_DOCKERFILE" "$R_SCAN_SECRETS" "$R_SCAN_VULNS" \
+                   "$R_CODEQL_JS" "$R_CODEQL_KOTLIN" "$R_CODEQL_SWIFT"; do
+            [ "$v" = "success" ] || all_pass=false
+          done
+          echo "quality_passed=$all_pass" >> "$GITHUB_OUTPUT"
+
+          if [ "$all_pass" = "true" ]; then
+            echo "::notice::Quality gate verde — publish autorizzato."
+          elif [ "$TRACK" = "alpha" ]; then
+            echo "::warning::Quality gate ROSSO ma track=alpha — publish autorizzato comunque (bypass alpha)."
+          else
+            echo "::error::Quality gate ROSSO su track=$TRACK — publish BLOCCATO."
+          fi
