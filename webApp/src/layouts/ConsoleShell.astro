@@ -16,12 +16,17 @@ import {
   Newspaper,
   Globe2,
   MapPin,
+  Wallet,
+  LineChart,
+  Link2,
+  PlusCircle,
+  Download,
 } from "lucide-react";
 
 interface Props {
   title: string;
   pageTitle?: string;
-  scope: "test-assistant" | "admin" | "blog" | "newsletter";
+  scope: "test-assistant" | "admin" | "blog" | "newsletter" | "ledger";
   activeHref?: string;
   roleBadge?: string;
 }
@@ -31,7 +36,7 @@ const {
   pageTitle,
   scope,
   activeHref,
-  roleBadge = scope === "admin" ? "Admin nazionale" : scope === "newsletter" ? "Editor newsletter" : "Assistente sede",
+  roleBadge = scope === "admin" ? "Admin nazionale" : scope === "newsletter" ? "Editor newsletter" : scope === "ledger" ? "Tesoreria" : "Assistente sede",
 } = Astro.props;
 
 type NavItem = { href: string; label: string; icon: any };
@@ -95,10 +100,29 @@ const newsletterSections: NavSection[] = [
   },
 ];
 
+const ledgerSections: NavSection[] = [
+  {
+    label: "Gestione conto",
+    items: [
+      { href: "/console/ledger",          label: "Movimenti",   icon: Wallet    },
+      { href: "/console/ledger/insights", label: "Andamento",   icon: LineChart },
+    ],
+  },
+  {
+    label: "Operazioni",
+    items: [
+      { href: "/console/ledger/new-link", label: "Crea link di pagamento", icon: Link2       },
+      { href: "/console/ledger/record",   label: "Registra incasso",       icon: PlusCircle  },
+      { href: "/console/ledger/export",   label: "Esporta CSV",            icon: Download    },
+    ],
+  },
+];
+
 const sections =
   scope === "test-assistant" ? testAssistantSections
   : scope === "admin" ? adminSections
   : scope === "newsletter" ? newsletterSections
+  : scope === "ledger" ? ledgerSections
   : blogSections;
 ---
 

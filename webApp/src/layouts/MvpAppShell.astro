@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   FileEdit,
   Mail,
+  Wallet,
 } from "lucide-react";
 
 interface Props {
@@ -90,7 +91,8 @@ const memberFullSections: NavSection[] = [
       { href: "/console/test-assistant/today", label: "Assistente al test", icon: ClipboardCheck },
       { href: "/console/admin/applicants",     label: "Amministrazione",    icon: ShieldCheck    },
       { href: "/console/newsletter",           label: "Newsletter",         icon: Mail           },
-      { href: "/keystatic",                   label: "Mensa Blogging",     icon: FileEdit       },
+      { href: "/admin/blog/keystatic",         label: "Blogging",           icon: FileEdit       },
+      { href: "/console/ledger",              label: "Conto economico",    icon: Wallet         },
     ],
   },
 ];
@@ -120,7 +122,11 @@ const sections = audience === "applicant" ? applicantSections : memberFullSectio
       <nav class="shell__nav">
         {
           sections.map((section) => (
-            <div class="shell__nav-section">
+            <div
+              class="shell__nav-section"
+              data-super-only={section.label === "Gestione" ? "" : undefined}
+              style={section.label === "Gestione" ? "display: none" : undefined}
+            >
               <p class="shell__nav-label">{section.label}</p>
               <ul class="shell__nav-list">
                 {section.items.map((item) => {
@@ -148,6 +154,22 @@ const sections = audience === "applicant" ? applicantSections : memberFullSectio
         <p>the high I.Q. society</p>
         <p>dal 1946</p>
       </div>
+
+      <script is:inline>
+        (function () {
+          try {
+            var raw = localStorage.getItem("mensa.auth.user");
+            if (!raw) return;
+            var user = JSON.parse(raw);
+            var powers = user && user.powers;
+            if (!Array.isArray(powers)) return;
+            if (powers.indexOf("super") === -1 && powers.indexOf("admin") === -1) return;
+            document.querySelectorAll("[data-super-only]").forEach(function (el) {
+              el.style.display = "";
+            });
+          } catch (_) {}
+        })();
+      </script>
     </aside>
 
     <div class="shell__main">
