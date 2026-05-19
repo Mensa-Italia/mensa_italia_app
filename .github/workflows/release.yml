@@ -664,6 +664,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Stub mensa-shared (lint non ha bisogno del codice reale)
+        run: |
+          mkdir -p shared/build/dist/js/productionLibrary
+          cat > shared/build/dist/js/productionLibrary/package.json <<'EOF'
+          {"name":"shared","version":"0.0.0","main":"shared.mjs","types":"shared.d.ts"}
+          EOF
+          echo "// stub" > shared/build/dist/js/productionLibrary/shared.mjs
+          echo "export {};" > shared/build/dist/js/productionLibrary/shared.d.ts
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
         working-directory: webApp
