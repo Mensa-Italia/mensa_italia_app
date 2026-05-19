@@ -1,0 +1,28 @@
+name: Notify
+
+# Quando un build di "Release" sul branch feat/mvp-testing-public va a buon fine,
+# colpisce il webhook Portainer per fare redeploy dello stack dev. Limitato al
+# branch MVP perché il webhook punta allo stack dev (gira l'immagine :dev).
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+    branches: [feat/mvp-testing-public]
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Portainer redeploy webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.REDEPLOY_URL }}
+        run: |
+          code=$(curl -X POST -s -o /dev/null -w "%{http_code}" "$WEBHOOK_URL" --insecure)
+          echo "HTTP $code"
+          # Portainer ritorna 204 No Content sul webhook valido.
+          if [ "$code" != "204" ] && [ "$code" != "200" ]; then
+            echo "Webhook unexpected status: $code"
+            exit 1
+          fi
