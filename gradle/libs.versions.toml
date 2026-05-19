@@ -42,7 +42,7 @@ play-services-location = "21.3.0"
 accompanist = "0.36.0"
 
 # Firebase
-firebase-bom-version = "33.7.0"
+firebase-bom-version = "34.13.0"
 google-services = "4.4.2"
 
 # Stripe
