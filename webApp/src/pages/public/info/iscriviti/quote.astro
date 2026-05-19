@@ -445,3 +445,118 @@ const includes = [
   }
   .source-footer__link:hover { color: var(--color-mensa-blue); text-decoration: underline; }
 </style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from "../../../../lib/motion";
+
+  // ─── Reduced-motion gate ───────────────────────────────────────────────────
+  if (!prefersReducedMotion()) {
+
+    // Kill any stale tweens from a previous View Transition navigation
+    gsap.killTweensOf(".hero__kicker, .hero__title, .hero__lead, .tier, .tier__badge, .includes__item, .payment__prose, .cta-section__btn");
+
+    // ─── Pre-hide elements that will animate in ──────────────────────────────
+    gsap.set(".hero__kicker, .hero__title, .hero__lead", { opacity: 0, y: 24 });
+
+    // Side cards (index 0 and 2)
+    const allTiers = gsap.utils.toArray<HTMLElement>(".tier");
+    const sideTiers   = allTiers.filter((_, i) => i !== 1);
+    const middleTier  = allTiers[1];
+    const badge       = middleTier?.querySelector<HTMLElement>(".tier__badge");
+
+    sideTiers.forEach((t) => gsap.set(t, { opacity: 0, y: 30 }));
+    if (middleTier) gsap.set(middleTier, { opacity: 0, scale: 0.94, y: 24 });
+    if (badge)      gsap.set(badge, { rotate: -2 });
+
+    gsap.set(".includes__item", { opacity: 0, y: 16 });
+    gsap.set(".payment__prose", { opacity: 0, y: 16 });
+    gsap.set(".cta-section__btn", { opacity: 0, scale: 0.95 });
+
+    // ─── Hero entrance (on load) ──────────────────────────────────────────────
+    const heroTl = gsap.timeline({ defaults: { ease: "power2.out", overwrite: true }, delay: 0.05 });
+    heroTl
+      .to(".hero__kicker", { opacity: 1, y: 0, duration: 0.6 })
+      .to(".hero__title",  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
+      .to(".hero__lead",   { opacity: 1, y: 0, duration: 0.6 }, "-=0.45");
+
+    // ─── Tier cards scroll-in ─────────────────────────────────────────────────
+    ScrollTrigger.create({
+      trigger: ".tiers__grid",
+      start: "top 80%",
+      onEnter: () => {
+        // Side cards first
+        gsap.to(sideTiers, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0,          // both side cards land together
+        });
+
+        // Middle card lands 0.1s after the side cards
+        if (middleTier) {
+          gsap.to(middleTier, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "back.out(1.3)",
+            delay: 0.1,
+            clearProps: "scale",  // avoid interfering with any :hover transform
+            onComplete: () => {
+              // Badge wobble fires once, just after the middle card lands
+              if (badge) {
+                gsap.to(badge, {
+                  rotate: 0,
+                  duration: 0.4,
+                  ease: "back.out(2.5)",
+                });
+              }
+            },
+          });
+        }
+      },
+    });
+
+    // ─── "Cosa include" checklist ─────────────────────────────────────────────
+    gsap.to(".includes__item", {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out",
+      stagger: 0.06,
+      scrollTrigger: {
+        trigger: ".includes__list",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    // ─── "Come si paga" prose ─────────────────────────────────────────────────
+    gsap.to(".payment__prose", {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: ".payment__prose",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    // ─── CTA button ───────────────────────────────────────────────────────────
+    gsap.to(".cta-section__btn", {
+      opacity: 1,
+      scale: 1,
+      duration: 0.5,
+      ease: "power3.out",
+      clearProps: "scale",
+      scrollTrigger: {
+        trigger: ".cta-section__btn",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+  }
+</script>
