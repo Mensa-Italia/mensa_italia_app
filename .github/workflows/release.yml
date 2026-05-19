@@ -328,17 +328,6 @@ jobs:
             -Dorg.gradle.java.home="$JAVA_HOME" \
             --no-daemon --stacktrace
 
-      - name: Point project.yml to Release XCFramework
-        run: |
-          /usr/bin/sed -i '' \
-            -e 's|/XCFrameworks/debug|/XCFrameworks/release|g' \
-            -e 's|assembleSharedDebugXCFramework|assembleSharedReleaseXCFramework|g' \
-            iosApp/project.yml
-
-      - name: Generate xcodeproj
-        working-directory: iosApp
-        run: xcodegen generate
-
       - name: Setup signing keychain
         env:
           P12_BASE64: ${{ secrets.APPLE_CERT_P12_BASE64 }}
@@ -374,6 +363,29 @@ jobs:
           echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
           echo "::notice::Installed profile $NAME ($UUID)"
 
+      - name: Patch project.yml (XCFramework release + manual signing iosApp only)
+        run: |
+          set -euo pipefail
+          # 1) Punta al Release XCFramework
+          /usr/bin/sed -i '' \
+            -e 's|/XCFrameworks/debug|/XCFrameworks/release|g' \
+            -e 's|assembleSharedDebugXCFramework|assembleSharedReleaseXCFramework|g' \
+            iosApp/project.yml
+          # 2) Manual signing + profile SOLO sul target iosApp. Passare questi
+          #    flag via xcodebuild CLI li propaga a TUTTI i target del workspace
+          #    incluse le SPM deps (Stripe, Firebase, GoogleUtilities, nanopb...)
+          #    che NON supportano provisioning profile → archive fail.
+          #    Scriverli nel project.yml li tiene scoped al target iosApp.
+          brew install yq
+          yq -i ".targets.iosApp.settings.base.CODE_SIGN_STYLE = \"Manual\"" iosApp/project.yml
+          yq -i ".targets.iosApp.settings.base.PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\"" iosApp/project.yml
+          yq -i ".targets.iosApp.settings.base.CODE_SIGN_IDENTITY = \"Apple Distribution\"" iosApp/project.yml
+          grep -A4 "CODE_SIGN_STYLE\|PROVISIONING_PROFILE_SPECIFIER" iosApp/project.yml | head -10
+
+      - name: Generate xcodeproj
+        working-directory: iosApp
+        run: xcodegen generate
+
       - name: Resolve SPM dependencies
         run: |
           xcodebuild -resolvePackageDependencies \
@@ -382,16 +394,15 @@ jobs:
 
       - name: Archive
         run: |
+          # Niente override CODE_SIGN_STYLE / PROFILE qui: stanno gia' nel
+          # project.yml scoped al target iosApp. Solo MARKETING_VERSION e
+          # CURRENT_PROJECT_VERSION che sono safe da propagare.
           xcodebuild archive \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/iosApp.xcarchive" \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM=6WA5D3RJBU \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$VERSION_CODE" \
             -allowProvisioningUpdates=NO
