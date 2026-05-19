@@ -108,6 +108,13 @@ function Inner() {
   const [downloading, setDownloading] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const days = user ? daysUntil(user.expireMembershipMs) : 0;
+  const pctLeft = useMemo(() => {
+    if (days < 0) return 0;
+    const clamped = Math.min(YEAR_MS, Math.max(0, days * 86_400_000));
+    return Math.round((clamped / YEAR_MS) * 100);
+  }, [days]);
+
   if (typeof window !== "undefined" && ready && authState === "Anonymous" && !window.localStorage.getItem(LS_USER_KEY)) {
     window.location.replace("/login");
     return null;
@@ -118,18 +125,10 @@ function Inner() {
   }
 
   const status = tesseraStatus(user.expireMembershipMs);
-  const days = daysUntil(user.expireMembershipMs);
   const expiryStr = formatItalianDateLong(user.expireMembershipMs);
   const qrPayload = `MENSA-IT|id:${user.id}|user:${user.username}|exp:${user.expireMembershipMs}`;
 
   const showRenewBanner = status === "expired" || (days >= 0 && days <= 30);
-
-  // Progress bar — days left out of a 365-day membership year.
-  const pctLeft = useMemo(() => {
-    if (days < 0) return 0;
-    const clamped = Math.min(YEAR_MS, Math.max(0, days * 86_400_000));
-    return Math.round((clamped / YEAR_MS) * 100);
-  }, [days]);
 
   const barColor =
     status === "expired" ? "var(--color-status-error)" :

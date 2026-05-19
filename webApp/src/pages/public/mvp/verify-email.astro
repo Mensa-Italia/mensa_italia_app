@@ -1,0 +1,178 @@
+---
+/**
+ * Verifica email — pagina di conferma post-registrazione. Demo MVP.
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  title="Verifica la tua email — MensaTesting"
+  description="Controlla la tua casella di posta per confermare l'account."
+>
+  <section class="page">
+    <div class="page__inner">
+      <div class="card">
+        <div class="card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-10 5L2 7"/>
+          </svg>
+        </div>
+
+        <div class="card__head">
+          <p class="card__kicker">MensaTesting</p>
+          <h1 class="card__title">Controlla la tua email</h1>
+          <p class="card__sub">
+            Ti abbiamo inviato un link di conferma a
+            <strong>prova@example.com</strong>.
+            Clicca il link per attivare il tuo account.
+          </p>
+        </div>
+
+        <div class="status-box">
+          <div class="status-box__row status-box__row--done">
+            <span class="status-box__check" aria-hidden="true">✓</span>
+            <div>
+              <p class="status-box__label">Email confermata</p>
+              <p class="status-box__meta">prova@example.com · verificata adesso</p>
+            </div>
+          </div>
+        </div>
+
+        <a href="/public/mvp/dashboard" class="btn btn--primary">Vai alla dashboard →</a>
+
+        <p class="card__foot">
+          Non hai ricevuto l'email?
+          <a href="#">Invia di nuovo</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-hub"><a href="/public/mvp/hub">← Hub demo MVP</a></div>
+</PublicLayout>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+
+  .page {
+    padding-block: clamp(var(--spacing-10), 12vh, 5rem);
+    background:
+      radial-gradient(50% 40% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 8%, transparent), transparent 70%),
+      var(--color-surface);
+  }
+  .page__inner {
+    max-inline-size: 480px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-6));
+  }
+
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-7) var(--spacing-6);
+    display: grid;
+    gap: var(--spacing-5);
+    text-align: center;
+  }
+  .card__icon {
+    inline-size: 52px;
+    block-size: 52px;
+    color: var(--color-mensa-blue);
+    margin-inline: auto;
+  }
+  .card__icon svg { inline-size: 100%; block-size: 100%; }
+  .card__head { display: grid; gap: var(--spacing-2); }
+  .card__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+  .card__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .card__foot {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .card__foot a { color: var(--color-mensa-blue); text-decoration: none; }
+
+  .status-box {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .status-box__row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4) var(--spacing-4);
+    text-align: start;
+  }
+  .status-box__check {
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .status-box__row--done .status-box__check {
+    background: color-mix(in oklch, #22c55e 15%, transparent);
+    color: #16a34a;
+  }
+  .status-box__label {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .status-box__meta {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .demo-hub {
+    max-inline-size: 480px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-6));
+    padding-block: var(--spacing-5);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+  .demo-hub a { color: var(--color-text-tertiary); text-decoration: none; }
+  .demo-hub a:hover { color: var(--color-text-primary); }
+</style>

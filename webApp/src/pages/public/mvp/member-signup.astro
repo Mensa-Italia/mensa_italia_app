@@ -1,0 +1,119 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Diventa socio — Mensa Italia"
+  pageTitle="Diventa socio"
+  audience="applicant"
+  activeHref="/public/mvp/my-tests"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <a href="/public/mvp/test-result?id=passed" class="back">← Risultato test</a>
+      <div class="congrats">
+        <span class="congrats__icon" aria-hidden="true">🎉</span>
+        <div>
+          <h1 class="page__title">Hai superato il test!</h1>
+          <p class="page__sub">Completa l'iscrizione e benvenuto nella comunità Mensa.</p>
+        </div>
+      </div>
+    </header>
+
+    <form class="form-section" onsubmit="event.preventDefault()">
+      <h2 class="section-title">Dati aggiuntivi</h2>
+
+      <div class="form__field">
+        <label for="prof">Professione</label>
+        <input type="text" id="prof" name="prof" placeholder="Es. Ingegnere del software" autocomplete="organization-title" />
+      </div>
+
+      <div class="form__field">
+        <label for="edu">Titolo di studio più alto conseguito</label>
+        <select id="edu" name="edu">
+          <option value="">Seleziona...</option>
+          <option>Licenza media</option>
+          <option>Diploma di scuola superiore</option>
+          <option>Laurea triennale</option>
+          <option>Laurea magistrale / specialistica</option>
+          <option>Dottorato di ricerca</option>
+        </select>
+      </div>
+
+      <div class="form__field">
+        <label for="how">Come hai conosciuto Mensa Italia?</label>
+        <select id="how" name="how">
+          <option value="">Seleziona...</option>
+          <option>Amici / familiari soci</option>
+          <option>Social media</option>
+          <option>Articolo / media</option>
+          <option>Ricerca online</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="form__field">
+        <label for="group">Gruppo locale preferito</label>
+        <select id="group" name="group">
+          <option value="">Nessuna preferenza</option>
+          <option>Roma</option>
+          <option>Milano</option>
+          <option>Bologna</option>
+          <option>Napoli</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="quota-card">
+      <div class="quota-card__body">
+        <p class="quota-card__label">Quota associativa annuale</p>
+        <p class="quota-card__amount">75 <span>€</span></p>
+        <p class="quota-card__meta">Ridotta a 37,50 € per under 26 e over 65 · rinnovo ogni anno</p>
+      </div>
+      <a href="/public/mvp/checkout?type=membership" class="btn btn--primary btn--lg">Paga e iscriviti →</a>
+    </div>
+
+    <p class="footnote">
+      Dopo il pagamento sarai iscritto ufficialmente a Mensa Italia e riceverai la tessera digitale.
+      Il checkout riporterà alla dashboard con lo stato aggiornato.
+    </p>
+
+  </div>
+</MvpAppShell>
+
+<style>
+  .page-content { max-inline-size: 600px; display: grid; gap: var(--spacing-6); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px var(--spacing-5); font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; white-space: nowrap; flex-shrink: 0; transition: background var(--motion-fast) var(--ease-out-quart); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--lg { padding: 13px var(--spacing-6); font-size: var(--text-base); }
+
+  .page-header { display: grid; gap: var(--spacing-1); }
+  .back { display: inline-flex; font-size: var(--text-xs); color: var(--color-text-tertiary); text-decoration: none; margin-block-end: var(--spacing-2); }
+  .back:hover { color: var(--color-text-primary); }
+  .congrats { display: flex; align-items: center; gap: var(--spacing-3); }
+  .congrats__icon { font-size: 2rem; }
+  .page__title { margin: 0; font-family: var(--font-display); font-size: clamp(var(--text-xl), 4vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .section-title { margin: 0 0 var(--spacing-4) 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .form-section { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .form__field { display: grid; gap: var(--spacing-1); }
+  .form__field label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .form__field input, .form__field select { padding: 9px var(--spacing-3); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); outline: none; transition: border-color var(--motion-fast) var(--ease-out-quart); font-family: inherit; appearance: none; }
+  .form__field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.5'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; padding-inline-end: 36px; }
+  .form__field input:focus, .form__field select:focus { border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+  .form__field input::placeholder { color: var(--color-text-tertiary); }
+
+  .quota-card { display: flex; align-items: center; gap: var(--spacing-5); padding: var(--spacing-5); background: color-mix(in oklch, var(--color-mensa-blue) 5%, var(--color-surface)); border: 1px solid color-mix(in oklch, var(--color-mensa-blue) 25%, transparent); border-radius: var(--radius-md); }
+  @media (max-width: 520px) { .quota-card { flex-direction: column; align-items: flex-start; } }
+  .quota-card__body { flex: 1; display: grid; gap: var(--spacing-1); }
+  .quota-card__label { margin: 0; font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-mensa-blue); }
+  .quota-card__amount { margin: 0; font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.5rem); font-weight: 800; letter-spacing: -0.04em; color: var(--color-text-primary); line-height: 1; }
+  .quota-card__amount span { font-size: var(--text-xl); }
+  .quota-card__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); line-height: 1.4; }
+
+  .footnote { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); line-height: 1.55; }
+</style>

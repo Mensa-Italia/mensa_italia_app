@@ -1,0 +1,136 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const tests = [
+  { data: "17/05/2026", aspirante: "Marco Rossi",         codice: "MN-2026-0124", sede: "Roma",    assistente: "Roberto Bianchi", caricato: "17/05 16:42", file: "marco_rossi_test_17mag.pdf"       },
+  { data: "17/05/2026", aspirante: "Giulia Ferretti",     codice: "MN-2026-0125", sede: "Milano",  assistente: "Sara Conti",      caricato: "17/05 17:10", file: "giulia_ferretti_test_17mag.pdf"   },
+  { data: "17/05/2026", aspirante: "Lorenzo Bianchi",     codice: "MN-2026-0126", sede: "Roma",    assistente: "Roberto Bianchi", caricato: "17/05 17:35", file: "lorenzo_bianchi_test_17mag.pdf"   },
+  { data: "18/05/2026", aspirante: "Valentina Esposito",  codice: "MN-2026-0127", sede: "Torino",  assistente: "Luca Greco",      caricato: "18/05 11:20", file: "valentina_esposito_test_18mag.pdf" },
+  { data: "18/05/2026", aspirante: "Federico Marini",     codice: "MN-2026-0128", sede: "Napoli",  assistente: "Carla Mancini",   caricato: "18/05 12:05", file: "federico_marini_test_18mag.pdf"   },
+  { data: "20/05/2026", aspirante: "Sara De Rosa",        codice: "MN-2026-0129", sede: "Bologna", assistente: "Mario Fabbri",    caricato: "20/05 09:48", file: "sara_derosa_test_20mag.pdf"        },
+  { data: "20/05/2026", aspirante: "Matteo Colombo",      codice: "MN-2026-0130", sede: "Milano",  assistente: "Sara Conti",      caricato: "20/05 10:30", file: "matteo_colombo_test_20mag.pdf"    },
+  { data: "22/05/2026", aspirante: "Chiara Ricci",        codice: "MN-2026-0131", sede: "Roma",    assistente: "Roberto Bianchi", caricato: "22/05 14:15", file: "chiara_ricci_test_22mag.pdf"      },
+  { data: "24/05/2026", aspirante: "Alberto Fontana",     codice: "MN-2026-0132", sede: "Firenze", assistente: "Anna Tosi",       caricato: "24/05 16:00", file: "alberto_fontana_test_24mag.pdf"   },
+  { data: "25/05/2026", aspirante: "Elena Moretti",       codice: "MN-2026-0133", sede: "Torino",  assistente: "Luca Greco",      caricato: "25/05 11:55", file: "elena_moretti_test_25mag.pdf"     },
+];
+---
+
+<ConsoleShell
+  title="Console test · Test da valutare"
+  pageTitle="Test da valutare"
+  scope="test"
+  activeHref="/console/psychologist/pending"
+>
+  <div class="page-content">
+
+    <div class="alert-banner">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.345 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/></svg>
+      <span>Hai 14 giorni per valutare ogni test. Oltre questa soglia compare un alert agli amministratori.</span>
+    </div>
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Test da valutare</h1>
+        <p class="page-header__sub">Documenti caricati dagli assistenti di sede, in attesa di valutazione.</p>
+      </div>
+      <span class="counter-pill">10 test in attesa · tempo medio di valutazione: 6 giorni</span>
+    </header>
+
+    <div class="toolbar">
+      <select class="toolbar__select" aria-label="Filtra per sede">
+        <option>Tutte le sedi</option>
+        <option>Roma</option>
+        <option>Milano</option>
+        <option>Bologna</option>
+        <option>Napoli</option>
+        <option>Torino</option>
+        <option>Firenze</option>
+      </select>
+      <select class="toolbar__select" aria-label="Filtra per data">
+        <option>Tutte le date</option>
+        <option>Ultimi 7 giorni</option>
+        <option>Ultimi 30 giorni</option>
+        <option>Ultimi 90 giorni</option>
+      </select>
+      <input type="search" class="toolbar__search" placeholder="Cerca per nome aspirante…" aria-label="Cerca per nome aspirante" />
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Data sessione</th>
+            <th>Aspirante</th>
+            <th>Codice prenotazione</th>
+            <th>Sede</th>
+            <th>Caricato da</th>
+            <th>Caricato il</th>
+            <th>Documento</th>
+            <th aria-label="Azioni"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {tests.map((t) => (
+            <tr>
+              <td class="td--date">{t.data}</td>
+              <td class="td--name">{t.aspirante}</td>
+              <td class="td--code"><code>{t.codice}</code></td>
+              <td>{t.sede}</td>
+              <td class="td--secondary">{t.assistente}</td>
+              <td class="td--secondary">{t.caricato}</td>
+              <td><a href="#" class="file-link">{t.file}</a></td>
+              <td class="td--action">
+                <a href="/console/psychologist/review?id=mock" class="btn-valuta">Valuta →</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { display: grid; gap: var(--spacing-5); }
+
+  .alert-banner { display: flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-3) var(--spacing-4); background: #fef9c3; border: 1px solid #f59e0b; border-radius: var(--radius-sm); font-size: var(--text-sm); color: #92400e; font-weight: 500; }
+  .alert-banner svg { width: 1rem; height: 1rem; flex-shrink: 0; color: #d97706; }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .counter-pill { display: inline-flex; align-items: center; padding: 0.35rem 0.875rem; background: color-mix(in oklch, var(--color-mensa-blue) 8%, var(--color-surface)); border: 1px solid color-mix(in oklch, var(--color-mensa-blue) 20%, transparent); border-radius: 9999px; font-size: var(--text-xs); font-weight: 600; color: var(--color-mensa-blue); white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+
+  .toolbar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; align-items: center; }
+  .toolbar__select, .toolbar__search { padding: 0.45rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); }
+  .toolbar__search { flex: 1; min-inline-size: 200px; }
+
+  .table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table thead tr { background: var(--color-surface-elevated); border-block-end: 1px solid var(--color-border-subtle); }
+  .table th { padding: 0.75rem 0.875rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); white-space: nowrap; }
+  .table tbody tr { border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .table tbody tr:last-child { border-block-end: none; }
+  .table tbody tr:hover { background: var(--color-surface-elevated); }
+  .table td { padding: 0.75rem 0.875rem; color: var(--color-text-primary); vertical-align: middle; }
+  .td--name { font-weight: 600; white-space: nowrap; }
+  .td--date, .td--secondary { color: var(--color-text-tertiary); font-size: var(--text-xs); white-space: nowrap; }
+  .td--code code { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); }
+  .td--action { text-align: right; white-space: nowrap; }
+
+  .file-link { color: var(--color-mensa-blue); text-decoration: none; font-size: var(--text-xs); font-weight: 500; }
+  .file-link:hover { text-decoration: underline; }
+
+  .btn-valuta { color: var(--color-mensa-blue); text-decoration: none; font-size: var(--text-xs); font-weight: 700; white-space: nowrap; }
+  .btn-valuta:hover { text-decoration: underline; }
+
+  @media (max-width: 700px) {
+    .table thead { display: none; }
+    .table tbody, .table tr, .table td { display: block; width: 100%; }
+    .table tr { padding: 0.75rem 1rem; border-block-end: 1px solid var(--color-border-subtle); }
+    .table td { padding: 0.2rem 0; }
+    .td--action { text-align: left; margin-block-start: 0.5rem; }
+  }
+</style>

@@ -1,16 +1,15 @@
 ---
-/**
- * Test del QI dimostrativo — wrapper Astro.
- *
- * Il vero contenuto è interamente nel client island `IqTestApp`, che:
- *   - carica le 35 matrici figurative da test.mensa.no (via proxy server-side)
- *   - mostra age gate + istruzioni + timer + risultato (IQ + percentile)
- *   - riusa le chiavi Tolgee `iqtest.*` già definite per iOS
- *
- * Niente hero finto: il copy della pagina sta tutto nei disclaimer dell'app.
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import { IqTestApp } from "../../components/public/IqTestApp";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.iqtest.read();
+
+const heroKicker = cms?.heroKicker ?? "Test di prova";
+const heroTitle = cms?.heroTitle ?? "Mettiti alla prova.";
+const heroSubtitle = cms?.heroSubtitle ?? "35 matrici figurative, 20–25 minuti. Identico al test ufficiale di esempio di Mensa Norge — Mensa Italia fa solo da contenitore grafico.";
 ---
 
 <PublicLayout
@@ -20,12 +19,9 @@ import { IqTestApp } from "../../components/public/IqTestApp";
 >
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="iqtest.title">Test di prova</p>
-      <h1 class="hero__title" data-i18n="web.iqtest.hero.title">Mettiti alla prova.</h1>
-      <p class="hero__sub" data-i18n="web.iqtest.hero.sub">
-        35 matrici figurative, 20–25 minuti. Identico al test ufficiale di
-        esempio di Mensa Norge — Mensa Italia fa solo da contenitore grafico.
-      </p>
+      <p class="hero__kicker" data-i18n="iqtest.title">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.iqtest.hero.title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.iqtest.hero.sub">{heroSubtitle}</p>
     </div>
   </section>
 

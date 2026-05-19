@@ -1,0 +1,294 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const movements = [
+  { date: "18/05/2026", desc: "Quota socio 2026",     ref: "Marco Rossi",          cat: "Quote soci",      catKey: "quote",    amount: "+€ 50,00",   stato: "Confermato"  },
+  { date: "17/05/2026", desc: "Test ammissione",       ref: "MN-2026-0124",         cat: "Test",            catKey: "test",     amount: "+€ 30,00",   stato: "Confermato"  },
+  { date: "16/05/2026", desc: "Acquisto cancelleria",  ref: "Cartoleria Bottega",   cat: "Spese",           catKey: "spese",    amount: "-€ 124,30",  stato: "Confermato"  },
+  { date: "15/05/2026", desc: "Quota socio 2026",      ref: "Lorenzo Bianchi",      cat: "Quote soci",      catKey: "quote",    amount: "+€ 50,00",   stato: "In sospeso"  },
+  { date: "14/05/2026", desc: "Donazione",             ref: "Anonimo",              cat: "Donazioni",       catKey: "donaz",    amount: "+€ 200,00",  stato: "Confermato"  },
+  { date: "12/05/2026", desc: "Affitto sala Roma",     ref: "Mensa Roma",           cat: "Spese",           catKey: "spese",    amount: "-€ 480,00",  stato: "Confermato"  },
+  { date: "11/05/2026", desc: "Test ammissione",       ref: "MN-2026-0120",         cat: "Test",            catKey: "test",     amount: "+€ 30,00",   stato: "Confermato"  },
+  { date: "10/05/2026", desc: "Quota socio 2026",      ref: "Sara Conti",           cat: "Quote soci",      catKey: "quote",    amount: "+€ 50,00",   stato: "Fallito"     },
+  { date: "09/05/2026", desc: "Stampa volantini",      ref: "Tipografia Aldo",      cat: "Spese",           catKey: "spese",    amount: "-€ 67,80",   stato: "Confermato"  },
+  { date: "08/05/2026", desc: "Vendita tessera fisica",ref: "Boutique",             cat: "Boutique",        catKey: "boutique", amount: "+€ 15,00",   stato: "Confermato"  },
+  { date: "06/05/2026", desc: "Quota socio 2026",      ref: "Valentina Esposito",   cat: "Quote soci",      catKey: "quote",    amount: "+€ 50,00",   stato: "Rimborsato"  },
+  { date: "05/05/2026", desc: "Catering evento Milano",ref: "La Spiga",             cat: "Spese",           catKey: "spese",    amount: "-€ 320,00",  stato: "Confermato"  },
+];
+
+const statoClass: Record<string, string> = {
+  "Confermato":  "badge--green",
+  "In sospeso":  "badge--yellow",
+  "Fallito":     "badge--red",
+  "Rimborsato":  "badge--gray",
+};
+
+const catClass: Record<string, string> = {
+  "quote":    "chip--blue",
+  "test":     "chip--violet",
+  "eventi":   "chip--orange",
+  "boutique": "chip--pink",
+  "spese":    "chip--gray",
+  "donaz":    "chip--green",
+};
+---
+
+<ConsoleShell
+  scope="ledger"
+  activeHref="/console/ledger"
+  pageTitle="Movimenti"
+  title="Mensa Ledger · Movimenti"
+>
+  <div class="page">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Movimenti</h1>
+        <p class="page-header__sub">Conto economico dell'associazione · aggiornato al 18/05/2026</p>
+      </div>
+    </header>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <p class="summary-card__label">Saldo attuale</p>
+        <p class="summary-card__value">€ 18.420,55</p>
+        <p class="summary-card__trend summary-card__trend--up">↑ +€ 1.230 negli ultimi 30 giorni</p>
+      </div>
+      <div class="summary-card">
+        <p class="summary-card__label">Entrate (30 gg)</p>
+        <p class="summary-card__value summary-card__value--green">€ 4.180</p>
+        <p class="summary-card__trend">12 movimenti</p>
+      </div>
+      <div class="summary-card">
+        <p class="summary-card__label">Uscite (30 gg)</p>
+        <p class="summary-card__value summary-card__value--red">€ 2.950</p>
+        <p class="summary-card__trend">8 movimenti</p>
+      </div>
+      <div class="summary-card">
+        <p class="summary-card__label">Pagamenti in sospeso</p>
+        <p class="summary-card__value summary-card__value--amber">€ 540</p>
+        <p class="summary-card__trend">3 link aperti</p>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <p class="chart-card__label">Andamento saldo — ultimi 6 mesi</p>
+      <svg viewBox="0 0 800 180" class="chart-svg" aria-label="Grafico andamento saldo ultimi 6 mesi" role="img">
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--color-mensa-blue)" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="var(--color-mensa-blue)" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <line x1="60" y1="20" x2="60" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="188" y1="20" x2="188" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="316" y1="20" x2="316" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="444" y1="20" x2="444" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="572" y1="20" x2="572" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="700" y1="20" x2="700" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="40" y1="148" x2="760" y2="148" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <path
+          d="M60,128 C100,124 148,118 188,110 C228,102 276,96 316,88 C356,80 404,74 444,65 C484,56 532,50 572,42 C612,34 656,30 700,28"
+          fill="none" stroke="var(--color-mensa-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        />
+        <path
+          d="M60,128 C100,124 148,118 188,110 C228,102 276,96 316,88 C356,80 404,74 444,65 C484,56 532,50 572,42 C612,34 656,30 700,28 L700,148 L60,148 Z"
+          fill="url(#areaGrad)"
+        />
+        <circle cx="60"  cy="128" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="188" cy="110" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="316" cy="88"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="444" cy="65"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="572" cy="42"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="700" cy="28"  r="4" fill="var(--color-mensa-blue)"/>
+        <text x="60"  y="166" text-anchor="middle" class="chart-label">Dic</text>
+        <text x="188" y="166" text-anchor="middle" class="chart-label">Gen</text>
+        <text x="316" y="166" text-anchor="middle" class="chart-label">Feb</text>
+        <text x="444" y="166" text-anchor="middle" class="chart-label">Mar</text>
+        <text x="572" y="166" text-anchor="middle" class="chart-label">Apr</text>
+        <text x="700" y="166" text-anchor="middle" class="chart-label">Mag</text>
+      </svg>
+    </div>
+
+    <div class="toolbar" role="search" aria-label="Filtra movimenti">
+      <select class="toolbar__select" aria-label="Filtra per stato">
+        <option>Tutti gli stati</option>
+        <option>Confermati</option>
+        <option>In sospeso</option>
+        <option>Falliti</option>
+      </select>
+      <select class="toolbar__select" aria-label="Filtra per categoria">
+        <option>Tutte le categorie</option>
+        <option>Quote soci</option>
+        <option>Test ammissione</option>
+        <option>Eventi</option>
+        <option>Boutique</option>
+        <option>Spese gestione</option>
+        <option>Donazioni</option>
+      </select>
+      <select class="toolbar__select" aria-label="Filtra per tipo">
+        <option>Tutti i tipi</option>
+        <option>Entrate</option>
+        <option>Uscite</option>
+      </select>
+      <div class="toolbar__dates">
+        <input type="date" class="toolbar__input" aria-label="Data da" value="2026-01-01" />
+        <span class="toolbar__date-sep">→</span>
+        <input type="date" class="toolbar__input" aria-label="Data a" value="2026-05-18" />
+      </div>
+      <button class="btn btn--primary" type="button" aria-label="Filtra movimenti">Filtra</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrizione</th>
+            <th>Categoria</th>
+            <th>Riferimento</th>
+            <th class="th--amount">Importo</th>
+            <th>Stato</th>
+            <th aria-label="Azioni"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {movements.map((m) => (
+            <tr>
+              <td class="td--date">{m.date}</td>
+              <td class="td--desc">{m.desc}</td>
+              <td><span class={`chip ${catClass[m.catKey] ?? "chip--gray"}`}>{m.cat}</span></td>
+              <td class="td--ref">{m.ref}</td>
+              <td class={`td--amount ${m.amount.startsWith("+") ? "amount--in" : "amount--out"}`}>{m.amount}</td>
+              <td><span class={`badge ${statoClass[m.stato] ?? "badge--gray"}`}>{m.stato}</span></td>
+              <td class="td--action">
+                <a href="#" class="action-link" aria-label={`Dettaglio ${m.desc}`}>Dettaglio</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" aria-label="Paginazione">
+      <button class="page-btn" aria-label="Pagina precedente">«</button>
+      <button class="page-btn page-btn--active" aria-current="page">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <span class="page-sep">…</span>
+      <button class="page-btn">7</button>
+      <button class="page-btn" aria-label="Pagina successiva">»</button>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page { display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0.25rem 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-4); }
+
+  .summary-card {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4) var(--spacing-5);
+    display: grid;
+    gap: var(--spacing-1);
+  }
+  .summary-card__label { margin: 0; font-size: var(--text-2xs); font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-card__value { margin: 0; font-size: var(--text-2xl); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .summary-card__value--green { color: #0a8a3e; }
+  .summary-card__value--red   { color: #c0392b; }
+  .summary-card__value--amber { color: #b45309; }
+  .summary-card__trend { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+  .summary-card__trend--up { color: #0a8a3e; font-weight: 600; }
+
+  .chart-card {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4) var(--spacing-5);
+  }
+  .chart-card__label { margin: 0 0 var(--spacing-3); font-size: var(--text-xs); font-weight: 600; color: var(--color-text-secondary); }
+  .chart-svg { display: block; width: 100%; height: auto; }
+  .chart-label { font-size: 11px; fill: var(--color-text-tertiary); font-family: inherit; }
+
+  .toolbar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; align-items: center; }
+  .toolbar__select, .toolbar__input {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+  .toolbar__dates { display: flex; align-items: center; gap: var(--spacing-2); }
+  .toolbar__date-sep { color: var(--color-text-tertiary); font-size: var(--text-sm); }
+
+  .table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table thead tr { background: var(--color-surface-elevated); border-block-end: 1px solid var(--color-border-subtle); }
+  .table th { padding: 0.75rem 0.875rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); white-space: nowrap; }
+  .th--amount { text-align: right; }
+  .table tbody tr { border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .table tbody tr:last-child { border-block-end: none; }
+  .table tbody tr:hover { background: var(--color-surface-elevated); }
+  .table td { padding: 0.75rem 0.875rem; color: var(--color-text-primary); vertical-align: middle; }
+  .td--date { color: var(--color-text-tertiary); font-size: var(--text-xs); white-space: nowrap; }
+  .td--desc { font-weight: 600; }
+  .td--ref  { color: var(--color-text-secondary); font-size: var(--text-xs); }
+  .td--amount { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  .td--action { text-align: right; white-space: nowrap; }
+  .amount--in  { color: #0a8a3e; }
+  .amount--out { color: #c0392b; }
+
+  .chip { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+  .chip--blue   { background: #dbeafe; color: #1e40af; }
+  .chip--violet { background: #ede9fe; color: #4c1d95; }
+  .chip--orange { background: #ffedd5; color: #9a3412; }
+  .chip--pink   { background: #fce7f3; color: #831843; }
+  .chip--gray   { background: var(--color-surface-elevated); color: var(--color-text-secondary); border: 1px solid var(--color-border-subtle); }
+  .chip--green  { background: #d1fae5; color: #065f46; }
+
+  .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; white-space: nowrap; }
+  .badge--green  { background: #d1fae5; color: #065f46; }
+  .badge--yellow { background: #fef3c7; color: #92400e; }
+  .badge--red    { background: #fee2e2; color: #991b1b; }
+  .badge--gray   { background: var(--color-surface-elevated); color: var(--color-text-secondary); border: 1px solid var(--color-border-subtle); }
+
+  .action-link { font-size: var(--text-xs); font-weight: 600; color: var(--color-mensa-blue); text-decoration: none; }
+  .action-link:hover { text-decoration: underline; }
+
+  .btn { display: inline-flex; align-items: center; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+
+  .pagination { display: flex; gap: var(--spacing-1); align-items: center; justify-content: flex-end; }
+  .page-btn { padding: 0.4rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); background: var(--color-surface); font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); cursor: pointer; transition: background 0.1s, border-color 0.1s; }
+  .page-btn:hover { background: var(--color-surface-elevated); border-color: var(--color-border-strong); }
+  .page-btn--active { background: var(--color-mensa-blue); color: var(--color-text-on-brand); border-color: var(--color-mensa-blue); }
+  .page-sep { color: var(--color-text-tertiary); padding-inline: var(--spacing-1); }
+
+  @media (max-width: 1023px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 479px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar__select, .toolbar__input { width: 100%; }
+    .toolbar__dates { flex-direction: column; }
+  }
+  @media (max-width: 700px) {
+    .table thead { display: none; }
+    .table tbody, .table tr, .table td { display: block; width: 100%; }
+    .table tr { padding: 0.75rem 1rem; border-block-end: 1px solid var(--color-border-subtle); }
+    .table td { padding: 0.2rem 0; }
+    .td--action { text-align: left; margin-block-start: 0.5rem; }
+    .td--amount { text-align: left; }
+  }
+</style>

@@ -1,21 +1,12 @@
 ---
-/**
- * Eventi pubblici — pagina marketing.
- *
- * Fetch server-side dei record `events` con `is_public=true && when_end>=now`,
- * via `pb.fullListUnauthenticated` (replicato in `publicApi.ts`). Gli eventi
- * pubblici includono sessioni di test ufficiale, conferenze aperte, eventi
- * promozionali — tutto ciò che un non-socio può vedere prima di iscriversi.
- *
- * I dati sono identici a quelli che la dashboard mostra per i soci, ma qui
- * filtriamo solo i pubblici e mostriamo CTA "Diventa socio per tutti gli eventi".
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import {
   listPublicEvents,
   pbFileUrl,
   type PublicEventRecord,
 } from "../../lib/publicApi";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
 
 let events: readonly PublicEventRecord[] = [];
 let fetchError: string | null = null;
@@ -24,6 +15,16 @@ try {
 } catch (err) {
   fetchError = err instanceof Error ? err.message : "Errore di caricamento";
 }
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.events.read();
+
+const heroKicker = cms?.heroKicker ?? "Eventi pubblici";
+const heroTitle = cms?.heroTitle ?? "Quello che puoi venire a vedere senza essere socio.";
+const heroSubtitle = cms?.heroSubtitle ?? "Sessioni di test d'ammissione, conferenze aperte al pubblico, presentazioni di libri e iniziative culturali. Sono tutti eventi organizzati dai gruppi locali Mensa Italia.";
+const ctaKicker = cms?.ctaKicker ?? "Per i soci";
+const ctaTitle = cms?.ctaTitle ?? "Eventi soltanto soci, una calendarizzazione fitta.";
+const ctaBody = cms?.ctaBody ?? "Oltre agli eventi pubblici, Mensa Italia organizza ogni anno oltre duecento attività riservate ai soci: cene mensili, weekend tematici, gite, congressi nazionali. Tutto pubblicato nella tua area personale.";
 
 const dateFmt = new Intl.DateTimeFormat("it-IT", {
   day: "numeric",
@@ -54,13 +55,9 @@ function dateLabel(startsIso: string, endsIso: string): string {
 >
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="public.events.title">Eventi pubblici</p>
-      <h1 class="hero__title" data-i18n="web.public_events.hero.title">Quello che puoi venire a vedere senza essere socio.</h1>
-      <p class="hero__sub" data-i18n="web.public_events.hero.sub">
-        Sessioni di test d'ammissione, conferenze aperte al pubblico,
-        presentazioni di libri e iniziative culturali. Sono tutti eventi
-        organizzati dai gruppi locali Mensa Italia.
-      </p>
+      <p class="hero__kicker" data-i18n="public.events.title">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.public_events.hero.title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.public_events.hero.sub">{heroSubtitle}</p>
     </div>
   </section>
 
@@ -128,13 +125,9 @@ function dateLabel(startsIso: string, endsIso: string): string {
 
   <section class="cta">
     <div class="cta__inner">
-      <p class="cta__kicker" data-i18n="web.public_events.cta.kicker">Per i soci</p>
-      <h2 data-i18n="web.public_events.cta.title">Eventi soltanto soci, una calendarizzazione fitta.</h2>
-      <p data-i18n="web.public_events.cta.body">
-        Oltre agli eventi pubblici, Mensa Italia organizza ogni anno oltre
-        duecento attività riservate ai soci: cene mensili, weekend tematici,
-        gite, congressi nazionali. Tutto pubblicato nella tua area personale.
-      </p>
+      <p class="cta__kicker" data-i18n="web.public_events.cta.kicker">{ctaKicker}</p>
+      <h2 data-i18n="web.public_events.cta.title">{ctaTitle}</h2>
+      <p data-i18n="web.public_events.cta.body">{ctaBody}</p>
       <div class="cta__btns">
         <a href="/public/iq-test" class="cta__btn cta__btn--primary" data-i18n="web.common.cta.try_test_demo">Prova il test d'esempio</a>
         <a href="/login" class="cta__btn cta__btn--ghost" data-i18n="web.common.cta.member_login">Sono già socio · Accedi</a>

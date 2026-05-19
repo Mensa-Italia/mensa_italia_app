@@ -1,0 +1,609 @@
+---
+import PublicLayout from "../../../../layouts/PublicLayout.astro";
+import StaticPageBody from "../../../../components/public/StaticPageBody.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const entry = await reader.collections.staticPages.read("iscriviti-test-ufficiale");
+const bodyContent = entry ? await entry.body() : null;
+const bodyNodes: any[] = bodyContent?.children ?? [];
+
+const steps = [
+  {
+    num: "01",
+    title: "Iscriviti online",
+    desc: "Registrati sul sito Mensa Italia tramite il pulsante PRENOTA IL TEST. Entro pochi giorni riceverai le credenziali per l'area soci come Guest.",
+  },
+  {
+    num: "02",
+    title: "Acquista il test",
+    desc: "Dall'area soci acquista il test (€15 di contributo spese). Poi contatta un Assistente al Test nella tua regione per concordare la sessione.",
+  },
+  {
+    num: "03",
+    title: "Sostieni il test",
+    desc: "Sessione supervisionata di 20 minuti. 45 sequenze di figure, niente matematica né cultura generale. Porta un documento d'identità valido.",
+  },
+  {
+    num: "04",
+    title: "Ricevi l'esito",
+    desc: "In circa 2 settimane ti arriverà l'esito via mail. Se superi la soglia del 98° percentile, puoi iscriverti al Mensa Italia.",
+  },
+];
+
+const porta = [
+  "Documento d'identità valido",
+  "Nulla di speciale: niente calcolatrici né dizionari",
+  "Se sei minorenne (16/17 anni): genitore o tutore presente e modulo consenso firmato",
+  "Tranquillità: l'allenamento non serve, la logica figurale è innata",
+];
+
+const faq = [
+  {
+    q: "Come ottengo il valore del mio QI?",
+    a: "Il test Mensa comunica solo se hai superato la soglia del 98° percentile (equivalente a QI 131 scala Wechsler). Il punteggio esatto non viene divulgato. Per sapere il valore preciso rivolgiti a uno psicologo psicometrista abilitato.",
+  },
+  {
+    q: "Posso allenarmi prima del test?",
+    a: "L'allenamento può ridurre lo stress ma non migliora significativamente il risultato. Ti consigliamo di fare qualche prova con il test preliminare norvegese su test.mensa.no.",
+  },
+  {
+    q: "Cosa succede se non supero?",
+    a: "Puoi ripetere il test una sola volta, dopo almeno 6 mesi dal primo tentativo. Acquista nuovamente il test e informa un Assistente al Test della tua regione.",
+  },
+];
+---
+
+<PublicLayout
+  active="chi-siamo"
+  title="Il test ufficiale di ammissione — Mensa Italia"
+  description="Come iscriversi al test ufficiale Mensa Italia: 4 passi, 20 minuti, 45 sequenze di figure. Niente matematica, niente cultura generale."
+>
+  <!-- ═══ BREADCRUMB ═══════════════════════════════════════════════ -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="breadcrumb__inner">
+      <ol class="breadcrumb__list">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li><a href="/public/info/iscriviti/">Iscriviti</a></li>
+        <li aria-hidden="true" class="breadcrumb__sep">·</li>
+        <li aria-current="page">Test ufficiale</li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">ISCRIVITI · 3 min di lettura</p>
+      <h1 class="hero__title">Il test ufficiale di ammissione</h1>
+      <p class="hero__lead"><strong>45 sequenze di figure in 20 minuti.</strong> Niente cultura generale, niente matematica.</p>
+    </div>
+  </section>
+
+  <!-- ═══ TIMELINE ═════════════════════════════════════════════════ -->
+  <section class="timeline">
+    <div class="timeline__inner">
+      <h2 class="timeline__heading" data-i18n="public.test.steps.heading">Come funziona</h2>
+      <ol class="timeline__list">
+        {steps.map((step, i) => (
+          <li class="step">
+            <div class="step__number" aria-hidden="true">{step.num}</div>
+            <div class="step__body">
+              <h3 class="step__title">{step.title}</h3>
+              <p class="step__desc">{step.desc}</p>
+            </div>
+            {i < steps.length - 1 && (
+              <span class="step__connector" aria-hidden="true"></span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═══ COSA PORTARE ═════════════════════════════════════════════ -->
+  <section class="bring">
+    <div class="bring__inner">
+      <div class="bring__card">
+        <div class="bring__card-header">
+          <span class="bring__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <h2 class="bring__title" data-i18n="public.test.bring.heading">Cosa portare il giorno del test</h2>
+        </div>
+        <ul class="bring__list">
+          {porta.map((item) => (
+            <li class="bring__item">
+              <span class="bring__bullet" aria-hidden="true">—</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FAQ INLINE ════════════════════════════════════════════════ -->
+  <section class="faq-inline">
+    <div class="faq-inline__inner">
+      <h2 class="faq-inline__heading" data-i18n="public.test.faq.heading">Domande comuni</h2>
+      <div class="faq-inline__list">
+        {faq.map((item) => (
+          <div class="faq-inline__item">
+            <p class="faq-inline__q">{item.q}</p>
+            <p class="faq-inline__a">{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BODY FALLBACK ════════════════════════════════════════════ -->
+  {bodyNodes.length > 0 && (
+    <section class="body-fallback">
+      <div class="body-fallback__inner">
+        <h2 class="body-fallback__title">Tutti i dettagli</h2>
+        <StaticPageBody nodes={bodyNodes} />
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ CTA ══════════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="cta-section__inner">
+      <div class="cta-section__body">
+        <p class="cta-section__label">Pronto per il test?</p>
+        <p class="cta-section__sub">Registrazione online in 2 minuti.</p>
+      </div>
+      <a href="/public/mvp/register" class="cta-section__btn">
+        Iscriviti al test →
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ FONTE ══════════════════════════════════════════════════ -->
+</PublicLayout>
+
+<style>
+  /* ═══ BREADCRUMB ════════════════════════════════════════════════ */
+  .breadcrumb {
+    padding-block: var(--spacing-3);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .breadcrumb__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .breadcrumb__list {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .breadcrumb__list a { color: var(--color-text-tertiary); text-decoration: none; }
+  .breadcrumb__list a:hover { color: var(--color-mensa-blue); }
+  .breadcrumb__list [aria-current="page"] { color: var(--color-text-primary); font-weight: 500; }
+  .breadcrumb__sep { color: var(--color-border-subtle); }
+
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 10%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 680px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__lead {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ═══ TIMELINE ════════════════════════════════════════════════ */
+  .timeline {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .timeline__inner {
+    max-inline-size: 800px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-8);
+  }
+  .timeline__heading {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .timeline__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  .step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: var(--spacing-4);
+    padding-block-end: var(--spacing-8);
+  }
+  .step:last-child { padding-block-end: 0; }
+  .step__number {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 800;
+    color: var(--color-mensa-blue);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    padding-block-start: 2px;
+    opacity: 0.9;
+  }
+  .step__body { display: grid; gap: var(--spacing-2); align-content: start; }
+  .step__title {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .step__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    max-inline-size: 54ch;
+  }
+  .step__connector {
+    position: absolute;
+    inset-inline-start: 24px;
+    inset-block-start: 40px;
+    inset-block-end: var(--spacing-4);
+    inline-size: 1px;
+    background: var(--color-border-subtle);
+    display: block;
+  }
+  @media (min-width: 720px) {
+    .timeline__list {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-4);
+    }
+    .step {
+      grid-template-columns: 1fr;
+      padding-block-end: 0;
+    }
+    .step__connector {
+      inset-inline-start: auto;
+      inset-block-start: 20px;
+      inset-block-end: auto;
+      inset-inline-end: calc(-1 * var(--spacing-4) / 2);
+      inline-size: var(--spacing-4);
+      block-size: 1px;
+    }
+    .step:last-child .step__connector { display: none; }
+  }
+
+  /* ═══ BRING ═════════════════════════════════════════════════ */
+  .bring {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .bring__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+  }
+  .bring__card {
+    border: 1px solid var(--color-mensa-blue);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .bring__card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4) var(--spacing-5);
+    background: color-mix(in oklch, var(--color-mensa-blue) 8%, var(--color-surface-elevated));
+    border-block-end: 1px solid color-mix(in oklch, var(--color-mensa-blue) 30%, transparent);
+  }
+  .bring__icon {
+    inline-size: 24px;
+    block-size: 24px;
+    color: var(--color-mensa-blue);
+    flex-shrink: 0;
+  }
+  .bring__icon svg { inline-size: 100%; block-size: 100%; }
+  .bring__title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-mensa-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bring__list {
+    list-style: none;
+    margin: 0;
+    padding: var(--spacing-5);
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .bring__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .bring__bullet {
+    color: var(--color-mensa-blue);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-block-start: 1px;
+  }
+
+  /* ═══ FAQ INLINE ═════════════════════════════════════════════ */
+  .faq-inline {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .faq-inline__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-6);
+  }
+  .faq-inline__heading {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+  .faq-inline__list {
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .faq-inline__item {
+    display: grid;
+    gap: var(--spacing-2);
+    padding-block-end: var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .faq-inline__item:last-child { border-block-end: none; padding-block-end: 0; }
+  .faq-inline__q {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+  }
+  .faq-inline__a {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ═══ BODY FALLBACK ══════════════════════════════════════════ */
+  .body-fallback {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-10));
+  }
+  .body-fallback__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .body-fallback__title {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary);
+  }
+
+  /* ═══ CTA SECTION ════════════════════════════════════════════ */
+  .cta-section {
+    background: var(--color-surface-elevated);
+    border-block: 1px solid var(--color-border-subtle);
+    padding-block: clamp(var(--spacing-6), 6vh, var(--spacing-8));
+  }
+  .cta-section__inner {
+    max-inline-size: 720px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-6);
+  }
+  @media (max-width: 560px) {
+    .cta-section__inner { flex-direction: column; align-items: stretch; }
+  }
+  .cta-section__body { display: grid; gap: 2px; }
+  .cta-section__label {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .cta-section__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+  .cta-section__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px var(--spacing-6);
+    background: var(--color-mensa-blue);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--motion-fast) var(--ease-out-quart);
+  }
+  .cta-section__btn:hover { background: var(--color-mensa-blue-deep, #1e40af); }
+
+  /* ═══ SOURCE FOOTER ═════════════════════════════════════════ */
+  .source-footer {
+    padding-block: var(--spacing-5);
+  }
+  .source-footer__inner {
+    max-inline-size: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    text-align: center;
+  }
+  .source-footer__link {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .source-footer__link:hover { color: var(--color-mensa-blue); text-decoration: underline; }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from "../../../../lib/motion";
+
+  // ─── Reduced-motion gate ───────────────────────────────────────────────────
+  if (!prefersReducedMotion()) {
+
+    // ─── Pre-hide elements that will animate in ──────────────────────────────
+    gsap.set(".hero__kicker, .hero__title, .hero__lead", { opacity: 0, y: 24 });
+    gsap.set(".step__number", { opacity: 0, scale: 0.85 });
+    gsap.set(".step__title", { opacity: 0, y: 18 });
+    gsap.set(".step__desc", { opacity: 0, y: 14 });
+
+    const connectors = gsap.utils.toArray<HTMLElement>(".step__connector");
+    if (connectors.length) {
+      connectors.forEach((c) => {
+        gsap.set(c, { scaleX: 0, transformOrigin: "left center" });
+      });
+    }
+
+    gsap.set(".bring__card", { opacity: 0, y: 20 });
+    gsap.set(".faq-inline__item", { opacity: 0, y: 16 });
+
+    // ─── Hero entrance (on load, not scroll) ─────────────────────────────────
+    const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+    heroTl
+      .to(".hero__kicker", { opacity: 1, y: 0, duration: 0.6 })
+      .to(".hero__title",  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
+      .to(".hero__lead",   { opacity: 1, y: 0, duration: 0.6 }, "-=0.45");
+
+    // ─── Timeline steps scroll-in ─────────────────────────────────────────────
+    const steps = gsap.utils.toArray<HTMLElement>(".step");
+    ScrollTrigger.create({
+      trigger: ".timeline__list",
+      start: "top 80%",
+      onEnter: () => {
+        steps.forEach((step, i) => {
+          const offset = i * 0.18;
+          const num   = step.querySelector(".step__number");
+          const title = step.querySelector(".step__title");
+          const desc  = step.querySelector(".step__desc");
+          const conn  = step.querySelector<HTMLElement>(".step__connector");
+
+          if (num) {
+            gsap.to(num, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)", delay: offset });
+          }
+          if (title) {
+            gsap.to(title, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", delay: offset + 0.1 });
+          }
+          if (desc) {
+            gsap.to(desc, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", delay: offset + 0.2 });
+          }
+          // Connector draws left-to-right midway through preceding step
+          if (conn) {
+            gsap.to(conn, {
+              scaleX: 1,
+              duration: 0.35,
+              ease: "power2.out",
+              delay: offset + 0.15,
+            });
+          }
+        });
+      },
+    });
+
+    // ─── "Cosa portare" callout card ─────────────────────────────────────────
+    gsap.to(".bring__card", {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: ".bring__card",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    // ─── FAQ pairs stagger ────────────────────────────────────────────────────
+    gsap.to(".faq-inline__item", {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out",
+      stagger: 0.08,
+      scrollTrigger: {
+        trigger: ".faq-inline__list",
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+  }
+</script>

@@ -1,0 +1,216 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  scope="ledger"
+  activeHref="/console/ledger/export"
+  pageTitle="Esporta CSV"
+  title="Mensa Ledger · Esporta CSV"
+>
+  <div class="page">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Esporta CSV</h1>
+        <p class="page-header__sub">Scarica i movimenti in formato tabellare per rendiconto, revisione o archiviazione.</p>
+      </div>
+    </header>
+
+    <div class="export-layout">
+
+      <div class="filters-card">
+        <h2 class="card-title">Filtri esportazione</h2>
+
+        <div class="form-group">
+          <p class="form-label">Periodo</p>
+          <div class="date-row">
+            <div class="date-field">
+              <label class="date-label" for="exp-from">Da</label>
+              <input type="date" id="exp-from" class="form-input" value="2026-01-01" />
+            </div>
+            <div class="date-field">
+              <label class="date-label" for="exp-to">A</label>
+              <input type="date" id="exp-to" class="form-input" value="2026-05-18" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <p class="form-label">Tipo movimenti</p>
+          <div class="chips-wrap" role="group" aria-label="Tipo movimenti">
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Entrate</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Uscite</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Confermati</label>
+            <label class="filter-chip"><input type="checkbox" class="sr-only" /> In sospeso</label>
+            <label class="filter-chip"><input type="checkbox" class="sr-only" /> Falliti</label>
+            <label class="filter-chip"><input type="checkbox" class="sr-only" /> Rimborsati</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <p class="form-label">Categorie</p>
+          <div class="chips-wrap" role="group" aria-label="Categorie">
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Quote soci</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Test ammissione</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Eventi</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Boutique</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Spese gestione</label>
+            <label class="filter-chip filter-chip--active"><input type="checkbox" checked class="sr-only" /> Donazioni</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <p class="form-label">Formato</p>
+          <div class="radio-group" role="radiogroup" aria-label="Formato file">
+            <label class="radio-label"><input type="radio" name="formato" value="csv-excel" checked /> CSV (Excel-friendly)</label>
+            <label class="radio-label"><input type="radio" name="formato" value="csv-utf8" /> CSV (UTF-8 puro)</label>
+            <label class="radio-label"><input type="radio" name="formato" value="xlsx" /> Excel .xlsx</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label"><input type="checkbox" checked /> Includi colonna note</label>
+          <label class="checkbox-label"><input type="checkbox" /> Anonimizza nomi</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--primary" id="download-btn">Scarica .csv</button>
+          <button type="button" class="btn btn--ghost">Programma export ricorrente</button>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <h2 class="card-title">Anteprima esportazione</h2>
+        <ul class="preview-meta">
+          <li><span class="meta-key">Periodo</span><span class="meta-val">01/01/2026 — 18/05/2026</span></li>
+          <li><span class="meta-key">Movimenti trovati</span><span class="meta-val">87</span></li>
+          <li><span class="meta-key">Entrate</span><span class="meta-val amount--in">€ 4.180,30</span></li>
+          <li><span class="meta-key">Uscite</span><span class="meta-val amount--out">€ 2.950,10</span></li>
+        </ul>
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Categoria</th>
+                <th>Importo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>18/05/2026</td><td>Entrata</td><td>Quote soci</td><td class="amount--in">+€ 50,00</td></tr>
+              <tr><td>17/05/2026</td><td>Entrata</td><td>Test</td><td class="amount--in">+€ 30,00</td></tr>
+              <tr><td>16/05/2026</td><td>Uscita</td><td>Spese</td><td class="amount--out">-€ 124,30</td></tr>
+              <tr><td>15/05/2026</td><td>Entrata</td><td>Quote soci</td><td class="amount--in">+€ 50,00</td></tr>
+              <tr><td>14/05/2026</td><td>Entrata</td><td>Donazioni</td><td class="amount--in">+€ 200,00</td></tr>
+            </tbody>
+          </table>
+          <p class="preview-truncated">… e altri 82 movimenti nel file completo</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<script is:inline>
+  document.querySelectorAll('.filter-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      chip.classList.toggle('filter-chip--active');
+    });
+  });
+
+  document.getElementById('download-btn').addEventListener('click', function() {
+    var rows = [
+      ['Data','Tipo','Categoria','Riferimento','Importo','Stato'],
+      ['18/05/2026','Entrata','Quote soci','Marco Rossi','50.00','Confermato'],
+      ['17/05/2026','Entrata','Test','MN-2026-0124','30.00','Confermato'],
+      ['16/05/2026','Uscita','Spese','Cartoleria Bottega','-124.30','Confermato'],
+      ['15/05/2026','Entrata','Quote soci','Lorenzo Bianchi','50.00','In sospeso'],
+      ['14/05/2026','Entrata','Donazioni','Anonimo','200.00','Confermato'],
+      ['12/05/2026','Uscita','Spese','Mensa Roma','-480.00','Confermato'],
+      ['11/05/2026','Entrata','Test','MN-2026-0120','30.00','Confermato'],
+      ['10/05/2026','Entrata','Quote soci','Sara Conti','50.00','Fallito'],
+      ['09/05/2026','Uscita','Spese','Tipografia Aldo','-67.80','Confermato'],
+      ['08/05/2026','Entrata','Boutique','Boutique','15.00','Confermato'],
+      ['06/05/2026','Entrata','Quote soci','Valentina Esposito','50.00','Rimborsato'],
+      ['05/05/2026','Uscita','Spese','La Spiga','-320.00','Confermato'],
+    ];
+    var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
+    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'mensa-ledger-export.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+<style>
+  .page { display: grid; gap: var(--spacing-5); }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0.25rem 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .export-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-5); align-items: start; }
+
+  .filters-card, .preview-card {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .card-title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+
+  .form-group { display: grid; gap: var(--spacing-2); }
+  .form-label { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); margin: 0; }
+  .form-input { padding: 0.45rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); width: 100%; box-sizing: border-box; }
+  .form-input:focus { outline: 2px solid var(--color-mensa-blue); outline-offset: 1px; }
+
+  .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); }
+  .date-field { display: grid; gap: var(--spacing-1); }
+  .date-label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-secondary); }
+
+  .chips-wrap { display: flex; gap: var(--spacing-2); flex-wrap: wrap; }
+  .filter-chip { display: inline-flex; align-items: center; padding: 0.3rem 0.75rem; border: 1.5px solid var(--color-border-subtle); border-radius: 9999px; font-size: var(--text-xs); font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; background: var(--color-surface); }
+  .filter-chip--active { background: color-mix(in oklch, var(--color-mensa-blue) 10%, var(--color-surface)); border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+  .radio-group { display: grid; gap: var(--spacing-2); }
+  .radio-label { display: flex; align-items: center; gap: var(--spacing-2); font-size: var(--text-sm); color: var(--color-text-primary); cursor: pointer; }
+  .checkbox-label { display: flex; align-items: center; gap: var(--spacing-2); font-size: var(--text-sm); color: var(--color-text-primary); cursor: pointer; }
+
+  .form-actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; padding-block-start: var(--spacing-2); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: opacity 0.15s; white-space: nowrap; }
+  .btn:hover { opacity: 0.85; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost { background: transparent; border-color: var(--color-border-subtle); color: var(--color-text-primary); }
+
+  .preview-meta { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-2); }
+  .preview-meta li { display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); padding-block: 0.3rem; border-block-end: 1px solid var(--color-border-subtle); }
+  .preview-meta li:last-child { border-block-end: none; }
+  .meta-key { color: var(--color-text-secondary); }
+  .meta-val { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--color-text-primary); }
+  .amount--in  { color: #0a8a3e; }
+  .amount--out { color: #c0392b; }
+
+  .preview-table-wrap { overflow-x: auto; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); }
+  .preview-table { width: 100%; border-collapse: collapse; font-size: var(--text-xs); }
+  .preview-table th { padding: 0.55rem 0.75rem; background: var(--color-surface); font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-tertiary); text-align: left; border-block-end: 1px solid var(--color-border-subtle); }
+  .preview-table td { padding: 0.5rem 0.75rem; color: var(--color-text-primary); border-block-end: 1px solid var(--color-border-subtle); font-variant-numeric: tabular-nums; }
+  .preview-table tr:last-child td { border-block-end: none; }
+  .preview-truncated { margin: var(--spacing-2) var(--spacing-3); font-size: var(--text-xs); color: var(--color-text-tertiary); font-style: italic; }
+
+  @media (max-width: 900px) {
+    .export-layout { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .filters-card, .preview-card { padding: var(--spacing-4); }
+    .date-row { grid-template-columns: 1fr; }
+    .form-actions { flex-direction: column; }
+  }
+</style>

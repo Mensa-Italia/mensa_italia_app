@@ -1,0 +1,325 @@
+---
+/**
+ * Hub di navigazione demo MVP — lista tutte le pagine del flusso MensaTesting
+ * per ruolo, permettendo di saltare tra stati senza completare il flow intero.
+ * Questa pagina non è parte del prodotto — solo per demo interne.
+ */
+import PublicLayout from "../../../layouts/PublicLayout.astro";
+---
+
+<PublicLayout
+  title="Hub Demo MVP — MensaTesting"
+  description="Navigazione rapida tra tutte le pagine demo del flusso MensaTesting."
+>
+  <div class="hub">
+    <div class="hub__inner">
+      <!-- Header -->
+      <div class="hub__header">
+        <p class="hub__eyebrow">Demo navigabile</p>
+        <h1 class="hub__title">Hub MVP — MensaTesting</h1>
+        <p class="hub__sub">
+          Questa pagina elenca tutte le schermate del flusso di ammissione.<br>
+          Nessuna azione è reale — dati mock, navigazione cosmetica.
+        </p>
+        <div class="hub__banner">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.345 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/></svg>
+          <span>Modalità demo attiva · nessun dato reale · nessuna azione ha effetti</span>
+        </div>
+      </div>
+
+      <!-- SEZIONE: Pubblico -->
+      <section class="hub__section">
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Pubblico</h2>
+          <span class="badge badge--blue">Visitatore</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/public/mvp" class="hub__card">
+            <span class="hub__card-name">Landing page</span>
+            <span class="hub__card-desc">Pagina di ingresso al flusso — "Diventa socio"</span>
+          </a>
+          <a href="/public/mvp/register" class="hub__card">
+            <span class="hub__card-name">Registrazione</span>
+            <span class="hub__card-desc">Creazione account nuovo aspirante</span>
+          </a>
+          <a href="/login" class="hub__card">
+            <span class="hub__card-name">Login (sito reale)</span>
+            <span class="hub__card-desc">Usa <code>marco@rossi.it</code> + password qualsiasi per entrare come aspirante. Per vedere la console staff/admin entra normalmente come socio: troverai le voci di gestione direttamente nella sidebar.</span>
+          </a>
+          <a href="/public/mvp/verify-email" class="hub__card">
+            <span class="hub__card-name">Verifica email</span>
+            <span class="hub__card-desc">Conferma indirizzo email dopo registrazione</span>
+          </a>
+          <a href="/public/mvp/faq" class="hub__card">
+            <span class="hub__card-name">FAQ</span>
+            <span class="hub__card-desc">Domande frequenti sul test di ammissione</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEZIONE: Aspirante -->
+      <section class="hub__section">
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Aspirante (loggato)</h2>
+          <span class="badge badge--green">Aspirante</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/public/mvp/dashboard" class="hub__card">
+            <span class="hub__card-name">Dashboard</span>
+            <span class="hub__card-desc">Riepilogo stato e prossimi passi dell'aspirante</span>
+          </a>
+          <a href="/public/mvp/profile" class="hub__card">
+            <span class="hub__card-name">Profilo</span>
+            <span class="hub__card-desc">Dati anagrafici e codice fiscale</span>
+          </a>
+          <a href="/public/mvp/book-test" class="hub__card">
+            <span class="hub__card-name">Prenota test</span>
+            <span class="hub__card-desc">Selezione sede, data e slot orario</span>
+          </a>
+          <a href="/public/mvp/checkout" class="hub__card">
+            <span class="hub__card-name">Checkout</span>
+            <span class="hub__card-desc">Pagamento quota esame (30 €) via Stripe</span>
+          </a>
+          <a href="/public/mvp/booking-confirmed" class="hub__card">
+            <span class="hub__card-name">Prenotazione confermata</span>
+            <span class="hub__card-desc">Ricevuta e promemoria post-pagamento</span>
+          </a>
+          <a href="/public/mvp/my-tests" class="hub__card">
+            <span class="hub__card-name">I miei test</span>
+            <span class="hub__card-desc">Storico prenotazioni e stati</span>
+          </a>
+          <a href="/public/mvp/test-result" class="hub__card">
+            <span class="hub__card-name">Risultato test</span>
+            <span class="hub__card-desc">Esito e punteggio dopo la sessione</span>
+          </a>
+          <a href="/public/mvp/member-signup" class="hub__card">
+            <span class="hub__card-name">Iscrizione socio</span>
+            <span class="hub__card-desc">Completamento iscrizione dopo superamento test</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEZIONE: Assistente al test (Console test) -->
+      <section class="hub__section">
+        <p class="hub__note">Queste pagine sono raggiungibili anche dalla sidebar dell'area soci dopo il login normale.</p>
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Assistente al test (Console test)</h2>
+          <span class="badge badge--orange">Staff sede</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/console/test-assistant/today" class="hub__card hub__card--staff">
+            <span class="hub__card-name">Test del giorno</span>
+            <span class="hub__card-desc">Lista candidati della sessione odierna</span>
+          </a>
+          <a href="/console/test-assistant/checkin" class="hub__card hub__card--staff">
+            <span class="hub__card-name">Check-in candidato</span>
+            <span class="hub__card-desc">Verifica documento e conferma presenza</span>
+          </a>
+          <a href="/console/test-assistant/upload" class="hub__card hub__card--staff">
+            <span class="hub__card-name">Carica documento test</span>
+            <span class="hub__card-desc">Caricamento scansione foglio risposte — lo psicologo valuta a posteriori</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEZIONE: Psicologo (Console test) -->
+      <section class="hub__section">
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Psicologo (Console test)</h2>
+          <span class="badge badge--gray">Psicologo</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/console/psychologist/pending" class="hub__card hub__card--psych">
+            <span class="hub__card-name">Test da valutare</span>
+            <span class="hub__card-desc">Documenti caricati dagli assistenti, in attesa di valutazione</span>
+          </a>
+          <a href="/console/psychologist/reviewed" class="hub__card hub__card--psych">
+            <span class="hub__card-name">Test valutati</span>
+            <span class="hub__card-desc">Storico completo delle valutazioni effettuate</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEZIONE: Amministrazione (Console test) -->
+      <section class="hub__section">
+        <div class="hub__section-header">
+          <h2 class="hub__section-title">Amministrazione (Console test)</h2>
+          <span class="badge badge--purple">Admin</span>
+        </div>
+        <div class="hub__grid">
+          <a href="/console/admin/applicants" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Aspiranti soci</span>
+            <span class="hub__card-desc">Lista completa con filtri per stato e sede</span>
+          </a>
+          <a href="/console/admin/applicant?id=mock" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Dettaglio aspirante</span>
+            <span class="hub__card-desc">Anagrafica, storico test, pagamenti, note</span>
+          </a>
+          <a href="/console/admin/collisions" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Collisioni CF / email</span>
+            <span class="hub__card-desc">Gestione conflitti con soci già registrati</span>
+          </a>
+          <a href="/console/admin/refunds?id=mock" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Cancellazione e rimborso</span>
+            <span class="hub__card-desc">Annullamento test con rimborso Stripe</span>
+          </a>
+          <a href="/console/admin/dates" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Date sessioni</span>
+            <span class="hub__card-desc">Calendario e gestione posti per sede</span>
+          </a>
+          <a href="/console/admin/promote?id=mock" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Promuovi a socio</span>
+            <span class="hub__card-desc">Conversione aspirante → socio nazionale</span>
+          </a>
+          <a href="/keystatic" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Gestione contenuti</span>
+            <span class="hub__card-desc">Keystatic CMS · news, FAQ, pagine statiche · contenuti versionati su Git</span>
+          </a>
+          <a href="/console/newsletter" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Newsletter</span>
+            <span class="hub__card-desc">Editor newsletter — MensaNews, Globale, Lombardia</span>
+          </a>
+          <a href="/console/ledger" class="hub__card hub__card--admin">
+            <span class="hub__card-name">Mensa Ledger</span>
+            <span class="hub__card-desc">Tesoreria — conto economico, link di pagamento, registrazione incassi, esportazione CSV</span>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</PublicLayout>
+
+<style>
+  .hub {
+    padding-block: clamp(2rem, 6vh, 4rem);
+    background: var(--color-surface);
+    min-block-size: 100vh;
+  }
+  .hub__inner {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 5vw, 2rem);
+    display: grid;
+    gap: 3rem;
+  }
+
+  /* Header */
+  .hub__header {
+    display: grid;
+    gap: 0.75rem;
+    padding-block-end: 1.5rem;
+    border-block-end: 2px solid #0f1d3b;
+  }
+  .hub__eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5b7fd4;
+  }
+  .hub__title {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: #0f1d3b;
+    letter-spacing: -0.02em;
+  }
+  .hub__sub {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #4a5568;
+    line-height: 1.6;
+  }
+  .hub__banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    background: #fef9c3;
+    border: 1px solid #f59e0b;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    color: #92400e;
+    font-weight: 500;
+    width: fit-content;
+  }
+  .hub__banner svg { width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: #d97706; }
+
+  .hub__note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4a5568;
+    line-height: 1.6;
+  }
+  .hub__note a { color: #5b7fd4; }
+  .hub__note code { font-size: 0.8em; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; }
+
+  /* Sections */
+  .hub__section { display: grid; gap: 1rem; }
+  .hub__section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block-end: 0.5rem;
+    border-block-end: 1px solid #e2e8f0;
+  }
+  .hub__section-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f1d3b;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .badge--blue   { background: #dbeafe; color: #1e40af; }
+  .badge--green  { background: #d1fae5; color: #065f46; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+  .badge--purple { background: #ede9fe; color: #4c1d95; }
+  .badge--gray   { background: #f1f5f9; color: #475569; }
+
+  /* Cards grid */
+  .hub__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+  }
+  .hub__card {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.625rem;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  }
+  .hub__card:hover {
+    border-color: #5b7fd4;
+    box-shadow: 0 2px 12px rgba(91,127,212,0.15);
+    transform: translateY(-1px);
+  }
+  .hub__card--staff:hover { border-color: #f97316; box-shadow: 0 2px 12px rgba(249,115,22,0.12); }
+  .hub__card--psych:hover { border-color: #0891b2; box-shadow: 0 2px 12px rgba(8,145,178,0.12); }
+  .hub__card--admin:hover { border-color: #7c3aed; box-shadow: 0 2px 12px rgba(124,58,237,0.12); }
+  .hub__card-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f1d3b;
+  }
+  .hub__card-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.4;
+  }
+</style>

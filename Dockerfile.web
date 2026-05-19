@@ -35,6 +35,12 @@ COPY --from=build /work/webApp/package.json /srv/webApp/package.json
 COPY --from=build /work/webApp/bun.lock /srv/webApp/bun.lock
 COPY --from=build /work/webApp/dist /srv/webApp/dist
 
+# Keystatic + alcuni handler SSR (newsletter editor) leggono file da src/content
+# a runtime via readFileSync(resolve(process.cwd(), "src/content/...")). Astro
+# non bundla questi file in dist/, vanno copiati esplicitamente.
+COPY --from=build /work/webApp/src/content /srv/webApp/src/content
+COPY --from=build /work/webApp/keystatic.config.tsx /srv/webApp/keystatic.config.tsx
+
 WORKDIR /srv/webApp
 RUN bun install --frozen-lockfile --production
 

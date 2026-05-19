@@ -1,0 +1,1109 @@
+{
+  "counters": {
+    "u_column": 13,
+    "u_row": 13,
+    "u_content_heading": 6,
+    "u_content_text": 8,
+    "u_content_image": 1,
+    "u_content_button": 3,
+    "u_content_divider": 3
+  },
+  "body": {
+    "id": "mn_body",
+    "rows": [
+      {
+        "id": "u_row_1",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_1",
+            "contents": [
+              {
+                "id": "u_content_text_1",
+                "type": "text",
+                "values": {
+                  "containerPadding": "20px 20px 10px",
+                  "anchor": "",
+                  "textAlign": "center",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_1", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<h1 style=\"font-size: 28px; font-weight: 700; color: #1d2f6f; margin: 0 0 8px 0; font-family: arial, helvetica, sans-serif;\">MensaNews n. 1113</h1><p style=\"font-size: 13px; color: #6b7280; font-style: italic; margin: 0; line-height: 1.5;\">Chi ha tempo non aspetti tempo. Chi ha matita non aspetti gomma. Chi ha voglia non aspetti e basta.</p>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_1", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#1d2f6f",
+          "columnsBackgroundColor": "#ffffff",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_1", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_2",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_2",
+            "contents": [
+              {
+                "id": "u_content_image_1",
+                "type": "image",
+                "values": {
+                  "containerPadding": "0px",
+                  "anchor": "",
+                  "src": {
+                    "url": "https://placehold.co/600x280/1d2f6f/ffffff?text=Francesco+Guardi+%E2%80%94+Veduta+sul+Canale+di+Cannaregio+%281775-1780%29",
+                    "width": 600,
+                    "height": 280
+                  },
+                  "textAlign": "center",
+                  "altText": "Francesco Guardi — Veduta sul Canale di Cannaregio, 1775-1780",
+                  "action": { "name": "web", "values": { "href": "", "target": "_blank" } },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_image_1", "htmlClassNames": "u_content_image" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true
+                }
+              },
+              {
+                "id": "u_content_text_2",
+                "type": "text",
+                "values": {
+                  "containerPadding": "20px 24px 16px",
+                  "anchor": "",
+                  "textAlign": "center",
+                  "lineHeight": "160%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_2", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 15px; font-style: italic; color: #374151; margin: 0 0 6px 0; line-height: 1.6;\">&ldquo;Ho notato che anche le persone che affermano che tutto è già scritto e che non possiamo far nulla per cambiare il destino, si guardano intorno prima di attraversare la strada.&rdquo;</p><p style=\"font-size: 12px; color: #6b7280; margin: 0; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;\">— Stephen Hawking</p>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_2", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_2", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_3",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_3",
+            "contents": [
+              {
+                "id": "u_content_text_3",
+                "type": "text",
+                "values": {
+                  "containerPadding": "14px 20px",
+                  "anchor": "",
+                  "textAlign": "center",
+                  "lineHeight": "180%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": true,
+                    "linkHoverUnderline": true
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_3", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 12px; color: #6b7280; margin: 0; letter-spacing: 0.03em;\"><a href=\"#comunicazioni\" style=\"color: #1d2f6f;\">Comunicazioni Generali</a> &nbsp;·&nbsp; <a href=\"#eventi-locali\" style=\"color: #1d2f6f;\">Eventi Locali</a> &nbsp;·&nbsp; <a href=\"#eventi-internazionali\" style=\"color: #1d2f6f;\">Eventi Internazionali</a> &nbsp;·&nbsp; <a href=\"#mwj\" style=\"color: #1d2f6f;\">Articoli MWJ</a> &nbsp;·&nbsp; <a href=\"#nuovi-soci\" style=\"color: #1d2f6f;\">Nuovi Soci</a> &nbsp;·&nbsp; <a href=\"#social\" style=\"color: #1d2f6f;\">Social</a></p>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_3", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#f0f4ff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_3", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_4",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_4",
+            "contents": [
+              {
+                "id": "u_content_divider_1",
+                "type": "divider",
+                "values": {
+                  "width": "100%",
+                  "border": {
+                    "borderTopWidth": "2px",
+                    "borderTopStyle": "solid",
+                    "borderTopColor": "#1d2f6f"
+                  },
+                  "textAlign": "center",
+                  "containerPadding": "10px 20px",
+                  "anchor": "",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_divider_1", "htmlClassNames": "u_content_divider" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_4", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_4", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_5",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_5",
+            "contents": [
+              {
+                "id": "u_content_heading_1",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 6px",
+                  "anchor": "comunicazioni",
+                  "headingType": "h2",
+                  "fontSize": "22px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_1", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "MIG 2026 — Palermo, 04-07 Giugno",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_4",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 12px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "160%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_4", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 14px; color: #374151; margin: 0 0 10px 0;\">Il Meeting Italiano di Giovedì (MIG) 2026 si terrà a <strong>Palermo</strong> dal <strong>4 al 7 giugno</strong>. Un'occasione unica per incontrare soci da tutta Italia in una delle città più ricche di storia e cultura del Mediterraneo.</p><p style=\"font-size: 14px; color: #374151; margin: 0;\">Le iscrizioni sono aperte. Posti limitati — prenota subito il tuo posto prima che si esauriscano.</p>"
+                }
+              },
+              {
+                "id": "u_content_button_1",
+                "type": "button",
+                "values": {
+                  "containerPadding": "4px 20px 20px",
+                  "anchor": "",
+                  "href": { "name": "web", "values": { "href": "https://www.mensa.it/mig2026", "target": "_blank" } },
+                  "buttonColors": {
+                    "color": "#ffffff",
+                    "backgroundColor": "#1d2f6f",
+                    "hoverColor": "#ffffff",
+                    "hoverBackgroundColor": "#2d4fa0"
+                  },
+                  "size": { "autoWidth": true, "width": "100%" },
+                  "fontStyle": {
+                    "bold": false,
+                    "italic": false,
+                    "underline": false,
+                    "strikethrough": false
+                  },
+                  "text": "<span style=\"font-size: 14px; line-height: 16.8px;\">Leggi tutto su MIG 2026</span>",
+                  "textAlign": "left",
+                  "lineHeight": "120%",
+                  "padding": "10px 20px",
+                  "borderRadius": "4px",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_button_1", "htmlClassNames": "u_content_button" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "calculatedWidth": 218,
+                  "calculatedHeight": 37
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_5", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_5", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_6",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_6",
+            "contents": [
+              {
+                "id": "u_content_heading_2",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 6px",
+                  "anchor": "",
+                  "headingType": "h2",
+                  "fontSize": "22px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_2", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "Meeting Bello Bello in Modo Assurdo — Udine, 05-08 Nov",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_5",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 12px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "160%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_5", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 14px; color: #374151; margin: 0 0 10px 0;\">Dal <strong>5 all'8 novembre</strong> a <strong>Udine</strong> si terrà il Meeting Bello Bello in Modo Assurdo, un fine settimana di attività, giochi e convivialità nel cuore del Friuli.</p><p style=\"font-size: 14px; color: #374151; margin: 0;\">Il programma include serate tematiche, escape rooms mentali, degustazioni e tanto altro. Non mancate!</p>"
+                }
+              },
+              {
+                "id": "u_content_button_2",
+                "type": "button",
+                "values": {
+                  "containerPadding": "4px 20px 20px",
+                  "anchor": "",
+                  "href": { "name": "web", "values": { "href": "https://www.mensa.it/meeting-udine-2025", "target": "_blank" } },
+                  "buttonColors": {
+                    "color": "#ffffff",
+                    "backgroundColor": "#1d2f6f",
+                    "hoverColor": "#ffffff",
+                    "hoverBackgroundColor": "#2d4fa0"
+                  },
+                  "size": { "autoWidth": true, "width": "100%" },
+                  "fontStyle": {
+                    "bold": false,
+                    "italic": false,
+                    "underline": false,
+                    "strikethrough": false
+                  },
+                  "text": "<span style=\"font-size: 14px; line-height: 16.8px;\">Leggi tutto sul Meeting Udine</span>",
+                  "textAlign": "left",
+                  "lineHeight": "120%",
+                  "padding": "10px 20px",
+                  "borderRadius": "4px",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_button_2", "htmlClassNames": "u_content_button" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "calculatedWidth": 240,
+                  "calculatedHeight": 37
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "#f8f9ff",
+              "_meta": { "htmlID": "u_column_6", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#f8f9ff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_6", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_7",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_7",
+            "contents": [
+              {
+                "id": "u_content_heading_3",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 6px",
+                  "anchor": "",
+                  "headingType": "h2",
+                  "fontSize": "22px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_3", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "Nasce il SIG Progetto Impresa",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_6",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 12px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "160%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_6", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 14px; color: #374151; margin: 0 0 10px 0;\">È nato ufficialmente il <strong>SIG Progetto Impresa</strong>, il nuovo Special Interest Group dedicato a soci con interessi nel mondo dell'imprenditoria, startup e innovazione.</p><p style=\"font-size: 14px; color: #374151; margin: 0;\">Il gruppo si riunisce periodicamente online e organizza eventi dedicati. Per iscriverti o saperne di più, clicca il bottone qui sotto.</p>"
+                }
+              },
+              {
+                "id": "u_content_button_3",
+                "type": "button",
+                "values": {
+                  "containerPadding": "4px 20px 20px",
+                  "anchor": "",
+                  "href": { "name": "web", "values": { "href": "https://www.mensa.it/sig-progetto-impresa", "target": "_blank" } },
+                  "buttonColors": {
+                    "color": "#ffffff",
+                    "backgroundColor": "#1d2f6f",
+                    "hoverColor": "#ffffff",
+                    "hoverBackgroundColor": "#2d4fa0"
+                  },
+                  "size": { "autoWidth": true, "width": "100%" },
+                  "fontStyle": {
+                    "bold": false,
+                    "italic": false,
+                    "underline": false,
+                    "strikethrough": false
+                  },
+                  "text": "<span style=\"font-size: 14px; line-height: 16.8px;\">Leggi tutto su SIG Progetto Impresa</span>",
+                  "textAlign": "left",
+                  "lineHeight": "120%",
+                  "padding": "10px 20px",
+                  "borderRadius": "4px",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_button_3", "htmlClassNames": "u_content_button" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "calculatedWidth": 264,
+                  "calculatedHeight": 37
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_7", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_7", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_8",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_8",
+            "contents": [
+              {
+                "id": "u_content_divider_2",
+                "type": "divider",
+                "values": {
+                  "width": "100%",
+                  "border": {
+                    "borderTopWidth": "1px",
+                    "borderTopStyle": "solid",
+                    "borderTopColor": "#d1d5db"
+                  },
+                  "textAlign": "center",
+                  "containerPadding": "4px 20px",
+                  "anchor": "",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_divider_2", "htmlClassNames": "u_content_divider" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_8", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_8", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_9",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_9",
+            "contents": [
+              {
+                "id": "u_content_heading_4",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 10px",
+                  "anchor": "eventi-locali",
+                  "headingType": "h2",
+                  "fontSize": "20px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_4", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "📍 Eventi Locali",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_7",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 20px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "180%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_7", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<ul style=\"font-size: 14px; color: #374151; margin: 0; padding-left: 20px; line-height: 1.8;\"><li><strong>16.05</strong> — Domodossola: Cena stellata</li><li><strong>17.05</strong> — San Mauro Torinese: Karaoke Mensano</li><li><strong>18.05</strong> — Milano: Aperitivo in centro</li><li><strong>20.05</strong> — Roma: Visita guidata Musei Capitolini</li><li><strong>22.05</strong> — Firenze: Escape Room tematica</li><li><strong>24.05</strong> — Bologna: Cena al ristorante giapponese</li><li><strong>25.05</strong> — Torino: Giochi da tavolo + pizza</li><li><strong>28.05</strong> — Napoli: Tour gastronomico</li></ul>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_9", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_9", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_10",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_10",
+            "contents": [
+              {
+                "id": "u_content_heading_5",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 10px",
+                  "anchor": "eventi-internazionali",
+                  "headingType": "h2",
+                  "fontSize": "20px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_5", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "🌍 Eventi Internazionali",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_8",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 20px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "180%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_8", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<ul style=\"font-size: 14px; color: #374151; margin: 0; padding-left: 20px; line-height: 1.8;\"><li><strong>EMAG 2026 Montenegro</strong> — Podgorica, 29 luglio – 2 agosto<br><span style=\"color: #6b7280; font-size: 13px;\">European Mensa Annual Gathering. Iscrizioni aperte fino al 30 giugno.</span></li></ul>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "#f8f9ff",
+              "_meta": { "htmlID": "u_column_10", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#f8f9ff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_10", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_11",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_11",
+            "contents": [
+              {
+                "id": "u_content_heading_6",
+                "type": "heading",
+                "values": {
+                  "containerPadding": "20px 20px 10px",
+                  "anchor": "nuovi-soci",
+                  "headingType": "h2",
+                  "fontSize": "20px",
+                  "textAlign": "left",
+                  "lineHeight": "140%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_heading_6", "htmlClassNames": "u_content_heading" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "🎉 Nuovi Soci Genetalici",
+                  "color": "#1d2f6f"
+                }
+              },
+              {
+                "id": "u_content_text_9",
+                "type": "text",
+                "values": {
+                  "containerPadding": "0 20px 20px",
+                  "anchor": "",
+                  "textAlign": "left",
+                  "lineHeight": "160%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#1d2f6f",
+                    "linkHoverColor": "#1d2f6f",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_9", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 14px; color: #374151; margin: 0;\">Benvenuti ai nuovi soci che compiono gli anni questa settimana! Mensa Italia vi augura un <strong>buon compleanno</strong> e tanti anni di stimolanti discussioni in compagnia della comunità mensana.</p>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_11", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_11", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_12",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_12",
+            "contents": [
+              {
+                "id": "u_content_divider_3",
+                "type": "divider",
+                "values": {
+                  "width": "100%",
+                  "border": {
+                    "borderTopWidth": "1px",
+                    "borderTopStyle": "solid",
+                    "borderTopColor": "#d1d5db"
+                  },
+                  "textAlign": "center",
+                  "containerPadding": "4px 20px",
+                  "anchor": "",
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_divider_3", "htmlClassNames": "u_content_divider" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_12", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#ffffff",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_12", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      },
+      {
+        "id": "u_row_13",
+        "cells": [1],
+        "columns": [
+          {
+            "id": "u_column_13",
+            "contents": [
+              {
+                "id": "u_content_text_10",
+                "type": "text",
+                "values": {
+                  "containerPadding": "20px",
+                  "anchor": "social",
+                  "textAlign": "center",
+                  "lineHeight": "180%",
+                  "linkStyle": {
+                    "inherit": true,
+                    "linkColor": "#ffffff",
+                    "linkHoverColor": "#d1d5db",
+                    "linkUnderline": false,
+                    "linkHoverUnderline": false
+                  },
+                  "hideDesktop": false,
+                  "_meta": { "htmlID": "u_content_text_10", "htmlClassNames": "u_content_text" },
+                  "selectable": true,
+                  "draggable": true,
+                  "duplicatable": true,
+                  "deletable": true,
+                  "hideable": true,
+                  "text": "<p style=\"font-size: 13px; color: #d1d5db; margin: 0 0 8px 0;\"><strong style=\"color: #ffffff;\">Seguici sui social</strong></p><p style=\"font-size: 12px; color: #9ca3af; margin: 0 0 12px 0;\"><a href=\"https://www.facebook.com/MensaItalia\" style=\"color: #9ca3af;\">Facebook</a> &nbsp;·&nbsp; <a href=\"https://www.instagram.com/mensa.italia\" style=\"color: #9ca3af;\">Instagram</a> &nbsp;·&nbsp; <a href=\"https://www.linkedin.com/company/mensa-italia\" style=\"color: #9ca3af;\">LinkedIn</a></p><p style=\"font-size: 11px; color: #6b7280; margin: 0 0 6px 0;\">Mensa Italia · Via Roma 1 · 20121 Milano MI</p><p style=\"font-size: 11px; color: #6b7280; margin: 0;\"><a href=\"https://www.mensa.it/cancella-iscrizione\" style=\"color: #6b7280;\">Cancella iscrizione</a> &nbsp;|&nbsp; <a href=\"https://www.mensa.it/newsletter/preferenze\" style=\"color: #6b7280;\">Gestisci preferenze</a></p>"
+                }
+              }
+            ],
+            "values": {
+              "border": {},
+              "padding": "0px",
+              "backgroundColor": "",
+              "_meta": { "htmlID": "u_column_13", "htmlClassNames": "u_column" }
+            }
+          }
+        ],
+        "values": {
+          "displayCondition": null,
+          "columns": false,
+          "backgroundColor": "#0f1d3b",
+          "columnsBackgroundColor": "",
+          "backgroundImage": { "url": "", "fullWidth": true, "repeat": "no-repeat", "size": "custom", "position": "center" },
+          "padding": "0px",
+          "anchor": "",
+          "hideDesktop": false,
+          "_meta": { "htmlID": "u_row_13", "htmlClassNames": "u_row" },
+          "selectable": true,
+          "draggable": true,
+          "duplicatable": true,
+          "deletable": true,
+          "hideable": true
+        }
+      }
+    ],
+    "headers": [],
+    "footers": [],
+    "values": {
+      "popupPosition": "center",
+      "popupWidth": "600px",
+      "popupHeight": "auto",
+      "borderRadius": "10px",
+      "contentAlign": "center",
+      "contentVerticalAlign": "center",
+      "contentWidth": "600px",
+      "fontFamily": {
+        "label": "Arial",
+        "value": "arial,helvetica,sans-serif"
+      },
+      "textColor": "#333333",
+      "popupBackgroundColor": "#FFFFFF",
+      "popupBackgroundImage": {
+        "url": "",
+        "fullWidth": true,
+        "repeat": "no-repeat",
+        "size": "cover",
+        "position": "center"
+      },
+      "popupOverlay_backgroundColor": "rgba(0, 0, 0, 0.1)",
+      "popupCloseButton_margin": "0px",
+      "popupCloseButton_position": "top-right",
+      "popupCloseButton_backgroundColor": "#DDDDDD",
+      "popupCloseButton_iconColor": "#000000",
+      "popupCloseButton_borderRadius": "0px",
+      "popupCloseButton_margin_top": "0px",
+      "popupCloseButton_margin_right": "0px",
+      "popupCloseButton_margin_bottom": "0px",
+      "popupCloseButton_margin_left": "0px",
+      "backgroundColor": "#f7f8fb",
+      "preheaderText": "MensaNews n. 1113 — eventi, comunicazioni e molto altro dalla comunità Mensa Italia",
+      "linkStyle": {
+        "body": true,
+        "linkColor": "#1d2f6f",
+        "linkHoverColor": "#1d2f6f",
+        "linkUnderline": true,
+        "linkHoverUnderline": true,
+        "inherit": false
+      },
+      "_meta": {
+        "htmlID": "u_body",
+        "htmlClassNames": "u_body"
+      }
+    }
+  },
+  "schemaVersion": 18
+}

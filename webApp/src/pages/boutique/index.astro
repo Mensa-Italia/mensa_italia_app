@@ -1,0 +1,706 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+---
+
+<AppShell title="Boutique — Mensa Italia" pageTitle="Boutique">
+  <div class="bq">
+
+    <header class="bq-hero">
+      <p class="bq-hero__eyebrow">Boutique</p>
+      <h1 class="bq-hero__title">Boutique Mensa Italia</h1>
+      <p class="bq-hero__sub">Tessera, merchandising, libri e gadget. Spediamo in tutta Italia.</p>
+    </header>
+
+    <div class="bq-toolbar">
+      <div class="bq-filters" role="list" aria-label="Filtra per categoria">
+        <button class="bq-filter bq-filter--active" data-filter="tutto" role="listitem">Tutto</button>
+        <button class="bq-filter" data-filter="tessere" role="listitem">Tessere & accessori</button>
+        <button class="bq-filter" data-filter="abbigliamento" role="listitem">Abbigliamento</button>
+        <button class="bq-filter" data-filter="libri" role="listitem">Libri & rivista</button>
+        <button class="bq-filter" data-filter="casa" role="listitem">Casa & ufficio</button>
+        <button class="bq-filter" data-filter="limited" role="listitem">Edizione limitata</button>
+      </div>
+
+      <div class="bq-toolbar__right">
+        <select class="bq-sort" aria-label="Ordina prodotti">
+          <option>Più popolari</option>
+          <option>Prezzo: crescente</option>
+          <option>Prezzo: decrescente</option>
+          <option>Novità</option>
+        </select>
+        <div class="bq-view-toggle">
+          <button class="bq-view-btn bq-view-btn--active" data-view="grid" aria-label="Vista griglia" title="Griglia">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/>
+              <rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/>
+            </svg>
+          </button>
+          <button class="bq-view-btn" data-view="list" aria-label="Vista lista" title="Lista">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <rect x="0" y="1" width="16" height="2" rx="1"/><rect x="0" y="7" width="16" height="2" rx="1"/>
+              <rect x="0" y="13" width="16" height="2" rx="1"/>
+            </svg>
+          </button>
+        </div>
+        <a href="/boutique/cart" class="bq-cart-btn" aria-label="Carrello" id="cart-icon-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="20" height="20" aria-hidden="true">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span class="bq-cart-badge" id="cart-count" aria-live="polite">0</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="bq-grid" id="products-grid">
+
+      <a href="/boutique/product/tessera-premium-metallo" class="bq-card" data-cat="tessere">
+        <div class="bq-card__img bq-card__img--blue">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="8" y="20" width="64" height="40" rx="6" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <circle cx="20" cy="35" r="6" fill="rgba(255,255,255,0.3)"/>
+            <rect x="14" y="47" width="36" height="3" rx="1.5" fill="rgba(255,255,255,0.5)"/>
+            <rect x="14" y="52" width="24" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Tessere & accessori</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Tessera Mensa premium in metallo</p>
+          <p class="bq-card__desc">Acciaio inox satinato inciso laser</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 25,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="tessera-premium-metallo" data-name="Tessera Mensa premium in metallo" data-price="25.00" data-cat="Tessere & accessori">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/tessera-classica" class="bq-card" data-cat="tessere">
+        <div class="bq-card__img bq-card__img--indigo">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="8" y="20" width="64" height="40" rx="6" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <circle cx="20" cy="35" r="6" fill="rgba(255,255,255,0.3)"/>
+            <rect x="14" y="47" width="36" height="3" rx="1.5" fill="rgba(255,255,255,0.5)"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Tessere & accessori</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Tessera Mensa classica</p>
+          <p class="bq-card__desc">PVC con perso­nalizzazione inclusa</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 15,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="tessera-classica" data-name="Tessera Mensa classica" data-price="15.00" data-cat="Tessere & accessori">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="abbigliamento">
+        <div class="bq-card__img bq-card__img--slate">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <path d="M20 55 L20 35 Q20 25 30 22 L40 18 L50 22 Q60 25 60 35 L60 55 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+            <path d="M30 22 Q35 30 40 30 Q45 30 50 22" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="bq-card__badges">
+          <span class="bq-card__badge bq-card__badge--sale">-20%</span>
+        </div>
+        <span class="bq-card__cat">Abbigliamento</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Felpa con cappuccio "Curiosity above all"</p>
+          <p class="bq-card__desc">Cotone organico 340g · unisex</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 52,00</span>
+            <span class="bq-card__price-old">€ 65,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="felpa-cappuccio-curiosity" data-name='Felpa "Curiosity above all"' data-price="52.00" data-cat="Abbigliamento">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="abbigliamento">
+        <div class="bq-card__img bq-card__img--teal">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <path d="M22 55 L22 35 Q22 25 32 22 L40 19 L48 22 Q58 25 58 35 L58 55 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Abbigliamento</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">T-shirt Mensa Italia logo</p>
+          <p class="bq-card__desc">Cotone pettinato 180g · 6 colori</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 24,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="tshirt-mensa-logo" data-name="T-shirt Mensa Italia logo" data-price="24.00" data-cat="Abbigliamento">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="abbigliamento">
+        <div class="bq-card__img bq-card__img--navy">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <path d="M15 55 Q15 42 25 38 L40 36 L55 38 Q65 42 65 55 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+            <ellipse cx="40" cy="28" rx="8" ry="9" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Abbigliamento</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Cap navy ricamato "M"</p>
+          <p class="bq-card__desc">Ricamo a filo oro · taglia unica</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 18,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="cap-navy-ricamato" data-name='Cap navy ricamato "M"' data-price="18.00" data-cat="Abbigliamento">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="abbigliamento">
+        <div class="bq-card__img bq-card__img--amber">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <path d="M18 60 L18 45 Q18 35 28 32 L40 30 L52 32 Q62 35 62 45 L62 60 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+            <line x1="25" y1="30" x2="20" y2="18" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="55" y1="30" x2="60" y2="18" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Abbigliamento</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Borsa di tela "the high I.Q. society"</p>
+          <p class="bq-card__desc">Canvas 100% cotone · manici lunghi</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 14,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="borsa-tela-hiq" data-name='Borsa di tela "the high I.Q. society"' data-price="14.00" data-cat="Abbigliamento">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="libri">
+        <div class="bq-card__img bq-card__img--emerald">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="22" y="15" width="36" height="50" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <rect x="26" y="22" width="28" height="2" rx="1" fill="rgba(255,255,255,0.5)"/>
+            <rect x="26" y="27" width="20" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+            <rect x="26" y="32" width="24" height="1" rx="0.5" fill="rgba(255,255,255,0.2)"/>
+            <rect x="26" y="35" width="22" height="1" rx="0.5" fill="rgba(255,255,255,0.2)"/>
+          </svg>
+        </div>
+        <div class="bq-card__badges">
+          <span class="bq-card__badge bq-card__badge--new">Nuovo</span>
+        </div>
+        <span class="bq-card__cat">Libri & rivista</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Storia di Mensa Italia 1983–2023</p>
+          <p class="bq-card__desc">Edizione cartonata · 280 pagine</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 28,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="storia-mensa-italia" data-name="Storia di Mensa Italia 1983–2023" data-price="28.00" data-cat="Libri & rivista">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="libri">
+        <div class="bq-card__img bq-card__img--rose">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="18" y="20" width="44" height="40" rx="3" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+            <text x="40" y="44" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-family="serif" font-weight="bold">QUID</text>
+            <rect x="18" y="30" width="44" height="3" fill="rgba(255,255,255,0.08)"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Libri & rivista</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Annata Quid 2025 (4 numeri)</p>
+          <p class="bq-card__desc">Rivista trimestrale · cofanetto</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 40,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="annata-quid-2025" data-name="Annata Quid 2025 (4 numeri)" data-price="40.00" data-cat="Libri & rivista">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="casa">
+        <div class="bq-card__img bq-card__img--warm">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <ellipse cx="28" cy="46" rx="9" ry="11" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <ellipse cx="52" cy="46" rx="9" ry="11" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M28 35 Q28 28 30 27" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M52 35 Q52 28 54 27" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Casa & ufficio</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Set 4 tazze da caffè in porcellana</p>
+          <p class="bq-card__desc">Porcellana bone china · logo a rilievo</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 34,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="set-tazze-porcellana" data-name="Set 4 tazze da caffè in porcellana" data-price="34.00" data-cat="Casa & ufficio">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="casa">
+        <div class="bq-card__img bq-card__img--gray">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="15" y="15" width="50" height="65" rx="3" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <rect x="20" y="22" width="40" height="30" rx="2" fill="rgba(255,255,255,0.08)"/>
+            <text x="40" y="42" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.5)" font-family="serif">M</text>
+          </svg>
+        </div>
+        <span class="bq-card__cat">Casa & ufficio</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Quaderno A5 logo a secco</p>
+          <p class="bq-card__desc">80 fogli cream · copertina rigida</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 12,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="quaderno-a5-logo" data-name="Quaderno A5 logo a secco" data-price="12.00" data-cat="Casa & ufficio">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/felpa-cappuccio-curiosity" class="bq-card" data-cat="limited">
+        <div class="bq-card__img bq-card__img--violet">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <circle cx="40" cy="40" r="18" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <text x="40" y="45" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.7)" font-family="sans-serif" font-weight="700">M</text>
+          </svg>
+        </div>
+        <div class="bq-card__badges">
+          <span class="bq-card__badge bq-card__badge--limited">Ed. limitata</span>
+        </div>
+        <span class="bq-card__cat">Edizione limitata</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Pin smaltato 80° anniversario</p>
+          <p class="bq-card__desc">Smalto duro · placcatura argento</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 8,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="pin-smaltato-80" data-name="Pin smaltato 80° anniversario" data-price="8.00" data-cat="Edizione limitata">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+      <a href="/boutique/product/tessera-legno-fresato" class="bq-card" data-cat="limited">
+        <div class="bq-card__img bq-card__img--wood">
+          <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+            <rect x="8" y="22" width="64" height="36" rx="5" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <text x="40" y="43" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.65)" font-family="serif">MENSA</text>
+            <text x="40" y="52" text-anchor="middle" font-size="6" fill="rgba(255,255,255,0.45)" font-family="serif" letter-spacing="2">N° 0012</text>
+          </svg>
+        </div>
+        <div class="bq-card__badges">
+          <span class="bq-card__badge bq-card__badge--limited">Ed. limitata</span>
+        </div>
+        <span class="bq-card__avail">Solo 12 rimasti</span>
+        <span class="bq-card__cat">Edizione limitata</span>
+        <div class="bq-card__body">
+          <p class="bq-card__name">Tessera in legno fresato (numerata)</p>
+          <p class="bq-card__desc">Ciliegio · max 50 pezzi · laser</p>
+          <div class="bq-card__price-row">
+            <span class="bq-card__price">€ 120,00</span>
+          </div>
+          <button class="bq-card__cta" data-slug="tessera-legno-fresato" data-name="Tessera in legno fresato (numerata)" data-price="120.00" data-cat="Edizione limitata">Aggiungi al carrello</button>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="bq-toast" id="bq-toast" role="alert" aria-live="assertive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Aggiunto al carrello</span>
+      <a href="/boutique/cart" class="bq-toast__link">Vedi carrello →</a>
+    </div>
+
+  </div>
+</AppShell>
+
+<style>
+  .bq { display: grid; gap: var(--spacing-6); }
+
+  .bq-hero { display: grid; gap: var(--spacing-2); }
+  .bq-hero__eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+  .bq-hero__title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+    line-height: 1.2;
+  }
+  .bq-hero__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .bq-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+  }
+  .bq-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+  .bq-filter {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+  }
+  .bq-filter:hover { border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); }
+  .bq-filter--active {
+    background: var(--color-mensa-blue);
+    border-color: var(--color-mensa-blue);
+    color: #fff;
+  }
+  .bq-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+  .bq-sort {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+  .bq-view-toggle {
+    display: flex;
+    gap: 2px;
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+  }
+  .bq-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 26px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+  }
+  .bq-view-btn--active { background: var(--color-mensa-blue); color: #fff; }
+
+  .bq-cart-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all var(--motion-fast) var(--ease-out-quart);
+  }
+  .bq-cart-btn:hover { background: var(--color-mensa-blue); color: #fff; border-color: var(--color-mensa-blue); }
+  .bq-cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #e53e3e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    border: 2px solid var(--color-surface);
+  }
+  .bq-cart-badge[data-empty="true"] { display: none; }
+
+  .bq-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-5);
+  }
+  @media (max-width: 900px) { .bq-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .bq-grid { grid-template-columns: 1fr; } }
+
+  .bq-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-elevated);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: box-shadow var(--motion-fast) var(--ease-out-quart),
+                transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .bq-card:hover {
+    box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+  .bq-card__img {
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .bq-card__img--blue   { background: linear-gradient(135deg, oklch(42% 0.18 263) 0%, oklch(28% 0.14 263) 100%); }
+  .bq-card__img--indigo { background: linear-gradient(135deg, oklch(45% 0.18 280) 0%, oklch(32% 0.14 280) 100%); }
+  .bq-card__img--slate  { background: linear-gradient(135deg, oklch(40% 0.06 240) 0%, oklch(26% 0.04 240) 100%); }
+  .bq-card__img--teal   { background: linear-gradient(135deg, oklch(52% 0.14 190) 0%, oklch(36% 0.10 190) 100%); }
+  .bq-card__img--navy   { background: linear-gradient(135deg, oklch(30% 0.14 245) 0%, oklch(18% 0.10 245) 100%); }
+  .bq-card__img--amber  { background: linear-gradient(135deg, oklch(68% 0.16 64) 0%, oklch(52% 0.14 64) 100%); }
+  .bq-card__img--emerald{ background: linear-gradient(135deg, oklch(52% 0.14 162) 0%, oklch(36% 0.12 162) 100%); }
+  .bq-card__img--rose   { background: linear-gradient(135deg, oklch(56% 0.18 6) 0%, oklch(40% 0.14 6) 100%); }
+  .bq-card__img--warm   { background: linear-gradient(135deg, oklch(62% 0.10 48) 0%, oklch(46% 0.08 48) 100%); }
+  .bq-card__img--gray   { background: linear-gradient(135deg, oklch(50% 0.02 240) 0%, oklch(34% 0.02 240) 100%); }
+  .bq-card__img--violet { background: linear-gradient(135deg, oklch(48% 0.18 310) 0%, oklch(32% 0.14 310) 100%); }
+  .bq-card__img--wood   { background: linear-gradient(135deg, oklch(56% 0.10 54) 0%, oklch(40% 0.08 48) 100%); }
+
+  .bq-card__badges {
+    position: absolute;
+    top: var(--spacing-3);
+    left: var(--spacing-3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bq-card__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bq-card__badge--new     { background: #22c55e; color: #fff; }
+  .bq-card__badge--limited { background: #7c3aed; color: #fff; }
+  .bq-card__badge--sale    { background: #e53e3e; color: #fff; }
+
+  .bq-card__avail {
+    position: absolute;
+    top: var(--spacing-3);
+    right: var(--spacing-3);
+    background: color-mix(in oklch, #7c3aed 15%, var(--color-surface));
+    color: #7c3aed;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    border: 1px solid color-mix(in oklch, #7c3aed 30%, transparent);
+  }
+  .bq-card__cat {
+    position: absolute;
+    top: calc(33.33% + var(--spacing-3));
+    right: var(--spacing-3);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    background: var(--color-surface-elevated);
+    padding: 2px 7px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-subtle);
+    pointer-events: none;
+  }
+
+  .bq-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    padding: var(--spacing-4);
+    flex: 1;
+  }
+  .bq-card__name {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bq-card__desc {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bq-card__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-2);
+    margin-top: auto;
+  }
+  .bq-card__price {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .bq-card__price-old {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: line-through;
+    font-variant-numeric: tabular-nums;
+  }
+  .bq-card__cta {
+    margin-top: var(--spacing-2);
+    width: 100%;
+    padding: 9px var(--spacing-3);
+    background: var(--color-mensa-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--motion-fast) var(--ease-out-quart);
+  }
+  .bq-card__cta:hover { opacity: 0.88; }
+
+  .bq-toast {
+    position: fixed;
+    bottom: var(--spacing-6);
+    right: var(--spacing-6);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: var(--color-text-primary);
+    color: var(--color-surface);
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    box-shadow: 0 8px 32px -4px rgba(0,0,0,0.3);
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .bq-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .bq-toast__link {
+    color: oklch(75% 0.18 263);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: var(--spacing-2);
+  }
+  .bq-toast__link:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .bq-toolbar { flex-direction: column; align-items: flex-start; }
+    .bq-toast { left: var(--spacing-4); right: var(--spacing-4); bottom: var(--spacing-4); }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var CART_KEY = 'mensa_boutique_cart';
+
+    function getCart() {
+      try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (_) { return []; }
+    }
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+    function totalQty(cart) {
+      return cart.reduce(function (s, i) { return s + (i.qty || 1); }, 0);
+    }
+    function updateCounter() {
+      var badge = document.getElementById('cart-count');
+      if (!badge) return;
+      var n = totalQty(getCart());
+      badge.textContent = String(n);
+      badge.dataset.empty = n === 0 ? 'true' : 'false';
+    }
+
+    function showToast() {
+      var toast = document.getElementById('bq-toast');
+      if (!toast) return;
+      toast.classList.add('is-visible');
+      setTimeout(function () { toast.classList.remove('is-visible'); }, 2500);
+    }
+
+    updateCounter();
+
+    document.querySelectorAll('.bq-card__cta').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var cart = getCart();
+        var slug  = btn.dataset.slug;
+        var name  = btn.dataset.name;
+        var price = parseFloat(btn.dataset.price || '0');
+        var cat   = btn.dataset.cat || '';
+        var existing = cart.find(function (i) { return i.slug === slug; });
+        if (existing) {
+          existing.qty = (existing.qty || 1) + 1;
+        } else {
+          cart.push({ slug: slug, name: name, price: price, cat: cat, qty: 1, size: null });
+        }
+        saveCart(cart);
+        updateCounter();
+        showToast();
+      });
+    });
+
+    document.querySelectorAll('.bq-filter').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.bq-filter').forEach(function (b) { b.classList.remove('bq-filter--active'); });
+        btn.classList.add('bq-filter--active');
+        var filter = btn.dataset.filter;
+        document.querySelectorAll('.bq-card').forEach(function (card) {
+          var cat = card.dataset.cat || '';
+          card.style.display = (filter === 'tutto' || cat === filter) ? '' : 'none';
+        });
+      });
+    });
+
+    document.querySelectorAll('.bq-view-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.bq-view-btn').forEach(function (b) { b.classList.remove('bq-view-btn--active'); });
+        btn.classList.add('bq-view-btn--active');
+        var grid = document.getElementById('products-grid');
+        if (!grid) return;
+        if (btn.dataset.view === 'list') {
+          grid.style.gridTemplateColumns = '1fr';
+        } else {
+          grid.style.gridTemplateColumns = '';
+        }
+      });
+    });
+  })();
+</script>

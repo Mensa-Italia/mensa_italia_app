@@ -1,0 +1,154 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const newsletters = [
+  {
+    slug: "mensanews",
+    name: "MensaNews",
+    description: "Newsletter nazionale settimanale",
+    subscribers: 2341,
+    lastSent: "12 Mag 2026",
+  },
+  {
+    slug: "globale",
+    name: "Newsletter Globale",
+    description: "Aggiornamenti istituzionali per tutta la comunità",
+    subscribers: 2512,
+    lastSent: "5 Mag 2026",
+  },
+  {
+    slug: "lombardia",
+    name: "Newsletter Lombardia",
+    description: "Eventi e iniziative del gruppo locale Lombardia",
+    subscribers: 412,
+    lastSent: "8 Mag 2026",
+  },
+];
+---
+
+<ConsoleShell
+  title="Newsletter — Console Mensa"
+  pageTitle="Newsletter"
+  scope="newsletter"
+  activeHref="/console/newsletter"
+>
+  <div class="page-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Newsletter</h1>
+        <p class="page-header__sub">Gestisci e invia le comunicazioni periodiche ai soci</p>
+      </div>
+    </header>
+
+    <div class="nl-grid">
+      {newsletters.map((nl) => (
+        <div class="nl-card">
+          <div class="nl-card__body">
+            <h2 class="nl-card__name">{nl.name}</h2>
+            <p class="nl-card__desc">{nl.description}</p>
+            <div class="nl-card__meta">
+              <span class="nl-card__subscribers"><strong>{nl.subscribers.toLocaleString("it-IT")}</strong> soci iscritti</span>
+              <span class="nl-card__sep" aria-hidden="true">·</span>
+              <span class="nl-card__last">Ultimo invio: {nl.lastSent}</span>
+            </div>
+          </div>
+          <div class="nl-card__footer">
+            <a href={`/console/newsletter/${nl.slug}`} class="nl-card__cta">
+              Apri editor →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content {
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding-block-end: var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+  .page-header__title {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+  .page-header__sub {
+    margin: 0;
+    margin-block-start: var(--spacing-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .nl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-4);
+  }
+
+  .nl-card {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-elevated);
+    overflow: hidden;
+  }
+  .nl-card__body {
+    padding: var(--spacing-5);
+    display: grid;
+    gap: var(--spacing-2);
+    align-content: start;
+  }
+  .nl-card__name {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+  .nl-card__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+  }
+  .nl-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+    margin-block-start: var(--spacing-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .nl-card__subscribers strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+  .nl-card__sep { color: var(--color-border-subtle); }
+  .nl-card__footer {
+    padding: var(--spacing-3) var(--spacing-5);
+    border-block-start: 1px solid var(--color-border-subtle);
+    background: var(--color-surface);
+  }
+  .nl-card__cta {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-mensa-blue);
+    text-decoration: none;
+  }
+  .nl-card__cta:hover { text-decoration: underline; }
+</style>

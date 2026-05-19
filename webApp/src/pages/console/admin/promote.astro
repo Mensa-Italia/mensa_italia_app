@@ -1,0 +1,134 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  title="Promuovi a socio — Admin Nazionale"
+  pageTitle="Promuovi a socio"
+  
+  activeHref="/console/admin/applicants" scope="test"
+  
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Promuovi a socio</h1>
+        <p class="page-header__sub">Conversione aspirante → socio nazionale</p>
+      </div>
+      <span class="badge badge--purple">applicants_admin</span>
+    </header>
+
+    <a href="/console/admin/applicant?id=mock" class="back-link">← Torna al dettaglio aspirante</a>
+
+    <div class="result-card">
+      <div class="result-card__avatar" aria-hidden="true">MR</div>
+      <div class="result-card__body">
+        <h2 class="result-card__name">Marco Rossi</h2>
+        <div class="result-card__badges">
+          <span class="status status--green">Passato</span>
+          <span class="iq-pill">IQ 132</span>
+        </div>
+        <dl class="result-card__fields">
+          <div><dt>Sede</dt><dd>Roma</dd></div>
+          <div><dt>Data test</dt><dd>6 Giu 2026</dd></div>
+          <div><dt>Punteggio</dt><dd>30 / 35</dd></div>
+          <div><dt>Percentile</dt><dd>98° +</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="summary-banner">
+      <ul class="summary-banner__list">
+        <li>
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          L'aspirante diventerà <strong>socio nazionale Mensa Italia</strong>.
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          Verrà attivato il gruppo locale <strong>Roma</strong>.
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          Quota esame già pagata · nessun ulteriore addebito per questa operazione.
+        </li>
+      </ul>
+    </div>
+
+    <div class="audit-banner">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
+      <div>
+        <p class="audit-banner__title">Azione riservata a national admin</p>
+        <p class="audit-banner__sub">Questa operazione viene registrata nel log di audit con operatore, data e ora. Non reversibile senza intervento manuale.</p>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label" for="note-interna">Nota interna (facoltativo)</label>
+        <textarea id="note-interna" class="form-textarea" rows="3" placeholder="Aggiungi una nota per il log di audit…"></textarea>
+      </div>
+      <div class="form-actions">
+        <a href="/console/admin/applicants?msg=promoted" class="btn btn--primary btn--lg">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          Conferma promozione
+        </a>
+        <a href="/console/admin/applicant?id=mock" class="btn btn--ghost">Annulla</a>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { max-inline-size: 780px; display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--purple { background: #ede9fe; color: #4c1d95; }
+
+  .back-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; font-weight: 500; width: fit-content; }
+  .back-link:hover { text-decoration: underline; }
+
+  .result-card { display: flex; gap: var(--spacing-4); padding: var(--spacing-5); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); align-items: flex-start; flex-wrap: wrap; }
+  .result-card__avatar { width: 4rem; height: 4rem; border-radius: 50%; background: var(--color-mensa-blue); color: var(--color-text-on-brand); font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .result-card__name { margin: 0 0 0.6rem; font-size: var(--text-lg); font-weight: 700; color: var(--color-text-primary); }
+  .result-card__badges { display: flex; gap: var(--spacing-2); align-items: center; flex-wrap: wrap; margin-block-end: var(--spacing-3); }
+  .result-card__fields { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2); }
+  @media (max-width: 480px) { .result-card__fields { grid-template-columns: 1fr; } }
+  .result-card__fields > div { display: flex; flex-direction: column; gap: 0.1rem; }
+  .result-card__fields dt { font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+  .result-card__fields dd { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+
+  .status { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 9999px; font-size: var(--text-xs); font-weight: 700; }
+  .status--green { background: #d1fae5; color: #065f46; }
+  .iq-pill { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 9999px; font-size: var(--text-xs); font-weight: 800; background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+
+  .summary-banner { background: #f0fdf4; border: 1px solid #86efac; border-radius: var(--radius-md); padding: var(--spacing-4); }
+  .summary-banner__list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--spacing-2); }
+  .summary-banner__list li { display: flex; align-items: flex-start; gap: var(--spacing-2); font-size: var(--text-sm); color: #14532d; }
+  .summary-banner__list svg { width: 1.1rem; height: 1.1rem; color: #22c55e; flex-shrink: 0; margin-block-start: 0.1rem; }
+  .summary-banner__list strong { font-weight: 700; }
+
+  .audit-banner { display: flex; gap: var(--spacing-3); align-items: flex-start; padding: var(--spacing-3) var(--spacing-4); background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--radius-sm); }
+  .audit-banner svg { width: 1.25rem; height: 1.25rem; color: #dc2626; flex-shrink: 0; margin-block-start: 0.1rem; }
+  .audit-banner__title { margin: 0 0 0.2rem; font-size: var(--text-sm); font-weight: 700; color: #7f1d1d; }
+  .audit-banner__sub { margin: 0; font-size: var(--text-xs); color: #991b1b; line-height: 1.5; }
+
+  .form-card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .form-group { display: grid; gap: var(--spacing-1); }
+  .form-label { font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-primary); }
+  .form-textarea { padding: 0.6rem 0.875rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); width: 100%; box-sizing: border-box; resize: vertical; }
+  .form-textarea:focus { outline: none; border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+
+  .form-actions { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: var(--spacing-2); padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--lg { padding: 0.75rem 2rem; font-size: var(--text-base); }
+  .btn svg { width: 1rem; height: 1rem; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost   { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-strong); }
+</style>

@@ -1,0 +1,135 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const candidates = [
+  { id: "c1", name: "Marco Rossi",        cf: "RSSMRC85A01H501Z", slot: "09:00", stato: "Check-in fatto" },
+  { id: "c2", name: "Giulia Ferretti",    cf: "FRRGLI92B41F205X", slot: "09:00", stato: "Atteso"         },
+  { id: "c3", name: "Lorenzo Bianchi",    cf: "BNCLNZ88D15L219Q", slot: "09:00", stato: "Presente"      },
+  { id: "c4", name: "Valentina Esposito", cf: "SPTVNT95E41F839K", slot: "10:30", stato: "Atteso"         },
+  { id: "c5", name: "Federico Marini",    cf: "MRNFRC90F12H501W", slot: "10:30", stato: "Atteso"         },
+  { id: "c6", name: "Sara Conti",         cf: "CNTSRA87M60G702N", slot: "10:30", stato: "Check-in fatto" },
+  { id: "c7", name: "Matteo De Luca",     cf: "DLCMTT93C21E625T", slot: "12:00", stato: "Atteso"         },
+  { id: "c8", name: "Chiara Ricci",       cf: "RCCCHI96A58L736P", slot: "12:00", stato: "Check-in fatto" },
+];
+---
+
+<ConsoleShell
+  title="Test del giorno — Staff Sede"
+  pageTitle="Test del giorno"
+  scope="test"
+  activeHref="/console/test-assistant/today"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Sessione del giorno</h1>
+        <p class="page-header__sub">Sede Roma · Sab 6 Giu 2026</p>
+      </div>
+      <span class="badge badge--orange">Staff sede</span>
+    </header>
+
+    <div class="counters">
+      <div class="counter"><span class="counter__num">8</span><span class="counter__label">Attesi</span></div>
+      <div class="counter counter--green"><span class="counter__num">3</span><span class="counter__label">Presenti</span></div>
+      <div class="counter counter--red"><span class="counter__num">0</span><span class="counter__label">Assenti</span></div>
+    </div>
+
+    <div class="toolbar">
+      <label class="toolbar__label" for="slot-filter">Filtra per slot:</label>
+      <select id="slot-filter" class="toolbar__select">
+        <option>Tutti gli slot</option>
+        <option>09:00</option>
+        <option>10:30</option>
+        <option>12:00</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Candidato</th>
+            <th>Codice fiscale</th>
+            <th>Slot</th>
+            <th>Stato</th>
+            <th aria-label="Azioni"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {candidates.map((c) => (
+            <tr>
+              <td class="td--name">{c.name}</td>
+              <td class="td--cf"><code>{c.cf}</code></td>
+              <td class="td--slot">{c.slot}</td>
+              <td>
+                <span class={`status ${c.stato === "Check-in fatto" ? "status--green" : c.stato === "Presente" ? "status--green" : c.stato === "Assente" ? "status--red" : "status--gray"}`}>
+                  {c.stato}
+                </span>
+              </td>
+              <td class="td--action">
+                <a href={`/console/test-assistant/checkin?id=${c.id}`} class="btn btn--sm btn--primary">Check-in</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--orange { background: #ffedd5; color: #9a3412; }
+
+  .counters { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
+  .counter { display: flex; flex-direction: column; align-items: center; padding: var(--spacing-4) var(--spacing-5); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); min-inline-size: 100px; text-align: center; }
+  .counter--green { border-color: #86efac; background: #f0fdf4; }
+  .counter--red   { border-color: #fca5a5; background: #fef2f2; }
+  .counter__num { font-size: 2rem; font-weight: 800; color: var(--color-text-primary); line-height: 1; }
+  .counter--green .counter__num { color: #15803d; }
+  .counter--red   .counter__num { color: #b91c1c; }
+  .counter__label { font-size: var(--text-2xs); font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-block-start: var(--spacing-1); }
+
+  .toolbar { display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap; }
+  .toolbar__label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .toolbar__select { padding: 0.4rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); cursor: pointer; }
+
+  .table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table thead tr { background: var(--color-surface-elevated); border-block-end: 1px solid var(--color-border-subtle); }
+  .table th { padding: 0.75rem 1rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); }
+  .table tbody tr { border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .table tbody tr:last-child { border-block-end: none; }
+  .table tbody tr:hover { background: var(--color-surface-elevated); }
+  .table td { padding: 0.875rem 1rem; color: var(--color-text-primary); vertical-align: middle; }
+  .td--name { font-weight: 600; }
+  .td--cf code { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); }
+  .td--slot { color: var(--color-text-tertiary); }
+  .td--action { text-align: right; }
+
+  .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.03em; }
+  .status--green { background: #d1fae5; color: #065f46; }
+  .status--red   { background: #fee2e2; color: #991b1b; }
+  .status--gray  { background: var(--color-surface-elevated); color: var(--color-text-tertiary); }
+
+  .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 600; text-decoration: none; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn--sm { padding: 0.35rem 0.875rem; font-size: var(--text-xs); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+
+  @media (max-width: 640px) {
+    .table thead { display: none; }
+    .table tbody, .table tr, .table td { display: block; width: 100%; }
+    .table tr { padding: 0.75rem 1rem; border-block-end: 1px solid var(--color-border-subtle); }
+    .table td { padding: 0.2rem 0; }
+    .td--action { text-align: left; margin-block-start: 0.5rem; }
+  }
+</style>

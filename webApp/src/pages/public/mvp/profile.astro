@@ -1,0 +1,143 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Il mio profilo — MensaTesting"
+  pageTitle="Il mio profilo"
+  audience="applicant"
+  activeHref="/public/mvp/profile"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <h1 class="page-header__title">Il mio profilo</h1>
+      <p class="page-header__sub">Mantieni aggiornati i tuoi dati anagrafici.</p>
+    </header>
+
+    <form class="form-section" onsubmit="event.preventDefault()">
+      <h2 class="section-title">Dati personali</h2>
+
+      <div class="form__row form__row--2">
+        <div class="form__field">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" value="Marco" autocomplete="given-name" />
+        </div>
+        <div class="form__field">
+          <label for="cognome">Cognome</label>
+          <input type="text" id="cognome" name="cognome" value="Rossi" autocomplete="family-name" />
+        </div>
+      </div>
+
+      <div class="form__field">
+        <label for="email">Email <span class="badge-readonly">sola lettura</span></label>
+        <input type="email" id="email" name="email" value="marco.rossi@example.com" readonly autocomplete="email" />
+      </div>
+
+      <div class="form__row form__row--2">
+        <div class="form__field">
+          <label for="cf">Codice fiscale</label>
+          <input type="text" id="cf" name="cf" value="RSSMRC85T10H501Z" autocomplete="off" style="text-transform:uppercase" />
+        </div>
+        <div class="form__field">
+          <label for="dob">Data di nascita</label>
+          <input type="date" id="dob" name="dob" value="1985-12-10" autocomplete="bday" />
+        </div>
+      </div>
+
+      <div class="form__field">
+        <label for="phone">Telefono</label>
+        <input type="tel" id="phone" name="phone" value="+39 333 1234567" autocomplete="tel" />
+      </div>
+
+      <h2 class="section-title section-title--spaced">Indirizzo</h2>
+
+      <div class="form__field">
+        <label for="via">Via e numero civico</label>
+        <input type="text" id="via" name="via" value="Via Roma, 42" autocomplete="street-address" />
+      </div>
+
+      <div class="form__row form__row--3">
+        <div class="form__field">
+          <label for="citta">Città</label>
+          <input type="text" id="citta" name="citta" value="Roma" autocomplete="address-level2" />
+        </div>
+        <div class="form__field">
+          <label for="cap">CAP</label>
+          <input type="text" id="cap" name="cap" value="00100" autocomplete="postal-code" />
+        </div>
+        <div class="form__field">
+          <label for="provincia">Provincia</label>
+          <input type="text" id="provincia" name="provincia" value="RM" maxlength="2" autocomplete="address-level1" />
+        </div>
+      </div>
+
+      <div class="form__actions">
+        <a href="/public/mvp/dashboard" class="btn btn--primary">Salva modifiche</a>
+      </div>
+    </form>
+
+    <div class="security-section">
+      <h2 class="section-title">Sicurezza</h2>
+      <div class="security-row">
+        <div>
+          <p class="security-row__title">Password</p>
+          <p class="security-row__meta">Ultima modifica: mai</p>
+        </div>
+        <a href="/login" class="btn btn--ghost">Cambia password</a>
+      </div>
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<style>
+  .page-content {
+    max-inline-size: 680px;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px var(--spacing-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--motion-fast) var(--ease-out-quart),
+                border-color var(--motion-fast) var(--ease-out-quart);
+  }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+
+  .page-header { display: grid; gap: var(--spacing-1); }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-tertiary); }
+
+  .section-title { margin: 0 0 var(--spacing-4) 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); letter-spacing: -0.01em; }
+  .section-title--spaced { margin-block-start: var(--spacing-2); }
+
+  .form-section { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); display: grid; gap: var(--spacing-4); }
+  .form__row--2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-3); min-inline-size: 0; }
+  .form__row--3 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 80px; gap: var(--spacing-3); min-inline-size: 0; }
+  @media (max-width: 480px) { .form__row--2, .form__row--3 { grid-template-columns: 1fr; } }
+  .form__field { display: grid; gap: var(--spacing-1); min-inline-size: 0; }
+  .form__field label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); display: flex; align-items: center; gap: var(--spacing-2); }
+  .badge-readonly { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); background: var(--color-border-subtle); border-radius: 4px; padding: 1px 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .form__field input { padding: 9px var(--spacing-3); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); outline: none; transition: border-color var(--motion-fast) var(--ease-out-quart); font-family: inherit; box-sizing: border-box; inline-size: 100%; }
+  .form__field input:focus { border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+  .form__field input[readonly] { opacity: 0.6; cursor: not-allowed; }
+  .form__actions { padding-block-start: var(--spacing-2); }
+
+  .security-section { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-5); }
+  .security-row { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .security-row__title { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .security-row__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+</style>

@@ -1,0 +1,443 @@
+---
+import PublicLayout from "../../../../layouts/PublicLayout.astro";
+import {
+  CLUSTERS,
+  PUBLIC_CLUSTER_ORDER,
+  type ClusterSlug,
+  loadAllStaticPages,
+  pageHref,
+} from "../../../../lib/staticPages";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return (Object.keys(CLUSTERS) as ClusterSlug[]).map((cluster) => ({
+    params: { cluster },
+  }));
+}
+
+const { cluster } = Astro.params as { cluster: ClusterSlug };
+const meta = CLUSTERS[cluster];
+if (!meta) return Astro.redirect("/public/about");
+
+const allPages = await loadAllStaticPages();
+const pages = allPages
+  .filter((p) => p.cluster === cluster)
+  .sort((a, b) => a.order - b.order);
+
+// Filter otherClusters: skip legal/contatti (belong in footer), skip self
+const otherClusters = PUBLIC_CLUSTER_ORDER
+  .filter((c) => c !== cluster && c !== "legal" && c !== "contatti")
+  .map((c) => CLUSTERS[c]);
+
+// Truncate helper: cut on last space before n chars, add ellipsis
+function truncate(s: string, n: number): string {
+  if (!s || s.length <= n) return s;
+  const cut = s.lastIndexOf(" ", n);
+  return s.slice(0, cut > 0 ? cut : n) + "…";
+}
+
+// Per-cluster editorial intro (2–3 sentences, richer than tagline)
+const CLUSTER_INTROS: Record<ClusterSlug, string> = {
+  "chi-siamo": "Mensa Italia è il capitolo italiano di Mensa International, il club di alto QI più antico e grande al mondo. Fondata nel 1946 a Oxford, oggi raccoglie oltre 150.000 soci in 100 paesi — uniti da un unico requisito: rientrare nel 2% più alto della popolazione. Qui trovi la storia, i valori e le persone che rendono unica questa comunità.",
+  "iscriviti": "Entrare in Mensa Italia è più semplice di quanto pensi. Puoi sostenere il nostro test ufficiale, presentare un risultato riconosciuto già ottenuto altrove, oppure esplorare i percorsi riservati a bambini e giovani. Scopri quale strada fa per te e cosa ti aspetta una volta dentro.",
+  "concorsi": "Ogni anno Mensa Italia organizza sfide aperte a tutti: dal Brain — il torneo di logica più atteso — a Mensa Ludo, competizione ludica a squadre. Che tu sia già socio o semplicemente curioso, le competizioni sono il modo più diretto per misurarti con menti brillanti.",
+  "intelligenza": "Cosa misura davvero un test del QI? Cosa sappiamo oggi sull'intelligenza umana, sulla creatività e sul talento eccezionale? Questa sezione raccoglie articoli, ricerche e approfondimenti per chi vuole andare oltre i luoghi comuni e capire davvero di cosa stiamo parlando.",
+  "pubblicazioni": "I soci Mensa producono contenuti di qualità: QUID, la rivista trimestrale, raccoglie saggi, racconti e dibattiti scritti interamente dalla comunità. Ci sono poi i podcast — Brainwaves, She Talks, Mensa Talk — e un archivio di materiali editoriali che crescono ogni anno.",
+  "contatti": "Hai domande sull'iscrizione, sul test o sulle attività locali? Scrivici o vieni a trovarci. La sede nazionale è a Milano, in Viale Lunigiana 7; i gruppi locali sono attivi in tutta Italia e rispondono via mail o sui social.",
+  "legal": "Informazioni sulla privacy, l'uso dei cookie e il trattamento dei dati personali in conformità al Regolamento Generale sulla Protezione dei Dati (GDPR). Qui trovi anche lo statuto dell'associazione e la policy sui contenuti del sito.",
+  "news": "Rassegna stampa, comunicati e aggiornamenti dalla community Mensa. Trovi qui le notizie più recenti sull'associazione, gli eventi in arrivo e le storie che i soci hanno scelto di condividere con il mondo.",
+};
+
+const heroIntro = CLUSTER_INTROS[cluster] ?? meta.tagline;
+
+// Split pages: first is featured, rest go in the 2-col grid
+const [featured, ...rest] = pages;
+
+// Pad order index to 2 digits
+function orderLabel(n: number): string {
+  return String(n).padStart(2, "0");
+}
+---
+
+<PublicLayout
+  title={`${meta.label} — Mensa Italia`}
+  description={meta.tagline}
+>
+  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__kicker">MENSA ITALIA · {meta.label}</p>
+      <h1 class="hero__title">{meta.label}</h1>
+      <p class="hero__lead">{heroIntro}</p>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE LIST ═════════════════════════════════════════════ -->
+  <section class="list">
+    <div class="list__inner">
+      {pages.length === 0 ? (
+        <p class="list__empty">Ancora nessun contenuto in questa sezione.</p>
+      ) : (
+        <>
+          {/* Featured card — first page (panoramica / order=10) */}
+          {featured && (
+            <a class="card card--featured" href={pageHref(featured.cluster, featured.pageSlug)}>
+              <span class="card__order">{orderLabel(featured.order)}</span>
+              <span class="card__title">{featured.title}</span>
+              {featured.intro?.trim() && (
+                <span class="card__intro">{featured.intro}</span>
+              )}
+              <span class="card__cta">Inizia da qui →</span>
+            </a>
+          )}
+
+          {/* Regular cards — 2-col grid */}
+          {rest.length > 0 && (
+            <ul class="card-grid">
+              {rest.map((p) => (
+                <li>
+                  <a class="card card--regular" href={pageHref(p.cluster, p.pageSlug)}>
+                    <span class="card__order">{orderLabel(p.order)}</span>
+                    <span class="card__title">{p.title}</span>
+                    {p.intro?.trim() && (
+                      <span class="card__intro">{truncate(p.intro, 120)}</span>
+                    )}
+                    <span class="card__arrow" aria-hidden="true">→</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  </section>
+
+  <!-- ═══ ALTRE SEZIONI ═════════════════════════════════════════ -->
+  {otherClusters.length > 0 && (
+    <section class="other">
+      <div class="other__inner">
+        <span class="other__kicker">Altre sezioni</span>
+        <nav class="other__pills" aria-label="Altre sezioni del sito">
+          {otherClusters.map((c, i) => (
+            <>
+              <a class="other__pill" href={c.hubHref ?? `/public/info/${c.slug}`}>
+                {c.label}
+              </a>
+              {i < otherClusters.length - 1 && (
+                <span class="other__sep" aria-hidden="true">·</span>
+              )}
+            </>
+          ))}
+        </nav>
+      </div>
+    </section>
+  )}
+</PublicLayout>
+
+<style>
+  /* ═══ HERO ═══════════════════════════════════════════════════ */
+  .hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--color-mensa-cyan) 12%, transparent), transparent 70%),
+      var(--color-surface);
+    padding-block: clamp(var(--spacing-10), 10vh, var(--spacing-12));
+    text-align: center;
+  }
+  .hero__inner {
+    max-inline-size: 640px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .hero__kicker {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mensa-blue);
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+  .hero__lead {
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ═══ LIST ════════════════════════════════════════════════════ */
+  .list {
+    padding-block: clamp(var(--spacing-8), 8vh, var(--spacing-12));
+  }
+  .list__inner {
+    max-inline-size: 900px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: grid;
+    gap: var(--spacing-5);
+  }
+  .list__empty {
+    margin: 0;
+    padding: var(--spacing-8) var(--spacing-4);
+    text-align: center;
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+  }
+
+  /* ═══ CARDS — shared ═════════════════════════════════════════ */
+  .card {
+    position: relative;
+    display: grid;
+    text-decoration: none;
+    transition:
+      border-color var(--motion-fast) var(--ease-out-quart),
+      transform var(--motion-fast) var(--ease-out-quart);
+  }
+  .card:hover {
+    border-color: var(--color-mensa-blue);
+    transform: translateY(-1px);
+  }
+
+  .card__order {
+    position: absolute;
+    inset-block-start: var(--spacing-4);
+    inset-inline-end: var(--spacing-4);
+    font-size: var(--text-2xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+
+  /* ═══ FEATURED CARD ══════════════════════════════════════════ */
+  .card--featured {
+    gap: var(--spacing-3);
+    padding: clamp(var(--spacing-5), 4vw, var(--spacing-8));
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    border-inline-start: 3px solid var(--color-mensa-blue);
+  }
+  .card--featured .card__title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-xl), 3vw, var(--text-2xl));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+    padding-inline-end: var(--spacing-8);
+  }
+  .card--featured .card__intro {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+  .card--featured .card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    margin-block-start: var(--spacing-1);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-mensa-blue);
+    letter-spacing: 0.01em;
+  }
+
+  /* ═══ REGULAR CARDS GRID ══════════════════════════════════════ */
+  .card-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
+  }
+  @media (max-width: 720px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+  .card--regular {
+    gap: var(--spacing-2);
+    padding: var(--spacing-4) var(--spacing-5);
+    padding-inline-end: var(--spacing-10);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .card--regular .card__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+    padding-inline-end: var(--spacing-4);
+  }
+  .card--regular .card__intro {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    line-height: 1.55;
+  }
+  .card--regular .card__arrow {
+    position: absolute;
+    inset-block-end: var(--spacing-4);
+    inset-inline-end: var(--spacing-4);
+    color: var(--color-mensa-blue);
+    font-size: var(--text-base);
+    line-height: 1;
+  }
+
+  /* ═══ ALTRE SEZIONI strip ════════════════════════════════════ */
+  .other {
+    border-block-start: 1px solid var(--color-border-subtle);
+    padding-block: var(--spacing-5);
+  }
+  .other__inner {
+    max-inline-size: 900px;
+    margin-inline: auto;
+    padding-inline: clamp(var(--spacing-4), 5vw, var(--spacing-8));
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+  }
+  .other__kicker {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+  .other__pills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+  .other__pill {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: 3px var(--spacing-3);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    transition: border-color var(--motion-fast) var(--ease-out-quart), color var(--motion-fast) var(--ease-out-quart);
+  }
+  .other__pill:hover {
+    border-color: var(--color-mensa-blue);
+    color: var(--color-mensa-blue);
+  }
+  .other__sep {
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+    user-select: none;
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, prefersReducedMotion } from "../../../../lib/motion";
+
+  if (!prefersReducedMotion()) {
+    // ── Pre-hide elements immediately to prevent FOUC ──────────────────────
+    const kicker = document.querySelector<HTMLElement>(".hero__kicker");
+    const title  = document.querySelector<HTMLElement>(".hero__title");
+    const lead   = document.querySelector<HTMLElement>(".hero__lead");
+    const featured = document.querySelector<HTMLElement>(".card--featured");
+    const gridItems = document.querySelectorAll<HTMLElement>(".card-grid > li");
+    const pills = document.querySelectorAll<HTMLElement>(".other__pill");
+
+    if (kicker) gsap.set(kicker, { opacity: 0, y: 8 });
+    if (title)  gsap.set(title,  { opacity: 0, y: 24 });
+    if (lead)   gsap.set(lead,   { opacity: 0, y: 18 });
+    if (featured) gsap.set(featured, { opacity: 0, y: 28 });
+    if (gridItems.length) gsap.set(gridItems, { opacity: 0, y: 24 });
+    if (pills.length) gsap.set(pills, { opacity: 0, y: 6 });
+
+    // ── 1. Hero entrance (load-time, not scroll) ───────────────────────────
+    const heroTl = gsap.timeline();
+    if (kicker) heroTl.to(kicker, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+    if (title)  heroTl.to(title,  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+    if (lead)   heroTl.to(lead,   { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.45);
+
+    // ── 2. Featured card scroll-in ─────────────────────────────────────────
+    if (featured) {
+      ScrollTrigger.create({
+        trigger: featured,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          gsap.to(featured, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          });
+        },
+      });
+    }
+
+    // ── 3. Regular cards stagger ───────────────────────────────────────────
+    const cardGrid = document.querySelector<HTMLElement>(".card-grid");
+    if (cardGrid && gridItems.length) {
+      const arrows = document.querySelectorAll<HTMLElement>(".card-grid .card__arrow");
+      if (arrows.length) gsap.set(arrows, { x: -4 });
+
+      ScrollTrigger.create({
+        trigger: cardGrid,
+        start: "top 80%",
+        once: true,
+        onEnter: () => {
+          gsap.to(gridItems, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            stagger: 0.08,
+            clearProps: "transform,opacity",
+          });
+          if (arrows.length) {
+            gsap.to(arrows, {
+              x: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              stagger: 0.08,
+              clearProps: "transform",
+            });
+          }
+        },
+      });
+    }
+
+    // ── 4. "Altre sezioni" pills stagger ──────────────────────────────────
+    const pillsNav = document.querySelector<HTMLElement>(".other__pills");
+    if (pillsNav && pills.length) {
+      ScrollTrigger.create({
+        trigger: pillsNav,
+        start: "top 90%",
+        once: true,
+        onEnter: () => {
+          gsap.to(pills, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: "power2.out",
+            stagger: 0.04,
+            clearProps: "transform,opacity",
+          });
+        },
+      });
+    }
+  }
+</script>

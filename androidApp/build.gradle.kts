@@ -6,6 +6,28 @@ plugins {
     // alias(libs.plugins.google.services)
 }
 
+// Versione letta dal file `VERSION` alla radice del repo (single source of truth
+// condivisa con la pipeline web). versionCode derivato come MAJOR*10000 + MINOR*100 + PATCH.
+val versionFile = rootProject.file("VERSION")
+val appVersionName: String = if (versionFile.exists()) versionFile.readText().trim() else "0.0.0"
+val appVersionCode: Int = appVersionName.split(".").let { parts ->
+    val (maj, min, pat) = (parts + listOf("0", "0", "0")).take(3).map { it.toIntOrNull() ?: 0 }
+    maj * 10000 + min * 100 + pat
+}.coerceAtLeast(1)
+
+// Signing release: legge da gradle properties o env. Se manca lo store, il
+// buildType release riusa il signing di debug così sviluppo locale e CI senza
+// secrets continuano a compilare (assembleRelease produce APK firmato debug).
+val releaseStoreFile: String? = (project.findProperty("ANDROID_STORE_FILE") as String?)
+    ?: System.getenv("ANDROID_STORE_FILE")
+val releaseStorePassword: String? = (project.findProperty("ANDROID_STORE_PASSWORD") as String?)
+    ?: System.getenv("ANDROID_STORE_PASSWORD")
+val releaseKeyAlias: String = (project.findProperty("ANDROID_KEY_ALIAS") as String?)
+    ?: System.getenv("ANDROID_KEY_ALIAS")
+    ?: "key"
+val releaseKeyPassword: String? = (project.findProperty("ANDROID_KEY_PASSWORD") as String?)
+    ?: System.getenv("ANDROID_KEY_PASSWORD")
+
 android {
     namespace = "it.mensa.app"
     compileSdk = 35
@@ -14,11 +36,29 @@ android {
         applicationId = "it.mensa.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         // Maps API key placeholder — override in local.properties or via CI secret
         manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("MAPS_API_KEY") ?: ""
+    }
+
+    signingConfigs {
+        if (releaseStoreFile != null && releaseStorePassword != null && releaseKeyPassword != null) {
+            create("release") {
+                storeFile = file(releaseStoreFile)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+        }
     }
 
     compileOptions {

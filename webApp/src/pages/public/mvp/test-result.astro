@@ -1,0 +1,96 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Esito test — MensaTesting"
+  pageTitle="Esito test"
+  audience="applicant"
+  activeHref="/public/mvp/my-tests"
+>
+  <div class="page-content">
+
+    <a href="/public/mvp/my-tests" class="back">← I miei test</a>
+
+    <div class="result-head result-head--pass">
+      <div class="result-head__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <span class="result-head__badge">Risultato: Passato ✓</span>
+        <h1 class="result-head__score">IQ 132</h1>
+        <p class="result-head__percentile">98° percentile · soglia superata</p>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-row"><span class="detail-label">Data</span><span class="detail-value">Sabato 20 Settembre 2025</span></div>
+      <div class="detail-row"><span class="detail-label">Sede</span><span class="detail-value">Roma · Via Nazionale, 91</span></div>
+      <div class="detail-row"><span class="detail-label">Orario</span><span class="detail-value">10:00 — 11:30</span></div>
+      <div class="detail-row"><span class="detail-label">Codice sessione</span><span class="detail-value detail-value--mono">MN-2025-0018</span></div>
+      <div class="detail-row"><span class="detail-label">Punteggio grezzo</span><span class="detail-value">41 / 45 domande</span></div>
+    </div>
+
+    <div class="next-card">
+      <div class="next-card__body">
+        <p class="next-card__kicker">Prossimo passo</p>
+        <h2 class="next-card__title">Diventa socio Mensa Italia</h2>
+        <p class="next-card__sub">Completa l'iscrizione pagando la quota annuale. Ti aspettiamo nella comunità.</p>
+      </div>
+      <a href="/public/mvp/member-signup" class="btn btn--primary">Diventa socio →</a>
+    </div>
+
+    <div class="note-card">
+      <p class="note-card__title">Nota · variante "Non passato"</p>
+      <p class="note-card__body">
+        Se il test fosse stato insufficiente (es. IQ 125, soglia 130), al posto della CTA "Diventa socio" apparirebbe:
+        <em>"Puoi riprovare tra 6 mesi. Continua ad allenarti con il test dimostrativo."</em>
+      </p>
+      <a href="/public/mvp/iq-test" class="btn-link">Vai al test dimostrativo →</a>
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<style>
+  .page-content { max-inline-size: 640px; display: grid; gap: var(--spacing-5); }
+
+  .back { display: inline-flex; font-size: var(--text-xs); color: var(--color-text-tertiary); text-decoration: none; }
+  .back:hover { color: var(--color-text-primary); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px var(--spacing-5); font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; white-space: nowrap; flex-shrink: 0; transition: background var(--motion-fast) var(--ease-out-quart); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn-link { font-size: var(--text-xs); color: var(--color-mensa-blue); text-decoration: none; }
+  .btn-link:hover { text-decoration: underline; }
+
+  .result-head { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-5); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); }
+  .result-head--pass { background: color-mix(in oklch, #22c55e 6%, transparent); border-color: color-mix(in oklch, #16a34a 25%, transparent); }
+  @media (max-width: 480px) { .result-head { flex-direction: column; align-items: flex-start; } }
+  .result-head__icon { inline-size: 52px; block-size: 52px; color: #16a34a; flex-shrink: 0; }
+  .result-head__icon svg { inline-size: 100%; block-size: 100%; }
+  .result-head__badge { display: inline-block; font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #16a34a; margin-block-end: var(--spacing-1); }
+  .result-head__score { margin: 0 0 2px 0; font-family: var(--font-display); font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; letter-spacing: -0.04em; color: var(--color-text-primary); line-height: 1; }
+  .result-head__percentile { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .detail-card { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-4); padding: var(--spacing-3) var(--spacing-4); border-block-end: 1px solid var(--color-border-subtle); }
+  .detail-row:last-child { border-block-end: none; }
+  .detail-label { font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); flex-shrink: 0; }
+  .detail-value { font-size: var(--text-sm); color: var(--color-text-primary); text-align: end; }
+  .detail-value--mono { font-family: ui-monospace, monospace; font-weight: 600; color: var(--color-mensa-blue); letter-spacing: 0.05em; }
+
+  .next-card { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-4) var(--spacing-5); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-inline-start: 3px solid var(--color-mensa-blue); border-radius: var(--radius-md); }
+  @media (max-width: 480px) { .next-card { flex-direction: column; align-items: flex-start; } }
+  .next-card__body { flex: 1; display: grid; gap: var(--spacing-1); }
+  .next-card__kicker { margin: 0; font-size: var(--text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-mensa-blue); }
+  .next-card__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+  .next-card__sub { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.5; }
+
+  .note-card { padding: var(--spacing-4); background: var(--color-surface-elevated); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-sm); display: grid; gap: var(--spacing-2); }
+  .note-card__title { margin: 0; font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); }
+  .note-card__body { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.55; }
+</style>

@@ -1,0 +1,171 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  scope="ledger"
+  activeHref="/console/ledger/insights"
+  pageTitle="Andamento"
+  title="Mensa Ledger · Andamento"
+>
+  <div class="page">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Andamento</h1>
+        <p class="page-header__sub">Tre viste sintetiche per leggere il conto economico dell'associazione. I dati si aggiornano dopo ogni movimento confermato.</p>
+      </div>
+    </header>
+
+    <div class="chart-card">
+      <p class="chart-card__title">Saldo nel tempo — ultimi 12 mesi</p>
+      <svg viewBox="0 0 1000 280" class="chart-svg" role="img" aria-label="Grafico saldo ultimi 12 mesi">
+        <defs>
+          <linearGradient id="grad12" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--color-mensa-blue)" stop-opacity="0.20"/>
+            <stop offset="100%" stop-color="var(--color-mensa-blue)" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <line x1="60" y1="20" x2="60" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="144" y1="20" x2="144" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="228" y1="20" x2="228" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="312" y1="20" x2="312" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="396" y1="20" x2="396" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="480" y1="20" x2="480" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="564" y1="20" x2="564" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="648" y1="20" x2="648" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="732" y1="20" x2="732" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="816" y1="20" x2="816" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="900" y1="20" x2="900" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="40" y1="230" x2="960" y2="230" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <path
+          d="M60,200 C80,196 120,190 144,185 C168,180 200,174 228,168 C252,162 280,156 312,148 C336,140 368,132 396,124 C420,116 452,108 480,100 C504,93 536,86 564,78 C588,70 620,63 648,56 C672,50 704,44 732,38 C756,33 788,30 816,26 C840,23 872,22 900,20"
+          fill="none" stroke="var(--color-mensa-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        />
+        <path
+          d="M60,200 C80,196 120,190 144,185 C168,180 200,174 228,168 C252,162 280,156 312,148 C336,140 368,132 396,124 C420,116 452,108 480,100 C504,93 536,86 564,78 C588,70 620,63 648,56 C672,50 704,44 732,38 C756,33 788,30 816,26 C840,23 872,22 900,20 L900,230 L60,230 Z"
+          fill="url(#grad12)"
+        />
+        <circle cx="60"  cy="200" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="144" cy="185" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="228" cy="168" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="312" cy="148" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="396" cy="124" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="480" cy="100" r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="564" cy="78"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="648" cy="56"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="732" cy="38"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="816" cy="26"  r="4" fill="var(--color-mensa-blue)"/>
+        <circle cx="900" cy="20"  r="4" fill="var(--color-mensa-blue)"/>
+        <text x="60"  y="250" text-anchor="middle" class="chart-label">Giu</text>
+        <text x="144" y="250" text-anchor="middle" class="chart-label">Lug</text>
+        <text x="228" y="250" text-anchor="middle" class="chart-label">Ago</text>
+        <text x="312" y="250" text-anchor="middle" class="chart-label">Set</text>
+        <text x="396" y="250" text-anchor="middle" class="chart-label">Ott</text>
+        <text x="480" y="250" text-anchor="middle" class="chart-label">Nov</text>
+        <text x="564" y="250" text-anchor="middle" class="chart-label">Dic</text>
+        <text x="648" y="250" text-anchor="middle" class="chart-label">Gen</text>
+        <text x="732" y="250" text-anchor="middle" class="chart-label">Feb</text>
+        <text x="816" y="250" text-anchor="middle" class="chart-label">Mar</text>
+        <text x="900" y="250" text-anchor="middle" class="chart-label">Apr</text>
+      </svg>
+    </div>
+
+    <div class="chart-card">
+      <p class="chart-card__title">Entrate vs Uscite per mese — ultimi 6 mesi</p>
+      <div class="chart-legend">
+        <span class="legend-dot" style="background:#0a8a3e"></span><span class="legend-label">Entrate</span>
+        <span class="legend-dot" style="background:#b45309"></span><span class="legend-label">Uscite</span>
+      </div>
+      <svg viewBox="0 0 800 240" class="chart-svg" role="img" aria-label="Grafico entrate vs uscite per mese">
+        <line x1="60" y1="20" x2="60" y2="200" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="60" y1="200" x2="780" y2="200" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <rect x="72"  y="84"  width="40" height="116" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="116" y="130" width="40" height="70"  rx="3" fill="#b45309" opacity="0.85"/>
+        <rect x="188" y="70"  width="40" height="130" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="232" y="110" width="40" height="90"  rx="3" fill="#b45309" opacity="0.85"/>
+        <rect x="308" y="60"  width="40" height="140" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="352" y="120" width="40" height="80"  rx="3" fill="#b45309" opacity="0.85"/>
+        <rect x="428" y="50"  width="40" height="150" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="472" y="100" width="40" height="100" rx="3" fill="#b45309" opacity="0.85"/>
+        <rect x="548" y="40"  width="40" height="160" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="592" y="90"  width="40" height="110" rx="3" fill="#b45309" opacity="0.85"/>
+        <rect x="668" y="30"  width="40" height="170" rx="3" fill="#0a8a3e" opacity="0.85"/>
+        <rect x="712" y="80"  width="40" height="120" rx="3" fill="#b45309" opacity="0.85"/>
+        <text x="111" y="220" text-anchor="middle" class="chart-label">Dic</text>
+        <text x="231" y="220" text-anchor="middle" class="chart-label">Gen</text>
+        <text x="351" y="220" text-anchor="middle" class="chart-label">Feb</text>
+        <text x="471" y="220" text-anchor="middle" class="chart-label">Mar</text>
+        <text x="591" y="220" text-anchor="middle" class="chart-label">Apr</text>
+        <text x="711" y="220" text-anchor="middle" class="chart-label">Mag</text>
+      </svg>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card chart-card--donut">
+        <p class="chart-card__title">Distribuzione per categoria — ultimi 90 giorni</p>
+        <div class="donut-wrap">
+          <svg viewBox="0 0 220 220" class="donut-svg" role="img" aria-label="Grafico distribuzione per categoria">
+            <circle cx="110" cy="110" r="80" fill="none" stroke="#dbeafe" stroke-width="38"/>
+            <circle cx="110" cy="110" r="80" fill="none" stroke="#ede9fe" stroke-width="38"
+              stroke-dasharray="50.89 452.39" stroke-dashoffset="-254.47" />
+            <circle cx="110" cy="110" r="80" fill="none" stroke="#ffedd5" stroke-width="38"
+              stroke-dasharray="39.58 452.39" stroke-dashoffset="-203.58" />
+            <circle cx="110" cy="110" r="80" fill="none" stroke="#d1fae5" stroke-width="38"
+              stroke-dasharray="33.93 452.39" stroke-dashoffset="-163.99" />
+            <circle cx="110" cy="110" r="80" fill="none" stroke="#fce7f3" stroke-width="38"
+              stroke-dasharray="22.62 452.39" stroke-dashoffset="-141.37" />
+            <circle cx="110" cy="110" r="80" fill="none" stroke="var(--color-mensa-blue)" stroke-width="38"
+              stroke-dasharray="203.58 452.39" stroke-dashoffset="0" />
+            <circle cx="110" cy="110" r="61" fill="var(--color-surface-elevated)"/>
+            <text x="110" y="105" text-anchor="middle" class="donut-pct">45%</text>
+            <text x="110" y="122" text-anchor="middle" class="donut-lbl">Quote soci</text>
+          </svg>
+          <ul class="donut-legend">
+            <li><span class="legend-dot" style="background:var(--color-mensa-blue)"></span>Quote soci — 45%</li>
+            <li><span class="legend-dot" style="background:#ffedd5;border:1px solid #9a3412"></span>Eventi — 18%</li>
+            <li><span class="legend-dot" style="background:#ede9fe;border:1px solid #4c1d95"></span>Test — 14%</li>
+            <li><span class="legend-dot" style="background:#fef3c7;border:1px solid #92400e"></span>Spese gestione — 12%</li>
+            <li><span class="legend-dot" style="background:#d1fae5;border:1px solid #065f46"></span>Donazioni — 8%</li>
+            <li><span class="legend-dot" style="background:#fce7f3;border:1px solid #831843"></span>Boutique — 3%</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page { display: grid; gap: var(--spacing-6); }
+
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0.25rem 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); max-inline-size: 65ch; }
+
+  .chart-card {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    display: grid;
+    gap: var(--spacing-3);
+  }
+  .chart-card__title { margin: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .chart-svg { display: block; width: 100%; height: auto; }
+  .chart-label { font-size: 11px; fill: var(--color-text-tertiary); font-family: inherit; }
+
+  .chart-legend { display: flex; gap: var(--spacing-4); align-items: center; flex-wrap: wrap; }
+  .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+  .chart-row { display: grid; }
+  .chart-card--donut { max-inline-size: 680px; }
+
+  .donut-wrap { display: flex; gap: var(--spacing-6); align-items: center; flex-wrap: wrap; }
+  .donut-svg { width: 180px; height: 180px; flex-shrink: 0; }
+  .donut-pct { font-size: 22px; font-weight: 700; fill: var(--color-text-primary); font-family: inherit; }
+  .donut-lbl { font-size: 10px; fill: var(--color-text-tertiary); font-family: inherit; }
+
+  .donut-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-2); }
+  .donut-legend li { display: flex; align-items: center; gap: var(--spacing-2); font-size: var(--text-xs); color: var(--color-text-secondary); }
+</style>

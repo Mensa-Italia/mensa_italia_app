@@ -1,0 +1,94 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="I miei test — MensaTesting"
+  pageTitle="I miei test"
+  audience="applicant"
+  activeHref="/public/mvp/my-tests"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <h1 class="page-header__title">I miei test</h1>
+      <p class="page-header__sub">Storico delle tue sessioni d'esame.</p>
+    </header>
+
+    <div class="tests-list">
+
+      <div class="test-row">
+        <div class="test-row__status"><span class="badge badge--upcoming">In attesa</span></div>
+        <div class="test-row__body">
+          <p class="test-row__date">Sabato 6 Giugno 2026</p>
+          <p class="test-row__meta">Roma · Via Nazionale, 91 · 10:00</p>
+        </div>
+        <div class="test-row__actions">
+          <a href="/public/mvp/test-result?id=upcoming" class="btn btn--ghost btn--sm">Dettagli</a>
+          <a href="#" class="btn-link">Scarica ricevuta</a>
+        </div>
+      </div>
+
+      <div class="test-row">
+        <div class="test-row__status"><span class="badge badge--failed">Non passato</span></div>
+        <div class="test-row__body">
+          <p class="test-row__date">Martedì 12 Marzo 2026</p>
+          <p class="test-row__meta">Milano · Viale Lunigiana, 7 · 14:00</p>
+          <p class="test-row__score">IQ 125 · soglia 130 (98° percentile)</p>
+        </div>
+        <div class="test-row__actions">
+          <a href="/public/mvp/test-result?id=failed" class="btn btn--ghost btn--sm">Dettagli</a>
+          <a href="#" class="btn-link">Scarica ricevuta</a>
+        </div>
+      </div>
+
+      <div class="test-row test-row--passed">
+        <div class="test-row__status"><span class="badge badge--passed">Passato ✓</span></div>
+        <div class="test-row__body">
+          <p class="test-row__date">Sabato 20 Settembre 2025</p>
+          <p class="test-row__meta">Roma · Via Nazionale, 91 · 10:00</p>
+          <p class="test-row__score test-row__score--pass">IQ 132 · 98° percentile</p>
+        </div>
+        <div class="test-row__actions">
+          <a href="/public/mvp/test-result?id=passed" class="btn btn--ghost btn--sm">Dettagli</a>
+          <a href="#" class="btn-link">Scarica ricevuta</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<style>
+  .page-content { max-inline-size: 720px; display: grid; gap: var(--spacing-6); }
+
+  .page-header { display: grid; gap: var(--spacing-1); }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-tertiary); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 7px var(--spacing-3); font-size: var(--text-xs); font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; white-space: nowrap; transition: background var(--motion-fast) var(--ease-out-quart), border-color var(--motion-fast) var(--ease-out-quart); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+  .btn-link { font-size: var(--text-xs); color: var(--color-text-tertiary); text-decoration: underline; white-space: nowrap; }
+  .btn-link:hover { color: var(--color-text-primary); }
+
+  .tests-list { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+  .test-row { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-4) var(--spacing-5); border-block-end: 1px solid var(--color-border-subtle); }
+  .test-row:last-child { border-block-end: none; }
+  .test-row--passed { background: color-mix(in oklch, #22c55e 4%, transparent); }
+  @media (max-width: 600px) { .test-row { flex-direction: column; align-items: flex-start; } }
+
+  .test-row__status { inline-size: 90px; flex-shrink: 0; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 8px; font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border-radius: var(--radius-sm); }
+  .badge--upcoming { background: color-mix(in oklch, var(--color-mensa-blue) 12%, transparent); color: var(--color-mensa-blue); }
+  .badge--failed { background: color-mix(in oklch, #dc2626 10%, transparent); color: #dc2626; }
+  .badge--passed { background: color-mix(in oklch, #16a34a 12%, transparent); color: #16a34a; }
+
+  .test-row__body { flex: 1; display: grid; gap: 2px; }
+  .test-row__date { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .test-row__meta { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .test-row__score { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+  .test-row__score--pass { color: #16a34a; font-weight: 600; }
+  .test-row__actions { display: flex; align-items: center; gap: var(--spacing-3); flex-shrink: 0; }
+</style>

@@ -1,0 +1,294 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Pagamento — MensaTesting"
+  pageTitle="Pagamento"
+  audience="applicant"
+  activeHref="/public/mvp/book-test"
+>
+  <div class="page-content">
+
+    <nav class="stepper" aria-label="Passi pagamento">
+      <ol class="stepper__list">
+        <li class="stepper__item is-current" id="step-indicator-1" aria-current="step">
+          <span class="stepper__num">1</span>
+          <span class="stepper__label">Riepilogo</span>
+        </li>
+        <li class="stepper__item is-future" id="step-indicator-2">
+          <span class="stepper__num">2</span>
+          <span class="stepper__label">Pagamento</span>
+        </li>
+        <li class="stepper__item is-future" id="step-indicator-3">
+          <span class="stepper__num">3</span>
+          <span class="stepper__label">Elaborazione</span>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="wizard">
+
+      <section class="wizard__step" id="step-1" aria-labelledby="step-1-title">
+        <h1 class="step-title" id="step-1-title">Riepilogo ordine</h1>
+        <div class="summary">
+          <div class="summary__rows">
+            <div class="summary__row">
+              <span class="summary__row-label">Test di ammissione Mensa</span>
+              <span class="summary__row-value">30,00 €</span>
+            </div>
+            <div class="summary__row summary__row--detail"><span id="co-venue">Roma · Via Nazionale, 91</span></div>
+            <div class="summary__row summary__row--detail"><span id="co-slot">Sab 6 Giu 2026 · 10:00 — 11:30</span></div>
+            <div class="summary__row summary__row--total"><span>Totale</span><span>30,00 €</span></div>
+          </div>
+        </div>
+        <div class="step-actions step-actions--right">
+          <button class="btn btn--primary" id="btn-step1-next">Procedi al pagamento →</button>
+        </div>
+      </section>
+
+      <section class="wizard__step" id="step-2" hidden aria-labelledby="step-2-title">
+        <h2 class="step-title" id="step-2-title">Dati di pagamento</h2>
+
+        <div class="stripe-badge">
+          <svg viewBox="0 0 36 16" fill="none" aria-hidden="true">
+            <path d="M33 0H3C1.3 0 0 1.3 0 3v10c0 1.7 1.3 3 3 3h30c1.7 0 3-1.3 3-3V3c0-1.7-1.3-3-3-3z" fill="#F6F9FC"/>
+            <text x="4" y="11" font-size="7" fill="#425466" font-family="sans-serif" font-weight="600">Stripe</text>
+          </svg>
+          <span>Pagamento sicuro · Powered by Stripe</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="lock-icon">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+
+        <form class="form" id="payment-form" onsubmit="event.preventDefault()">
+          <div class="form__field">
+            <label for="card-name">Nome sulla carta</label>
+            <input type="text" id="card-name" name="card-name" placeholder="Marco Rossi" autocomplete="cc-name" />
+          </div>
+          <div class="form__field">
+            <label for="card-number">Numero carta</label>
+            <div class="input-icon-wrap">
+              <input type="text" id="card-number" name="card-number" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" maxlength="19" />
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="form__row form__row--2">
+            <div class="form__field">
+              <label for="card-exp">Scadenza</label>
+              <input type="text" id="card-exp" name="card-exp" placeholder="MM / AA" inputmode="numeric" autocomplete="cc-exp" maxlength="7" />
+            </div>
+            <div class="form__field">
+              <label for="card-cvc">CVC</label>
+              <input type="text" id="card-cvc" name="card-cvc" placeholder="123" inputmode="numeric" autocomplete="cc-csc" maxlength="4" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full btn--pay" id="btn-pay">Paga 30,00 €</button>
+        </form>
+
+        <p class="cancel-link"><a href="/public/mvp/book-test">← Torna alla selezione</a></p>
+      </section>
+
+      <section class="wizard__step" id="step-3" hidden aria-labelledby="step-3-title" aria-live="polite">
+        <h2 class="step-title" id="step-3-title">Elaborazione pagamento</h2>
+        <div class="processing-list" id="processing-list" aria-live="polite"></div>
+      </section>
+
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<script is:inline>
+(function () {
+  var VENUE_LABELS = {
+    roma: "Roma · Via Nazionale, 91",
+    milano: "Milano · Viale Lunigiana, 7",
+    bologna: "Bologna · Via dell'Indipendenza, 25",
+    napoli: "Napoli · Via Toledo, 148"
+  };
+  var SLOT_LABELS = {
+    "rm-060626-1000": "Sab 6 Giu 2026 · 10:00 — 11:30",
+    "rm-060626-1400": "Sab 6 Giu 2026 · 14:00 — 15:30",
+    "rm-200626-1000": "Sab 20 Giu 2026 · 10:00 — 11:30",
+    "rm-040726-1000": "Sab 4 Lug 2026 · 10:00 — 11:30",
+    "mi-070626-1000": "Dom 7 Giu 2026 · 10:00 — 11:30",
+    "mi-210626-1000": "Dom 21 Giu 2026 · 10:00 — 11:30",
+    "mi-050726-1000": "Dom 5 Lug 2026 · 10:00 — 11:30",
+    "bo-140626-1000": "Dom 14 Giu 2026 · 10:00 — 11:30",
+    "bo-280626-1000": "Dom 28 Giu 2026 · 10:00 — 11:30",
+    "bo-120726-1000": "Dom 12 Lug 2026 · 10:00 — 11:30",
+    "na-080626-1000": "Lun 8 Giu 2026 · 10:00 — 11:30",
+    "na-220626-1000": "Lun 22 Giu 2026 · 10:00 — 11:30",
+    "na-060726-1000": "Lun 6 Lug 2026 · 10:00 — 11:30"
+  };
+
+  var params = new URLSearchParams(window.location.search);
+  var sedeId = params.get("sede") || "roma";
+  var slotId = params.get("slot") || "rm-060626-1000";
+
+  var venueLabel = VENUE_LABELS[sedeId] || "Roma · Via Nazionale, 91";
+  var slotLabel = SLOT_LABELS[slotId] || "Sab 6 Giu 2026 · 10:00 — 11:30";
+  document.getElementById("co-venue").textContent = venueLabel;
+  document.getElementById("co-slot").textContent = slotLabel;
+
+  function updateStepper(current) {
+    for (var i = 1; i <= 3; i++) {
+      var el = document.getElementById("step-indicator-" + i);
+      el.classList.remove("is-current", "is-done", "is-future");
+      if (i < current) el.classList.add("is-done");
+      else if (i === current) { el.classList.add("is-current"); el.setAttribute("aria-current", "step"); }
+      else { el.classList.add("is-future"); el.removeAttribute("aria-current"); }
+    }
+  }
+
+  function goToStep(from, to) {
+    var fromEl = document.getElementById("step-" + from);
+    var toEl = document.getElementById("step-" + to);
+    fromEl.hidden = true;
+    toEl.removeAttribute("hidden");
+    requestAnimationFrame(function () {
+      toEl.classList.add("is-entering");
+      requestAnimationFrame(function () { toEl.classList.add("is-visible"); });
+    });
+    toEl.focus();
+    updateStepper(to);
+  }
+
+  document.getElementById("btn-step1-next").addEventListener("click", function () {
+    goToStep(1, 2);
+  });
+
+  document.getElementById("payment-form").addEventListener("submit", function () {
+    goToStep(2, 3);
+    startProcessing();
+  });
+
+  var STEPS = [
+    "Verifica dati carta…",
+    "Autorizzazione bancaria…",
+    "Conferma pagamento…",
+    "Generazione biglietto…"
+  ];
+
+  function startProcessing() {
+    var list = document.getElementById("processing-list");
+    list.innerHTML = "";
+    var astroCid = null;
+    for (var i = 0; i < list.attributes.length; i++) {
+      var a = list.attributes[i];
+      if (a.name.indexOf("data-astro-cid-") === 0) { astroCid = a.name; break; }
+    }
+    var cidAttr = astroCid ? " " + astroCid : "";
+    var rows = [];
+    STEPS.forEach(function (text, i) {
+      var row = document.createElement("div");
+      row.className = "proc-row proc-row--pending";
+      if (astroCid) row.setAttribute(astroCid, "");
+      row.innerHTML =
+        '<span class="proc-icon proc-icon--spin" aria-hidden="true"' + cidAttr + ">&#8635;</span>" +
+        '<span class="proc-text"' + cidAttr + ">" + text + "</span>";
+      list.appendChild(row);
+      rows.push(row);
+    });
+
+    rows.forEach(function (row, i) {
+      var delay = i * 650;
+      setTimeout(function () {
+        row.classList.remove("proc-row--pending");
+        row.classList.add("proc-row--active");
+      }, delay);
+      setTimeout(function () {
+        row.classList.remove("proc-row--active");
+        row.classList.add("proc-row--done");
+        row.querySelector(".proc-icon").innerHTML = "&#10003;";
+        row.querySelector(".proc-icon").classList.remove("proc-icon--spin");
+        if (i === rows.length - 1) {
+          setTimeout(function () {
+            window.location.href = "/public/mvp/booking-confirmed?ref=MN-2026-0042";
+          }, 500);
+        }
+      }, delay + 550);
+    });
+  }
+})();
+</script>
+
+<style>
+  .page-content { max-inline-size: 680px; display: grid; gap: var(--spacing-6); }
+
+  .stepper { }
+  .stepper__list { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; }
+  .stepper__item { display: flex; align-items: center; gap: var(--spacing-2); flex: 1; }
+  .stepper__item:not(:last-child)::after { content: ""; flex: 1; block-size: 1px; background: var(--color-border-subtle); margin-inline: var(--spacing-2); }
+  .stepper__num { display: inline-flex; align-items: center; justify-content: center; inline-size: 28px; block-size: 28px; border-radius: 50%; font-size: var(--text-xs); font-weight: 700; flex-shrink: 0; transition: background 200ms ease, color 200ms ease; background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); color: var(--color-text-tertiary); }
+  .stepper__label { font-size: var(--text-xs); font-weight: 500; color: var(--color-text-tertiary); transition: color 200ms ease; white-space: nowrap; }
+  .stepper__item.is-current .stepper__num { background: var(--color-mensa-blue); color: var(--color-text-on-brand); border-color: var(--color-mensa-blue); }
+  .stepper__item.is-current .stepper__label { color: var(--color-text-primary); font-weight: 600; }
+  .stepper__item.is-done .stepper__num { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .stepper__item.is-done .stepper__label { color: var(--color-text-secondary); }
+  @media (max-width: 400px) { .stepper__label { display: none; } }
+
+  .wizard__step { display: grid; gap: var(--spacing-5); outline: none; transition: opacity 200ms ease, transform 200ms ease; }
+  .wizard__step.is-entering { opacity: 0; transform: translateY(8px); }
+  .wizard__step.is-visible { opacity: 1; transform: translateY(0); }
+
+  .step-title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+
+  .summary { background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-4) var(--spacing-5); }
+  .summary__rows { display: grid; gap: 0; }
+  .summary__row { display: flex; justify-content: space-between; gap: var(--spacing-3); padding-block: var(--spacing-2); border-block-end: 1px solid var(--color-border-subtle); font-size: var(--text-sm); color: var(--color-text-primary); }
+  .summary__row:last-child { border-block-end: none; }
+  .summary__row--detail { font-size: var(--text-xs); color: var(--color-text-tertiary); padding-block: var(--spacing-1); }
+  .summary__row--total { font-weight: 700; font-size: var(--text-base); padding-block-start: var(--spacing-3); border-block-end: none; }
+  .summary__row-label { flex: 1; }
+  .summary__row-value { font-variant-numeric: tabular-nums; }
+
+  .stripe-badge { display: flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-2) var(--spacing-3); background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .stripe-badge svg:first-child { inline-size: 36px; block-size: 16px; flex-shrink: 0; }
+  .stripe-badge span { flex: 1; }
+  .lock-icon { inline-size: 14px; block-size: 14px; flex-shrink: 0; }
+
+  .form { display: grid; gap: var(--spacing-4); }
+  .form__row--2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-3); }
+  @media (max-width: 400px) { .form__row--2 { grid-template-columns: 1fr; } }
+  .form__field { display: grid; gap: var(--spacing-1); }
+  .form__field label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary); }
+  .form__field input { padding: 9px var(--spacing-3); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); outline: none; transition: border-color var(--motion-fast) var(--ease-out-quart); font-family: inherit; }
+  .form__field input:focus { border-color: var(--color-mensa-blue); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-mensa-blue) 15%, transparent); }
+  .form__field input::placeholder { color: var(--color-text-tertiary); }
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap input { padding-inline-end: 40px; }
+  .input-icon { position: absolute; inset-block-start: 50%; inset-inline-end: var(--spacing-3); transform: translateY(-50%); inline-size: 18px; block-size: 18px; color: var(--color-text-tertiary); pointer-events: none; }
+  .input-icon svg { inline-size: 100%; block-size: 100%; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px var(--spacing-5); font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; text-decoration: none; transition: background 150ms ease; font-family: inherit; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover { background: var(--color-mensa-blue-deep); }
+  .btn--full { inline-size: 100%; }
+  .btn--pay { font-size: var(--text-base); padding: 13px var(--spacing-5); }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+
+  .step-actions { display: flex; gap: var(--spacing-3); }
+  .step-actions--right { justify-content: flex-end; }
+
+  .cancel-link { margin: 0; text-align: center; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .cancel-link a { color: var(--color-text-tertiary); text-decoration: underline; }
+  .cancel-link a:hover { color: var(--color-text-primary); }
+
+  .processing-list { display: grid; gap: var(--spacing-3); padding: var(--spacing-2) 0; }
+  .proc-row { display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3) var(--spacing-4); border-radius: var(--radius-sm); background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); font-size: var(--text-sm); color: var(--color-text-tertiary); transition: color 200ms ease, border-color 200ms ease; }
+  .proc-row--active { color: var(--color-text-primary); border-color: var(--color-mensa-blue); }
+  .proc-row--done { color: #16a34a; border-color: #bbf7d0; background: color-mix(in oklch, #16a34a 6%, transparent); }
+  .proc-icon { font-size: 1.1em; inline-size: 20px; text-align: center; flex-shrink: 0; }
+  .proc-icon--spin { display: inline-block; animation: spin 1s linear infinite; }
+  .proc-text { flex: 1; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>

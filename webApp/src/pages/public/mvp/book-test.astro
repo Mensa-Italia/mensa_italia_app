@@ -1,0 +1,334 @@
+---
+import MvpAppShell from "../../../layouts/MvpAppShell.astro";
+---
+
+<MvpAppShell
+  title="Prenota il test — MensaTesting"
+  pageTitle="Prenota test"
+  audience="applicant"
+  activeHref="/public/mvp/book-test"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <h1 class="page-header__title">Prenota il test</h1>
+      <p class="page-header__sub">Prezzo test: <strong>30 €</strong> · Durata: <strong>90 minuti</strong> · Documento d'identità obbligatorio</p>
+    </header>
+
+    <nav class="stepper" aria-label="Passi prenotazione">
+      <ol class="stepper__list">
+        <li class="stepper__item is-current" id="step-indicator-1" aria-current="step">
+          <span class="stepper__num">1</span>
+          <span class="stepper__label">Sede</span>
+        </li>
+        <li class="stepper__item is-future" id="step-indicator-2">
+          <span class="stepper__num">2</span>
+          <span class="stepper__label">Data</span>
+        </li>
+        <li class="stepper__item is-future" id="step-indicator-3">
+          <span class="stepper__num">3</span>
+          <span class="stepper__label">Conferma</span>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="wizard">
+
+      <section class="wizard__step" id="step-1" aria-labelledby="step-1-title">
+        <h2 class="step-title" id="step-1-title">Scegli la sede</h2>
+        <div class="venues" role="radiogroup" aria-label="Sedi disponibili">
+          <div class="venue" role="radio" aria-checked="false" tabindex="0" data-venue-id="roma" data-venue-label="Roma" data-venue-address="Via Nazionale, 91 — 00184 Roma RM">
+            <div class="venue__head">
+              <span class="venue__name">Roma</span>
+              <span class="venue__check" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3,8 7,12 13,4"/></svg>
+              </span>
+            </div>
+            <p class="venue__address">Via Nazionale, 91 — 00184 Roma RM</p>
+            <p class="venue__spots">8 posti disponibili</p>
+          </div>
+          <div class="venue" role="radio" aria-checked="false" tabindex="0" data-venue-id="milano" data-venue-label="Milano" data-venue-address="Viale Lunigiana, 7 — 20125 Milano MI">
+            <div class="venue__head">
+              <span class="venue__name">Milano</span>
+              <span class="venue__check" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3,8 7,12 13,4"/></svg>
+              </span>
+            </div>
+            <p class="venue__address">Viale Lunigiana, 7 — 20125 Milano MI</p>
+            <p class="venue__spots">12 posti disponibili</p>
+          </div>
+          <div class="venue" role="radio" aria-checked="false" tabindex="0" data-venue-id="bologna" data-venue-label="Bologna" data-venue-address="Via dell'Indipendenza, 25 — 40121 Bologna BO">
+            <div class="venue__head">
+              <span class="venue__name">Bologna</span>
+              <span class="venue__check" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3,8 7,12 13,4"/></svg>
+              </span>
+            </div>
+            <p class="venue__address">Via dell'Indipendenza, 25 — 40121 Bologna BO</p>
+            <p class="venue__spots">5 posti disponibili</p>
+          </div>
+          <div class="venue" role="radio" aria-checked="false" tabindex="0" data-venue-id="napoli" data-venue-label="Napoli" data-venue-address="Via Toledo, 148 — 80132 Napoli NA">
+            <div class="venue__head">
+              <span class="venue__name">Napoli</span>
+              <span class="venue__check" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3,8 7,12 13,4"/></svg>
+              </span>
+            </div>
+            <p class="venue__address">Via Toledo, 148 — 80132 Napoli NA</p>
+            <p class="venue__spots">10 posti disponibili</p>
+          </div>
+        </div>
+        <div class="step-actions step-actions--right">
+          <button class="btn btn--primary" id="btn-step1-next" disabled>Continua →</button>
+        </div>
+      </section>
+
+      <section class="wizard__step" id="step-2" hidden aria-labelledby="step-2-title">
+        <h2 class="step-title" id="step-2-title">Scegli data e orario</h2>
+        <p class="step-sub" id="step-2-venue-label">Disponibilità per <strong>—</strong></p>
+        <div class="slots" id="slots-list" role="radiogroup" aria-label="Slot disponibili"></div>
+        <div class="step-actions">
+          <button class="btn btn--ghost" id="btn-step2-back">← Indietro</button>
+          <button class="btn btn--primary" id="btn-step2-next" disabled>Continua →</button>
+        </div>
+      </section>
+
+      <section class="wizard__step" id="step-3" hidden aria-labelledby="step-3-title">
+        <h2 class="step-title" id="step-3-title">Conferma prenotazione</h2>
+        <div class="summary-box">
+          <div class="summary-row"><span class="summary-label">Sede</span><span class="summary-value" id="confirm-venue">—</span></div>
+          <div class="summary-row"><span class="summary-label">Data</span><span class="summary-value" id="confirm-date">—</span></div>
+          <div class="summary-row"><span class="summary-label">Orario</span><span class="summary-value" id="confirm-time">—</span></div>
+          <div class="summary-row summary-row--total"><span class="summary-label">Prezzo</span><span class="summary-value">30,00 €</span></div>
+        </div>
+        <div class="pay-box">
+          <p class="pay-box__text">Stai per pagare <strong>30,00 €</strong></p>
+        </div>
+        <div class="step-actions">
+          <button class="btn btn--ghost" id="btn-step3-back">← Indietro</button>
+          <button class="btn btn--primary" id="btn-step3-pay">Procedi al pagamento →</button>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+</MvpAppShell>
+
+<script is:inline>
+(function () {
+  var SLOTS = {
+    roma: [
+      { id: "rm-060626-1000", date: "Sab 6 Giu 2026", time: "10:00 — 11:30", spots: 4 },
+      { id: "rm-060626-1400", date: "Sab 6 Giu 2026", time: "14:00 — 15:30", spots: 7 },
+      { id: "rm-200626-1000", date: "Sab 20 Giu 2026", time: "10:00 — 11:30", spots: 10 },
+      { id: "rm-040726-1000", date: "Sab 4 Lug 2026", time: "10:00 — 11:30", spots: 12 }
+    ],
+    milano: [
+      { id: "mi-070626-1000", date: "Dom 7 Giu 2026", time: "10:00 — 11:30", spots: 6 },
+      { id: "mi-210626-1000", date: "Dom 21 Giu 2026", time: "10:00 — 11:30", spots: 3 },
+      { id: "mi-050726-1000", date: "Dom 5 Lug 2026", time: "10:00 — 11:30", spots: 9 }
+    ],
+    bologna: [
+      { id: "bo-140626-1000", date: "Dom 14 Giu 2026", time: "10:00 — 11:30", spots: 5 },
+      { id: "bo-280626-1000", date: "Dom 28 Giu 2026", time: "10:00 — 11:30", spots: 2 },
+      { id: "bo-120726-1000", date: "Dom 12 Lug 2026", time: "10:00 — 11:30", spots: 8 }
+    ],
+    napoli: [
+      { id: "na-080626-1000", date: "Lun 8 Giu 2026", time: "10:00 — 11:30", spots: 10 },
+      { id: "na-220626-1000", date: "Lun 22 Giu 2026", time: "10:00 — 11:30", spots: 7 },
+      { id: "na-060726-1000", date: "Lun 6 Lug 2026", time: "10:00 — 11:30", spots: 4 }
+    ]
+  };
+
+  var state = { venueId: null, venueLabel: null, slotId: null, slotDate: null, slotTime: null };
+
+  function goToStep(from, to) {
+    var fromEl = document.getElementById("step-" + from);
+    var toEl = document.getElementById("step-" + to);
+    fromEl.hidden = true;
+    toEl.removeAttribute("hidden");
+    requestAnimationFrame(function () {
+      toEl.classList.add("is-entering");
+      requestAnimationFrame(function () {
+        toEl.classList.add("is-visible");
+      });
+    });
+    toEl.focus();
+    updateStepper(to);
+  }
+
+  function updateStepper(current) {
+    for (var i = 1; i <= 3; i++) {
+      var el = document.getElementById("step-indicator-" + i);
+      el.classList.remove("is-current", "is-done", "is-future");
+      if (i < current) el.classList.add("is-done");
+      else if (i === current) { el.classList.add("is-current"); el.setAttribute("aria-current", "step"); }
+      else { el.classList.add("is-future"); el.removeAttribute("aria-current"); }
+    }
+  }
+
+  function renderSlots(venueId, venueLabel) {
+    var list = document.getElementById("slots-list");
+    var sub = document.getElementById("step-2-venue-label");
+    sub.innerHTML = "Disponibilità per <strong>" + venueLabel + "</strong>";
+    var slots = SLOTS[venueId] || [];
+    list.innerHTML = "";
+    var astroCid = null;
+    for (var i = 0; i < list.attributes.length; i++) {
+      var a = list.attributes[i];
+      if (a.name.indexOf("data-astro-cid-") === 0) { astroCid = a.name; break; }
+    }
+    slots.forEach(function (s) {
+      var el = document.createElement("div");
+      el.className = "slot";
+      el.setAttribute("role", "radio");
+      el.setAttribute("aria-checked", "false");
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("data-slot-id", s.id);
+      el.setAttribute("data-slot-date", s.date);
+      el.setAttribute("data-slot-time", s.time);
+      if (astroCid) el.setAttribute(astroCid, "");
+      var lowClass = s.spots <= 3 ? " slot__spots--low" : "";
+      el.innerHTML =
+        '<div class="slot__body"' + (astroCid ? " " + astroCid : "") + '><p class="slot__date"' + (astroCid ? " " + astroCid : "") + '>' + s.date + "</p>" +
+        '<p class="slot__time"' + (astroCid ? " " + astroCid : "") + '>' + s.time + "</p></div>" +
+        '<span class="slot__spots' + lowClass + '"' + (astroCid ? " " + astroCid : "") + '>' + s.spots + " posti</span>" +
+        '<span class="slot__arrow"' + (astroCid ? " " + astroCid : "") + '>→</span>';
+      el.addEventListener("click", function () { selectSlot(this); });
+      el.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); selectSlot(this); } });
+      list.appendChild(el);
+    });
+    document.getElementById("btn-step2-next").disabled = true;
+    state.slotId = null;
+  }
+
+  function selectVenue(el) {
+    document.querySelectorAll(".venue").forEach(function (v) {
+      v.classList.remove("venue--selected");
+      v.setAttribute("aria-checked", "false");
+    });
+    el.classList.add("venue--selected");
+    el.setAttribute("aria-checked", "true");
+    state.venueId = el.getAttribute("data-venue-id");
+    state.venueLabel = el.getAttribute("data-venue-label");
+    document.getElementById("btn-step1-next").disabled = false;
+  }
+
+  function selectSlot(el) {
+    document.querySelectorAll(".slot").forEach(function (s) {
+      s.classList.remove("slot--selected");
+      s.setAttribute("aria-checked", "false");
+    });
+    el.classList.add("slot--selected");
+    el.setAttribute("aria-checked", "true");
+    state.slotId = el.getAttribute("data-slot-id");
+    state.slotDate = el.getAttribute("data-slot-date");
+    state.slotTime = el.getAttribute("data-slot-time");
+    document.getElementById("btn-step2-next").disabled = false;
+  }
+
+  document.querySelectorAll(".venue").forEach(function (el) {
+    el.addEventListener("click", function () { selectVenue(this); });
+    el.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); selectVenue(this); } });
+  });
+
+  document.getElementById("btn-step1-next").addEventListener("click", function () {
+    renderSlots(state.venueId, state.venueLabel);
+    goToStep(1, 2);
+  });
+
+  document.getElementById("btn-step2-back").addEventListener("click", function () {
+    goToStep(2, 1);
+  });
+
+  document.getElementById("btn-step2-next").addEventListener("click", function () {
+    document.getElementById("confirm-venue").textContent = state.venueLabel;
+    document.getElementById("confirm-date").textContent = state.slotDate;
+    document.getElementById("confirm-time").textContent = state.slotTime;
+    goToStep(2, 3);
+  });
+
+  document.getElementById("btn-step3-back").addEventListener("click", function () {
+    goToStep(3, 2);
+  });
+
+  document.getElementById("btn-step3-pay").addEventListener("click", function () {
+    var params = new URLSearchParams({ sede: state.venueId, slot: state.slotId });
+    window.location.href = "/public/mvp/checkout?" + params.toString();
+  });
+})();
+</script>
+
+<style>
+  .page-content { max-inline-size: 760px; display: grid; gap: var(--spacing-6); }
+
+  .page-header { display: grid; gap: var(--spacing-1); }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .stepper { }
+  .stepper__list { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 0; }
+  .stepper__item { display: flex; align-items: center; gap: var(--spacing-2); flex: 1; position: relative; }
+  .stepper__item:not(:last-child)::after { content: ""; flex: 1; block-size: 1px; background: var(--color-border-subtle); margin-inline: var(--spacing-2); }
+  .stepper__num { display: inline-flex; align-items: center; justify-content: center; inline-size: 28px; block-size: 28px; border-radius: 50%; font-size: var(--text-xs); font-weight: 700; flex-shrink: 0; transition: background 200ms ease, color 200ms ease; background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); color: var(--color-text-tertiary); }
+  .stepper__label { font-size: var(--text-xs); font-weight: 500; color: var(--color-text-tertiary); transition: color 200ms ease; white-space: nowrap; }
+  .stepper__item.is-current .stepper__num { background: var(--color-mensa-blue); color: var(--color-text-on-brand); border-color: var(--color-mensa-blue); }
+  .stepper__item.is-current .stepper__label { color: var(--color-text-primary); font-weight: 600; }
+  .stepper__item.is-done .stepper__num { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .stepper__item.is-done .stepper__label { color: var(--color-text-secondary); }
+  @media (max-width: 400px) { .stepper__label { display: none; } .stepper__item::after { flex: 1; } }
+
+  .wizard { position: relative; }
+  .wizard__step { display: grid; gap: var(--spacing-5); outline: none; opacity: 1; transform: none; transition: opacity 200ms ease, transform 200ms ease; }
+  .wizard__step.is-entering { opacity: 0; transform: translateY(8px); }
+  .wizard__step.is-visible { opacity: 1; transform: translateY(0); }
+
+  .step-title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); }
+  .step-sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .venues { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-3); }
+  @media (max-width: 600px) { .venues { grid-template-columns: 1fr; } }
+  .venue { padding: var(--spacing-4); background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); cursor: pointer; display: grid; gap: var(--spacing-1); transition: border-color 150ms ease, box-shadow 150ms ease; }
+  .venue:hover { border-color: color-mix(in oklch, var(--color-mensa-blue) 50%, transparent); }
+  .venue--selected { border-color: var(--color-mensa-blue); box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-mensa-blue) 20%, transparent); }
+  .venue__head { display: flex; align-items: center; justify-content: space-between; }
+  .venue__name { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-primary); }
+  .venue__check { inline-size: 18px; block-size: 18px; color: var(--color-mensa-blue); opacity: 0; transition: opacity 150ms ease; }
+  .venue__check svg { inline-size: 100%; block-size: 100%; }
+  .venue--selected .venue__check { opacity: 1; }
+  .venue__address { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+  .venue__spots { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+  .slots { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+  .slot { display: flex; align-items: center; gap: var(--spacing-4); padding: var(--spacing-4) var(--spacing-5); cursor: pointer; border-block-end: 1px solid var(--color-border-subtle); transition: background 150ms ease; }
+  .slot:last-child { border-block-end: none; }
+  .slot:hover { background: var(--color-surface-elevated); }
+  .slot--selected { background: color-mix(in oklch, var(--color-mensa-blue) 6%, transparent); border-color: var(--color-mensa-blue); outline: 1px solid var(--color-mensa-blue); }
+  .slot__body { flex: 1; display: grid; gap: 2px; }
+  .slot__date { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .slot__time { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .slot__spots { font-size: var(--text-xs); font-weight: 500; color: var(--color-text-tertiary); flex-shrink: 0; }
+  .slot__spots--low { color: #dc2626; font-weight: 600; }
+  .slot__arrow { color: var(--color-text-tertiary); font-size: var(--text-sm); flex-shrink: 0; }
+
+  .summary-box { background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--spacing-4) var(--spacing-5); display: grid; gap: 0; }
+  .summary-row { display: flex; justify-content: space-between; gap: var(--spacing-3); padding-block: var(--spacing-2); border-block-end: 1px solid var(--color-border-subtle); font-size: var(--text-sm); }
+  .summary-row:last-child { border-block-end: none; }
+  .summary-row--total { font-weight: 700; font-size: var(--text-base); }
+  .summary-label { color: var(--color-text-tertiary); }
+  .summary-value { color: var(--color-text-primary); font-weight: 500; }
+
+  .pay-box { padding: var(--spacing-4) var(--spacing-5); background: color-mix(in oklch, var(--color-mensa-blue) 8%, transparent); border: 1px solid color-mix(in oklch, var(--color-mensa-blue) 25%, transparent); border-radius: var(--radius-md); }
+  .pay-box__text { margin: 0; font-size: var(--text-sm); color: var(--color-text-primary); }
+
+  .step-actions { display: flex; gap: var(--spacing-3); align-items: center; }
+  .step-actions--right { justify-content: flex-end; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px var(--spacing-5); font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; text-decoration: none; transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease; font-family: inherit; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--primary:hover:not(:disabled) { background: var(--color-mensa-blue-deep); }
+  .btn--primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn--ghost { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border-strong); }
+  .btn--ghost:hover { background: var(--color-surface-elevated); }
+</style>

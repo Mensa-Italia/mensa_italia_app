@@ -37,6 +37,14 @@ export function MensaProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (authState === "Authenticated") {
+      document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
+    } else if (authState === "Anonymous") {
+      document.cookie = "mensa_session=; path=/; max-age=0; SameSite=Lax";
+    }
+  }, [authState]);
+
   return (
     <MensaCtx.Provider
       value={{

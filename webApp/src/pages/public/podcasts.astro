@@ -1,18 +1,12 @@
 ---
-/**
- * Podcast pubblici.
- *
- * Fetch server-side della collection `podcasts` (PB pubblica, no auth).
- * Cover via `pbFileUrl(record, record.image)`. Link diretto a YouTube
- * tramite `youtube_playlist_id`: per ora niente player embedded sul
- * pubblico (riservato alla dashboard via `AudioPlayerService`).
- */
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import {
   listPublicPodcasts,
   pbFileUrl,
   type PublicPodcastRecord,
 } from "../../lib/publicApi";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
 
 let podcasts: readonly PublicPodcastRecord[] = [];
 let fetchError: string | null = null;
@@ -21,6 +15,13 @@ try {
 } catch (err) {
   fetchError = err instanceof Error ? err.message : "Errore di caricamento";
 }
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.podcasts.read();
+
+const heroKicker = cms?.heroKicker ?? "Podcast";
+const heroTitle = cms?.heroTitle ?? "Voci di Mensa Italia.";
+const heroSubtitle = cms?.heroSubtitle ?? "Conversazioni, interviste, monologhi. I podcast sono prodotti dai soci. Ascoltali direttamente nell'app Mensa, su iOS e Android — con player integrato, episodi recenti e download offline.";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -50,13 +51,9 @@ const jsonLd = {
 >
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="web.podcasts.hero.kicker">Podcast</p>
-      <h1 class="hero__title" data-i18n="web.podcasts.hero.title">Voci di Mensa Italia.</h1>
-      <p class="hero__sub" data-i18n="web.podcasts.hero.sub">
-        Conversazioni, interviste, monologhi. I podcast sono prodotti dai soci.
-        Ascoltali direttamente nell'app Mensa, su iOS e Android — con player
-        integrato, episodi recenti e download offline.
-      </p>
+      <p class="hero__kicker" data-i18n="web.podcasts.hero.kicker">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.podcasts.hero.title">{heroTitle}</h1>
+      <p class="hero__sub" data-i18n="web.podcasts.hero.sub">{heroSubtitle}</p>
     </div>
   </section>
 

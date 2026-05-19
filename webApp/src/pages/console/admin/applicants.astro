@@ -1,0 +1,158 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+
+const applicants = [
+  { id: "a1",  name: "Marco Rossi",         email: "marco.rossi@email.it",      cf: "RSSMRC85A01H501Z", sede: "Roma",    stato: "Test prenotato",  update: "5 giu 2026" },
+  { id: "a2",  name: "Giulia Ferretti",      email: "g.ferretti@mail.it",         cf: "FRRGLI92B41F205X", sede: "Milano",  stato: "Iscritto",        update: "3 giu 2026" },
+  { id: "a3",  name: "Lorenzo Bianchi",      email: "l.bianchi@email.it",         cf: "BNCLNZ88D15L219Q", sede: "Roma",    stato: "Esito ricevuto",  update: "6 giu 2026" },
+  { id: "a4",  name: "Valentina Esposito",   email: "v.esposito@example.com",     cf: "SPTVNT95E41F839K", sede: "Torino",  stato: "Bocciato",        update: "2 giu 2026" },
+  { id: "a5",  name: "Federico Marini",      email: "fedmarini@email.it",         cf: "MRNFRC90F12H501W", sede: "Napoli",  stato: "Iscritto",        update: "1 giu 2026" },
+  { id: "a6",  name: "Sara Conti",           email: "sara.conti@mail.it",         cf: "CNTSRA87M60G702N", sede: "Milano",  stato: "Test prenotato",  update: "4 giu 2026" },
+  { id: "a7",  name: "Matteo De Luca",       email: "m.deluca@email.it",          cf: "DLCMTT93C21E625T", sede: "Roma",    stato: "Iscritto",        update: "31 mag 2026"},
+  { id: "a8",  name: "Chiara Ricci",         email: "chiara.ricci@mail.it",       cf: "RCCCHI96A58L736P", sede: "Bologna", stato: "Esito ricevuto",  update: "6 giu 2026" },
+  { id: "a9",  name: "Alberto Fontana",      email: "a.fontana@email.com",        cf: "FNTALB91G10F205Z", sede: "Firenze", stato: "Iscritto",        update: "30 mag 2026"},
+  { id: "a10", name: "Elena Moretti",        email: "elena.moretti@mail.it",      cf: "MRTLNE89A52H501X", sede: "Milano",  stato: "Test prenotato",  update: "5 giu 2026" },
+  { id: "a11", name: "Davide Caruso",        email: "d.caruso@example.it",        cf: "CRSDVD94D10F839Q", sede: "Napoli",  stato: "Bocciato",        update: "2 giu 2026" },
+  { id: "a12", name: "Francesca Lombardi",   email: "f.lombardi@email.it",        cf: "LMBFNC97B65H501W", sede: "Torino",  stato: "Iscritto",        update: "28 mag 2026"},
+];
+
+const statoClass: Record<string, string> = {
+  "Iscritto":       "status--blue",
+  "Test prenotato": "status--orange",
+  "Esito ricevuto": "status--green",
+  "Bocciato":       "status--red",
+};
+---
+
+<ConsoleShell
+  title="Lista aspiranti — Admin Nazionale"
+  pageTitle="Aspiranti soci"
+  scope="test"
+  activeHref="/console/admin/applicants"
+>
+  <div class="page-content">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Aspiranti soci</h1>
+        <p class="page-header__sub">12 profili in totale · aggiornato oggi</p>
+      </div>
+      <span class="badge badge--purple">Admin nazionale</span>
+    </header>
+
+    <div class="toolbar">
+      <select class="toolbar__select" aria-label="Filtra per stato">
+        <option>Tutti gli stati</option>
+        <option>Iscritto</option>
+        <option>Test prenotato</option>
+        <option>Esito ricevuto</option>
+        <option>Bocciato</option>
+      </select>
+      <select class="toolbar__select" aria-label="Filtra per sede">
+        <option>Tutte le sedi</option>
+        <option>Roma</option>
+        <option>Milano</option>
+        <option>Torino</option>
+        <option>Napoli</option>
+        <option>Firenze</option>
+        <option>Bologna</option>
+      </select>
+      <input type="search" class="toolbar__search" placeholder="Cerca per CF o email…" aria-label="Cerca per CF o email" />
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Codice fiscale</th>
+            <th>Sede</th>
+            <th>Stato</th>
+            <th>Ultimo agg.</th>
+            <th aria-label="Azioni"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {applicants.map((a) => (
+            <tr>
+              <td class="td--name">{a.name}</td>
+              <td class="td--email">{a.email}</td>
+              <td><code class="cf-code">{a.cf}</code></td>
+              <td>{a.sede}</td>
+              <td><span class={`status ${statoClass[a.stato] ?? "status--gray"}`}>{a.stato}</span></td>
+              <td class="td--date">{a.update}</td>
+              <td class="td--action">
+                <a href={`/console/admin/applicant?id=${a.id}`} class="btn btn--sm btn--primary">Dettaglio</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" aria-label="Paginazione">
+      <button class="page-btn page-btn--active" aria-current="page">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <span class="page-sep">…</span>
+      <button class="page-btn">8</button>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<style>
+  .page-content { display: grid; gap: var(--spacing-5); }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; align-self: flex-start; }
+  .badge--purple { background: #ede9fe; color: #4c1d95; }
+
+  .toolbar { display: flex; gap: var(--spacing-3); flex-wrap: wrap; align-items: center; }
+  .toolbar__select, .toolbar__search { padding: 0.45rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); }
+  .toolbar__search { flex: 1; min-inline-size: 200px; }
+
+  .table-wrap { background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table thead tr { background: var(--color-surface-elevated); border-block-end: 1px solid var(--color-border-subtle); }
+  .table th { padding: 0.75rem 0.875rem; text-align: left; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); white-space: nowrap; }
+  .table tbody tr { border-block-end: 1px solid var(--color-border-subtle); transition: background var(--motion-fast) var(--ease-out-quart); }
+  .table tbody tr:last-child { border-block-end: none; }
+  .table tbody tr:hover { background: var(--color-surface-elevated); }
+  .table td { padding: 0.75rem 0.875rem; color: var(--color-text-primary); vertical-align: middle; }
+  .td--name { font-weight: 600; white-space: nowrap; }
+  .td--email { color: var(--color-text-secondary); font-size: var(--text-xs); }
+  .td--date  { color: var(--color-text-tertiary); font-size: var(--text-xs); white-space: nowrap; }
+  .td--action { text-align: right; white-space: nowrap; }
+  .cf-code { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-surface-elevated); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); }
+
+  .status { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+  .status--blue   { background: #dbeafe; color: #1e40af; }
+  .status--orange { background: #ffedd5; color: #9a3412; }
+  .status--green  { background: #d1fae5; color: #065f46; }
+  .status--red    { background: #fee2e2; color: #991b1b; }
+  .status--gray   { background: var(--color-surface-elevated); color: var(--color-text-tertiary); }
+
+  .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; border: 2px solid transparent; }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn--sm { padding: 0.3rem 0.75rem; font-size: var(--text-xs); }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+
+  .pagination { display: flex; gap: var(--spacing-1); align-items: center; justify-content: flex-end; }
+  .page-btn { padding: 0.4rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); background: var(--color-surface); font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); cursor: pointer; transition: background 0.1s, border-color 0.1s; }
+  .page-btn:hover { background: var(--color-surface-elevated); border-color: var(--color-border-strong); }
+  .page-btn--active { background: var(--color-mensa-blue); color: var(--color-text-on-brand); border-color: var(--color-mensa-blue); }
+  .page-sep { color: var(--color-text-tertiary); padding-inline: var(--spacing-1); }
+
+  @media (max-width: 700px) {
+    .table thead { display: none; }
+    .table tbody, .table tr, .table td { display: block; width: 100%; }
+    .table tr { padding: 0.75rem 1rem; border-block-end: 1px solid var(--color-border-subtle); }
+    .table td { padding: 0.2rem 0; }
+    .td--action { text-align: left; margin-block-start: 0.5rem; }
+  }
+</style>

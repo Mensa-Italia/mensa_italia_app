@@ -1,0 +1,224 @@
+---
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+import { NewsletterEditor } from "../../../components/newsletter/NewsletterEditor";
+
+type SlugKey = "mensanews" | "globale" | "lombardia";
+
+const meta: Record<SlugKey, { name: string; subscribers: number; lastSent: string; designFile: string | null }> = {
+  mensanews: {
+    name: "MensaNews",
+    subscribers: 2341,
+    lastSent: "12 Mag 2026",
+    designFile: "mensanews-template-design.json",
+  },
+  globale: {
+    name: "Newsletter Globale",
+    subscribers: 2512,
+    lastSent: "5 Mag 2026",
+    designFile: null,
+  },
+  lombardia: {
+    name: "Newsletter Lombardia",
+    subscribers: 412,
+    lastSent: "8 Mag 2026",
+    designFile: null,
+  },
+};
+
+const { slug } = Astro.params;
+
+if (!slug || !(slug in meta)) {
+  return Astro.redirect("/console/newsletter");
+}
+
+const info = meta[slug as SlugKey];
+
+let initialDesign: object | null = null;
+if (info.designFile) {
+  try {
+    const designPath = resolve(process.cwd(), "src/content/newsletters", info.designFile);
+    initialDesign = JSON.parse(readFileSync(designPath, "utf-8"));
+  } catch {
+    initialDesign = null;
+  }
+}
+
+const activeHref = `/console/newsletter/${slug}`;
+---
+
+<ConsoleShell
+  title={`Editor — ${info.name} — Console Mensa`}
+  pageTitle={`Editor — ${info.name}`}
+  scope="newsletter"
+  activeHref={activeHref}
+>
+  <div class="page-content">
+    <header class="page-header">
+      <div class="page-header__left">
+        <a href="/console/newsletter" class="page-header__back">← Tutte le newsletter</a>
+        <h1 class="page-header__title">Editor — {info.name}</h1>
+        <div class="page-header__meta">
+          <span class="badge badge--blue">{info.subscribers.toLocaleString("it-IT")} soci iscritti</span>
+          <span class="page-header__last">Ultimo invio: {info.lastSent}</span>
+        </div>
+      </div>
+      <div class="page-header__actions">
+        <button type="button" class="btn btn--ghost" id="btn-preview">Anteprima</button>
+        <button type="button" class="btn btn--primary" id="btn-send">Invia ora →</button>
+      </div>
+    </header>
+
+    <NewsletterEditor initialDesign={initialDesign} client:only="react" />
+  </div>
+
+  <dialog id="send-dialog" class="send-dialog">
+    <div class="send-dialog__box">
+      <h2 class="send-dialog__title">Inviare la newsletter?</h2>
+      <p class="send-dialog__body">
+        Stai per inviare <strong>{info.name}</strong> a <strong>{info.subscribers.toLocaleString("it-IT")}</strong> soci. Questa azione non si può annullare.
+      </p>
+      <div class="send-dialog__actions">
+        <button type="button" class="btn btn--ghost" id="btn-cancel">Annulla</button>
+        <button type="button" class="btn btn--danger" id="btn-confirm">Sì, invia ora</button>
+      </div>
+    </div>
+  </dialog>
+</ConsoleShell>
+
+<script>
+  const dialog = document.getElementById("send-dialog") as HTMLDialogElement | null;
+  document.getElementById("btn-send")?.addEventListener("click", () => dialog?.showModal());
+  document.getElementById("btn-cancel")?.addEventListener("click", () => dialog?.close());
+  document.getElementById("btn-preview")?.addEventListener("click", () => alert("Anteprima (demo) — non disponibile in questa versione."));
+  document.getElementById("btn-confirm")?.addEventListener("click", () => {
+    dialog?.close();
+    alert("Newsletter inviata — la coda di invio richiederà ~10 minuti.");
+  });
+</script>
+
+<style>
+  .page-content {
+    display: grid;
+    gap: var(--spacing-5);
+  }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding-block-end: var(--spacing-5);
+    border-block-end: 1px solid var(--color-border-subtle);
+    flex-wrap: wrap;
+  }
+  .page-header__left {
+    display: grid;
+    gap: var(--spacing-1);
+  }
+  .page-header__back {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .page-header__back:hover { color: var(--color-text-primary); }
+  .page-header__title {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+  .page-header__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+  }
+  .page-header__last {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+  .page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-shrink: 0;
+  }
+
+  .badge--blue {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px var(--spacing-3);
+    background: color-mix(in oklch, var(--color-mensa-blue) 10%, var(--color-surface));
+    color: var(--color-mensa-blue);
+    border-radius: var(--radius-full);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .btn {
+    padding: 7px 18px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .btn--ghost {
+    background: var(--color-surface-elevated);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-subtle);
+  }
+  .btn--ghost:hover { color: var(--color-text-primary); }
+  .btn--primary {
+    background: var(--color-mensa-blue);
+    color: var(--color-text-on-brand, #fff);
+  }
+  .btn--primary:hover { opacity: 0.9; }
+  .btn--danger {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+  }
+  .btn--danger:hover { background: #b91c1c; }
+
+  .send-dialog {
+    border: none;
+    padding: 0;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-modal, 0 20px 60px rgba(0,0,0,0.2));
+    max-inline-size: 420px;
+    inline-size: 90vw;
+  }
+  .send-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+  .send-dialog__box {
+    padding: var(--spacing-6);
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .send-dialog__title {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+  .send-dialog__body {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+  .send-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-2);
+  }
+</style>

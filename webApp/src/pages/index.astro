@@ -1,5 +1,69 @@
 ---
 import PublicLayout from "../layouts/PublicLayout.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../keystatic.config";
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const cms = await reader.singletons.home.read();
+
+const heroKicker = cms?.heroKicker ?? "Mensa Italia · dal 1983 · The High I.Q. Society";
+const heroTitle = cms?.heroTitle ?? "Persone _curiose_. Un test in comune.";
+
+/**
+ * Split heroTitle into per-word spans for the editorial reveal animation.
+ * Words inside `_..._` become accent spans with an inner <em>.
+ * Punctuation (.,;:!?) attached to the end of a word stays attached to
+ * that word's span — it is never wrapped in its own span.
+ */
+function buildHeroTitleHtml(text: string): string {
+  // First, tokenise around the _accent_ markers
+  const segments: Array<{ text: string; accent: boolean }> = [];
+  const accentRe = /_([^_]+)_/g;
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = accentRe.exec(text)) !== null) {
+    if (m.index > lastIndex) {
+      segments.push({ text: text.slice(lastIndex, m.index), accent: false });
+    }
+    segments.push({ text: m[1], accent: true });
+    lastIndex = m.index + m[0].length;
+  }
+  if (lastIndex < text.length) {
+    segments.push({ text: text.slice(lastIndex), accent: false });
+  }
+
+  // Helper: escape HTML entities in plain text
+  function esc(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // For each segment, split into words and emit spans
+  const spans: string[] = [];
+  for (const seg of segments) {
+    // Split on whitespace, keeping non-empty tokens
+    const words = seg.text.split(/\s+/).filter(Boolean);
+    for (const word of words) {
+      const safe = esc(word);
+      if (seg.accent) {
+        spans.push(`<span class="hero__title-word hero__title-word--accent"><em>${safe}</em></span>`);
+      } else {
+        spans.push(`<span class="hero__title-word">${safe}</span>`);
+      }
+    }
+  }
+
+  // Join with a single space so natural wrapping is preserved
+  return spans.join(" ");
+}
+const heroTitleHtml = buildHeroTitleHtml(heroTitle);
+const heroSubtitle = cms?.heroSubtitle ?? "Mensa è un club internazionale di persone curiose. L'unico requisito per entrare è un test di logica: se rientri nel 2% più alto della popolazione, sei dentro. Dal latino mensa, la tavola rotonda: tra soci si sta tutti allo stesso livello.";
+const featuresKicker = cms?.featuresKicker ?? "Cosa facciamo";
+const featuresTitle = cms?.featuresTitle ?? "Comunità, cultura, conversazione.";
+const joinKicker = cms?.joinKicker ?? "Come entrare";
+const joinTitle = cms?.joinTitle ?? "Due strade, una porta.";
+const endKicker = cms?.endKicker ?? "Sei già socio?";
+const endTitle = cms?.endTitle ?? "Accedi alla tua area personale.";
+const endSubtitle = cms?.endSubtitle ?? "Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -39,16 +103,9 @@ const organizationJsonLd = {
   <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__kicker" data-i18n="web.home.hero.kicker">Mensa Italia · dal 1983 · The High I.Q. Society</p>
-      <h1 class="hero__title" data-i18n="web.home.hero.title">
-        Persone <em>curiose</em>.<br/>Un test in comune.
-      </h1>
-      <p class="hero__sub" data-i18n="web.home.hero.sub">
-        Mensa è un club internazionale di persone curiose. L'unico requisito
-        per entrare è un test di logica: se rientri nel 2% più alto della
-        popolazione, sei dentro. Dal latino <em>mensa</em>, la tavola rotonda:
-        tra soci si sta tutti allo stesso livello.
-      </p>
+      <p class="hero__kicker" data-i18n="web.home.hero.kicker">{heroKicker}</p>
+      <h1 class="hero__title" data-i18n="web.home.hero.title" set:html={heroTitleHtml}></h1>
+      <p class="hero__sub" data-i18n="web.home.hero.sub">{heroSubtitle}</p>
       <div class="hero__cta">
         <a href="/public/iq-test" class="hero__btn hero__btn--primary" data-i18n="web.home.hero.cta_primary">
           Mettiti alla prova
@@ -90,8 +147,8 @@ const organizationJsonLd = {
   <section class="features">
     <div class="features__inner">
       <header class="features__head">
-        <p class="features__kicker" data-i18n="web.home.features.kicker">Cosa facciamo</p>
-        <h2 class="features__title" data-i18n="web.home.features.title">Comunità, cultura, conversazione.</h2>
+        <p class="features__kicker" data-i18n="web.home.features.kicker">{featuresKicker}</p>
+        <h2 class="features__title" data-i18n="web.home.features.title">{featuresTitle}</h2>
       </header>
 
       <div class="features__grid">
@@ -167,8 +224,8 @@ const organizationJsonLd = {
   <section class="join">
     <div class="join__inner">
       <header>
-        <p class="join__kicker" data-i18n="web.home.join.kicker">Come entrare</p>
-        <h2 class="join__title" data-i18n="web.home.join.title">Due strade, una porta.</h2>
+        <p class="join__kicker" data-i18n="web.home.join.kicker">{joinKicker}</p>
+        <h2 class="join__title" data-i18n="web.home.join.title">{joinTitle}</h2>
       </header>
 
       <ol class="join__steps">
@@ -210,11 +267,9 @@ const organizationJsonLd = {
   <!-- ═══ CTA finale ══════════════════════════════════════════ -->
   <section class="end">
     <div class="end__inner">
-      <p class="end__kicker" data-i18n="web.home.end.kicker">Sei già socio?</p>
-      <h2 data-i18n="web.home.end.title">Accedi alla tua area personale.</h2>
-      <p class="end__sub" data-i18n="web.home.end.body">
-        Tessera digitale, eventi, registro soci, rivista, podcast — tutto in un'unica dashboard.
-      </p>
+      <p class="end__kicker" data-i18n="web.home.end.kicker">{endKicker}</p>
+      <h2 data-i18n="web.home.end.title">{endTitle}</h2>
+      <p class="end__sub" data-i18n="web.home.end.body">{endSubtitle}</p>
       <a href="/login" class="end__btn" data-i18n="web.home.end.cta">Accedi come socio</a>
     </div>
   </section>
@@ -258,7 +313,15 @@ const organizationJsonLd = {
     text-wrap: balance;
     max-inline-size: 18ch;
   }
-  .hero__title em {
+  /* Word-span for the editorial reveal animation */
+  .hero__title :global(.hero__title-word) {
+    display: inline-block;
+    /* Natural space character between spans preserves word spacing */
+  }
+
+  /* :global(em) needed because <em> is injected via set:html and so doesn't
+     carry the Astro scoped-style data-attribute. */
+  .hero__title :global(em) {
     font-style: italic;
     font-weight: 500;
     color: var(--color-mensa-blue);
@@ -601,3 +664,68 @@ const organizationJsonLd = {
   }
   .end__btn:hover { background: var(--color-mensa-blue-deep); }
 </style>
+
+<script>
+  import { gsap, prefersReducedMotion, EASE_EDITORIAL } from "../lib/motion";
+
+  const reduced = prefersReducedMotion();
+
+  // ── Hero title words ─────────────────────────────────────────────
+  const words = document.querySelectorAll<HTMLElement>(".hero__title-word");
+  if (words.length && !reduced) {
+    gsap.set(words, { y: "0.6em", opacity: 0 });
+    gsap.to(words, {
+      y: 0,
+      opacity: 1,
+      duration: 0.7,
+      ease: EASE_EDITORIAL,
+      stagger: 0.08,
+      delay: 0.15,
+    });
+
+    // Accent word: micro-pop lands around its stagger slot
+    const accent = document.querySelector<HTMLElement>(".hero__title-word--accent");
+    if (accent) {
+      const accentIndex = Array.from(words).indexOf(accent);
+      const accentDelay = 0.15 + accentIndex * 0.08;
+      gsap.from(accent, {
+        scale: 0.92,
+        duration: 0.5,
+        ease: "back.out(2)",
+        delay: accentDelay,
+      });
+    }
+  }
+
+  // ── Hero kicker ──────────────────────────────────────────────────
+  const kicker = document.querySelector<HTMLElement>(".hero__kicker");
+  if (kicker) {
+    if (!reduced) {
+      gsap.set(kicker, { y: 8, opacity: 0 });
+      gsap.to(kicker, { y: 0, opacity: 1, duration: 0.5, ease: EASE_EDITORIAL, delay: 0.05 });
+    }
+  }
+
+  // ── Hero subtitle ────────────────────────────────────────────────
+  const sub = document.querySelector<HTMLElement>(".hero__sub");
+  if (sub) {
+    if (!reduced) {
+      gsap.set(sub, { y: 18, opacity: 0 });
+      gsap.to(sub, { y: 0, opacity: 1, duration: 0.7, ease: EASE_EDITORIAL, delay: 0.5 });
+    }
+  }
+
+  // ── CTA buttons ──────────────────────────────────────────────────
+  const ctaBtns = document.querySelectorAll<HTMLElement>(".hero__cta > *");
+  if (ctaBtns.length && !reduced) {
+    gsap.set(ctaBtns, { y: 14, opacity: 0 });
+    gsap.to(ctaBtns, {
+      y: 0,
+      opacity: 1,
+      duration: 0.5,
+      ease: EASE_EDITORIAL,
+      stagger: 0.06,
+      delay: 0.9,
+    });
+  }
+</script>

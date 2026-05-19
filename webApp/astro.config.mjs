@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
+import markdoc from "@astrojs/markdoc";
+import keystatic from "@keystatic/astro";
 import tailwindcss from "@tailwindcss/vite";
 import node from "@astrojs/node";
 import { fileURLToPath } from "node:url";
@@ -17,7 +19,36 @@ export default defineConfig({
   // when we want them static — most pages stay SSR for now.
   output: "server",
   adapter: node({ mode: "standalone" }),
-  integrations: [react()],
+  integrations: [
+    react(),
+    markdoc(),
+    keystatic(),
+    {
+      name: "keystatic-light-mode",
+      hooks: {
+        "astro:config:setup": ({ injectScript }) => {
+          injectScript(
+            "page",
+            `if (window.location.pathname.startsWith("/keystatic")) {
+              try { localStorage.setItem("keystatic-color-scheme", "light"); } catch (_) {}
+              var forceLight = function () {
+                var root = document.documentElement;
+                if (!root) return;
+                root.classList.remove("kui-scheme--auto", "kui-scheme--dark");
+                if (!root.classList.contains("kui-scheme--light")) root.classList.add("kui-scheme--light");
+                root.style.colorScheme = "light";
+              };
+              forceLight();
+              try {
+                var mo = new MutationObserver(forceLight);
+                mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
+              } catch (_) {}
+            }`,
+          );
+        },
+      },
+    },
+  ],
   vite: {
     plugins: [tailwindcss()],
     resolve: {

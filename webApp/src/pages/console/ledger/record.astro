@@ -1,0 +1,176 @@
+---
+import ConsoleShell from "../../../layouts/ConsoleShell.astro";
+---
+
+<ConsoleShell
+  scope="ledger"
+  activeHref="/console/ledger/record"
+  pageTitle="Registra incasso"
+  title="Mensa Ledger · Registra incasso"
+>
+  <div class="page">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Registra incasso</h1>
+        <p class="page-header__sub">Inserisci manualmente un movimento — entrata o uscita — per tenerlo nel registro.</p>
+      </div>
+    </header>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label" for="rec-date">Data movimento</label>
+        <input type="date" id="rec-date" class="form-input" value="2026-05-18" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-amount">Importo</label>
+        <div class="input-prefix-wrap">
+          <span class="input-prefix">€</span>
+          <input type="number" id="rec-amount" class="form-input input--prefixed" placeholder="0,00" min="0.01" step="0.01" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <p class="form-label">Tipo</p>
+        <div class="chips-row" role="radiogroup" aria-label="Tipo movimento">
+          <label class="type-chip type-chip--active" id="chip-in">
+            <input type="radio" name="tipo" value="entrata" checked class="sr-only" /> Entrata
+          </label>
+          <label class="type-chip" id="chip-out">
+            <input type="radio" name="tipo" value="uscita" class="sr-only" /> Uscita
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-cat">Categoria</label>
+        <select id="rec-cat" class="form-input">
+          <option>Quote soci</option>
+          <option>Test ammissione</option>
+          <option>Eventi</option>
+          <option>Boutique</option>
+          <option>Donazioni</option>
+          <option>Spese gestione</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-party">Pagatore / Beneficiario</label>
+        <input type="text" id="rec-party" class="form-input" placeholder="es. Marco Rossi o Cartoleria Bottega" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-method">Metodo</label>
+        <select id="rec-method" class="form-input">
+          <option>Bonifico</option>
+          <option>Contanti</option>
+          <option>Carta</option>
+          <option>PayPal</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-ref">Riferimento <span class="form-label--optional">(opzionale)</span></label>
+        <input type="text" id="rec-ref" class="form-input" placeholder="es. numero ricevuta, ordine…" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rec-notes">Note <span class="form-label--optional">(opzionale)</span></label>
+        <textarea id="rec-notes" class="form-input form-textarea" rows="3" placeholder="Dettagli aggiuntivi…"></textarea>
+      </div>
+
+      <div class="form-group">
+        <p class="form-label">Allega ricevuta <span class="form-label--optional">(opzionale)</span></p>
+        <div class="drop-zone" aria-label="Zona drop file ricevuta">
+          <span class="drop-zone__icon" aria-hidden="true">📎</span>
+          <span class="drop-zone__text">Drop PDF o JPG qui — max 5 MB</span>
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" class="sr-only" tabindex="-1" aria-label="Allega ricevuta" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn--primary" onclick="location.href='/console/ledger?msg=registered'">Registra movimento</button>
+        <a href="/console/ledger" class="btn btn--ghost">Annulla</a>
+      </div>
+    </div>
+
+  </div>
+</ConsoleShell>
+
+<script is:inline>
+  document.querySelectorAll('[name="tipo"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.getElementById('chip-in').classList.toggle('type-chip--active', this.value === 'entrata');
+      document.getElementById('chip-out').classList.toggle('type-chip--active', this.value === 'uscita');
+    });
+  });
+  document.getElementById('chip-out').addEventListener('click', function() {
+    document.querySelector('[name="tipo"][value="uscita"]').checked = true;
+    document.getElementById('chip-in').classList.remove('type-chip--active');
+    document.getElementById('chip-out').classList.add('type-chip--active');
+  });
+  document.getElementById('chip-in').addEventListener('click', function() {
+    document.querySelector('[name="tipo"][value="entrata"]').checked = true;
+    document.getElementById('chip-in').classList.add('type-chip--active');
+    document.getElementById('chip-out').classList.remove('type-chip--active');
+  });
+</script>
+
+<style>
+  .page { display: grid; gap: var(--spacing-5); }
+  .page-header__title { margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); font-weight: 700; letter-spacing: -0.02em; color: var(--color-text-primary); }
+  .page-header__sub { margin: 0.25rem 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+  .form-card {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-6);
+    max-inline-size: 640px;
+    display: grid;
+    gap: var(--spacing-4);
+  }
+  .form-group { display: grid; gap: var(--spacing-1); }
+  .form-label { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
+  .form-label--optional { font-weight: 400; color: var(--color-text-tertiary); }
+  .form-input { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--color-surface); color: var(--color-text-primary); width: 100%; box-sizing: border-box; }
+  .form-input:focus { outline: 2px solid var(--color-mensa-blue); outline-offset: 1px; border-color: var(--color-mensa-blue); }
+  .form-textarea { resize: vertical; font-family: inherit; }
+  .input-prefix-wrap { display: flex; align-items: stretch; }
+  .input-prefix { display: inline-flex; align-items: center; padding: 0 0.75rem; background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-inline-end: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: var(--text-sm); color: var(--color-text-secondary); font-weight: 600; }
+  .input--prefixed { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+  .chips-row { display: flex; gap: var(--spacing-2); }
+  .type-chip { display: inline-flex; align-items: center; padding: 0.4rem 1.1rem; border: 1.5px solid var(--color-border-subtle); border-radius: 9999px; font-size: var(--text-sm); font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; background: var(--color-surface); }
+  .type-chip--active { background: color-mix(in oklch, var(--color-mensa-blue) 10%, var(--color-surface)); border-color: var(--color-mensa-blue); color: var(--color-mensa-blue); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+  .drop-zone {
+    border: 2px dashed var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: var(--color-surface);
+    cursor: default;
+    text-align: center;
+  }
+  .drop-zone__icon { font-size: 24px; }
+  .drop-zone__text { font-size: var(--text-sm); color: var(--color-text-tertiary); }
+
+  .form-actions { display: flex; gap: var(--spacing-3); padding-block-start: var(--spacing-2); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: opacity 0.15s; white-space: nowrap; }
+  .btn:hover { opacity: 0.85; }
+  .btn--primary { background: var(--color-mensa-blue); color: var(--color-text-on-brand); }
+  .btn--ghost { background: transparent; border-color: var(--color-border-subtle); color: var(--color-text-primary); }
+
+  @media (max-width: 640px) {
+    .form-card { padding: var(--spacing-4); }
+    .form-actions { flex-direction: column; }
+  }
+</style>
