@@ -3,7 +3,6 @@
 ### Pipeline
 
 [![Release](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml)
-[![Notify](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/notify.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/notify.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
 [![Web image](https://img.shields.io/badge/ghcr.io-mensa--web-2496ED?logo=docker&logoColor=white)](https://github.com/Mensa-Italia/mensa_italia_app/pkgs/container/mensa-web)
 [![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
