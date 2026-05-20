@@ -21,7 +21,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.32.x'
+          flutter-version: '3.35.x'
 
       - name: Decode signing keystore
         run: |
