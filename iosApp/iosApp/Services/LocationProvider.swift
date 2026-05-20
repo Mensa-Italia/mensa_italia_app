@@ -49,7 +49,7 @@ final class LocationProvider: NSObject, CLLocationManagerDelegate {
             }
             let first = await group.next()
             group.cancelAll()
-            return first
+            return first ?? nil
         }
     }
 
