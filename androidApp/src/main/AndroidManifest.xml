@@ -5,6 +5,15 @@
     <!-- Network -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Google Play policy: alcune deps (es. Coil + photo picker fallback)
+         possono auto-mergere READ_MEDIA_IMAGES/_VIDEO nel manifest finale.
+         Il nostro caso d'uso e' una-tantum (foto profilo/evento). Su
+         Android 13+ il Photo Picker non richiede queste permission, su
+         <13 lo scoped content provider basta. Le rimuoviamo dal merge per
+         non incappare nella policy "permission media non conforme". -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+
     <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
