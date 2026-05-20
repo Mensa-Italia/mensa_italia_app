@@ -594,11 +594,14 @@ jobs:
         env:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          ASC_KEY_PATH: ${{ env.HOME }}/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
           IPA_PATH: ${{ github.workspace }}/mensa-italia-v${{ needs.prepare.outputs.version }}.ipa
           FASTLANE_HIDE_CHANGELOG: '1'
           FASTLANE_DISABLE_COLORS: '1'
         run: |
+          # ASC_KEY_PATH va calcolato in shell — il context env: della workflow
+          # NON conosce $HOME (lo deduce solo a runtime).
+          export ASC_KEY_PATH="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          ls -la "$ASC_KEY_PATH"
           fastlane ios "$TRACK"
 
       - name: Cleanup ASC key
