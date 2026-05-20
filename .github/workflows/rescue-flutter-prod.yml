@@ -28,22 +28,18 @@ jobs:
           mkdir -p android/app/keystore
           echo "${{ secrets.KEY_JKS }}" | base64 -d > android/app/keystore/release.jks
 
-      - name: Configure signing in android/key.properties
-        env:
-          STORE_PWD: ${{ secrets.KEY_PASSWORD }}
-          ALIAS_PWD: ${{ secrets.ALIAS_PASSWORD }}
-        run: |
-          cat > android/key.properties <<EOF
-          storeFile=keystore/release.jks
-          storePassword=$STORE_PWD
-          keyAlias=key
-          keyPassword=$ALIAS_PWD
-          EOF
-
       - name: Flutter pub get
         run: flutter pub get
 
       - name: Build AAB
+        env:
+          # Il vecchio build.gradle.kts era scritto per Codemagic e legge
+          # CM_KEYSTORE_PATH/PASSWORD/KEY_ALIAS/KEY_PASSWORD quando CI=true.
+          # Mappiamo i nostri secret GitHub a quei nomi.
+          CM_KEYSTORE_PATH: ${{ github.workspace }}/android/app/keystore/release.jks
+          CM_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          CM_KEY_ALIAS: key
+          CM_KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         run: flutter build appbundle --release
 
       - name: Cleanup keystore
