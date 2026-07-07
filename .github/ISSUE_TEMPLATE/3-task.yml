@@ -1,0 +1,37 @@
+name: 🔧 Task tecnico
+description: Chore, docs, refactor o sicurezza
+labels: ["type:chore"]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: Descrizione
+    validations:
+      required: true
+  - type: dropdown
+    id: worktype
+    attributes:
+      label: Tipo di lavoro
+      description: Aggiorna la label type:* di conseguenza (chore / docs / refactor / security).
+      options:
+        - Chore
+        - Docs
+        - Refactor
+        - Security
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Members
+        - Events
+        - Payments
+        - Documents
+        - Auth/SSO
+        - Notifications
+        - i18n
+        - DevOps
+    validations:
+      required: true
