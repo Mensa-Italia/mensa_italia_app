@@ -1,0 +1,55 @@
+name: 🐛 Bug
+description: Qualcosa non funziona come dovrebbe
+labels: ["type:bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Cosa succede
+      description: Descrivi il problema e il suo impatto.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passi per riprodurre
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento atteso
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Dominio di prodotto — verrà rispecchiato nel campo "Area" del board.
+      options:
+        - Members
+        - Events
+        - Payments
+        - Documents
+        - Auth/SSO
+        - Notifications
+        - i18n
+        - DevOps
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorità (stima)
+      options:
+        - "P0 · Critical"
+        - "P1 · High"
+        - "P2 · Medium"
+        - "P3 · Low"
+    validations:
+      required: false
+  - type: input
+    id: env
+    attributes:
+      label: Ambiente / versione
+      placeholder: "es. app iOS 2.3.1 · web prod · backend staging"
