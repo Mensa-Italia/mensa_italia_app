@@ -1,0 +1,32 @@
+name: ✨ Feature
+description: Nuova funzionalità o miglioramento
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema / esigenza
+      description: Che problema risolve? Per chi?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Come immagini la soluzione (anche a grandi linee).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Dominio di prodotto — verrà rispecchiato nel campo "Area" del board.
+      options:
+        - Members
+        - Events
+        - Payments
+        - Documents
+        - Auth/SSO
+        - Notifications
+        - i18n
+        - DevOps
+    validations:
+      required: true
