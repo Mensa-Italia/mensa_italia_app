@@ -22,7 +22,7 @@ name: Release
 
 on:
   push:
-    branches: [master, feat/mvp-testing-public]
+    branches: [main, feat/mvp-testing-public]
   workflow_dispatch:
     inputs:
       track:
@@ -650,7 +650,7 @@ jobs:
             git commit -m "Release v${VERSION} (${TRACK}) [skip ci]"
           fi
           git tag "v${VERSION}"
-          git push origin master --follow-tags
+          git push origin main --follow-tags
 
       - name: Locate artifacts
         id: paths
