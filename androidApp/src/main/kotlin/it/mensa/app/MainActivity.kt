@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import it.mensa.app.navigation.MensaNavGraph
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.support.LaunchHarness
 import it.mensa.app.ui.theme.MensaTheme
 import org.koin.android.ext.android.inject
 
@@ -24,6 +25,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Automation hooks (screenshot capture): reads `mensa_screen` /
+        // `mensa_autologin_*` extras. Inert on non-debuggable builds.
+        // Must run before setContent so RootViewModel sees it on first compose.
+        LaunchHarness.configure(this, intent)
 
         // Edge-to-edge: Compose draws behind system bars
         enableEdgeToEdge()

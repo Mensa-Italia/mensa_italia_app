@@ -2,6 +2,7 @@ package it.mensa.app.ui.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
@@ -62,6 +63,20 @@ class RootViewModel : ViewModel() {
         // 2. Restore persisted auth token
         runCatching { auth.init() }
 
+        // 2b. Automation sign-in (screenshot capture). Only ever populated on a
+        //     debuggable build — see [LaunchHarness]. Runs before the phase
+        //     subscription so the very first emission is already Authenticated.
+        if (auth.authState.value !is AuthState.Authenticated) {
+            LaunchHarness.autologin?.let { (email, password) ->
+                Logger.i("RootVM", "harness", "auto-login for $email")
+                val result = runCatching { auth.login(email, password) }
+                    .getOrElse { Result.failure(it) }
+                if (result.isFailure) {
+                    Logger.w("RootVM", "harness", "auto-login failed", result.exceptionOrNull())
+                }
+            }
+        }
+
         // Record whether this was an existing session (affects onboarding gate)
         sessionRestored = auth.authState.value is AuthState.Authenticated
 
@@ -89,6 +104,10 @@ class RootViewModel : ViewModel() {
             if (user == null) {
                 // User record not yet loaded — stay on Loading
                 RootPhase.Loading
+            } else if (LaunchHarness.isActive) {
+                // Screenshot harness always wants the authenticated shell —
+                // a fresh automation login would otherwise land on onboarding.
+                RootPhase.Main
             } else {
                 val showOnboarding = onboarding.shouldShow(user)
                 if (showOnboarding) RootPhase.Onboarding else RootPhase.Main

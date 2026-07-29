@@ -16,6 +16,13 @@ enum PushPermissionRequester {
 
     @discardableResult
     static func requestIfNeeded() async -> Bool {
+        // Automation (store screenshots, see `tools/storekit`) launches the app
+        // with this env set: the system permission alert would otherwise sit on
+        // top of every capture. Env vars can't be injected into a production
+        // install, so this is inert outside the simulator harness.
+        guard ProcessInfo.processInfo.environment["MENSA_SUPPRESS_PERMISSION_PROMPTS"] != "1" else {
+            return false
+        }
         let center = UNUserNotificationCenter.current()
         let current = await center.notificationSettings()
 

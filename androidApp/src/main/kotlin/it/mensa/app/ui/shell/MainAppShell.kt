@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,6 +82,7 @@ import it.mensa.app.features.tickets.ticketsNavGraph
 import it.mensa.app.features.today.TodayScreen
 import it.mensa.app.navigation.toRoute
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaNavItem
 import it.mensa.app.ui.components.MensaNavigationBar
@@ -123,6 +125,40 @@ object SearchRoute {
 
 private val tabRoutes = MainTab.values().map { it.route }.toSet()
 
+// ─── Automation entry points ──────────────────────────────────────────────────
+
+/**
+ * Maps a [LaunchHarness] `mensa_screen` alias to a route inside this shell.
+ *
+ * Aliases mirror the iOS `MENSA_LAUNCH_SCREEN` values in
+ * `iosApp/iosApp/App/iosAppApp.swift` so a single scene id in
+ * `tools/storekit/storekit.config.json` drives both platforms.
+ * Returns null for unknown aliases, which leaves the shell on its default tab.
+ */
+private fun harnessRoute(alias: String): String? = when (alias.lowercase()) {
+    "today" -> MainTab.Today.route
+    "discover" -> MainTab.Discover.route
+    "card" -> MainTab.Card.route
+    "profile" -> MainTab.Profile.route
+    "search" -> SearchRoute.ROUTE
+    "events" -> EventRoutes.LIST
+    "deals" -> DealsRoute.LIST
+    "sigs" -> SigsRoutes.LIST
+    "members" -> MembersRoutes.DIRECTORY
+    "localoffices" -> LocalOfficesRoutes.LIST
+    "documents" -> DocumentsRoutes.LIST
+    "notifications" -> NotificationsRoutes.LIST
+    "boutique" -> BoutiqueRoutes.LIST
+    "tableport" -> TableportRoutes.PASSPORT
+    "quid" -> QuidRoute.ISSUES
+    "podcasts" -> PodcastsRoutes.LIST
+    "contacts" -> ContactsRoutes.LIST
+    "tickets" -> TicketsRoutes.LIST
+    "receipts" -> ReceiptsRoutes.LIST
+    "addonshub", "addons" -> AddonsHubRoutes.HUB
+    else -> null
+}
+
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -135,6 +171,17 @@ fun MainAppShell() {
     val accountConfirmationRequest by accountConfirmationController.current.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
+
+    // Automation entry point (screenshot capture). A tab alias becomes the
+    // NavHost start destination so the shell opens directly on it; a drill
+    // alias starts on Today and pushes the destination once.
+    val harnessTarget = remember { LaunchHarness.screen?.let(::harnessRoute) }
+    val startDestination = harnessTarget?.takeIf { it in tabRoutes } ?: MainTab.Today.route
+    LaunchedEffect(harnessTarget) {
+        if (harnessTarget != null && harnessTarget !in tabRoutes) {
+            navController.navigate(harnessTarget) { launchSingleTop = true }
+        }
+    }
 
     // Track current route for tab highlight + bottom bar visibility
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -203,7 +250,7 @@ fun MainAppShell() {
             // ── Master NavHost ────────────────────────────────────────────────
             NavHost(
                 navController = navController,
-                startDestination = MainTab.Today.route,
+                startDestination = startDestination,
             ) {
                 // ── Tab roots ─────────────────────────────────────────────────
 
