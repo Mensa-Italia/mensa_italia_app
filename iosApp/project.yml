@@ -23,6 +23,19 @@ targets:
     info:
       path: iosApp/Info.plist
       properties:
+        # Il target usa un Info.plist esplicito, quindi le impostazioni
+        # INFOPLIST_KEY_* non vengono applicate: versioni e orientamenti
+        # devono stare qui, altrimenti `xcodegen generate` li sostituisce con
+        # i default (1.0 / 1, nessun vincolo di orientamento).
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UILaunchScreen:
           UIColorName: LaunchBackground
           UIImageName: LaunchLogo
