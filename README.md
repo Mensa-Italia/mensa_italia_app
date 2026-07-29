@@ -2,18 +2,18 @@
 
 ### Pipeline
 
-[![Release](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml)
+[![Release](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
 [![Web image](https://img.shields.io/badge/ghcr.io-mensa--web-2496ED?logo=docker&logoColor=white)](https://github.com/Mensa-Italia/mensa_italia_app/pkgs/container/mensa-web)
 [![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
 
 ### Quality per area
 
-[![Web](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml)
-[![Kotlin](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml)
-[![Swift](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml)
-[![Docker](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml)
-[![Secrets](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml/badge.svg?branch=master)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml)
+[![Web](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml)
+[![Kotlin](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml)
+[![Swift](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml)
+[![Docker](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml)
+[![Secrets](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml)
 
 ### Stack
 
@@ -78,6 +78,7 @@ Tre client nativi che condividono lo stesso core di business logic scritto in **
 | `iosApp/` | SwiftUI iOS 26, Liquid Glass, Stripe SDK, Firebase | `.ipa` |
 | `webApp/` | Astro 6 SSR, React 19, Tailwind 4, Keystatic, Unlayer | Docker image `ghcr.io/mensa-italia/mensa-web` |
 | `tools/` | Bash + Tolgee | Sincronizzazione traduzioni i18n |
+| `tools/storekit/` | Bun + TypeScript, simctl/adb, Chromium headless | Screenshot e metadata per App Store e Google Play |
 
 ---
 
@@ -89,9 +90,9 @@ Tutto orchestrato da [`.github/workflows/release.yml`](.github/workflows/release
 
 | Trigger | Effetto |
 |---|---|
-| Push a `master` con `[ALPHA]` nel subject | web `:alpha` + Play `internal` + TestFlight (interno) |
-| Push a `master` con `[BETA]` nel subject | web `:beta` + Play `beta` + TestFlight gruppo `Test open` |
-| Push a `master` con `[RELEASE]` nel subject | web `:latest` + Play `production` + App Store review |
+| Push a `main` con `[ALPHA]` nel subject | web `:alpha` + Play `internal` + TestFlight (interno) |
+| Push a `main` con `[BETA]` nel subject | web `:beta` + Play `beta` + TestFlight gruppo `Test open` |
+| Push a `main` con `[RELEASE]` nel subject | web `:latest` + Play `production` + App Store review |
 | Push a `feat/mvp-testing-public` | solo web `:dev` (niente native) |
 | `workflow_dispatch` | input `track` scelto dalla UI |
 
@@ -131,7 +132,7 @@ Due livelli.
 
 ### Workflow QA per area — radar su ogni push
 
-Ogni area ha il **proprio workflow**, quindi il proprio badge in cima al README. Se uno chip diventa rosso sai subito **dove guardare**. Triggerano su ogni push e PR a `master`.
+Ogni area ha il **proprio workflow**, quindi il proprio badge in cima al README. Se uno chip diventa rosso sai subito **dove guardare**. Triggerano su ogni push e PR a `main`.
 
 | Workflow file | Job | Tool | Area |
 |---|---|---|---|
@@ -232,6 +233,26 @@ bun dev                 # http://localhost:4321
 cd iosApp && xcodegen generate && open iosApp.xcodeproj
 # Run da Xcode (⌘R)
 ```
+
+### Asset store (screenshot + metadata)
+
+[`tools/storekit`](tools/storekit/README.md) esegue le app vere su simulatore
+iOS ed emulatore Android, cattura le schermate, le incornicia e produce
+l'albero che `deliver` e `supply` si aspettano — screenshot iPhone 6.9" e
+iPad 13", phone e tablet Android, feature graphic 1024×500, icona 512×512 e
+testi di listing per lingua.
+
+```bash
+cd tools/storekit
+bun install
+bun run doctor            # verifica toolchain
+bun run preview           # confronta i temi, nessun device richiesto
+bun run all               # capture → render → assets → deliver
+```
+
+Le scene si raggiungono con i punti di ingresso diretti delle app
+(`--initial-tab` / `MENSA_LAUNCH_SCREEN` su iOS, `LaunchHarness` con extra
+d'intent su Android, attivo solo su build debuggable), non simulando tap.
 
 ---
 

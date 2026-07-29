@@ -1,0 +1,7 @@
+# Catture, artwork generato, build intermedie e alberi fastlane.
+out/
+
+# Credenziali dell'account demo.
+.env
+
+node_modules/

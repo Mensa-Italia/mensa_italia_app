@@ -1,0 +1,14 @@
+# Appfile per le lane di pubblicazione degli asset store.
+#
+# Non contiene segreti: tutto arriva da variabili d'ambiente (vedi .env.example).
+# Le lane di release delle build (TestFlight/Play) restano in
+# .github/workflows/release.yml e non passano da qui.
+
+app_identifier ENV["STOREKIT_BUNDLE_ID"] || "it.mensa.app"
+apple_id ENV["FASTLANE_APPLE_ID"]
+team_id ENV["FASTLANE_TEAM_ID"] || "6WA5D3RJBU"
+
+for_platform :android do
+  json_key_file ENV["SUPPLY_JSON_KEY"]
+  package_name ENV["STOREKIT_APPLICATION_ID"] || "it.mensa.app"
+end

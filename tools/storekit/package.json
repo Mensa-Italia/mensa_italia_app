@@ -1,0 +1,21 @@
+{
+  "name": "@mensa/storekit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cattura, incornicia e impagina gli screenshot di Mensa Italia per App Store e Google Play.",
+  "scripts": {
+    "storekit": "bun run src/cli.ts",
+    "doctor": "bun run src/cli.ts doctor",
+    "capture": "bun run src/cli.ts capture",
+    "render": "bun run src/cli.ts render",
+    "preview": "bun run src/cli.ts preview",
+    "all": "bun run src/cli.ts all",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "puppeteer-core": "^24.10.0",
+    "typescript": "^5.7.0"
+  }
+}

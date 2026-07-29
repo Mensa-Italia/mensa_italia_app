@@ -1,0 +1,96 @@
+# Lane di pubblicazione degli asset store prodotti da `tools/storekit`.
+#
+# Queste lane caricano SOLO screenshot e metadata: il binario continua a
+# passare da .github/workflows/release.yml, che genera un proprio Fastfile
+# temporaneo e non tocca questa directory.
+#
+#   cd tools/storekit
+#   bun run all                      # genera out/fastlane/**
+#   fastlane ios upload_screenshots  # App Store Connect
+#   fastlane android upload_screenshots
+#
+# Aggiungi `dry_run:true` per una prova a vuoto:
+#   fastlane ios upload_screenshots dry_run:true
+
+STOREKIT_ROOT = File.expand_path("..", __dir__)
+IOS_DELIVERY = File.join(STOREKIT_ROOT, "out", "fastlane", "ios")
+ANDROID_DELIVERY = File.join(STOREKIT_ROOT, "out", "fastlane", "android")
+
+def require_delivery!(path, what)
+  return if Dir.exist?(path)
+
+  UI.user_error!(
+    "#{path} non esiste. Genera prima gli asset:\n" \
+    "  cd tools/storekit && bun run all\n" \
+    "(#{what})"
+  )
+end
+
+platform :ios do
+  before_all do
+    if ENV["ASC_KEY_ID"] && ENV["ASC_ISSUER_ID"] && ENV["ASC_KEY_PATH"]
+      app_store_connect_api_key(
+        key_id: ENV["ASC_KEY_ID"],
+        issuer_id: ENV["ASC_ISSUER_ID"],
+        key_filepath: ENV["ASC_KEY_PATH"],
+        duration: 1200,
+        in_house: false
+      )
+    end
+  end
+
+  desc "Carica screenshot e metadata su App Store Connect (nessun binario)"
+  lane :upload_screenshots do |options|
+    require_delivery!(IOS_DELIVERY, "screenshot e metadata iOS")
+
+    deliver(
+      screenshots_path: File.join(IOS_DELIVERY, "screenshots"),
+      metadata_path: File.join(IOS_DELIVERY, "metadata"),
+      skip_binary_upload: true,
+      skip_app_version_update: true,
+      skip_screenshots: false,
+      skip_metadata: false,
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      automatic_release: false,
+      force: true,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      dry_run: options[:dry_run] == true || options[:dry_run] == "true"
+    )
+  end
+
+  desc "Carica solo i metadata testuali su App Store Connect"
+  lane :upload_metadata do
+    require_delivery!(IOS_DELIVERY, "metadata iOS")
+
+    deliver(
+      metadata_path: File.join(IOS_DELIVERY, "metadata"),
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_app_version_update: true,
+      submit_for_review: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+end
+
+platform :android do
+  desc "Carica screenshot, feature graphic, icona e metadata su Google Play"
+  lane :upload_screenshots do |options|
+    require_delivery!(ANDROID_DELIVERY, "screenshot e metadata Android")
+
+    supply(
+      metadata_path: File.join(ANDROID_DELIVERY, "metadata", "android"),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs: false,
+      track: options[:track] || "production",
+      validate_only: options[:dry_run] == true || options[:dry_run] == "true"
+    )
+  end
+end
