@@ -42,6 +42,7 @@ import it.mensa.app.ui.shell.MainAppShell
 import it.mensa.app.ui.theme.EasingEmphasizedDecelerate
 import it.mensa.app.ui.theme.LocalMensaGradients
 import it.mensa.app.ui.theme.MensaBlue
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -208,20 +209,23 @@ private fun AnonymousLandingContent(
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth(),
             )
-            OutlinedButton(
-                onClick = onExploreClick,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 14.dp),
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.5.dp,
-                    color = Color.White.copy(alpha = 0.9f),
-                ),
-            ) {
-                Text(
-                    text = tr("app.login.explore_no_account", "Esplora senza account"),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge,
-                )
+            // `public_area_enabled` off → niente ingresso ospite.
+            if (koinAccess().featureFlags.publicAreaEnabled) {
+                OutlinedButton(
+                    onClick = onExploreClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(vertical = 14.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.5.dp,
+                        color = Color.White.copy(alpha = 0.9f),
+                    ),
+                ) {
+                    Text(
+                        text = tr("app.login.explore_no_account", "Esplora senza account"),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
             }
         }
     }

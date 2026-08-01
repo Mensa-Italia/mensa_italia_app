@@ -62,6 +62,7 @@ import it.mensa.app.features.profile._components.ProfileSectionGroup
 import it.mensa.app.features.profile._components.ProfileSectionTone
 import it.mensa.app.features.profile._components.ProfileToggleRow
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.MensaScaffold
@@ -165,16 +166,21 @@ fun ProfileScreen(
             item(key = "section_association") {
                 Spacer(Modifier.height(14.dp))
                 AnimatedSection(visible = sectionsVisible, indexDelay = 120) {
-                    ProfileSectionGroup(
-                        kicker = tr("app.profile.section_association_kicker", fallback = "ASSOCIAZIONE"),
-                        title = tr("app.profile.section_association", fallback = "Associazione"),
-                        tone = ProfileSectionTone.Neutral,
-                    ) {
-                        ProfileRow(
-                            icon = Icons.Outlined.AccountTree,
-                            title = tr("app.org_chart.title", fallback = "Organigramma"),
-                            onClick = { onNavigate(ProfileRoute.OrgChart) },
-                        )
+                    // L'organigramma e' l'unica voce della sezione: a
+                    // `org_chart_enabled` spento sparisce tutto il gruppo,
+                    // altrimenti resterebbe un header senza righe.
+                    if (koinAccess().featureFlags.orgChartEnabled) {
+                        ProfileSectionGroup(
+                            kicker = tr("app.profile.section_association_kicker", fallback = "ASSOCIAZIONE"),
+                            title = tr("app.profile.section_association", fallback = "Associazione"),
+                            tone = ProfileSectionTone.Neutral,
+                        ) {
+                            ProfileRow(
+                                icon = Icons.Outlined.AccountTree,
+                                title = tr("app.org_chart.title", fallback = "Organigramma"),
+                                onClick = { onNavigate(ProfileRoute.OrgChart) },
+                            )
+                        }
                     }
                 }
             }

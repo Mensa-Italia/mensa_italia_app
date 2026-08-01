@@ -95,6 +95,12 @@ class DiscoverViewModel : ViewModel() {
             } else {
                 section.categories
             }
+                // `local_groups_enabled` off → via la tile Gruppi locali da
+                // qualunque sezione la contenga.
+                .let { list ->
+                    if (koinAccess().featureFlags.localGroupsEnabled) list
+                    else list - DiscoverCategory.LocalOffices
+                }
 
             ResolvedDiscoverSection(
                 titleKey = section.titleKey,

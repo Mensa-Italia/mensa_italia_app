@@ -81,6 +81,13 @@ class RootViewModel(
             Logger.i("RootVM", "i18n", "bootstrapped for locale: $locale")
         }
 
+        // 1b. Server-driven feature switches. Awaited here so the shell never
+        //     renders a section the association has switched off.
+        runCatching {
+            koinAccess().featureFlags.bootstrap()
+            Logger.i("RootVM", "flags", "feature flags loaded")
+        }
+
         // 2. Restore persisted auth token
         runCatching { auth.init() }
 
@@ -147,8 +154,13 @@ class RootViewModel(
         _phase.value = RootPhase.Main
     }
 
-    /** Navigate to public area from anonymous landing. */
+    /**
+     * Navigate to public area from anonymous landing. No-op when
+     * `public_area_enabled` is off — the button is hidden in that case, this
+     * guard covers deep links and any caller added later.
+     */
     fun enterPublic() {
+        if (!koinAccess().featureFlags.publicAreaEnabled) return
         _phase.value = RootPhase.Public
     }
 

@@ -21,6 +21,7 @@ import it.mensa.shared.api.endpoints.SettingsApi
 import it.mensa.shared.api.endpoints.TicketsApi
 import it.mensa.shared.auth.passkey.PasskeyEnrollmentGate
 import it.mensa.shared.auth.passkey.PasskeyRepository
+import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.i18n.TranslationLoader
 import it.mensa.shared.iqtest.MensaTestClient
@@ -71,6 +72,7 @@ val extrasModule = module {
     // i18n
     single { TranslationLoader(get(), get(), get(), get()) }
     single { I18n(get()) }
+    single { FeatureFlags(get(), get()) }
 
     // Realtime SSE client
     single { RealtimeClient(get(), get()) }

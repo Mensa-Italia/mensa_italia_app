@@ -80,6 +80,10 @@ struct ProfileView: View {
             }
 
             // MARK: Associazione
+            // L'intera sezione dipende da `org_chart_enabled`: l'organigramma
+            // e' l'unica voce che contiene, quindi a flag spento la sezione
+            // resterebbe un header vuoto.
+            if koin.featureFlags.orgChartEnabled {
             Section(tr("app.profile.section_association", fallback: "Associazione")) {
                 NavigationLink {
                     OrgChartView()
@@ -87,6 +91,7 @@ struct ProfileView: View {
                     ProfileRowLabel(icon: "person.2.badge.gearshape",
                                     title: tr("app.org_chart.title", fallback: "Organigramma"))
                 }
+            }
             }
 
             // MARK: App settings

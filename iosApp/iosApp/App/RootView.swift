@@ -23,6 +23,14 @@ final class RootViewModel {
         // bump LocaleManager.version and re-render the SwiftUI tree.
         LocaleManager.shared.startObservingCatalog()
 
+        // 1b. Server-driven feature switches (public area, org chart, local
+        //     groups). Awaited before the shell renders: a late flip would
+        //     otherwise flash a section the association has switched off.
+        // `try?`: le suspend fun Kotlin arrivano come `async throws` e possono
+        // lanciare su cancellazione. `bootstrap` non propaga errori suoi —
+        // tiene i valori in cache — quindi un throw qui non deve fermare l'avvio.
+        try? await koin.featureFlags.bootstrap()
+
         // 2. Initialize auth state from persisted token. Capture whether the
         //    init landed us in Authenticated — that means we're resuming an
         //    existing session and the DEBUG onboarding force-show should NOT
@@ -179,7 +187,10 @@ struct RootView: View {
                     // (niente push, niente back). Dentro PublicArea c'e'
                     // un "Sei socio? Accedi" che rimette guestMode = false
                     // e RootView torna a LoginView.
-                    if guestMode {
+                    // `public_area_enabled` off vince sulla preferenza
+                    // persistente: chi era rimasto in area pubblica da prima
+                    // che il flag venisse spento torna al login.
+                    if guestMode && koin.featureFlags.publicAreaEnabled {
                         PublicAreaShell()
                             .transition(.opacity.combined(with: .move(edge: .leading)))
                     } else {

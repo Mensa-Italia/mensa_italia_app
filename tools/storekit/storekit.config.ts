@@ -106,7 +106,7 @@ const config: StorekitConfig = {
         },
         en: {
           kicker: "Your day",
-          headline: ["Everything Mensa,", "the moment you open"],
+          headline: ["All of Mensa,", "when you open the app"],
         },
       },
     },

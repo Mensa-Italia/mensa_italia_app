@@ -154,19 +154,27 @@ struct LoginView: View {
                 }
 
                 Section {
-                    // Swap root invece di push: settiamo `guestMode = true`
-                    // e RootView re-renderizza con `PublicAreaShell` come
-                    // pagina principale. Niente back button perche' siamo
-                    // a livello root, e cold-launch successivi aprono
-                    // direttamente l'area pubblica (preferenza persistente).
-                    Button {
-                        guestMode = true
-                    } label: {
-                        Label(
-                            tr("app.login.explore_no_account", fallback: "Esplora senza account"),
-                            systemImage: "rectangle.portrait.and.arrow.right"
-                        )
-                        .foregroundStyle(.primary)
+                    // `public_area_enabled` off → niente ingresso ospite. Il
+                    // gate sta anche in RootView, perche' `guestModeEnabled` e'
+                    // persistente: chi era gia' in area pubblica quando il flag
+                    // e' stato spento deve comunque uscirne.
+                    // Il footer qui sotto resta: e' il link marketing verso
+                    // mensa.it, non fa parte dell'area pubblica in-app.
+                    if koin.featureFlags.publicAreaEnabled {
+                        // Swap root invece di push: settiamo `guestMode = true`
+                        // e RootView re-renderizza con `PublicAreaShell` come
+                        // pagina principale. Niente back button perche' siamo
+                        // a livello root, e cold-launch successivi aprono
+                        // direttamente l'area pubblica (preferenza persistente).
+                        Button {
+                            guestMode = true
+                        } label: {
+                            Label(
+                                tr("app.login.explore_no_account", fallback: "Esplora senza account"),
+                                systemImage: "rectangle.portrait.and.arrow.right"
+                            )
+                            .foregroundStyle(.primary)
+                        }
                     }
                 } footer: {
                     HStack(spacing: 4) {

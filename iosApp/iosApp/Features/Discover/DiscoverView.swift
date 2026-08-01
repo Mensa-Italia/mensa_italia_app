@@ -35,10 +35,12 @@ struct DiscoverView: View {
         List {
             // Section 1 — Community / browse
             Section(header: header(tr("app.discover.community", fallback: "Community"))) {
-                row(icon: "building.2.fill",
-                    color: .cyan,
-                    title: tr("local_offices.title", fallback: "Gruppi locali"),
-                    route: .localOffices)
+                if koin.featureFlags.localGroupsEnabled {
+                    row(icon: "building.2.fill",
+                        color: .cyan,
+                        title: tr("local_offices.title", fallback: "Gruppi locali"),
+                        route: .localOffices)
+                }
                 row(icon: "calendar",
                     color: AppTheme.Colors.mensaBlue,
                     title: tr("views.events.title", fallback: "Eventi"),

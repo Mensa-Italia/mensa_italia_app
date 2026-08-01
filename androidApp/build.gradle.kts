@@ -33,12 +33,12 @@ val releaseKeyPassword: String? = (project.findProperty("ANDROID_KEY_PASSWORD") 
 
 android {
     namespace = "it.mensa.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "it.mensa.app"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = appVersionCode
         versionName = appVersionName
 
