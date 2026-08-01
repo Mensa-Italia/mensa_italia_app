@@ -655,10 +655,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download all artifacts
+      # Solo gli artefatti che finiscono nella Release. Senza `pattern` questo
+      # step scarica anche il blob `*.dockerbuild` che buildx allega al job Web:
+      # non ci serve, e il 2026-08-01 il suo download ha fallito 5 retry
+      # facendo cadere Finalize *dopo* che Play e TestFlight avevano gia'
+      # pubblicato — build sugli store, ma niente tag ne' GitHub Release.
+      - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          pattern: '{android-artifacts,ios-ipa}'
 
       - name: Commit VERSION bump & tag
         run: |
