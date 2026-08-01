@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.mensa.app.support.AppFormat
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.ReceiptModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
 import java.util.Locale
 
 // ─── Receipt kind ─────────────────────────────────────────────────────────────
@@ -73,16 +73,19 @@ val ReceiptModel.statusColor: Color
 
 // ─── Amount formatter ─────────────────────────────────────────────────────────
 
-val ReceiptModel.amountFormatted: String
-    get() {
-        val euros = amount / 100.0
-        val fmt = NumberFormat.getCurrencyInstance(Locale.ITALY)
-        return try {
-            fmt.format(euros)
-        } catch (_: Exception) {
-            "€%.2f".format(euros)
-        }
+/**
+ * Always euro, but grouped and punctuated the way [locale] writes numbers.
+ * Compose call sites pass `rememberAppLocale()` so the amount re-renders when
+ * the user switches language.
+ */
+fun ReceiptModel.amountFormatted(locale: Locale = AppFormat.locale()): String {
+    val euros = amount / 100.0
+    return try {
+        AppFormat.money(euros, locale)
+    } catch (_: Exception) {
+        "€%.2f".format(euros)
     }
+}
 
 // ─── UI State ─────────────────────────────────────────────────────────────────
 

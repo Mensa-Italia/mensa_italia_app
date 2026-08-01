@@ -27,6 +27,10 @@ jetbrains-navigation-compose = "2.8.0-alpha13"
 # DataStore
 androidx-datastore = "1.1.1"
 
+# Credential Manager (passkey). Fermi a 1.5.0 e non 1.6.0 perche' compileSdk
+# qui e' 35: la 1.6.0 e` allineata alla 36.
+androidx-credentials = "1.5.0"
+
 # Coil
 coil = "3.0.4"
 
@@ -101,6 +105,15 @@ sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-ex
 sqldelight-async-extensions = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
 
 androidx-security-crypto = { module = "androidx.security:security-crypto", version = "1.1.0-alpha06" }
+
+# Credential Manager: prompt di sistema per creare e usare le passkey.
+# Le due API che ci servono (CreatePublicKeyCredentialRequest e
+# GetPublicKeyCredentialOption) prendono e restituiscono direttamente JSON
+# WebAuthn, quindi il bridge lato Android e` sottile. Il modulo
+# credentials-play-services-auth e` il provider che parla con Google Password
+# Manager: senza quello il prompt non ha dove salvare la passkey.
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
 
 # Multiplatform Settings (Russhwolf) — cross-platform key/value with native
 # secure backends: KeychainSettings (iOS), SharedPreferencesSettings wrapping

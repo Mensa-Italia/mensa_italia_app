@@ -71,7 +71,7 @@ struct DocumentDetailView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
                 .tint(AppTheme.Colors.mensaBlue)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)

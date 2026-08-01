@@ -71,7 +71,7 @@ struct AccountConfirmationSheet: View {
                         } label: {
                             label(tr("ex_app.confirm.approve", fallback: "Approva"))
                         }
-                        .buttonStyle(.glassProminent)
+                        .compatGlassProminentButtonStyle()
                         .tint(AppTheme.Colors.mensaBlue)
                         .disabled(submitting)
 
@@ -101,7 +101,7 @@ struct AccountConfirmationSheet: View {
                 Button(tr("app.retry", fallback: "Riprova")) {
                     Task { await load() }
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
             }
         }
     }

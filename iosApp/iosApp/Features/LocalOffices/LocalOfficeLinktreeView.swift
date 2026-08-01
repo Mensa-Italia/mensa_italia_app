@@ -345,7 +345,7 @@ struct LocalOfficeLinktreeView: View {
             }
             .frame(height: 52)
             .padding(.horizontal, 16)
-            .glassEffect(.regular, in: .rect(cornerRadius: 14))
+            .compatGlass(cornerRadius: 14)
         }
         .buttonStyle(.plain)
     }

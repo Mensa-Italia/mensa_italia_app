@@ -3,6 +3,7 @@ package it.mensa.app.features.members
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
+import it.mensa.app.support.AppFormat
 import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -121,9 +122,6 @@ class MemberDetailViewModel(private val memberId: String) : ViewModel() {
         else -> v
     }
 
-    private fun formatInstant(ms: Long): String {
-        val date = java.util.Date(ms)
-        val fmt = java.text.SimpleDateFormat("dd MMMM yyyy", java.util.Locale.ITALIAN)
-        return fmt.format(date)
-    }
+    private fun formatInstant(ms: Long): String =
+        AppFormat.format(java.util.Date(ms), AppFormat.Skeleton.DAY_MONTH_LONG_YEAR)
 }

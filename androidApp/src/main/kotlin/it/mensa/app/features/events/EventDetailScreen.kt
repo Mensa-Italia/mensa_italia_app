@@ -75,6 +75,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import it.mensa.app.features.events.util.EventDateFormatter
 import it.mensa.app.services.calendar.CalendarHelper
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -98,6 +99,7 @@ fun EventDetailScreen(
     onEditClick: (String) -> Unit = {},
     vm: EventDetailViewModel = koinViewModel { parametersOf(eventId) },
 ) {
+    val locale = rememberAppLocale()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -191,7 +193,7 @@ fun EventDetailScreen(
                                     }
                                     Column {
                                         Text(tr("events.detail.start", fallback = "Inizio"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text(EventDateFormatter.formatFull(event.whenStart), style = MaterialTheme.typography.bodyMedium)
+                                        Text(EventDateFormatter.formatFull(event.whenStart, locale), style = MaterialTheme.typography.bodyMedium)
                                     }
                                 }
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -200,7 +202,7 @@ fun EventDetailScreen(
                                     }
                                     Column {
                                         Text(tr("events.detail.end", fallback = "Fine"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text(EventDateFormatter.formatFull(event.whenEnd), style = MaterialTheme.typography.bodyMedium)
+                                        Text(EventDateFormatter.formatFull(event.whenEnd, locale), style = MaterialTheme.typography.bodyMedium)
                                     }
                                 }
                                 event.position?.let { pos ->
@@ -332,14 +334,15 @@ fun EventDetailScreen(
 
 @Composable
 private fun ScheduleStack(schedules: List<EventScheduleModel>) {
+    val locale = rememberAppLocale()
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         schedules.forEach { s ->
             Card {
                 Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.primaryContainer) {
                         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(EventDateFormatter.formatDayMonth(s.whenStart), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onPrimaryContainer)
-                            Text(EventDateFormatter.formatTime(s.whenStart), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(EventDateFormatter.formatDayMonth(s.whenStart, locale), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(EventDateFormatter.formatTime(s.whenStart, locale), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     Column(modifier = Modifier.weight(1f)) {
@@ -347,7 +350,7 @@ private fun ScheduleStack(schedules: List<EventScheduleModel>) {
                         if (s.description.isNotBlank()) {
                             Text(s.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 3, overflow = TextOverflow.Ellipsis)
                         }
-                        Text("${EventDateFormatter.formatTime(s.whenStart)} – ${EventDateFormatter.formatTime(s.whenEnd)}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                        Text("${EventDateFormatter.formatTime(s.whenStart, locale)} – ${EventDateFormatter.formatTime(s.whenEnd, locale)}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
                     }
                 }
             }

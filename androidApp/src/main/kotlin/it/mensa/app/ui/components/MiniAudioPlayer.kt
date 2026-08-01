@@ -34,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.audio.AudioTrack
-import it.mensa.app.ui.theme.LightPrimary
 import org.koin.compose.koinInject
 
 /**
@@ -221,13 +219,15 @@ private fun MiniAudioPlayerContent(
         }
 
         // Progress hairline — separate composable that reads progress to avoid
-        // re-rendering the whole bar on every 500 ms tick.
+        // re-rendering the whole bar on every 500 ms tick. Il lato dritto del
+        // bordo inferiore esiste solo tra i due raggi d'angolo (16dp): senza
+        // l'inset orizzontale la hairline sborda sulle curve della card.
         MiniProgressHairline(
             controller = controller,
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)),
+                .padding(horizontal = 16.dp),
         )
     }
 }
@@ -247,14 +247,16 @@ private fun MiniProgressHairline(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Black.copy(alpha = 0.10f)),
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)),
         )
         // Filled portion
         Box(
             modifier = Modifier
                 .fillMaxWidth(fraction = progress.coerceIn(0f, 1f))
                 .height(2.dp)
-                .background(LightPrimary),
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.primary),
         )
     }
 }

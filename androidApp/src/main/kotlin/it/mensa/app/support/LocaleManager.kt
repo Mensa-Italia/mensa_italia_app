@@ -39,6 +39,11 @@ class LocaleManager(private val context: Context) {
     /** Currently active locale language code (e.g. "it", "en") */
     val currentLocale: StateFlow<String> = _currentLocale.asStateFlow()
 
+    private val _override = MutableStateFlow<String?>(null)
+
+    /** Persisted user override; null = follow the system locale. */
+    val override: StateFlow<String?> = _override.asStateFlow()
+
     init {
         scope.launch {
             // Restore persisted locale on startup
@@ -46,9 +51,26 @@ class LocaleManager(private val context: Context) {
                 .map { prefs -> prefs[KEY_LOCALE] }
                 .first()
             if (saved != null) {
+                _override.value = saved
                 _currentLocale.value = saved
             }
         }
+    }
+
+    /**
+     * Read the persisted override directly from DataStore and return the tag
+     * the i18n loader should bootstrap with (override, else system locale).
+     * Unlike observing [currentLocale] at boot, this cannot race the async
+     * restore in [init].
+     */
+    suspend fun awaitPreferred(): String {
+        val saved = runCatching {
+            context.localeDataStore.data.map { prefs -> prefs[KEY_LOCALE] }.first()
+        }.getOrNull()
+        _override.value = saved
+        val resolved = saved ?: Locale.getDefault().language
+        _currentLocale.value = resolved
+        return resolved
     }
 
     /**
@@ -56,6 +78,7 @@ class LocaleManager(private val context: Context) {
      * Triggers re-bootstrap of I18n in upstream consumers.
      */
     suspend fun setLocale(languageCode: String) {
+        _override.value = languageCode
         _currentLocale.value = languageCode
         context.localeDataStore.edit { prefs ->
             prefs[KEY_LOCALE] = languageCode
@@ -67,6 +90,7 @@ class LocaleManager(private val context: Context) {
         context.localeDataStore.edit { prefs ->
             prefs.remove(KEY_LOCALE)
         }
+        _override.value = null
         _currentLocale.value = Locale.getDefault().language
     }
 

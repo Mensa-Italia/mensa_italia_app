@@ -6,6 +6,7 @@ import it.mensa.app.features.discover.DiscoverViewModel
 import it.mensa.app.features.profile.ProfileViewModel
 import it.mensa.app.features.profile.sub.CalendarLinkerViewModel
 import it.mensa.app.features.profile.sub.DevicesViewModel
+import it.mensa.app.features.profile.sub.PasskeysViewModel
 import it.mensa.app.features.profile.sub.LanguagePickerViewModel
 import it.mensa.app.features.profile.sub.MakeDonationViewModel
 import it.mensa.app.features.profile.sub.OrgChartViewModel
@@ -22,6 +23,7 @@ import it.mensa.app.services.push.PushTokenStore
 import it.mensa.app.services.stripe.StripeService
 import it.mensa.app.services.wallet.WalletService
 import it.mensa.app.support.LocaleManager
+import it.mensa.app.support.ThemeManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -64,9 +66,10 @@ val appModule = module {
 
     // Locale manager (DataStore-backed)
     single { LocaleManager(androidContext()) }
+    single { ThemeManager(androidContext()) }
 
     // ViewModels
-    viewModel { RootViewModel() }
+    viewModel { RootViewModel(get()) }
     viewModel { LoginViewModel() }
     viewModel { CardViewModel() }
     viewModel { DiscoverViewModel() }
@@ -74,7 +77,7 @@ val appModule = module {
     viewModel { SearchViewModel(androidContext()) }
 
     // Profile ViewModels
-    viewModel { ProfileViewModel(get()) }
+    viewModel { ProfileViewModel(get(), get()) }
     viewModel { LanguagePickerViewModel(get()) }
     viewModel { PaymentMethodsViewModel() }
     viewModel { PaymentMethodPickerViewModel() }
@@ -82,5 +85,6 @@ val appModule = module {
     viewModel { MakeDonationViewModel() }
     viewModel { CalendarLinkerViewModel() }
     viewModel { DevicesViewModel() }
+    viewModel { PasskeysViewModel() }
     viewModel { OrgChartViewModel() }
 }

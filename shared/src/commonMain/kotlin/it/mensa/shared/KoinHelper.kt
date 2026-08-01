@@ -1,6 +1,8 @@
 package it.mensa.shared
 
 import it.mensa.shared.auth.AuthRepository
+import it.mensa.shared.auth.passkey.PasskeyEnrollmentGate
+import it.mensa.shared.auth.passkey.PasskeyRepository
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.onboarding.OnboardingState
 import it.mensa.shared.repository.AddonsRepository
@@ -60,6 +62,8 @@ class KoinAccess(
     val exApps: ExAppsRepository,
     val i18n: I18n,
     val onboarding: OnboardingState,
+    val passkeys: PasskeyRepository,
+    val passkeyEnrollment: PasskeyEnrollmentGate,
     val mensaTest: MensaTestClient,
     val spotlightSync: SpotlightSyncEngine,
 )
@@ -91,6 +95,8 @@ fun koinAccess(): KoinAccess = KoinAccess(
     exApps = KoinPlatform.getKoin().get(),
     i18n = KoinPlatform.getKoin().get(),
     onboarding = KoinPlatform.getKoin().get(),
+    passkeys = KoinPlatform.getKoin().get(),
+    passkeyEnrollment = KoinPlatform.getKoin().get(),
     mensaTest = KoinPlatform.getKoin().get(),
     spotlightSync = KoinPlatform.getKoin().get(),
 )

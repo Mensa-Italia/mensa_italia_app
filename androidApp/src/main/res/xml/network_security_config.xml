@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- No cleartext HTTP in production -->
+    <!-- No cleartext HTTP in production.
+         The bundled ISRG roots (Let's Encrypt) are needed on Android 7.0
+         (API 24): ISRG Root X1 only entered the system store in 7.1.1, and
+         *.mensa.it serves Let's Encrypt certificates chained to it. -->
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
         </trust-anchors>
     </base-config>
 

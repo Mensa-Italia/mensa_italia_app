@@ -75,7 +75,7 @@ struct PublicTestSessionDetailView: View {
                         }
                         .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                        .compatGlass(cornerRadius: 16)
                     }
                 }
 
@@ -131,7 +131,7 @@ struct PublicTestSessionDetailView: View {
                                 .foregroundStyle(.secondary)
                                 .padding(14)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                                .compatGlass(cornerRadius: 16)
                         }
                     }
                 }
@@ -204,7 +204,7 @@ struct PublicTestSessionDetailView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
         .contentShape(.rect(cornerRadius: 14))
     }
 

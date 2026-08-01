@@ -90,7 +90,6 @@ struct CardView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 24) {
                 heroSection
-                qrSection
                 membershipSection
                 navigationTilesSection
                 actionButtons
@@ -138,38 +137,11 @@ struct CardView: View {
         .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 8)
     }
 
-    // MARK: - QR
-
-    private var qrSection: some View {
-        VStack(spacing: 14) {
-            Text(tr("app.card.show_coordinator", fallback: "Mostra al coordinatore"))
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .tracking(1)
-
-            QRCodeView(payload: vm.qrPayload, size: 180)
-                .padding(16)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-
-            Text("ID \(vm.memberId)")
-                .font(.system(.footnote, design: .monospaced))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
-        .padding(.horizontal, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
-        )
-    }
-
     // MARK: - Membership info section (inset-grouped style)
 
     private var membershipSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeader(tr("card.membership", fallback: "Membership"))
+            sectionHeader(tr("card.membership", fallback: "Iscrizione"))
 
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {

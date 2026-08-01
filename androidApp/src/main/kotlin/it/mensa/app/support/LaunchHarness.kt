@@ -3,6 +3,7 @@ package it.mensa.app.support
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import it.mensa.shared.demo.DemoIdentity
 
 /**
  * LaunchHarness: intent-driven launch overrides used by automation
@@ -31,6 +32,7 @@ object LaunchHarness {
     const val EXTRA_SCREEN = "mensa_screen"
     const val EXTRA_EMAIL = "mensa_autologin_email"
     const val EXTRA_PASSWORD = "mensa_autologin_pwd"
+    const val EXTRA_DEMO_IDENTITY = "mensa_demo_identity"
 
     /** Requested destination alias (e.g. `today`, `events`, `card`), or null. */
     var screen: String? = null
@@ -61,6 +63,10 @@ object LaunchHarness {
         extras.getString(EXTRA_SCREEN)?.takeIf { it.isNotBlank() }?.let { screen = it }
         extras.getString(EXTRA_EMAIL)?.takeIf { it.isNotBlank() }?.let { email = it }
         extras.getString(EXTRA_PASSWORD)?.takeIf { it.isNotBlank() }?.let { password = it }
+        // Sostituisce nome, foto e numero tessera del socio loggato con un
+        // segnaposto, cosi' gli screenshot pubblicati non espongono i dati di
+        // chi ha fatto il login. Vedi [DemoIdentity].
+        DemoIdentity.enabled = extras.getString(EXTRA_DEMO_IDENTITY) == "1"
         if (isActive) {
             Logger.i("LaunchHarness", "configure", "active: screen=$screen autologin=${email != null}")
         }

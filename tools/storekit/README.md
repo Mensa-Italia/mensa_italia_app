@@ -91,6 +91,7 @@ punto di ingresso diretto.
 | `MENSA_SKIP_ONBOARDING=1` | in DEBUG ogni login *fresco* atterrerebbe su onboarding |
 | `MENSA_REFRESH_ALL=1` | refresh di tutti i repository (warm-up della cache) |
 | `MENSA_SUPPRESS_PERMISSION_PROMPTS=1` | niente alert di sistema sopra la cattura |
+| `MENSA_DEMO_IDENTITY=1` | dati del socio sostituiti da un segnaposto |
 
 Passano come `SIMCTL_CHILD_*` a `simctl launch`.
 
@@ -127,6 +128,25 @@ Gli alias di `mensa_screen` combaciano con i valori iOS, così una sola scena in
 Su una build di release la harness è inerte: `LaunchHarness.configure` esce
 subito se `FLAG_DEBUGGABLE` non è impostato, e le variabili d'ambiente non sono
 iniettabili in un'app installata dallo store.
+
+---
+
+## Dati personali
+
+Le immagini finiscono pubbliche e indicizzate sugli store, quindi storekit
+attiva sempre [`DemoIdentity`](../../shared/src/commonMain/kotlin/it/mensa/shared/demo/DemoIdentity.kt):
+il socio loggato viene mostrato come *Giulia Bianchi*, senza foto e con id
+segnaposto. Il record vero resta intatto nel DB locale e sul backend, si filtra
+solo cio' che la UI mostra.
+
+Vengono sostituiti anche `id` e `username`, non solo il nome: la tessera ci
+costruisce sopra il QR (`MENSA-IT|id:…|user:…`), che altrimenti finirebbe sugli
+store in forma **scansionabile**.
+
+> ⚠️ Il filtro copre il **socio loggato**, non gli altri. Se aggiungi scene che
+> mostrano rubrica, registro soci o risultati di ricerca su persone, quelle
+> schermate contengono dati di terzi e vanno guardate una per una prima
+> dell'upload.
 
 ---
 

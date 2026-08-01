@@ -21,6 +21,7 @@ import it.mensa.app.features.profile.sub.DevicesScreen
 import it.mensa.app.features.profile.sub.LanguagePickerScreen
 import it.mensa.app.features.profile.sub.MakeDonationScreen
 import it.mensa.app.features.profile.sub.OrgChartScreen
+import it.mensa.app.features.profile.sub.PasskeysScreen
 import it.mensa.app.features.profile.sub.PaymentMethodsScreen
 import it.mensa.app.features.profile.sub.RenewMembershipScreen
 
@@ -32,6 +33,7 @@ sealed class ProfileRoute(val route: String) {
     object MakeDonation : ProfileRoute("profile_donation")
     object CalendarLinker : ProfileRoute("profile_calendar")
     object Devices : ProfileRoute("profile_devices")
+    object Passkeys : ProfileRoute("profile_passkeys")
     object OrgChart : ProfileRoute("profile_orgchart")
     object Credits : ProfileRoute("profile_credits")
     object PrivacyPolicy : ProfileRoute("profile_privacy")
@@ -100,6 +102,9 @@ fun ProfileNavGraph(
         }
         composable(ProfileRoute.Devices.route) {
             DevicesScreen(onBack = { navController.popBackStack() })
+        }
+        composable(ProfileRoute.Passkeys.route) {
+            PasskeysScreen(onBack = { navController.popBackStack() })
         }
         composable(ProfileRoute.OrgChart.route) {
             OrgChartScreen(onBack = { navController.popBackStack() })

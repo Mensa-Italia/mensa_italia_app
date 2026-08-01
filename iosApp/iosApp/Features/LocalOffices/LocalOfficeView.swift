@@ -397,7 +397,7 @@ struct LocalOfficeView: View {
             }
             .frame(height: 52)
             .padding(.horizontal, 16)
-            .glassEffect(.regular, in: .rect(cornerRadius: 14))
+            .compatGlass(cornerRadius: 14)
         }
         .buttonStyle(.plain)
     }
@@ -657,7 +657,7 @@ struct LocalOfficeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
     }
 
     // MARK: - Admins (referenti) section
@@ -719,7 +719,7 @@ struct LocalOfficeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
         .contentShape(.rect(cornerRadius: 14))
     }
 
@@ -763,7 +763,7 @@ struct LocalOfficeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
         .contentShape(.rect(cornerRadius: 14))
     }
 

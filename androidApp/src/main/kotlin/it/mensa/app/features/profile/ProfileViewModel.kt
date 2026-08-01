@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.Logger
+import it.mensa.app.support.ThemeManager
+import it.mensa.app.support.ThemeMode
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
-
-enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 data class ProfileUiState(
     val user: UserModel? = null,
@@ -40,6 +40,7 @@ data class ProfileUiState(
 
 class ProfileViewModel(
     private val localeManager: LocaleManager,
+    private val themeManager: ThemeManager,
 ) : ViewModel() {
 
     private val auth = koinAccess().auth
@@ -50,6 +51,15 @@ class ProfileViewModel(
     init {
         observeUser()
         observeLocale()
+        observeTheme()
+    }
+
+    private fun observeTheme() {
+        viewModelScope.launch {
+            themeManager.mode.collect { mode ->
+                _uiState.update { it.copy(themeMode = mode) }
+            }
+        }
     }
 
     private fun observeUser() {
@@ -62,7 +72,7 @@ class ProfileViewModel(
 
     private fun observeLocale() {
         viewModelScope.launch {
-            localeManager.currentLocale.collect { tag ->
+            localeManager.override.collect { tag ->
                 val name = if (tag != null) {
                     runCatching {
                         Locale.forLanguageTag(tag)
@@ -78,7 +88,9 @@ class ProfileViewModel(
     }
 
     fun onThemeModeChange(mode: ThemeMode) {
-        _uiState.update { it.copy(themeMode = mode) }
+        viewModelScope.launch {
+            themeManager.setMode(mode)
+        }
     }
 
     fun onNotificationsToggle(enabled: Boolean) {

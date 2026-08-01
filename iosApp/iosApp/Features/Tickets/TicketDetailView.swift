@@ -74,7 +74,7 @@ struct TicketDetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(20)
-                    .glassEffect(.regular, in: .rect(cornerRadius: 20))
+                    .compatGlass(cornerRadius: 20)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -82,16 +82,16 @@ struct TicketDetailView: View {
                         infoRow(
                             icon: "calendar",
                             label: tr("tickets.deadline", fallback: "Scadenza"),
-                            value: formatItalianDate(dl)
+                            value: formatAppDate(dl)
                         )
                     }
                     if let ref = t.internalRefId, !ref.isEmpty {
                         infoRow(icon: "number", label: tr("tickets.ref", fallback: "Riferimento"), value: ref)
                     }
-                    infoRow(icon: "clock", label: tr("tickets.created", fallback: "Creato"), value: formatItalianDate(t.created))
+                    infoRow(icon: "clock", label: tr("tickets.created", fallback: "Creato"), value: formatAppDate(t.created))
                 }
                 .padding(16)
-                .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                .compatGlass(cornerRadius: 16)
 
                 if let link = t.link, let url = URL(string: link) {
                     Link(destination: url) {

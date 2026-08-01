@@ -1,5 +1,7 @@
 package it.mensa.app.features.events
 
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -73,10 +75,8 @@ import it.mensa.app.support.FilesUrl
 import it.mensa.app.ui.components.CachedAsyncImage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 /**
  * AddEventScreen — Android equivalent of iOS AddEventView.swift.
@@ -92,7 +92,8 @@ fun AddEventScreen(
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val dtFormatter = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ITALIAN) }
+    val locale = rememberAppLocale()
+    val dtFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.NUMERIC_DATE_TIME, locale) }
 
     var showImageOptions by remember { mutableStateOf(false) }
     var showPhotoPicker by remember { mutableStateOf(false) }

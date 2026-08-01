@@ -326,7 +326,7 @@ struct DealDetailView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
             }
 
             if let code = discountCode(for: deal) {
@@ -349,7 +349,7 @@ struct DealDetailView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                 }
-                .buttonStyle(.glass)
+                .compatGlassButtonStyle()
 
                 Button {
                     qrSheet = true
@@ -362,7 +362,7 @@ struct DealDetailView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                 }
-                .buttonStyle(.glass)
+                .compatGlassButtonStyle()
             }
         }
         .padding(.top, 4)

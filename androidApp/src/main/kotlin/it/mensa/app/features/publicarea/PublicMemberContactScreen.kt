@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import java.net.URLEncoder
@@ -79,7 +80,7 @@ fun PublicMemberContactScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = titleCase(contact.name),
+                        text = titleCase(contact.name, rememberAppLocale()),
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -117,7 +118,7 @@ fun PublicMemberContactScreen(
                 ) {
                     Avatar(imageUrl = contact.imageUrl, name = contact.name, sizeDp = 88)
                     Text(
-                        text = titleCase(contact.name),
+                        text = titleCase(contact.name, rememberAppLocale()),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,

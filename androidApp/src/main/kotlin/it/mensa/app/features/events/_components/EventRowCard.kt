@@ -1,5 +1,6 @@
 package it.mensa.app.features.events._components
 
+import it.mensa.app.support.rememberAppLocale
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -54,6 +55,7 @@ fun EventRowCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
+    val locale = rememberAppLocale()
     val isPast = EventDateFormatter.isPast(event)
     val imageUrl = buildImageUrl(event)
     val interactionSource = remember { MutableInteractionSource() }
@@ -153,7 +155,7 @@ fun EventRowCard(
                 Column(modifier = Modifier.weight(1f)) {
                     // Data al posto di KickerLabel
                     Text(
-                        text = EventDateFormatter.formatMedium(event.whenStart),
+                        text = EventDateFormatter.formatMedium(event.whenStart, locale),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )

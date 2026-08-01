@@ -15,7 +15,14 @@ struct LoginView: View {
     @AppStorage("guestModeEnabled") private var guestMode: Bool = false
 
     private var canSubmit: Bool {
-        !vm.email.isEmpty && !vm.password.isEmpty && !vm.loading
+        !vm.email.isEmpty && !vm.password.isEmpty && !vm.loading && !vm.passkeyLoading
+    }
+
+    /// Il bottone passkey si mostra sempre e chiede solo l'email: sondare il
+    /// server per sapere se questa email ha una passkey lo trasformerebbe in un
+    /// oracolo su chi e' socio.
+    private var canUsePasskey: Bool {
+        !vm.email.isEmpty && !vm.loading && !vm.passkeyLoading
     }
 
     var body: some View {
@@ -98,12 +105,52 @@ struct LoginView: View {
                             Spacer()
                         }
                     }
-                    .buttonStyle(.glassProminent)
+                    .compatGlassProminentButtonStyle()
                     .tint(AppTheme.Colors.mensaBlue)
                     .controlSize(.large)
                     .disabled(!canSubmit)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                }
+
+                // ── Passkey ──────────────────────────────────────────────────
+                // Serve solo l'email: la Session API di Zitadel pretende il check
+                // utente prima di poter creare la challenge WebAuthn, quindi il
+                // login usernameless non e' possibile e il flusso resta a due
+                // passi (email → prompt biometrico).
+                Section {
+                    Button {
+                        focus = nil
+                        Task { _ = await vm.loginWithPasskey() }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            if vm.passkeyLoading {
+                                ProgressView()
+                            } else {
+                                Label(
+                                    tr("app.login.passkey.action", fallback: "Accedi con una passkey"),
+                                    systemImage: "person.badge.key"
+                                )
+                            }
+                            Spacer()
+                        }
+                    }
+                    .controlSize(.large)
+                    .disabled(!canUsePasskey)
+                } footer: {
+                    // Nota neutra, non un errore: chi non ha una passkey su questo
+                    // dispositivo non ha sbagliato niente.
+                    if let notice = vm.passkeyNotice {
+                        Label {
+                            Text(notice)
+                        } icon: {
+                            Image(systemName: "info.circle")
+                        }
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 4)
+                    }
                 }
 
                 Section {

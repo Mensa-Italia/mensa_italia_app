@@ -91,7 +91,7 @@ struct TicketRow: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(14)
-        .glassEffect(.regular, in: .rect(cornerRadius: 16))
+        .compatGlass(cornerRadius: 16)
     }
 }
 

@@ -11,6 +11,7 @@ import it.mensa.shared.auth.oidc.OidcTokenResponse
 import it.mensa.shared.auth.oidc.TokenRefresher
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.di.wipeAllUserData
+import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,19 @@ class AuthRepository(
 
     private val _currentUser = MutableStateFlow<UserModel?>(null)
     val currentUser: StateFlow<UserModel?> = _currentUser.asStateFlow()
+
+    private val _lastLoginMethod = MutableStateFlow<LoginMethod?>(null)
+
+    /**
+     * Come l'utente e' entrato *in questa esecuzione dell'app*, o null se la
+     * sessione e' stata ripristinata da disco a freddo.
+     *
+     * Volutamente non persistito: serve solo a decidere se proporre
+     * l'attivazione della passkey dopo un accesso con password, e un cold start
+     * con sessione ripristinata non e' un accesso con password. Vedi
+     * [it.mensa.shared.auth.passkey.PasskeyEnrollmentGate].
+     */
+    val lastLoginMethod: StateFlow<LoginMethod?> = _lastLoginMethod.asStateFlow()
 
     init {
         tokenRefresher.onSessionLost = {
@@ -100,16 +114,16 @@ class AuthRepository(
         // only tokens, so /me is the only path that picks up server-side
         // membership / powers / addons changes.
         val cachedJson = db.keyValueQueries.selectById(KEY_CURRENT_USER).awaitAsOneOrNull()?.value_
-        _currentUser.value = cachedJson?.let {
-            runCatching { json.decodeFromString<UserModel>(it) }.getOrNull()
-        }
+        _currentUser.value = DemoIdentity.redact(
+            cachedJson?.let { runCatching { json.decodeFromString<UserModel>(it) }.getOrNull() },
+        )
         when (val outcome = fetchMeOrWipe()) {
             is MeOutcome.Ok -> {
                 db.keyValueQueries.insertOrReplace(
                     key = KEY_CURRENT_USER,
                     value_ = json.encodeToString(UserModel.serializer(), outcome.user),
                 )
-                _currentUser.value = outcome.user
+                _currentUser.value = DemoIdentity.redact(outcome.user)
             }
             MeOutcome.Offline -> Unit   // keep cached UI, will retry next init/login
             MeOutcome.Wiped -> Unit     // wipeAndGoAnonymous already nuked state
@@ -186,25 +200,52 @@ class AuthRepository(
         runCatching { wipeAllUserData() }
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
+        _lastLoginMethod.value = null
     }
 
     suspend fun login(email: String, password: String): Result<UserModel> = runCatching {
-        val tokens = api.loginWithZitadel(email, password)
-        require(tokens.access_token.isNotBlank()) { "Empty access_token in /auth-with-zitadel response" }
-        require(!tokens.refresh_token.isNullOrBlank()) { "Empty refresh_token in /auth-with-zitadel response" }
+        adoptTokens(
+            tokens = api.loginWithZitadel(email, password),
+            method = LoginMethod.PASSWORD,
+            source = "/auth-with-zitadel",
+        )
+    }
+
+    /**
+     * Rende attiva una sessione a partire dai token restituiti dal backend.
+     *
+     * Condiviso fra login con password e login con passkey: i due endpoint
+     * differiscono solo per come l'utente ha dimostrato la propria identita',
+     * non per cosa si fa con i token che ne escono. [source] entra nei messaggi
+     * d'errore per dire quale dei due ha risposto male.
+     *
+     * `internal` perche' il chiamante dal lato passkey e'
+     * [it.mensa.shared.auth.passkey.PasskeyRepository], nello stesso modulo: la
+     * proprieta' della sessione resta qui, l'HTTP resta la'.
+     */
+    internal suspend fun adoptTokens(
+        tokens: OidcTokenResponse,
+        method: LoginMethod,
+        source: String,
+    ): UserModel {
+        require(tokens.access_token.isNotBlank()) { "Empty access_token in $source response" }
+        require(!tokens.refresh_token.isNullOrBlank()) { "Empty refresh_token in $source response" }
 
         val session = buildSession(tokens)
         persist(session)
         _authState.value = AuthState.Authenticated(session.accessToken)
 
-        // /api/cs/auth-with-zitadel always bundles the user record alongside
-        // the OIDC tokens; only the refresh response omits it (handled in init).
-        val user = requireNotNull(tokens.record) { "/auth-with-zitadel response missing user record" }
+        // Entrambi gli endpoint di login allegano il record utente ai token OIDC;
+        // solo la risposta di refresh lo omette (gestito in init).
+        val user = requireNotNull(tokens.record) { "$source response missing user record" }
         val userJsonStr = json.encodeToString(UserModel.serializer(), user)
         db.keyValueQueries.insertOrReplace(key = KEY_CURRENT_USER, value_ = userJsonStr)
-        _currentUser.value = user
+        // Il record vero e' gia' su DB: da qui in poi si espone solo cio' che
+        // la UI deve mostrare, che in modalita' screenshot e' un segnaposto.
+        _currentUser.value = DemoIdentity.redact(user)
+        _lastLoginMethod.value = method
 
-        user
+        return user
     }
 
     suspend fun logout() {
@@ -213,6 +254,7 @@ class AuthRepository(
         runCatching { wipeAllUserData() }
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
+        _lastLoginMethod.value = null
     }
 
     private suspend fun buildSession(tokens: OidcTokenResponse): OidcSession {
@@ -250,6 +292,7 @@ class AuthRepository(
         runCatching { tokenStore.clear() }
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
+        _lastLoginMethod.value = null
         runCatching { db.keyValueQueries.deleteById(KEY_CURRENT_USER) }
     }
 }
@@ -259,3 +302,6 @@ sealed interface AuthState {
     data object Anonymous : AuthState
     data class Authenticated(val token: String) : AuthState
 }
+
+/** Come e' avvenuto l'accesso corrente. Vedi [AuthRepository.lastLoginMethod]. */
+enum class LoginMethod { PASSWORD, PASSKEY }

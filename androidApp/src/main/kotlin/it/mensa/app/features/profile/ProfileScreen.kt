@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Devices
+import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.profile._components.ProfileDropdownRow
+import it.mensa.app.support.ThemeMode
 import it.mensa.app.features.profile._components.ProfileRow
 import it.mensa.app.features.profile._components.ProfileSectionGroup
 import it.mensa.app.features.profile._components.ProfileSectionTone
@@ -126,6 +128,11 @@ fun ProfileScreen(
                             icon = Icons.Outlined.Devices,
                             title = tr("views.devices.title", fallback = "Dispositivi"),
                             onClick = { onNavigate(ProfileRoute.Devices) },
+                        )
+                        ProfileRow(
+                            icon = Icons.Outlined.Fingerprint,
+                            title = tr("views.passkeys.title", fallback = "Passkey"),
+                            onClick = { onNavigate(ProfileRoute.Passkeys) },
                         )
                     }
                 }
@@ -222,7 +229,7 @@ fun ProfileScreen(
                         )
                         ProfileRow(
                             icon = Icons.Outlined.Policy,
-                            title = tr("app.profile.privacy_policy", fallback = "Privacy Policy"),
+                            title = tr("app.profile.privacy_policy", fallback = "Informativa privacy"),
                             onClick = { onNavigate(ProfileRoute.PrivacyPolicy) },
                         )
                         ProfileRow(
@@ -282,7 +289,10 @@ fun ProfileScreen(
             item(key = "version_footer") {
                 Spacer(Modifier.height(20.dp))
                 Text(
-                    text = tr("app.profile.footer", fallback = "Mensa Italia $appVersion"),
+                    // `{version}`, not a Kotlin "$appVersion" template: the push extractor
+                    // ships the fallback verbatim, so a template lands in the
+                    // catalog as literal text and every language renders it raw.
+                    text = tr("app.profile.footer", "Mensa Italia {version}", "version" to appVersion),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
                     textAlign = TextAlign.Center,

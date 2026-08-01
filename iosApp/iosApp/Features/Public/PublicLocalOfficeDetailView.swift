@@ -197,7 +197,7 @@ struct PublicLocalOfficeDetailView: View {
                 .padding(.leading, 4)
         }
         .padding(14)
-        .glassEffect(.regular, in: .rect(cornerRadius: 16))
+        .compatGlass(cornerRadius: 16)
         .contentShape(.rect(cornerRadius: 16))
     }
 
@@ -269,7 +269,7 @@ struct PublicLocalOfficeDetailView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
         .contentShape(.rect(cornerRadius: 14))
     }
 
@@ -331,7 +331,7 @@ struct PublicLocalOfficeDetailView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
         .contentShape(.rect(cornerRadius: 14))
     }
 

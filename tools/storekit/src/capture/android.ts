@@ -348,7 +348,9 @@ async function setAppLocale(
 }
 
 function launchExtras(scene: Scene | null): string[] {
-  const extras: string[] = [];
+  // Segnaposto al posto dei dati del socio: le immagini finiscono pubbliche
+  // sugli store. Vedi `DemoIdentity` nel modulo condiviso.
+  const extras: string[] = ["--es", "mensa_demo_identity", "1"];
   if (scene?.android?.screen) extras.push("--es", "mensa_screen", scene.android.screen);
   const creds = credentials();
   if (creds) {

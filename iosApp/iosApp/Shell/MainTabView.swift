@@ -54,46 +54,7 @@ struct MainTabView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-        TabView(selection: $selectedTab) {
-            Tab(tr("app.tab.today", fallback: "Today"), systemImage: "sparkles", value: AppTab.today) { // i18n
-                NavigationStack {
-                    TodayView()
-                }
-                // Measure the bottom safe-area inset from inside a Tab — at
-                // this depth `safeAreaInsets.bottom` includes the floating
-                // tab bar's reserved footprint plus the home indicator,
-                // which is exactly what we need to position the mini-player.
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear
-                            .preference(
-                                key: TabBarBottomInsetKey.self,
-                                value: proxy.safeAreaInsets.bottom
-                            )
-                    }
-                )
-            }
-            Tab(tr("app.tab.discover", fallback: "Discover"), systemImage: "square.grid.2x2", value: AppTab.discover) { // i18n
-                NavigationStack {
-                    DiscoverView()
-                }
-            }
-            Tab(tr("app.tab.search", fallback: "Search"), systemImage: "magnifyingglass", value: AppTab.search, role: .search) { // i18n
-                NavigationStack {
-                    SearchView()
-                }
-            }
-            Tab(tr("app.tab.card", fallback: "Card"), systemImage: "person.text.rectangle", value: AppTab.card) { // i18n
-                NavigationStack {
-                    CardView()
-                }
-            }
-            Tab(tr("app.tab.profile", fallback: "Profile"), systemImage: "person.crop.circle", value: AppTab.profile) { // i18n
-                NavigationStack {
-                    ProfileView()
-                }
-            }
-        }
+        tabShell
         .task {
             // Ask for push permission once we're past auth + onboarding.
             // Non-blocking; the system dialog is owned by UNUserNotificationCenter.
@@ -190,6 +151,85 @@ struct MainTabView: View {
                 AudioPlayerService.shared.isPresentingFullPlayer = newValue
             }
         }
+    }
+
+    /// The 5-tab shell. iOS 18+ uses the `Tab` builder (needed for the
+    /// `.search` role and the iOS 26 floating bar); iOS 17 falls back to the
+    /// classic `.tabItem`/`.tag` syntax, which renders the same tabs.
+    @ViewBuilder
+    private var tabShell: some View {
+        if #available(iOS 18.0, *) {
+            TabView(selection: $selectedTab) {
+                Tab(tr("app.tab.today", fallback: "Oggi"), systemImage: "sparkles", value: AppTab.today) { // i18n
+                    todayContent
+                }
+                Tab(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2", value: AppTab.discover) { // i18n
+                    NavigationStack {
+                        DiscoverView()
+                    }
+                }
+                Tab(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass", value: AppTab.search, role: .search) { // i18n
+                    NavigationStack {
+                        SearchView()
+                    }
+                }
+                Tab(tr("app.tab.card", fallback: "Tessera"), systemImage: "person.text.rectangle", value: AppTab.card) { // i18n
+                    NavigationStack {
+                        CardView()
+                    }
+                }
+                Tab(tr("app.tab.profile", fallback: "Profilo"), systemImage: "person.crop.circle", value: AppTab.profile) { // i18n
+                    NavigationStack {
+                        ProfileView()
+                    }
+                }
+            }
+        } else {
+            TabView(selection: $selectedTab) {
+                todayContent
+                    .tabItem { Label(tr("app.tab.today", fallback: "Oggi"), systemImage: "sparkles") } // i18n
+                    .tag(AppTab.today)
+                NavigationStack {
+                    DiscoverView()
+                }
+                .tabItem { Label(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2") } // i18n
+                .tag(AppTab.discover)
+                NavigationStack {
+                    SearchView()
+                }
+                .tabItem { Label(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass") } // i18n
+                .tag(AppTab.search)
+                NavigationStack {
+                    CardView()
+                }
+                .tabItem { Label(tr("app.tab.card", fallback: "Tessera"), systemImage: "person.text.rectangle") } // i18n
+                .tag(AppTab.card)
+                NavigationStack {
+                    ProfileView()
+                }
+                .tabItem { Label(tr("app.tab.profile", fallback: "Profilo"), systemImage: "person.crop.circle") } // i18n
+                .tag(AppTab.profile)
+            }
+        }
+    }
+
+    private var todayContent: some View {
+        NavigationStack {
+            TodayView()
+        }
+        // Measure the bottom safe-area inset from inside a Tab — at
+        // this depth `safeAreaInsets.bottom` includes the floating
+        // tab bar's reserved footprint plus the home indicator,
+        // which is exactly what we need to position the mini-player.
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(
+                        key: TabBarBottomInsetKey.self,
+                        value: proxy.safeAreaInsets.bottom
+                    )
+            }
+        )
     }
 
     @ViewBuilder

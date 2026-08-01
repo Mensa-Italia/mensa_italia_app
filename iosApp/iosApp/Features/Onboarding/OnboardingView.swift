@@ -134,7 +134,7 @@ struct OnboardingView: View {
             .frame(height: 54)
             .foregroundStyle(.white)
         }
-        .buttonStyle(.glassProminent)
+        .compatGlassProminentButtonStyle()
         .tint(AppTheme.Colors.mensaBlue)
         .controlSize(.large)
         .animation(.snappy(duration: 0.35), value: vm.isLastPage)
@@ -499,7 +499,7 @@ private struct HeroEvents: View {
                     .font(.system(size: 78, weight: .light))
                     .foregroundStyle(AppTheme.Colors.mensaCyan, AppTheme.Colors.mensaBlue)
                     .symbolRenderingMode(.palette)
-                    .symbolEffect(.bounce, options: .repeat(.continuous), value: bounce)
+                    .symbolEffect(.bounce, options: .repeating, value: bounce)
             }
             .scaleEffect(active ? 1 : 0.8)
             .opacity(active ? 1 : 0)
@@ -670,7 +670,7 @@ private struct HeroSearch: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(AppTheme.Colors.mensaCyan)
-                .symbolEffect(.variableColor.iterative.reversing, options: .repeat(.continuous), value: sweep)
+                .symbolEffect(.variableColor.iterative.reversing, options: .repeating, value: sweep)
             // animated typing cursor
             HStack(spacing: 1) {
                 Text("Mensa")

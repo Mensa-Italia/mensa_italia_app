@@ -722,7 +722,9 @@ private fun EmptyResultsContent(query: String) {
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = tr("app.search.empty.title", "Niente per \"$query\""),
+                    // See ProfileScreen: a "$query" template would be pushed to Tolgee
+                    // as literal text. The handle has to be `{query}`.
+                    text = tr("app.search.empty.title", "Niente per \"{query}\"", "query" to query),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
                 )

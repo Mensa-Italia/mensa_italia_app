@@ -11,6 +11,7 @@ import it.mensa.shared.api.endpoints.LocationsApi
 import it.mensa.shared.api.endpoints.MetadataApi
 import it.mensa.shared.api.endpoints.OrgChartApi
 import it.mensa.shared.api.endpoints.NotificationsApi
+import it.mensa.shared.api.endpoints.PasskeyApi
 import it.mensa.shared.api.endpoints.PodcastsApi
 import it.mensa.shared.api.endpoints.QuidApi
 import it.mensa.shared.api.endpoints.PaymentMethodsApi
@@ -18,6 +19,8 @@ import it.mensa.shared.api.endpoints.ReceiptsApi
 import it.mensa.shared.api.endpoints.SearchApi
 import it.mensa.shared.api.endpoints.SettingsApi
 import it.mensa.shared.api.endpoints.TicketsApi
+import it.mensa.shared.auth.passkey.PasskeyEnrollmentGate
+import it.mensa.shared.auth.passkey.PasskeyRepository
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.i18n.TranslationLoader
 import it.mensa.shared.iqtest.MensaTestClient
@@ -63,6 +66,7 @@ val extrasModule = module {
     single { PodcastsApi(get()) }
     single { LocalOfficesApi(get()) }
     single { ExAppsApi(get(), get()) }
+    single { PasskeyApi(get()) }
 
     // i18n
     single { TranslationLoader(get(), get(), get(), get()) }
@@ -89,6 +93,11 @@ val extrasModule = module {
     single { PodcastsRepository(get()) }
     single { LocalOfficesRepository(get()) }
     single { ExAppsRepository(get(), get()) }
+
+    // Passkey: HTTP + orchestrazione, piu` il gate che decide se proporre
+    // l'attivazione dopo un accesso con password.
+    single { PasskeyRepository(get(), get(), get()) }
+    single { PasskeyEnrollmentGate(get(), get(), get()) }
 
     // Onboarding gate
     single { OnboardingState(get()) }

@@ -1,7 +1,9 @@
 package it.mensa.app.features.profile.sub
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,15 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AssistantPhoto
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,12 +38,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
@@ -211,114 +215,181 @@ private fun OrgGroupSection(group: OrgChartGroup, vm: OrgChartViewModel) {
         }
 
         if (expanded) {
-            group.members.filter { it.isMaster }.forEach { member ->
-                OrgMemberHeroRow(member = member, onClick = {})
-            }
-            group.members.filter { !it.isMaster }.forEach { member ->
-                OrgMemberRow(member = member, onClick = {})
+            // "Tavola rotonda": nessuna hero — tutti hanno la stessa card a
+            // griglia (2 colonne), i responsabili sono solo ordinati per primi
+            // e distinti da bordo accent + badge dentro la card.
+            val ordered = group.members.filter { it.isMaster } +
+                group.members.filter { !it.isMaster }
+            ordered.chunked(2).forEach { rowMembers ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    rowMembers.forEach { member ->
+                        OrgMemberCard(
+                            member = member,
+                            onClick = {},
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    if (rowMembers.size == 1) {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
             }
         }
     }
 }
 
+/**
+ * Card unica per TUTTI i membri: foto del socio come background con scrim
+ * graduale (contrasto del testo garantito), gradient brand + iniziali in
+ * fallback. I responsabili (is_master) si distinguono solo per bordo accent
+ * e badge — stessa dimensione di tutti gli altri.
+ */
 @Composable
-private fun OrgMemberHeroRow(member: OrgChartMember, onClick: () -> Unit) {
+private fun OrgMemberCard(
+    member: OrgChartMember,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val colorScheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(18.dp)
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MemberAvatar(member = member, size = 48)
-        Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                member.name,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                color = if (member.inactive) colorScheme.onSurfaceVariant else colorScheme.onSurface,
-            )
-            if (member.role.isNotEmpty()) {
-                Text(
-                    member.role,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorScheme.primary,
-                )
-            }
-        }
-        AssistChip(onClick = {}, label = {
-            Text(
-                tr("app.org_chart.master_badge", fallback = "Capo"),
-                style = MaterialTheme.typography.labelSmall,
-            )
-        })
-    }
-}
-
-@Composable
-private fun OrgMemberRow(member: OrgChartMember, onClick: () -> Unit) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MemberAvatar(member = member, size = 36)
-        Spacer(Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                member.name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (member.inactive) colorScheme.onSurfaceVariant else colorScheme.onSurface,
-            )
-            if (member.role.isNotEmpty()) {
-                Text(
-                    member.role,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MemberAvatar(member: OrgChartMember, size: Int) {
     Box(
-        modifier = Modifier
-            .size(size.dp)
-            .clip(CircleShape)
-            .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MensaCyan))),
-        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .height(168.dp)
+            .clip(shape)
+            .border(
+                width = if (member.isMaster) 2.dp else 1.dp,
+                color = if (member.isMaster) {
+                    colorScheme.primary
+                } else {
+                    colorScheme.outlineVariant.copy(alpha = 0.4f)
+                },
+                shape = shape,
+            )
+            .clickable(onClick = onClick)
+            .alpha(if (member.inactive) 0.55f else 1f),
     ) {
-        if (member.image.isNotEmpty()) {
-            val url = if (member.image.startsWith("http")) {
-                member.image
+        // Background: foto (thumb 0x500, lo stesso del dettaglio socio) o
+        // gradient brand con iniziali.
+        val photo = member.image.takeIf {
+            it.isNotEmpty() && !it.contains("cloud32.it/Associazioni/img/Uomo-1.png")
+        }
+        if (photo != null) {
+            val url = if (photo.startsWith("http")) {
+                photo
             } else {
-                FilesUrl.build(collection = "members_registry", recordId = member.userId, filename = member.image)
+                FilesUrl.build(
+                    collection = "members_registry",
+                    recordId = member.userId,
+                    filename = photo,
+                    thumb = "0x500",
+                )
             }
             CachedAsyncImage(
                 model = url,
-                contentDescription = member.name,
-                modifier = Modifier
-                    .size(size.dp)
-                    .clip(CircleShape),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize(),
             )
         } else {
-            val initials = member.name
-                .split(" ")
-                .filter { it.isNotEmpty() }
-                .take(2)
-                .joinToString("") { it.first().uppercase() }
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Brush.linearGradient(listOf(colorScheme.primary, MensaCyan))),
+                contentAlignment = Alignment.Center,
+            ) {
+                val initials = member.name
+                    .split(" ")
+                    .filter { it.isNotEmpty() }
+                    .take(2)
+                    .joinToString("") { it.first().uppercase() }
+                Text(
+                    text = initials.ifEmpty { "?" },
+                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White.copy(alpha = 0.35f),
+                )
+            }
+        }
+
+        // Scrim graduale, sempre presente: testo bianco leggibile su qualsiasi foto.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        0f to Color.Black.copy(alpha = 0.02f),
+                        0.5f to Color.Black.copy(alpha = 0.30f),
+                        1f to Color.Black.copy(alpha = 0.72f),
+                    )
+                ),
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(12.dp),
+        ) {
             Text(
-                text = initials.ifEmpty { "?" },
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                member.name,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (member.role.isNotEmpty()) {
+                Text(
+                    member.role,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.88f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+
+        if (member.isMaster) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .background(colorScheme.primary, RoundedCornerShape(50))
+                    .padding(horizontal = 7.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Filled.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(10.dp),
+                    tint = Color.White,
+                )
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    tr("app.org_chart.master_badge", fallback = "Responsabile").uppercase(),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.3.sp,
+                    color = Color.White,
+                )
+            }
+        }
+
+        if (member.inactive) {
+            Text(
+                tr("app.org_chart.inactive_badge", fallback = "Dimissionario").uppercase(),
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(50))
+                    .padding(horizontal = 7.dp, vertical = 3.dp),
             )
         }
     }

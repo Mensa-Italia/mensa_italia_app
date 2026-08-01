@@ -173,7 +173,7 @@ final class RenewMembershipViewModel {
 
     var expiryString: String {
         guard let u = user else { return "-" }
-        return formatItalianDate(u.expireMembership)
+        return formatAppDate(u.expireMembership)
     }
 
     var countdownString: String {

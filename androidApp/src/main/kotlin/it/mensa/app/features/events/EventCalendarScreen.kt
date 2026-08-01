@@ -45,13 +45,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.features.events.util.EventDateFormatter
 import it.mensa.app.ui.theme.MensaCyan
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 /**
  * EventCalendarScreen — Android equivalent of iOS EventCalendarView.swift.
@@ -68,7 +68,8 @@ fun EventCalendarScreen(
     val daysWithEvents = remember(state.events) { vm.daysWithEvents() }
     val selectedDayEvents = remember(state.selectedDateMillis, state.events) { vm.eventsOnDay(state.selectedDateMillis) }
 
-    val dayFormatter = remember { SimpleDateFormat("EEEE d MMMM yyyy", Locale.ITALIAN) }
+    val locale = rememberAppLocale()
+    val dayFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.FULL_DAY, locale) }
 
     Scaffold(
         topBar = {
@@ -139,8 +140,11 @@ private fun CalendarMonthGrid(
     eventsCountForDay: (Long) -> Int,
     modifier: Modifier = Modifier,
 ) {
-    val monthTitleFormatter = remember { SimpleDateFormat("LLLL yyyy", Locale.ITALIAN) }
-    val monthTitle = remember(displayedMonthMillis) { monthTitleFormatter.format(Date(displayedMonthMillis)).replaceFirstChar { it.uppercase() } }
+    val locale = rememberAppLocale()
+    val monthTitleFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.MONTH_YEAR, locale) }
+    val monthTitle = remember(displayedMonthMillis, locale) {
+        AppFormat.titlecase(monthTitleFormatter.format(Date(displayedMonthMillis)), locale)
+    }
     val weekdays = listOf("L", "M", "M", "G", "V", "S", "D")
     val days = remember(displayedMonthMillis) { buildMonthDays(displayedMonthMillis) }
 

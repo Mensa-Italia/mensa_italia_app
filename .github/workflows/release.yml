@@ -31,6 +31,11 @@ on:
         default: 'alpha'
         type: choice
         options: [alpha, beta, production]
+      skip_quality:
+        description: 'Salta lint/scan/CodeQL e pubblica comunque (CodeQL Swift da solo vale ore)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: release-${{ github.ref }}
@@ -62,6 +67,7 @@ jobs:
       should_publish_play: ${{ steps.mode.outputs.should_publish_play }}
       should_publish_ios: ${{ steps.mode.outputs.should_publish_ios }}
       should_finalize: ${{ steps.mode.outputs.should_finalize }}
+      skip_quality: ${{ steps.mode.outputs.skip_quality }}
 
     steps:
       - name: Checkout
@@ -76,12 +82,14 @@ jobs:
           REF: ${{ github.ref }}
           EVENT: ${{ github.event_name }}
           INPUT_TRACK: ${{ github.event.inputs.track }}
+          INPUT_SKIP_QUALITY: ${{ github.event.inputs.skip_quality }}
         run: |
           set -euo pipefail
           mode="none"; track="none"
           should_build_web=false; should_build_native=false
           should_publish_play=false; should_publish_ios=false
           should_finalize=false
+          skip_quality=false
 
           # IMPORTANTE: matchare SOLO sulla prima riga del commit (subject),
           # NON sul body. Altrimenti un messaggio che DESCRIVE i token (es.
@@ -99,6 +107,17 @@ jobs:
             mode="release"; track="beta"
           elif printf '%s' "$subject" | grep -qE '(^|[[:space:]])\[ALPHA\]([[:space:]]|$)'; then
             mode="release"; track="alpha"
+          fi
+
+          # Bypass del quality gate. Due sorgenti, stesso effetto: i job di
+          # lint/scan/CodeQL non girano affatto e il gate risulta verde.
+          #   - workflow_dispatch → checkbox "skip_quality"
+          #   - push             → token [SKIP-QA] nel subject del commit
+          # Serve perche' CodeQL Swift ricostruisce XCFramework + app su macOS
+          # e da solo vale piu' dell'intera pipeline di build.
+          if [ "$INPUT_SKIP_QUALITY" = "true" ] || \
+             printf '%s' "$subject" | grep -qE '(^|[[:space:]])\[SKIP-QA\]([[:space:]]|$)'; then
+            skip_quality=true
           fi
 
           case "$mode" in
@@ -121,8 +140,12 @@ jobs:
           echo "should_publish_play=$should_publish_play" >> "$GITHUB_OUTPUT"
           echo "should_publish_ios=$should_publish_ios" >> "$GITHUB_OUTPUT"
           echo "should_finalize=$should_finalize" >> "$GITHUB_OUTPUT"
+          echo "skip_quality=$skip_quality" >> "$GITHUB_OUTPUT"
 
-          echo "::notice::Mode=$mode track=$track"
+          echo "::notice::Mode=$mode track=$track skip_quality=$skip_quality"
+          if [ "$skip_quality" = "true" ]; then
+            echo "::warning::Quality gate BYPASSATO — nessun lint, scan segreti o CodeQL su questa release."
+          fi
 
       - name: Determine version & versionCode
         id: version
@@ -684,7 +707,7 @@ jobs:
   lint-web:
     name: Lint web
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -706,7 +729,7 @@ jobs:
   typecheck-web:
     name: Typecheck web
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -727,7 +750,7 @@ jobs:
   lint-kotlin:
     name: Lint Kotlin
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -752,7 +775,7 @@ jobs:
   lint-swift:
     name: Lint Swift
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -766,7 +789,7 @@ jobs:
   lint-dockerfile:
     name: Lint Dockerfile
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -783,7 +806,7 @@ jobs:
   scan-secrets:
     name: Scan secrets
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -796,7 +819,7 @@ jobs:
   scan-vulns:
     name: Scan vulns
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -816,7 +839,7 @@ jobs:
   codeql-js:
     name: CodeQL JS/TS
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -828,7 +851,7 @@ jobs:
   codeql-kotlin:
     name: CodeQL Kotlin
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -847,7 +870,7 @@ jobs:
   codeql-swift:
     name: CodeQL Swift
     needs: prepare
-    if: needs.prepare.outputs.mode == 'release'
+    if: needs.prepare.outputs.mode == 'release' && needs.prepare.outputs.skip_quality != 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -923,8 +946,19 @@ jobs:
           R_CODEQL_KOTLIN: ${{ needs.codeql-kotlin.result }}
           R_CODEQL_SWIFT: ${{ needs.codeql-swift.result }}
           TRACK: ${{ needs.prepare.outputs.track }}
+          SKIP_QUALITY: ${{ needs.prepare.outputs.skip_quality }}
         run: |
           set -euo pipefail
+
+          # Bypass esplicito: i job sopra sono stati saltati, non falliti.
+          # Distinguere i due casi qui evita che uno `skipped` venga letto
+          # come rosso e blocchi il publish.
+          if [ "$SKIP_QUALITY" = "true" ]; then
+            echo "quality_passed=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Quality gate saltato su richiesta — publish autorizzato senza controlli."
+            exit 0
+          fi
+
           all_pass=true
           for v in "$R_LINT_WEB" "$R_TYPECHECK_WEB" "$R_LINT_KOTLIN" "$R_LINT_SWIFT" \
                    "$R_LINT_DOCKERFILE" "$R_SCAN_SECRETS" "$R_SCAN_VULNS" \

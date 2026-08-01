@@ -51,16 +51,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.QrCodeView
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.TicketModel
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -195,15 +193,16 @@ private fun TicketContent(
         // Info rows card
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val locale = rememberAppLocale()
                 val deadline = ticket.deadline
                 if (deadline != null) {
-                    InfoRow(icon = Icons.Outlined.CalendarMonth, label = tr("tickets.deadline", fallback = "Scadenza"), value = formatItalianInstant(deadline))
+                    InfoRow(icon = Icons.Outlined.CalendarMonth, label = tr("tickets.deadline", fallback = "Scadenza"), value = formatTicketDate(deadline, locale))
                 }
                 val ref = ticket.internalRefId
                 if (!ref.isNullOrBlank()) {
                     InfoRow(icon = Icons.Outlined.Numbers, label = tr("tickets.ref", fallback = "Riferimento"), value = ref)
                 }
-                InfoRow(icon = Icons.Outlined.Schedule, label = tr("tickets.created", fallback = "Creato"), value = formatItalianInstant(ticket.created))
+                InfoRow(icon = Icons.Outlined.Schedule, label = tr("tickets.created", fallback = "Creato"), value = formatTicketDate(ticket.created, locale))
             }
         }
 
@@ -240,12 +239,9 @@ private fun InfoRow(
     }
 }
 
-private fun formatItalianInstant(instant: Instant): String {
+private fun formatTicketDate(instant: Instant, locale: Locale): String {
     return try {
-        val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        val date = Date(instant.toEpochMilliseconds())
-        val fmt = SimpleDateFormat("d MMMM yyyy", Locale.ITALIAN)
-        fmt.format(date)
+        AppFormat.format(instant, AppFormat.Skeleton.DAY_MONTH_LONG_YEAR, locale)
     } catch (_: Exception) {
         "—"
     }

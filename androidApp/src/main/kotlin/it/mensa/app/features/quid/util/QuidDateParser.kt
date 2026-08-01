@@ -1,5 +1,6 @@
 package it.mensa.app.features.quid.util
 
+import it.mensa.app.support.AppFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,11 +59,15 @@ object QuidDateParser {
     }
 
     /**
-     * Returns long Italian date ("31 marzo 2026") or raw string on failure.
+     * Long date in the in-app language ("31 marzo 2026" / "31 March 2026"), or
+     * the raw string when [parse] cannot make sense of it.
+     *
+     * Note this is the *output* side only — [parse] still reads the Italian
+     * month names the backend publishes, and must not follow the UI language.
      */
-    fun longDateText(raw: String): String {
+    fun longDateText(raw: String, locale: Locale = AppFormat.locale()): String {
         val date = parse(raw) ?: return raw
-        val fmt = SimpleDateFormat("d MMMM yyyy", Locale.ITALIAN)
+        val fmt = AppFormat.formatter(AppFormat.Skeleton.DAY_MONTH_LONG_YEAR, locale)
         fmt.timeZone = TimeZone.getDefault()
         return fmt.format(date)
     }

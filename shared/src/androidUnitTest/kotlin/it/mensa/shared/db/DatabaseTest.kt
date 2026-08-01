@@ -5,17 +5,21 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlinx.coroutines.test.runTest
 
 class DatabaseTest {
 
-    private fun createTestDatabase(): MensaDatabase {
+    // `create` va atteso: lo schema è generato in modalità asincrona, quindi
+    // torna un QueryResult e senza `await()` nessuna tabella viene creata
+    // davvero — i test fallivano tutti con "no such table".
+    private suspend fun createTestDatabase(): MensaDatabase {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        MensaDatabase.Schema.create(driver)
+        MensaDatabase.Schema.create(driver).await()
         return MensaDatabase(driver)
     }
 
     @Test
-    fun testEventInsertAndSelect() {
+    fun testEventInsertAndSelect() = runTest {
         val db = createTestDatabase()
         val queries = db.eventQueries
 
@@ -23,11 +27,15 @@ class DatabaseTest {
             id = "evt1",
             name = "Test Event",
             description = "A test event",
+            image = "",
+            infoLink = "",
+            contact = "",
             whenStart = 1700000000000L,
             whenEnd = 1700003600000L,
             owner = "owner1",
             isNational = 1L,
             isSpot = 0L,
+            isPublic = 1L,
             bookingLink = "https://example.com/book",
             positionJson = """{"id":"loc1","name":"Rome","lat":41.9,"lon":12.5,"address":"Via Roma 1","state":"Lazio"}""",
             updatedAt = 1700000000000L,
@@ -51,7 +59,7 @@ class DatabaseTest {
     }
 
     @Test
-    fun testDealInsertAndSelect() {
+    fun testDealInsertAndSelect() = runTest {
         val db = createTestDatabase()
         val queries = db.dealQueries
 
@@ -88,7 +96,7 @@ class DatabaseTest {
     }
 
     @Test
-    fun testKeyValueInsertAndSelect() {
+    fun testKeyValueInsertAndSelect() = runTest {
         val db = createTestDatabase()
         val queries = db.keyValueQueries
 
@@ -114,7 +122,7 @@ class DatabaseTest {
     }
 
     @Test
-    fun testRegSociInsertAndSearch() {
+    fun testRegSociInsertAndSearch() = runTest {
         val db = createTestDatabase()
         val queries = db.regSociQueries
 
@@ -130,6 +138,8 @@ class DatabaseTest {
             fullProfileLink = null,
             nameToSearch = "Mario Rossi . Rossi Mario",
             updatedAt = 1700000000000L,
+            dataHash = null,
+            imageHash = null,
         )
 
         val result = queries.selectById("1001").executeAsOneOrNull()

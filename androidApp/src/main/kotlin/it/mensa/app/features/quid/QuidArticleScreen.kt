@@ -34,6 +34,7 @@ import it.mensa.app.features.quid._components.buildAudioTrack
 import it.mensa.app.features.quid._components.quidTrackId
 import it.mensa.app.features.quid.util.QuidDateParser
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -287,7 +288,7 @@ private fun BylineRow(dateStr: String) {
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
         )
         Text(
-            text = QuidDateParser.longDateText(dateStr),
+            text = QuidDateParser.longDateText(dateStr, rememberAppLocale()),
             style = MaterialTheme.typography.bodySmall.copy(fontStyle = FontStyle.Italic),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(vertical = 2.dp),

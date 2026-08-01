@@ -598,7 +598,7 @@ struct SearchView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .glassEffect(.regular, in: .rect(cornerRadius: 16))
+            .compatGlass(cornerRadius: 16)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -638,7 +638,7 @@ struct SearchView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .glassEffect(.regular, in: .rect(cornerRadius: 16))
+            .compatGlass(cornerRadius: 16)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

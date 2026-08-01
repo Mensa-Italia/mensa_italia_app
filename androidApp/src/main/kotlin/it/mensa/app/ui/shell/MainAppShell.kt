@@ -112,10 +112,10 @@ enum class MainTab(
     val labelFallback: String,
     val icon: ImageVector,
 ) {
-    Today("today", "app.tab.today", "Today", Icons.Outlined.AutoAwesome),
-    Discover("discover", "app.tab.discover", "Discover", Icons.Outlined.GridView),
-    Card("card", "app.tab.card", "Card", Icons.Outlined.CreditCard),
-    Profile("profile", "app.tab.profile", "Profile", Icons.Outlined.AccountCircle),
+    Today("today", "app.tab.today", "Oggi", Icons.Outlined.AutoAwesome),
+    Discover("discover", "app.tab.discover", "Scopri", Icons.Outlined.GridView),
+    Card("card", "app.tab.card", "Tessera", Icons.Outlined.CreditCard),
+    Profile("profile", "app.tab.profile", "Profilo", Icons.Outlined.AccountCircle),
 }
 
 /** Route for the global search drill destination (no longer a tab). */

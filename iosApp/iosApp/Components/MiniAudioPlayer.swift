@@ -45,7 +45,7 @@ struct MiniAudioPlayer: View {
             content(track: track)
                 .frame(height: 56)
                 .frame(maxWidth: .infinity)
-                .glassEffect(.regular, in: .capsule)
+                .compatGlassCapsule()
         }
     }
 
@@ -162,7 +162,11 @@ struct MiniAudioPlayer: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.78), value: observer.queueCount)
         }
         .overlay(alignment: .bottom) {
+            // La capsula del glass ha il lato dritto solo tra i due raggi
+            // d'angolo (height/2): senza questo inset la hairline sborda
+            // oltre i bordi curvi della chip.
             MiniProgressHairline()
+                .padding(.horizontal, 28)
         }
     }
 
@@ -199,10 +203,10 @@ private struct MiniProgressHairline: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Rectangle()
+                Capsule()
                     .fill(Color.primary.opacity(0.10))
                     .frame(height: 1.5)
-                Rectangle()
+                Capsule()
                     .fill(AppTheme.Colors.brandTintAdaptive)
                     .frame(width: max(0, geo.size.width * service.progress), height: 1.5)
             }

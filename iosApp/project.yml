@@ -2,12 +2,16 @@ name: iosApp
 options:
   bundleIdPrefix: it.mensa
   deploymentTarget:
-    iOS: "26.0"
+    # 17.0 = floor of @Observable/SwiftData-era APIs the app uses; keeps the
+    # native app close to the legacy Flutter build's OS support.
+    iOS: "17.0"
 
 packages:
   Stripe:
     url: https://github.com/stripe/stripe-ios-spm
-    from: 23.30.0
+    # 25.9.0+ fixes the PaymentSheetLoader `async let` SIGABRT
+    # ("freed pointer was not the last allocation") under Xcode 26.4 / Swift 6.3.
+    from: 26.4.1
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
     from: 11.0.0
@@ -76,7 +80,40 @@ targets:
         OTHER_LDFLAGS: -framework Shared -lsqlite3 -lc++
     preBuildScripts:
       - script: |
+          set -eu
           cd "$SRCROOT/.."
+
+          # Xcode non esegue il profilo di shell, quindi JAVA_HOME di solito qui
+          # non c'e' e `java` e' quello di sistema. Gradle 8.10 non parte su
+          # Java 24+ e muore con un messaggio opaco ("* What went wrong: 25.0.2"),
+          # che Xcode riporta solo come "PhaseScriptExecution failed".
+          # I keg openjdk di Homebrew sono spesso installati ma non linkati,
+          # quindi cerchiamoli a mano.
+          if [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME:-}/bin/java" ]; then
+            for keg in \
+              /opt/homebrew/opt/openjdk@17 \
+              /opt/homebrew/opt/openjdk@21 \
+              /usr/local/opt/openjdk@17 \
+              /usr/local/opt/openjdk@21 \
+              /Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+              /Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home \
+              "/Applications/Android Studio.app/Contents/jbr/Contents/Home"; do
+              for home in "$keg/libexec/openjdk.jdk/Contents/Home" "$keg"; do
+                if [ -x "$home/bin/java" ]; then
+                  JAVA_HOME="$home"
+                  export JAVA_HOME
+                  break 2
+                fi
+              done
+            done
+          fi
+
+          if [ -z "${JAVA_HOME:-}" ] || [ ! -x "$JAVA_HOME/bin/java" ]; then
+            echo "error: nessun JDK 17/21 utilizzabile. Installa con 'brew install openjdk@17' oppure esporta JAVA_HOME." >&2
+            exit 1
+          fi
+
+          export PATH="$JAVA_HOME/bin:$PATH"
           ./gradlew :shared:assembleSharedDebugXCFramework
         name: Build Kotlin Shared
         basedOnDependencyAnalysis: false

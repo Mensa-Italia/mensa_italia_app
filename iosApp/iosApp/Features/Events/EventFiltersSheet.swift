@@ -115,7 +115,7 @@ struct EventFiltersSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(tr("events.filter.reset", fallback: "Reset"), role: .destructive) {
+                    Button(tr("events.filter.reset", fallback: "Azzera"), role: .destructive) {
                         draft.reset()
                     }
                     .disabled(draft.isEmpty)

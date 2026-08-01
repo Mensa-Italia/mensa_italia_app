@@ -68,6 +68,8 @@ import it.mensa.app.features.localoffices._components.LocalOfficeLinkEditorSheet
 import it.mensa.app.features.localoffices._components.LocalOfficeTestDateEditorSheet
 import it.mensa.app.features.localoffices._components.TestDateEditorMode
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.rememberAppLocale
+import it.mensa.app.support.AppFormat
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -77,7 +79,6 @@ import it.mensa.shared.model.LocalOfficeTestDateModel
 import it.mensa.shared.model.SigModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone as JTimeZone
@@ -374,7 +375,7 @@ fun LocalOfficeScreen(
                     ),
                 )
             },
-            text = { Text(formatItalianDate(td.date.toEpochMilliseconds())) },
+            text = { Text(formatTestDate(td.date.toEpochMilliseconds(), rememberAppLocale())) },
             confirmButton = {
                 TextButton(
                     onClick = { vm.deleteTestDate(td.id); deletingTestDate = null },
@@ -540,7 +541,7 @@ private fun TestDatesGroup(
             testDates.forEachIndexed { idx, td ->
                 ListItem(
                     headlineContent = {
-                        Text(formatItalianDate(td.date.toEpochMilliseconds()))
+                        Text(formatTestDate(td.date.toEpochMilliseconds(), rememberAppLocale()))
                     },
                     supportingContent = {
                         val supporting = listOfNotNull(
@@ -573,9 +574,13 @@ private fun TestDatesGroup(
                                     enabled = false,
                                     label = {
                                         Text(
+                                            // `{n}`, not a Kotlin template: the push
+                                            // extractor ships the fallback verbatim, so a
+                                            // template reaches Tolgee as literal text.
                                             tr(
                                                 "local_office.test_dates.max_short",
-                                                fallback = "max ${td.maxParticipants}",
+                                                "max {n}",
+                                                "n" to td.maxParticipants,
                                             ),
                                         )
                                     },
@@ -732,7 +737,7 @@ private fun PersonGroup(
                     else FilesUrl.build(collection, p.recordId, p.image, "400x400")
                 }
                 ListItem(
-                    headlineContent = { Text(titleCaseName(p.name)) },
+                    headlineContent = { Text(titleCaseName(p.name, rememberAppLocale())) },
                     leadingContent = { PersonAvatar(imageUrl = imageUrl, name = p.name) },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier = Modifier.clickable { onPersonClick(p.userId) },
@@ -773,12 +778,8 @@ private fun PersonAvatar(imageUrl: String?, name: String) {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-private fun titleCaseName(s: String): String =
-    s.split(' ').joinToString(" ") { word ->
-        word.lowercase().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.ITALIAN) else it.toString()
-        }
-    }
+private fun titleCaseName(s: String, locale: Locale): String =
+    s.split(' ').joinToString(" ") { word -> AppFormat.titlecase(word.lowercase(), locale) }
 
 private fun resolveIcon(raw: String): String {
     val trimmed = raw.trim()
@@ -798,9 +799,12 @@ private fun resolveIcon(raw: String): String {
     }
 }
 
-fun formatItalianDate(ms: Long): String {
-    val date = Date(ms)
-    val fmt = SimpleDateFormat("EEEE d MMMM yyyy, HH:mm", Locale.ITALIAN)
+/**
+ * Test dates are stored as a UTC wall-clock instant, so the formatter is pinned
+ * to UTC — rendering them in the device zone would shift the published hour.
+ */
+fun formatTestDate(ms: Long, locale: Locale): String {
+    val fmt = AppFormat.formatter(AppFormat.Skeleton.FULL_WITH_TIME, locale)
     fmt.timeZone = JTimeZone.getTimeZone("UTC")
-    return fmt.format(date)
+    return fmt.format(Date(ms))
 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.LocalOfficeAssistantModel
@@ -105,7 +106,7 @@ fun PublicTestSessionDetailScreen(
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = formatItalianDateTime(testDate.date.toEpochMilliseconds()),
+                    text = formatLocalisedDateTime(testDate.date.toEpochMilliseconds(), rememberAppLocale()),
                     style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface,
                 )

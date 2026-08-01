@@ -14,6 +14,13 @@ struct MensaApp: App {
         CrashLogger_appleKt.installCrashLogger()
         MensaSdk.shared.doInitKoinIos()
         Log.app.info("Koin initialized")
+        // Cattura screenshot per gli store (`tools/storekit`): sostituisce
+        // nome, foto e numero tessera del socio loggato con un segnaposto,
+        // così le immagini pubblicate non espongono i dati di chi ha fatto il
+        // login. È solo una property su un oggetto Kotlin, quindi non tocca il
+        // database e può stare qui, prima di `BootstrapGate`.
+        DemoIdentity.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_DEMO_IDENTITY"] == "1"
         // Register the iOS Spotlight sink with KMP. KMP owns the diff +
         // image download + batching; the sink is a thin translator from
         // `SpotlightMemberBlock` → `CSSearchableItem`. clearAll() also

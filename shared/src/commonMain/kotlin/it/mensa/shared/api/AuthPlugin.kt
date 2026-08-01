@@ -40,9 +40,17 @@ object AuthRefresherHolder {
  * expire and a refresh token is available, refresh synchronously before
  * setting the Authorization header.
  */
+/** True when [host] belongs to the Mensa backend (svc/auth/…). The Bearer
+ *  token must NEVER be attached to third-party hosts (e.g. the Tolgee CDN):
+ *  it leaks the user's session and some origins reject foreign Authorization
+ *  headers outright (BunnyCDN → Azure returns 403). */
+private fun isMensaHost(host: String): Boolean =
+    host == "mensa.it" || host.endsWith(".mensa.it")
+
 val AuthPlugin = createClientPlugin("MensaAuthPlugin") {
     onRequest { request, _ ->
         if (request.attributes.getOrNull(SkipAuthAttribute) == true) return@onRequest
+        if (!isMensaHost(request.url.host)) return@onRequest
 
         val refresher = AuthRefresherHolder.refresher
         val session = AuthHolder.session

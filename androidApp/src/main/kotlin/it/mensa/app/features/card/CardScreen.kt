@@ -217,57 +217,12 @@ private fun CardContent(
             }
         }
 
-        // ── QR Code section (always visible) ──
-        item(key = "qr_section") {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = tr("card.qr_kicker", fallback = "MOSTRA AL COORDINATORE"),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        letterSpacing = 1.5.sp,
-                    ),
-                )
-                Spacer(Modifier.height(16.dp))
-                Card(
-                    shape = RoundedCornerShape(22.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        QrCodeView(
-                            payload = state.qrPayload.orEmpty(),
-                            size = 180.dp,
-                            cornerRadius = 12.dp,
-                        )
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            text = "ID ${state.membershipCode ?: "—"}",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontFamily = FontFamily.Monospace,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                letterSpacing = 2.sp,
-                            ),
-                        )
-                    }
-                }
-            }
-        }
 
         // ── Membership info section ──
         item(key = "membership_section") {
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                 Text(
-                    text = tr("card.membership_kicker", fallback = "MEMBERSHIP"),
+                    text = tr("card.membership_kicker", fallback = "ISCRIZIONE"),
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         letterSpacing = 1.5.sp,

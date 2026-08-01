@@ -442,7 +442,7 @@ private struct SigRowCard: View {
         }
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .compatGlass(cornerRadius: 20)
     }
 
     @ViewBuilder

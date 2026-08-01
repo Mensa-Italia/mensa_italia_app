@@ -94,11 +94,45 @@ class RegSociRepository(
     suspend fun firstSnapshot(): List<RegSociModel> = observeAll().first()
 
     suspend fun getById(id: String): RegSociModel? {
-        runCatching { val r = api.get(id); upsertNoTx(r); return r }
+        runCatching { val r = api.get(id); upsertIfChanged(r); return r }
         return db.regSociQueries.selectById(id).awaitAsOneOrNull()?.toModel(json)
     }
 
-    private suspend fun upsertNoTx(m: RegSociModel) {
+    /**
+     * Scrive solo se la riga è davvero cambiata.
+     *
+     * [upsertNoTx] rinfresca sempre `updatedAt`, quindi riscrivere un record
+     * identico fa comunque cambiare la riga e SQLDelight sveglia tutti gli
+     * osservatori di `selectAll`. Chi guarda la lista (la ricerca globale)
+     * ricostruisce i risultati, e se durante la ricostruzione richiede a sua
+     * volta un [getById] il ciclo si richiude su se stesso: scrittura →
+     * notifica → ricostruzione → scrittura. Il main thread resta occupato
+     * finché l'utente non lascia la schermata.
+     *
+     * Il confronto salta `updatedAt` (è il campo che cambia sempre) e
+     * `nameToSearch` (derivato da `name`).
+     */
+    private suspend fun upsertIfChanged(m: RegSociModel) {
+        val fullDataJson = json.encodeToString(JsonObject.serializer(), m.fullData)
+        val stored = db.regSociQueries.selectById(m.id).awaitAsOneOrNull()
+        if (stored != null &&
+            stored.name == m.name &&
+            stored.image == m.image &&
+            stored.city == m.city &&
+            stored.birthdate == m.birthdate?.toEpochMilliseconds() &&
+            stored.state == m.state &&
+            stored.fullProfileLink == m.fullProfileLink &&
+            stored.dataHash == m.dataHash &&
+            stored.imageHash == m.imageHash &&
+            stored.fullDataJson == fullDataJson
+        ) return
+        upsertNoTx(m, fullDataJson)
+    }
+
+    private suspend fun upsertNoTx(
+        m: RegSociModel,
+        fullDataJson: String = json.encodeToString(JsonObject.serializer(), m.fullData),
+    ) {
         db.regSociQueries.insertOrReplace(
             id = m.id,
             uid = 0L,
@@ -107,7 +141,7 @@ class RegSociRepository(
             city = m.city,
             birthdate = m.birthdate?.toEpochMilliseconds(),
             state = m.state,
-            fullDataJson = json.encodeToString(JsonObject.serializer(), m.fullData),
+            fullDataJson = fullDataJson,
             fullProfileLink = m.fullProfileLink,
             nameToSearch = m.name.lowercase(),
             updatedAt = Clock.System.now().toEpochMilliseconds(),

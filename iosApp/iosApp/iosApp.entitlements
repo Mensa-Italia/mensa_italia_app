@@ -4,6 +4,25 @@
 <dict>
 	<key>aps-environment</key>
 	<string>development</string>
+	<!-- webcredentials abilita le passkey. L'rpId in uso e' auth.mensa.it, cioe'
+	     il dominio dell'istanza Zitadel: e' quello che condivide le passkey con
+	     gli altri servizi che entrano via OIDC sullo stesso IdP, e l'unico con cui
+	     funzionano anche quelle gia' create dalla Console (vedi il commento su
+	     zauth.PasskeyRPID).
+	     svc.mensa.it resta elencato di proposito: le passkey registrate prima del
+	     cambio hanno quell'rpId e smetterebbero di colpo di funzionare. Si potra'
+	     togliere quando non ne restera' nessuna.
+	     iOS verifica l'associazione scaricando
+	     https://<dominio>/.well-known/apple-app-site-association, che deve
+	     contenere questo bundle sotto "webcredentials" (MensaCore/main/utilities/aasa.go;
+	     su auth.mensa.it ci arriva via una route Traefik dedicata). In sviluppo,
+	     prima che il file sia pubblicato, si usa il suffisso "?mode=developer" con
+	     Associated Domains Development attivo sul device. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>webcredentials:auth.mensa.it</string>
+		<string>webcredentials:svc.mensa.it</string>
+	</array>
 	<key>com.apple.developer.in-app-payments</key>
 	<array>
 		<string>merchant.it.mensa.app</string>

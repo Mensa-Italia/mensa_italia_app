@@ -1,5 +1,7 @@
 package it.mensa.app.features.events._components
 
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,9 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import it.mensa.app.features.events.ScheduleDraftUi
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
  * ScheduleListSheet — Android equivalent of iOS ScheduleListSheet.swift.
@@ -52,8 +52,9 @@ fun ScheduleListSheet(
     var showAdd by remember { mutableStateOf(false) }
     var editingSchedule by remember { mutableStateOf<ScheduleDraftUi?>(null) }
 
-    val timeFormatter = remember { SimpleDateFormat("HH:mm", Locale.ITALIAN) }
-    val dayFormatter = remember { SimpleDateFormat("EEEE, d MMMM", Locale.ITALIAN) }
+    val locale = rememberAppLocale()
+    val timeFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.TIME, locale) }
+    val dayFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.WEEKDAY_DAY_MONTH, locale) }
 
     val visible = schedules.filter { !it.isDeleted }.sortedBy { it.whenStart }
 

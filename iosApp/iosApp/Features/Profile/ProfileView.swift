@@ -40,7 +40,7 @@ struct ProfileView: View {
                     RenewMembershipView()
                 } label: {
                     ProfileRowLabel(icon: "creditcard",
-                                    title: tr("app.profile.membership", fallback: "Membership"))
+                                    title: tr("app.profile.membership", fallback: "Iscrizione"))
                 }
                 NavigationLink {
                     PaymentMethodsView()
@@ -53,6 +53,12 @@ struct ProfileView: View {
                 } label: {
                     ProfileRowLabel(icon: "iphone",
                                     title: tr("views.devices.title", fallback: "Dispositivi"))
+                }
+                NavigationLink {
+                    PasskeysView()
+                } label: {
+                    ProfileRowLabel(icon: "person.badge.key",
+                                    title: tr("views.passkeys.title", fallback: "Passkey"))
                 }
             }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import org.koin.androidx.compose.koinViewModel
@@ -53,6 +54,7 @@ fun RenewMembershipScreen(
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val user = uiState.user
     val isExpired = vm.isExpired(user)
+    val locale = rememberAppLocale()
     val uriHandler = LocalUriHandler.current
     val colorScheme = MaterialTheme.colorScheme
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -114,7 +116,7 @@ fun RenewMembershipScreen(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = vm.expiryString(user),
+                        text = vm.expiryString(user, locale),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = colorScheme.onSurface,
                     )

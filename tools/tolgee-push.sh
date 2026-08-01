@@ -63,13 +63,49 @@ for f in web_root.rglob('*.astro'):
         fb = re.sub(r'\s+', ' ', fb)
         add(k, fb)
 
+# ── Pre-flight: reject anything ICU cannot parse ─────────────────────────────
+# Both failures below are silent corruption if they reach Tolgee: the bad string
+# is stored, auto-translated into every language, and only shows up on screen.
+problems = []
+for k, v in sorted(found.items()):
+    # A Kotlin/Swift template that was never interpolated — `${x}`, `\(x)`.
+    # The extractor ships the fallback verbatim, so it lands as literal text.
+    if re.search(r'\$\{|\$[A-Za-z_]|\\\(', v):
+        problems.append((k, v, 'string template — use a {handle} and pass it via args'))
+        continue
+    # An apostrophe glued to a brace: ICU reads `'` as quoting and swallows the
+    # placeholder. `l'accesso {email}` is fine; `l'{email}` is not.
+    if re.search(r"'\s*[{}]|[{}]\s*'", v):
+        problems.append((k, v, "apostrophe touching a brace — reword so they don't touch"))
+        continue
+    # A brace that is not a plain {identifier}.
+    if '{' in re.sub(r'\{[A-Za-z0-9_]+\}', '', v) or '}' in re.sub(r'\{[A-Za-z0-9_]+\}', '', v):
+        problems.append((k, v, 'brace is not a plain {handle}'))
+
+if problems:
+    print(f'\n  ✗ {len(problems)} fallback(s) cannot be pushed as ICU:\n')
+    for k, v, why in problems:
+        print(f'      {k}\n        value: {v!r}\n        why:   {why}\n')
+    raise SystemExit(1)
+
 json.dump(dict(sorted(found.items())), open('tools/tolgee-payload/it.json','w'), ensure_ascii=False, indent=2)
 print(f'  → {len(found)} keys extracted to tools/tolgee-payload/it.json')
 PY
 
+### Format: JSON_ICU, never JSON_I18NEXT.
+#
+# i18next spells placeholders `{{x}}`; our fallbacks (and the runtime in
+# shared/I18n.kt) spell them `{x}`. Pushed as I18NEXT, Tolgee reads those single
+# braces as literal text and stores them ICU-escaped — `{days}` becomes
+# `'{'days'}'`, which the runtime then prints on screen verbatim. ICU parses
+# `{days}` as an argument, which is what we mean.
+#
+# Two things this format will reject, both worth failing on:
+#   - an apostrophe glued to a brace (`l'{name}`) — ICU reads it as quoting
+#   - a brace that is not a plain `{identifier}` (a Kotlin `${...}` template)
 echo "▶ Pushing to Tolgee (KEEP mode — existing translations preserved)…"
 cd "$OUT_DIR"
-tolgee --project-id "$PROJECT_ID" --format JSON_I18NEXT push \
+tolgee --project-id "$PROJECT_ID" --format JSON_ICU push \
   --files-template "*.json" \
   --languages it \
   --no-strict-namespace \

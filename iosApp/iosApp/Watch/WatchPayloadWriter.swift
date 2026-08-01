@@ -106,7 +106,7 @@ final class WatchPayloadWriter: NSObject {
     private func buildCard() -> WatchPayload.CardSnapshot? {
         guard let user = lastUser else { return nil }
         let fullName = user.name.isEmpty ? user.username : user.name
-        let expiryFormatted = formatItalianDate(user.expireMembership)
+        let expiryFormatted = formatAppDate(user.expireMembership)
         let qrPayload = "MENSA-IT|id:\(user.id)|user:\(user.username)|exp:\(expiryFormatted)"
         let isActive: Bool = {
             // Stessa euristica di CardView: scadenza nel futuro = attiva.

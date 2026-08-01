@@ -280,6 +280,10 @@ function launchEnv(scene: Scene | null, warmup = false): Record<string, string> 
     // to onboarding so the flow can be iterated on. Screenshots want the tab
     // shell, and the app already exposes this exact escape hatch.
     SIMCTL_CHILD_MENSA_SKIP_ONBOARDING: "1",
+    // Nome, foto e numero tessera del socio diventano un segnaposto: le
+    // immagini finiscono pubbliche sugli store. Vedi `DemoIdentity` nel
+    // modulo condiviso.
+    SIMCTL_CHILD_MENSA_DEMO_IDENTITY: "1",
   };
   if (creds) {
     // The app has two separate autologin hooks with different env names.

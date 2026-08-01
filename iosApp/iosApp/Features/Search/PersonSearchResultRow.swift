@@ -32,22 +32,6 @@ struct PersonSearchResultRow: View {
         self.localOfficeAffiliations = localOfficeAffiliations
     }
 
-    /// Locally fetched copy of the member, used when the upstream `member`
-    /// has an empty `image` (the `members_registry` LIST endpoint frequently
-    /// returns image=""; only `getById` returns the canonical filename).
-    /// We hold the fetched result here instead of relying on the cache →
-    /// flow → SearchViewModel.rebuildIfPossible chain, which was flaky in
-    /// practice (the avatar would only appear after opening the detail).
-    /// Owning the fetched record at the row level decouples the avatar from
-    /// upstream cache propagation entirely.
-    @State private var fetchedMember: RegSociModel?
-
-    /// Render-time member: prefer the locally-fetched record (if any), fall
-    /// back to whatever the upstream gave us.
-    private var displayMember: RegSociModel {
-        fetchedMember ?? member
-    }
-
     private var hasRole: Bool {
         if let role, !role.isEmpty { return true }
         return false
@@ -64,8 +48,8 @@ struct PersonSearchResultRow: View {
 
                 if hasRole {
                     roleLine
-                } else if !displayMember.city.isEmpty {
-                    Text(displayMember.city.capitalized)
+                } else if !member.city.isEmpty {
+                    Text(member.city.capitalized)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -81,35 +65,10 @@ struct PersonSearchResultRow: View {
         .padding(.vertical, 2)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
-        // On first appearance (and when the row is reused for a different id):
-        // if the upstream member has no photo, fetch the full record directly
-        // and store it in @State. We use the fetched object for rendering — no
-        // dependency on the SQLDelight cache propagating back. `try?` keeps
-        // failures silent (the row simply stays on initials).
-        .task(id: member.id) {
-            Log.ui.info("[avatar] task fired id=\(member.id) image='\(member.image)'")
-            // If the upstream already has the photo, nothing to do.
-            guard member.image.isEmpty else {
-                Log.ui.info("[avatar] skip — image already present")
-                return
-            }
-            // If we already fetched this same id, skip.
-            if let f = fetchedMember, f.id == member.id {
-                Log.ui.info("[avatar] skip — already fetched")
-                return
-            }
-            do {
-                Log.ui.info("[avatar] calling getById id=\(member.id)")
-                if let fresh = try await koin.regSoci.getById(id: member.id) {
-                    Log.ui.info("[avatar] getById OK id=\(member.id) freshImage='\(fresh.image)'")
-                    fetchedMember = fresh
-                } else {
-                    Log.ui.info("[avatar] getById returned nil id=\(member.id)")
-                }
-            } catch {
-                Log.ui.error("[avatar] getById threw id=\(member.id) err=\(error.localizedDescription)")
-            }
-        }
+        // Niente fetch della foto qui: se ne occupa `SearchViewModel`, una
+        // volta sola per socio. Farlo anche a livello di riga significava due
+        // richieste per ogni faccia a schermo, e la cella riciclata dallo
+        // scroll ne faceva partire un'altra ad ogni ricomparsa.
     }
 
     // MARK: - Avatar with optional ring
@@ -118,7 +77,7 @@ struct PersonSearchResultRow: View {
     /// a thin brand-tint ring (1.5pt) is inset around it — a quiet authority
     /// signal that doesn't disrupt the row rhythm.
     private var avatar: some View {
-        MemberAvatar(member: displayMember, size: 40)
+        MemberAvatar(member: member, size: 40)
             .overlay {
                 if hasRole {
                     Circle()
@@ -215,7 +174,7 @@ struct PersonSearchResultRow: View {
     /// the directory cell. Words normalized to Title Case from the upper-case
     /// backend.
     private var styledName: Text {
-        let parts = displayMember.name
+        let parts = member.name
             .split(separator: " ")
             .map { word -> String in
                 guard let first = word.first else { return String(word) }

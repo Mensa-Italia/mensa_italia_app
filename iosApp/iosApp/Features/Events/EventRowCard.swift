@@ -44,7 +44,7 @@ struct EventRowCard: View {
         }
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .compatGlass(cornerRadius: 20)
         // Effetto "passato": colori spenti + opacità ridotta. Applicato
         // all'INTERA card, così foto, tag e testo scolano in coro. Le tile
         // restano leggibili e tappabili — l'utente capisce che è passato.

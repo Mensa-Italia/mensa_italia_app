@@ -62,6 +62,8 @@ import it.mensa.app.features.members._components.MemberHeroAvatar
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.shared.model.RegSociModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -146,7 +148,10 @@ private fun MemberDetailContent(
     onDial: (String) -> Unit,
     onEmail: (String) -> Unit,
 ) {
-    val profileRows = remember(member) { vm.profileRows(member) }
+    val locale = rememberAppLocale()
+    // `locale` is a remember key: the birthdate inside profileRows is formatted
+    // eagerly, so the rows have to be rebuilt when the language changes.
+    val profileRows = remember(member, locale) { vm.profileRows(member) }
     val mensaRows = remember(member) { vm.mensaRows(member) }
     val contactRows = remember(member) { vm.contactRows(member) }
     val sigRows = remember(member) { vm.sigRows(member) }
@@ -240,7 +245,7 @@ private fun MemberDetailContent(
                             modifier = Modifier.size(14.dp),
                         )
                         Text(
-                            text = formatBirthdate(bd.toEpochMilliseconds()),
+                            text = formatBirthdate(bd.toEpochMilliseconds(), locale),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.SemiBold,
                             ),
@@ -369,8 +374,5 @@ private fun DataSection(
     }
 }
 
-private fun formatBirthdate(ms: Long): String {
-    val date = java.util.Date(ms)
-    val fmt = java.text.SimpleDateFormat("dd MMMM yyyy", java.util.Locale.ITALIAN)
-    return fmt.format(date)
-}
+private fun formatBirthdate(ms: Long, locale: java.util.Locale): String =
+    AppFormat.format(java.util.Date(ms), AppFormat.Skeleton.DAY_MONTH_LONG_YEAR, locale)

@@ -144,10 +144,16 @@ final class SearchViewModel {
     /// every emission and causing the search list to flicker / reset scroll.
     private var started = false
 
-    /// IDs whose `getById` hydration is in flight. Used by `enqueueMemberHydration`
-    /// to dedupe repeated requests (the same member can appear in many hits and
-    /// rebuildIfPossible runs frequently as caches stream in).
-    private var hydratingMembers: Set<String> = []
+    /// IDs per cui `getById` è già stato chiamato in questa sessione.
+    ///
+    /// Deve restare pieno anche dopo che la richiesta è finita, non solo
+    /// mentre è in volo: due terzi del registro soci non hanno foto, quindi
+    /// per quei record `getById` torna `image` vuota e la condizione che ha
+    /// fatto scattare la hydration resta vera. Svuotando l'insieme a fine
+    /// richiesta si riparte da capo ad ogni ricostruzione, e siccome ogni
+    /// `getById` scriveva sul database (che a sua volta fa ricostruire) il
+    /// giro non si chiudeva mai.
+    private var attemptedMemberHydration: Set<String> = []
 
     func start() {
         guard !started else { return }
@@ -234,13 +240,6 @@ final class SearchViewModel {
         } else if let l = state as? SearchRepositoryStateLoading {
             phase = .loading(l.query)
         } else if let s = state as? SearchRepositoryStateSuccess {
-            // Diagnostic: traccia le chiavi che il backend ritorna così se
-            // server-side rinominano un tipo lo notiamo subito (sintomo:
-            // sezione vuota su un canonical type). Da rimuovere quando lo
-            // schema sarà stabile.
-            let keys = (s.response.results.keys as? Set<AnyHashable>)?
-                .compactMap { $0.base as? String }.sorted() ?? []
-            Log.auth.info("[search] q=\(s.query) backend keys=\(keys)")
             saveRecent(s.query)
             lastSuccess = (s.query, s.response)
             phase = .results(buildSections(query: s.query, response: s.response))
@@ -315,14 +314,10 @@ final class SearchViewModel {
         for (hit, kind) in adminPairs + assistantPairs {
             guard let userId = SearchParsers.shared.parseMemberIdFromImageURL(raw: hit.image),
                   let slug = SearchParsers.shared.parseDeepLinkSlug(deepLink: hit.deepLink, expectedHost: "local-office") else {
-                Log.auth.info("[aff] skip hit id=\(hit.id) image='\(hit.image)' link='\(hit.deepLink)'")
                 continue
             }
-            let aff = LocalOfficeAffiliation(label: hit.title, slug: slug, kind: kind)
-            byUser[userId, default: []].append(aff)
-            Log.auth.info("[aff] add userId=\(userId) slug=\(slug) label='\(hit.title)'")
+            byUser[userId, default: []].append(LocalOfficeAffiliation(label: hit.title, slug: slug, kind: kind))
         }
-        Log.auth.info("[aff] admins=\(adminHits.count) assistants=\(assistantHits.count) → \(byUser.count) user(s) enriched")
         return byUser
     }
 
@@ -583,26 +578,20 @@ final class SearchViewModel {
 
     // MARK: - Member hydration (auto-load missing avatars)
 
-    /// Fire-and-forget hydration of a single member by id. Deduped via
-    /// `hydratingMembers` so repeated calls (e.g. rebuildIfPossible firing
-    /// on every cache emission) don't spam the network.
+    /// Scarica il record completo di un socio, una volta sola per sessione.
     ///
-    /// On success `getById` upserts the canonical record into SQLDelight; the
-    /// `members_registry` flow then re-emits, `membersSub` catches it, and
-    /// `rebuildIfPossible` produces a new `HydratedHit` with the populated
-    /// `image` field — the row swaps from initials to the loaded avatar.
+    /// Serve perché la LIST di `members_registry` spesso torna `image` vuota:
+    /// solo `getById` porta il filename canonico. Al ritorno il record viene
+    /// scritto su SQLDelight, il flow ri-emette, `membersSub` lo raccoglie e
+    /// la riga passa dalle iniziali alla foto.
     ///
-    /// This lives in the viewmodel (rather than relying on
-    /// `PersonSearchResultRow.task(id:)`) because List row lifecycles are
-    /// noisy under fast scroll / navigation, and we want the fetch to be
-    /// resilient to that.
+    /// Sta nel viewmodel e non nella riga perché il ciclo di vita delle celle
+    /// di `List` è rumoroso sotto scroll veloce: una riga riciclata rifarebbe
+    /// la stessa richiesta ogni volta che ricompare.
     private func enqueueMemberHydration(_ id: String) {
-        guard !id.isEmpty, !hydratingMembers.contains(id) else { return }
-        hydratingMembers.insert(id)
-        Task { [weak self] in
-            _ = try? await koin.regSoci.getById(id: id)
-            await MainActor.run { self?.hydratingMembers.remove(id) }
-        }
+        guard !id.isEmpty, !attemptedMemberHydration.contains(id) else { return }
+        attemptedMemberHydration.insert(id)
+        Task { _ = try? await koin.regSoci.getById(id: id) }
     }
 
     // MARK: - Deep-link parsing helpers
@@ -775,13 +764,27 @@ final class SearchViewModel {
         )
     }
 
-    /// Re-emit hydrated sections after caches update — keeps the rendered
-    /// rows in sync with late-arriving local data and ensures the user-typed
-    /// query benefits from the directory as soon as it streams in.
+    /// Ricostruisce le sezioni quando arrivano dati locali in ritardo, così la
+    /// query beneficia della rubrica appena questa finisce di sincronizzarsi.
+    ///
+    /// Le sette cache chiamano questo metodo indipendentemente e spesso
+    /// emettono a raffica: la ricostruzione costa una scansione dell'intero
+    /// registro soci (~2700 record) sul main actor, quindi farne una per
+    /// emissione fa perdere frame durante lo scroll. Qui ne accodiamo una
+    /// sola e lasciamo che le emissioni dello stesso giro si fondano.
     private func rebuildIfPossible() {
-        guard let success = lastSuccess else { return }
-        phase = .results(buildSections(query: success.query, response: success.response))
+        guard lastSuccess != nil, !rebuildScheduled else { return }
+        rebuildScheduled = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.rebuildScheduled = false
+            guard let success = self.lastSuccess else { return }
+            self.phase = .results(self.buildSections(query: success.query, response: success.response))
+        }
     }
+
+    /// True fra la richiesta di ricostruzione e la sua esecuzione.
+    private var rebuildScheduled = false
 
     // MARK: - Org chart enrichment
 

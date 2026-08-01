@@ -84,7 +84,7 @@ struct DealCardView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
-        .glassEffect(.regular, in: .rect(cornerRadius: 16))
+        .compatGlass(cornerRadius: 16)
         .contentShape(Rectangle())
     }
 }

@@ -67,6 +67,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // java.time (used by kotlinx.datetime) only exists from API 26;
+        // desugaring backports it to minSdk 24.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -85,6 +88,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
     implementation(project(":shared"))
 
     // KotlinX Serialization JSON (needed to parse JsonObject from shared models)
@@ -157,6 +162,10 @@ dependencies {
 
     // Chrome Custom Tabs
     implementation(libs.androidx.browser)
+
+    // Credential Manager (passkey)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
 
     // ZXing (QR fallback)
     implementation(libs.zxing.core)

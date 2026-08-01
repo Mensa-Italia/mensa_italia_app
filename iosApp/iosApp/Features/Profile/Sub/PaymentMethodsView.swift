@@ -159,7 +159,7 @@ private struct PaymentMethodRow: View {
             }
             Spacer()
             if !isDefault {
-                Button(tr("app.payments.make_default", fallback: "Default")) {
+                Button(tr("app.payments.make_default", fallback: "Predefinita")) {
                     setDefault()
                 }
                 .buttonStyle(.bordered)

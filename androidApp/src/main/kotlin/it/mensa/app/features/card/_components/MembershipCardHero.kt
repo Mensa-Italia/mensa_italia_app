@@ -61,6 +61,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -292,11 +295,30 @@ private fun CardBackFace(
         }
     }
 
-    val paddingDp = (20f * u).dp
-    val nameFontSize = (20f * u).sp
-    val labelFontSize = (14f * u).sp
-    val idFontSize = (20f * u).sp
-    val mensaItFontSize = (14f * u).sp
+    // The card face is a fixed artwork: every measure derives from the card
+    // width (u) alone. `dp.toSp()` divides by the user's fontScale, so system
+    // font size never re-flows the card — exactly like a pre-rendered PNG.
+    val density = LocalDensity.current
+    fun cardSp(value: Float) = with(density) { (value * u).dp.toSp() }
+    // Deterministic text metrics: no extra font padding, line box centered.
+    val cardTextStyle = TextStyle(
+        fontFamily = GothamBold,
+        color = Color.Black,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+        lineHeightStyle = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Center,
+            trim = LineHeightStyle.Trim.Both,
+        ),
+    )
+
+    val paddingDp = (18f * u).dp
+    val nameFontSize = cardSp(20f)
+    val nameLineHeight = cardSp(22f)
+    val labelFontSize = cardSp(13f)
+    val labelLineHeight = cardSp(15f)
+    val idFontSize = cardSp(20f)
+    val idLineHeight = cardSp(22f)
+    val mensaItFontSize = cardSp(13f)
 
     Box(modifier = Modifier.fillMaxSize().background(MensaBlue)) {
         // Background image
@@ -319,13 +341,14 @@ private fun CardBackFace(
                 .fillMaxSize()
                 .padding(paddingDp),
         ) {
-            // Top: lettering (2/3 width)
+            // Top: lettering (60% of the inner width; height follows the
+            // asset's aspect ratio, so it too scales purely with the card)
             Image(
                 painter = painterResource(R.drawable.tessera_lettering),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .fillMaxWidth(2f / 3f),
+                    .fillMaxWidth(0.6f),
             )
 
             Spacer(Modifier.weight(1f))
@@ -338,9 +361,9 @@ private fun CardBackFace(
                 nameParts.forEach { part ->
                     Text(
                         text = part.uppercase(),
-                        fontFamily = GothamBold,
+                        style = cardTextStyle,
                         fontSize = nameFontSize,
-                        color = Color.Black,
+                        lineHeight = nameLineHeight,
                         maxLines = 1,
                         softWrap = false,
                     )
@@ -352,9 +375,9 @@ private fun CardBackFace(
             // "Tessera" label
             Text(
                 text = "Tessera",
-                fontFamily = GothamBold,
+                style = cardTextStyle,
                 fontSize = labelFontSize,
-                color = Color.Black,
+                lineHeight = labelLineHeight,
                 maxLines = 1,
             )
 
@@ -367,18 +390,18 @@ private fun CardBackFace(
             ) {
                 Text(
                     text = memberId,
-                    fontFamily = GothamBold,
+                    style = cardTextStyle,
                     fontSize = idFontSize,
-                    color = Color.Black,
+                    lineHeight = idLineHeight,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width((8f * u).dp))
                 Text(
                     text = "MENSA.IT",
-                    fontFamily = GothamBold,
+                    style = cardTextStyle,
                     fontSize = mensaItFontSize,
-                    color = Color.Black,
+                    lineHeight = labelLineHeight,
                     maxLines = 1,
                 )
             }

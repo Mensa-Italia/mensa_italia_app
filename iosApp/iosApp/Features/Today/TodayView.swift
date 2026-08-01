@@ -144,7 +144,7 @@ struct TodayView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .glassEffect(.regular, in: .rect(cornerRadius: 14))
+            .compatGlass(cornerRadius: 14)
         }
         .buttonStyle(.plain)
     }
@@ -235,7 +235,7 @@ struct TodayView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .glassEffect(.regular, in: .rect(cornerRadius: 18))
+                .compatGlass(cornerRadius: 18)
             }
         }
     }
@@ -272,7 +272,7 @@ struct TodayView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .glassEffect(.regular, in: .rect(cornerRadius: 14))
+        .compatGlass(cornerRadius: 14)
     }
 }
 

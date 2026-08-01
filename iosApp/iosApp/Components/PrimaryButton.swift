@@ -38,7 +38,7 @@ struct PrimaryButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 52)
         }
-        .buttonStyle(.glassProminent)
+        .compatGlassProminentButtonStyle()
         .disabled(loading)
     }
 }

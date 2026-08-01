@@ -81,7 +81,7 @@ struct StampConfirmSheet: View {
                                 .padding(.vertical, 4)
                         }
                     }
-                    .buttonStyle(.glassProminent)
+                    .compatGlassProminentButtonStyle()
                     .tint(AppTheme.Colors.mensaBlue)
                     .disabled(saving)
                 }

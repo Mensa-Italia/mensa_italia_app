@@ -302,7 +302,7 @@ struct EventDetailView: View {
                     }
                     .frame(maxWidth: .infinity).frame(height: 48)
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
                 .tint(AppTheme.Colors.brandSecondary)
             }
 
@@ -316,7 +316,7 @@ struct EventDetailView: View {
                     }
                     .frame(maxWidth: .infinity).frame(height: 48)
                 }
-                .buttonStyle(.glass)
+                .compatGlassButtonStyle()
             }
         }
     }
@@ -359,7 +359,7 @@ struct EventDetailView: View {
                     Spacer(minLength: 0)
                 }
                 .padding(10)
-                .glassEffect(.regular, in: .rect(cornerRadius: 14))
+                .compatGlass(cornerRadius: 14)
                 .modifier(StaggerAppear(index: idx))
             }
         }
@@ -387,7 +387,7 @@ struct EventDetailView: View {
                 Image(systemName: "arrow.up.right.square")
                     .padding(8)
             }
-            .buttonStyle(.glass)
+            .compatGlassButtonStyle()
             .padding(10)
         }
     }
@@ -523,7 +523,7 @@ struct EventDetailView: View {
                         }
                         .frame(maxWidth: .infinity).frame(height: 44)
                     }
-                    .buttonStyle(.glass)
+                    .compatGlassButtonStyle()
                 }
                 if let siteURL = infoSiteURL(link) {
                     Link(destination: siteURL) {
@@ -533,7 +533,7 @@ struct EventDetailView: View {
                         }
                         .frame(maxWidth: .infinity).frame(height: 44)
                     }
-                    .buttonStyle(.glass)
+                    .compatGlassButtonStyle()
                 }
             }
         }

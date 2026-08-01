@@ -79,7 +79,7 @@ struct TestAssistantView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
                 .tint(AppTheme.Colors.mensaBlue)
             }
             .padding(20)

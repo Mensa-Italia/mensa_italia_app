@@ -40,13 +40,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.DeviceModel
 import org.koin.androidx.compose.koinViewModel
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,10 +159,13 @@ private fun DeviceListItem(
     modifier: Modifier = Modifier,
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val fmt = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ITALIAN)
-        .withZone(ZoneId.systemDefault())
+    val locale = rememberAppLocale()
     val updated = try {
-        fmt.format(java.time.Instant.ofEpochMilli(device.updated.toEpochMilliseconds()))
+        AppFormat.format(
+            java.util.Date(device.updated.toEpochMilliseconds()),
+            AppFormat.Skeleton.DAY_MONTH_YEAR,
+            locale,
+        )
     } catch (e: Exception) { "—" }
 
     ListItem(

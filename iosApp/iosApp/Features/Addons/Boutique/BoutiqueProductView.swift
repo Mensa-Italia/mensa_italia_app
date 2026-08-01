@@ -81,7 +81,7 @@ struct BoutiqueProductView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 6)
                 }
-                .buttonStyle(.glassProminent)
+                .compatGlassProminentButtonStyle()
                 .tint(AppTheme.Colors.mensaBlue)
                 .padding(.top, 8)
             }

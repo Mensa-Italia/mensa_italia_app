@@ -25,7 +25,7 @@ final class CardViewModel {
 
     var expiry: String {
         guard let u = user else { return "-" }
-        return formatItalianDate(u.expireMembership)
+        return formatAppDate(u.expireMembership)
     }
 
     var avatarURL: URL? {

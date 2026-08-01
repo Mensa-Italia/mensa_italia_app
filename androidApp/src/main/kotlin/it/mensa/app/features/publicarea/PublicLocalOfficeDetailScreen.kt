@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.rememberAppLocale
+import it.mensa.app.support.AppFormat
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -59,7 +61,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -353,7 +354,7 @@ internal fun TestDateCard(
             )
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = formatItalianDateTime(td.date.toEpochMilliseconds()),
+                    text = formatLocalisedDateTime(td.date.toEpochMilliseconds(), rememberAppLocale()),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -459,7 +460,7 @@ private fun PersonRow(
             Avatar(imageUrl = imageUrl, name = name)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = titleCase(name),
+                    text = titleCase(name, rememberAppLocale()),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -560,11 +561,11 @@ private fun ErrorMessage(text: String) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-internal fun formatItalianDateTime(epochMillis: Long): String {
-    val df = SimpleDateFormat("EEEE d MMMM yyyy, HH:mm", Locale.ITALIAN)
-    return df.format(Date(epochMillis))
-        .replaceFirstChar { it.uppercase(Locale.ITALIAN) }
-}
+internal fun formatLocalisedDateTime(epochMillis: Long, locale: Locale): String =
+    AppFormat.titlecase(
+        AppFormat.format(Date(epochMillis), AppFormat.Skeleton.FULL_WITH_TIME, locale),
+        locale,
+    )
 
 internal fun assistantSubtitle(a: LocalOfficeAssistantModel): String? {
     val seen = mutableSetOf<String>()
@@ -580,10 +581,8 @@ internal fun assistantSubtitle(a: LocalOfficeAssistantModel): String? {
     return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
 }
 
-internal fun titleCase(s: String): String =
-    s.split(' ').joinToString(" ") { word ->
-        word.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ITALIAN) else it.toString() }
-    }
+internal fun titleCase(s: String, locale: Locale): String =
+    s.split(' ').joinToString(" ") { word -> AppFormat.titlecase(word.lowercase(), locale) }
 
 internal fun initials(name: String): String {
     val parts = name.trim().split(' ').filter { it.isNotEmpty() }.take(2)

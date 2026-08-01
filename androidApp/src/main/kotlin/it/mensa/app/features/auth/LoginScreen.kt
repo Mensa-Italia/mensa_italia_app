@@ -22,6 +22,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Fingerprint
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
@@ -91,7 +93,16 @@ fun LoginScreen(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     val canSubmit = uiState.email.isNotBlank() &&
         uiState.password.isNotBlank() &&
-        !uiState.loading
+        !uiState.loading &&
+        !uiState.passkeyLoading
+
+    // Il bottone passkey chiede solo l'email e si mostra sempre: sondare il
+    // server per sapere se questa email ha una passkey lo trasformerebbe in un
+    // oracolo su chi e' socio.
+    val canUsePasskey = uiState.passkeySupported &&
+        uiState.email.isNotBlank() &&
+        !uiState.loading &&
+        !uiState.passkeyLoading
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -251,6 +262,72 @@ fun LoginScreen(
                             fontWeight = FontWeight.SemiBold,
                         ),
                     )
+                }
+            }
+
+            // ── Passkey ───────────────────────────────────────────────────────
+            // Nascosto sotto API 28, dove Credential Manager non sa gestire le
+            // passkey (minSdk qui e' 24, quindi il caso e' reale).
+            if (uiState.passkeySupported) {
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        focusManager.clearFocus()
+                        vm.onPasskeyClick(context)
+                    },
+                    enabled = canUsePasskey,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                ) {
+                    if (uiState.passkeyLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.5.dp,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.Fingerprint,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Text(
+                            text = tr("app.login.passkey.action", "Accedi con una passkey"),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
+                }
+
+                // Nota informativa, non un errore: chi non ha una passkey su
+                // questo dispositivo non ha sbagliato niente.
+                AnimatedVisibility(
+                    visible = uiState.passkeyNotice != null,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    uiState.passkeyNotice?.let { notice ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Text(
+                                text = notice,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             }
 

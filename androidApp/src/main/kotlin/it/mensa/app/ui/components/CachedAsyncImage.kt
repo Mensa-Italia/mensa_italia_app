@@ -37,6 +37,7 @@ fun CachedAsyncImage(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
+    onState: ((coil3.compose.AsyncImagePainter.State) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val imageLoader = remember {
@@ -62,6 +63,7 @@ fun CachedAsyncImage(
         imageLoader = imageLoader,
         contentScale = contentScale,
         modifier = modifier,
+        onState = onState,
     )
 }
 

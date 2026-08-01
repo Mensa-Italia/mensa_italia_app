@@ -102,7 +102,7 @@ struct ReceiptDetailView: View {
                 }
                 .padding(20)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .glassEffect(.regular, in: .rect(cornerRadius: 20))
+                .compatGlass(cornerRadius: 20)
 
                 VStack(alignment: .leading, spacing: 14) {
                     if let desc = r.description_, !desc.isEmpty {
@@ -114,7 +114,7 @@ struct ReceiptDetailView: View {
                     }
                 }
                 .padding(16)
-                .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                .compatGlass(cornerRadius: 16)
 
                 Button {
                     Task { await vm.downloadPDF(id: r.id) }

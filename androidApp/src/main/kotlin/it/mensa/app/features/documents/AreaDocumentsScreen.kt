@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
@@ -42,8 +43,9 @@ fun AreaDocumentsScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var filterExpanded by remember { mutableStateOf(false) }
 
-    val dateFmt = remember {
-        DateFormat.getDateInstance(DateFormat.MEDIUM, Locale("it", "IT"))
+    val locale = rememberAppLocale()
+    val dateFmt = remember(locale) {
+        DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
     }
 
     MensaScaffold(

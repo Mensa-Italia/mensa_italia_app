@@ -122,22 +122,18 @@ struct OrgChartView: View {
     @ViewBuilder
     private func groupSection(_ group: OrgChartGroup, index gIdx: Int) -> some View {
         let isInactive = group.members.allSatisfy { $0.inactive }
-        let masters = group.members.filter { $0.isMaster }
-        let rest    = group.members.filter { !$0.isMaster }
+        // "Tavola rotonda": nessuna hero card — tutti hanno la stessa tile,
+        // i responsabili (is_master) vengono solo ordinati per primi e
+        // distinti da bordo accent + badge dentro la card.
+        let ordered = group.members.filter { $0.isMaster }
+            + group.members.filter { !$0.isMaster }
 
         VStack(alignment: .leading, spacing: 18) {
             sectionHeader(title: localizedGroupTitle(group.title),
                           count: group.members.count,
                           inactive: isInactive)
 
-            // Hero card per ogni membro con is_master=true. Più di uno → stack.
-            ForEach(Array(masters.enumerated()), id: \.offset) { _, m in
-                heroCard(m)
-            }
-
-            if !rest.isEmpty {
-                memberGrid(rest, startIndex: masters.count)
-            }
+            memberGrid(ordered, startIndex: 0)
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 24)
@@ -192,26 +188,6 @@ struct OrgChartView: View {
         }
     }
 
-    // MARK: - Hero card (is_master)
-
-    /// Tile espansa per i master. Se il socio ha una foto, la usa come
-    /// background con scrim graduale per garantire contrasto del testo;
-    /// altrimenti torna al gradient brand. Stile HIG: angoli continui,
-    /// scrim sotto al testo, no testo bianco su sfondo chiaro senza overlay.
-    private func heroCard(_ member: OrgChartMember) -> some View {
-        NavigationLink {
-            MemberDetailView(memberId: member.userId)
-        } label: {
-            HeroCardContent(member: member)
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(member.name), \(member.role)")
-        .accessibilityHint(tr("app.org_chart.view_profile",
-                              fallback: "Apri profilo"))
-        .accessibilityAddTraits(.isButton)
-    }
-
     // MARK: - Member grid
 
     private func memberGrid(_ members: [OrgChartMember], startIndex: Int) -> some View {
@@ -239,81 +215,11 @@ struct OrgChartView: View {
 
 // MARK: - Member card
 
+/// Tile unica per TUTTI i membri ("tavola rotonda": nessuna gerarchia di
+/// dimensioni). Foto del socio come background con scrim graduale per il
+/// contrasto WCAG del testo; gradient brand + iniziali in fallback. I
+/// responsabili (is_master) si distinguono solo per bordo accent + badge.
 private struct OrgMemberCard: View {
-    let member: OrgChartMember
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            avatar
-            VStack(alignment: .leading, spacing: 4) {
-                Text(member.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(member.inactive ? .secondary : .primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                Text(member.role)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-            }
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(minHeight: 150)
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.primary.opacity(0.06), lineWidth: 1)
-        )
-        // Badge ancorato al box reale della card (dopo background/frame).
-        .overlay(alignment: .bottomTrailing) {
-            if member.inactive {
-                inactiveBadge
-                    .padding(10)
-            }
-        }
-        .opacity(member.inactive ? 0.55 : 1)
-    }
-
-    /// Pillola "Dimissionario" — chiave Tolgee `app.org_chart.inactive_badge`.
-    private var inactiveBadge: some View {
-        Text(tr("app.org_chart.inactive_badge", fallback: "Dimissionario"))
-            .font(.system(size: 9, weight: .bold))
-            .tracking(0.5)
-            .textCase(.uppercase)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(
-                Capsule().fill(Color(.tertiarySystemFill))
-            )
-            .overlay(
-                Capsule().stroke(.secondary.opacity(0.25), lineWidth: 0.5)
-            )
-    }
-
-    /// Foto reale del socio, con iniziali in fallback. Logica gemella di
-    /// `MemberAvatar`, ma evitiamo di costruire un `RegSociModel` da Swift
-    /// (data class Kotlin → init bridge richiede tutti i campi).
-    private var avatar: some View {
-        OrgAvatar(
-            userId: member.userId,
-            image: member.image,
-            name: member.name,
-            size: 44
-        )
-        .opacity(member.inactive ? 0.55 : 1)
-    }
-}
-
-// MARK: - Hero content
-
-private struct HeroCardContent: View {
     let member: OrgChartMember
 
     private var photoURL: URL? {
@@ -322,11 +228,9 @@ private struct HeroCardContent: View {
               !raw.contains("cloud32.it/Associazioni/img/Uomo-1.png")
         else { return nil }
         if raw.hasPrefix("http") { return URL(string: raw) }
-        // PocketBase serve solo i thumb dichiarati nella field config; `800x400`
-        // non è tra questi e il server o rigenera al volo o spara l'originale —
-        // entrambi lenti. `0x500` è il thumb "retina hero" condiviso col
-        // dettaglio socio, decisamente più rapido. `.scaledToFill()` croppa al
-        // riquadro del card senza problemi.
+        // `0x500` è il thumb "retina hero" condiviso col dettaglio socio —
+        // l'unico dichiarato lato PocketBase oltre a 0x100 (troppo piccolo
+        // come background).
         return Files.url(
             collection: "members_registry",
             recordId: member.userId,
@@ -341,19 +245,29 @@ private struct HeroCardContent: View {
             scrim
             label
         }
-        // Was a hard `frame(height: 220)` — long names ("Mela Amedeo Anna",
-        // "Bartolomei Maria Cristina", …) were getting clipped at the bottom
-        // because the label couldn't grow. `minHeight` keeps the visual rhythm
-        // (most cards stay 220pt) while letting tall labels push the card
-        // a few points taller when needed.
-        .frame(minHeight: 220)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 168)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
-            // Bordo sottile per separare la card dal background in light mode.
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(.white.opacity(0.08), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(
+                    member.isMaster
+                        ? AppTheme.Colors.brandTintAdaptive
+                        : Color.primary.opacity(0.06),
+                    lineWidth: member.isMaster ? 2 : 1
+                )
         )
-        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
+        .overlay(alignment: .topTrailing) {
+            if member.isMaster {
+                masterBadge.padding(8)
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if member.inactive {
+                inactiveBadge.padding(8)
+            }
+        }
+        .opacity(member.inactive ? 0.55 : 1)
     }
 
     // MARK: Layers
@@ -361,174 +275,99 @@ private struct HeroCardContent: View {
     @ViewBuilder
     private var background: some View {
         if let url = photoURL {
-            // CachedAsyncImage with `.scaledToFill()` adopts the image's
-            // intrinsic pixel size by default — for an 800×400 thumb that's
-            // 800pt of layout width, which propagates up the VStack →
-            // ScrollView and lets the page scroll horizontally.
-            //
-            // Fix: render the image as the BACKGROUND of a clear-color shim.
-            // The `Color.clear` claims minimal layout footprint (it adopts
-            // whatever the parent proposes), and `.background` overlays the
-            // image without driving the parent size. `.clipped()` ensures
-            // the overflow doesn't bleed past the card bounds.
+            // Il thumb adotterebbe la sua size intrinseca e gonfierebbe il
+            // layout: `Color.clear` reclama solo lo spazio proposto e l'immagine
+            // vive nel background, croppata dai bounds della card.
             Color.clear
                 .background(
                     CachedAsyncImage(url: url) { img in
                         img.resizable().scaledToFill()
                     } placeholder: {
-                        brandGradient
+                        AppTheme.brandGradient
                     }
                 )
                 .clipped()
         } else {
-            brandGradient
-                .overlay(alignment: .topTrailing) {
-                    Circle()
-                        .strokeBorder(.white.opacity(0.18), lineWidth: 1)
-                        .frame(width: 220, height: 220)
-                        .offset(x: 70, y: -70)
-                }
-                .overlay(alignment: .bottomTrailing) {
-                    Circle()
-                        .strokeBorder(.white.opacity(0.12), lineWidth: 1)
-                        .frame(width: 160, height: 160)
-                        .offset(x: 50, y: 60)
-                }
+            AppTheme.brandGradient
+                .overlay(
+                    Text(initials)
+                        .font(.system(size: 44, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.35))
+                )
         }
     }
 
-    private var brandGradient: some View {
-        LinearGradient(
-            colors: [
-                AppTheme.Colors.brandPrimary,
-                AppTheme.Colors.brandSecondary
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    /// Scrim graduale: trasparente in alto, ~70% opacità nera in basso.
-    /// Garantisce contrasto WCAG AA per il testo bianco sopra qualsiasi foto.
-    /// Solo se c'è una foto — sul gradient brand non serve (già abbastanza scuro).
-    @ViewBuilder
+    /// Scrim graduale: trasparente in alto, scuro in basso. Sempre presente
+    /// (anche sul gradient) così il testo bianco resta leggibile ovunque.
     private var scrim: some View {
-        if photoURL != nil {
-            LinearGradient(
-                stops: [
-                    .init(color: .black.opacity(0.05), location: 0.0),
-                    .init(color: .black.opacity(0.35), location: 0.45),
-                    .init(color: .black.opacity(0.75), location: 1.0)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        }
+        LinearGradient(
+            stops: [
+                .init(color: .black.opacity(0.02), location: 0.0),
+                .init(color: .black.opacity(0.30), location: 0.5),
+                .init(color: .black.opacity(0.72), location: 1.0)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     private var label: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 6) {
-                Image(systemName: "star.fill")
-                    .font(.caption2)
-                Text(member.role.uppercased())
-                    .font(.caption.weight(.bold))
-                    .tracking(1.5)
-                    .lineLimit(1)
-            }
-            .foregroundStyle(.white.opacity(0.92))
-            .shadow(color: .black.opacity(0.4), radius: 4, y: 1)
-
+        VStack(alignment: .leading, spacing: 2) {
             Text(member.name)
-                // Smarter sizing: name shrinks aggressively (down to 50%) and
-                // tightens letter spacing before wrapping. With `lineLimit(2)`
-                // and `fixedSize(vertical:)` the label requests its true
-                // height so the parent ZStack/frame can accommodate it.
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white)
                 .lineLimit(2)
-                .minimumScaleFactor(0.5)
-                .allowsTightening(true)
-                .fixedSize(horizontal: false, vertical: true)
-                .shadow(color: .black.opacity(0.45), radius: 6, y: 2)
-
-            HStack(spacing: 8) {
-                Text(tr("app.org_chart.view_profile",
-                        fallback: "Apri profilo"))
-                    .font(.footnote.weight(.semibold))
-                Image(systemName: "arrow.right")
-                    .font(.footnote.weight(.semibold))
+                .minimumScaleFactor(0.85)
+                .multilineTextAlignment(.leading)
+                .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
+            if !member.role.isEmpty {
+                Text(member.role)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.88))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
             }
+        }
+        .padding(12)
+    }
+
+    /// Pillola "Responsabile" — chiave Tolgee `app.org_chart.master_badge`.
+    private var masterBadge: some View {
+        HStack(spacing: 3) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 8, weight: .bold))
+            Text(tr("app.org_chart.master_badge", fallback: "Responsabile"))
+                .font(.system(size: 9, weight: .bold))
+                .tracking(0.3)
+                .textCase(.uppercase)
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(Capsule().fill(AppTheme.Colors.brandTintAdaptive))
+    }
+
+    /// Pillola "Dimissionario" — chiave Tolgee `app.org_chart.inactive_badge`.
+    private var inactiveBadge: some View {
+        Text(tr("app.org_chart.inactive_badge", fallback: "Dimissionario"))
+            .font(.system(size: 9, weight: .bold))
+            .tracking(0.5)
+            .textCase(.uppercase)
             .foregroundStyle(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .background(
-                // Material `.thin` su foto dà glass legibility HIG-style.
-                Capsule().fill(.ultraThinMaterial)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(.ultraThinMaterial))
+            .overlay(
+                Capsule().stroke(.white.opacity(0.25), lineWidth: 0.5)
             )
-            .overlay(Capsule().stroke(.white.opacity(0.25), lineWidth: 1))
-        }
-        .padding(22)
-    }
-}
-
-// MARK: - Avatar
-
-private struct OrgAvatar: View {
-    let userId: String
-    let image: String
-    let name: String
-    let size: CGFloat
-
-    private var resolvedURL: URL? {
-        let raw = image
-        guard !raw.isEmpty, !isPlaceholderURL(raw) else { return nil }
-        if raw.hasPrefix("http://") || raw.hasPrefix("https://") {
-            return URL(string: raw)
-        }
-        // Standard `0x100` come MemberAvatar / Spotlight engine — l'unica size
-        // sicuramente configurata lato PocketBase per le foto soci.
-        return Files.url(
-            collection: "members_registry",
-            recordId: userId,
-            filename: raw,
-            thumb: "0x100"
-        )
-    }
-
-    var body: some View {
-        Group {
-            if let url = resolvedURL {
-                CachedAsyncImage(url: url) { img in
-                    img.resizable().scaledToFill()
-                } placeholder: { bubble }
-            } else {
-                bubble
-            }
-        }
-        .frame(width: size, height: size)
-        .clipShape(Circle())
-        .overlay(Circle().stroke(.white.opacity(0.6), lineWidth: 1))
-    }
-
-    private var bubble: some View {
-        ZStack {
-            AppTheme.brandGradient
-            Text(initials)
-                .font(.system(size: size * 0.4, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-        }
     }
 
     private var initials: String {
-        let parts = name.split(separator: " ").prefix(2)
+        let parts = member.name.split(separator: " ").prefix(2)
         let chars = parts.compactMap { $0.first }
         let s = String(chars).uppercased()
         return s.isEmpty ? "?" : s
-    }
-
-    private func isPlaceholderURL(_ url: String) -> Bool {
-        url.contains("cloud32.it/Associazioni/img/Uomo-1.png")
     }
 }
 

@@ -13,15 +13,20 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import it.mensa.app.navigation.MensaNavGraph
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.support.LaunchHarness
+import it.mensa.app.support.ThemeManager
+import it.mensa.app.support.ThemeMode
 import it.mensa.app.ui.theme.MensaTheme
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
     private val audioPlayerController: AudioPlayerController by inject()
+    private val themeManager: ThemeManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,10 +48,16 @@ class MainActivity : ComponentActivity() {
         window.navigationBarColor = Color.TRANSPARENT
 
         setContent {
-            MensaTheme {
+            // Preferenza utente (Profilo → Tema) sopra il tema di sistema.
+            val themeMode by themeManager.mode.collectAsState()
+            val isDark = when (themeMode) {
+                ThemeMode.DARK -> true
+                ThemeMode.LIGHT -> false
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            MensaTheme(darkTheme = isDark) {
                 // Set default system bar icon appearance based on theme
                 // Content screens (light bg) want dark icons; dark-themed screens override locally
-                val isDark = isSystemInDarkTheme()
                 val view = LocalView.current
                 if (!view.isInEditMode) {
                     SideEffect {

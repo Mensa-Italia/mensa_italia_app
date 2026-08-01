@@ -24,9 +24,6 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content()
             .padding(padding)
-            .glassEffect(
-                .regular.tint(tint ?? .clear),
-                in: .rect(cornerRadius: cornerRadius)
-            )
+            .compatGlass(cornerRadius: cornerRadius, tint: tint)
     }
 }

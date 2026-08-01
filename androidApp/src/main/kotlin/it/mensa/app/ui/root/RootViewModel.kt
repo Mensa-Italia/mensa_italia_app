@@ -3,6 +3,7 @@ package it.mensa.app.ui.root
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.LaunchHarness
+import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
@@ -33,7 +34,9 @@ sealed class RootPhase {
     data object Public : RootPhase()
 }
 
-class RootViewModel : ViewModel() {
+class RootViewModel(
+    private val localeManager: LocaleManager,
+) : ViewModel() {
 
     private val auth = koinAccess().auth
     private val i18n = koinAccess().i18n
@@ -46,16 +49,34 @@ class RootViewModel : ViewModel() {
     /** True when we restored a session at boot (affects onboarding gate in DEBUG). */
     private var sessionRestored: Boolean = false
 
+    /** Last locale the i18n catalog was bootstrapped for (avoids duplicate reloads). */
+    private var bootstrappedLocale: String? = null
+
     init {
         viewModelScope.launch {
             bootstrap()
         }
+        // Re-bootstrap the i18n catalog whenever the user switches language
+        // (LanguagePickerScreen → LocaleManager.setLocale/clearLocale). The
+        // `ready` StateFlow re-emits and every tr() call site recomposes.
+        viewModelScope.launch {
+            localeManager.currentLocale.collect { tag ->
+                val locale = tag.ifBlank { "it" }
+                if (bootstrappedLocale != null && bootstrappedLocale != locale) {
+                    bootstrappedLocale = locale
+                    runCatching { i18n.bootstrap(locale) }
+                    Logger.i("RootVM", "i18n", "re-bootstrapped for locale: $locale")
+                }
+            }
+        }
     }
 
     private suspend fun bootstrap() {
-        // 1. Bootstrap i18n (loads catalog; fallbacks work even if this fails)
+        // 1. Bootstrap i18n (loads catalog; fallbacks work even if this fails).
+        //    Honour the persisted per-app language override, else system locale.
         runCatching {
-            val locale = java.util.Locale.getDefault().language.ifBlank { "it" }
+            val locale = localeManager.awaitPreferred().ifBlank { "it" }
+            bootstrappedLocale = locale
             i18n.bootstrap(locale)
             Logger.i("RootVM", "i18n", "bootstrapped for locale: $locale")
         }

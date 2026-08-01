@@ -29,7 +29,11 @@ fun tr(
     vararg args: Pair<String, Any>,
 ): String {
     val i18n = remember { koinAccess().i18n }
-    // Observe ready state so this recomposes when locale changes
+    // Observe ready state so this recomposes when locale changes. The state
+    // MUST be read during composition (as a remember key) — collecting it
+    // without reading it would never subscribe this composable to updates.
     val ready by i18n.ready.collectAsState()
-    return i18n.t(key, fallback, args.associate { (k, v) -> k to v.toString() })
+    return remember(ready, key, fallback, args) {
+        i18n.t(key, fallback, args.associate { (k, v) -> k to v.toString() })
+    }
 }

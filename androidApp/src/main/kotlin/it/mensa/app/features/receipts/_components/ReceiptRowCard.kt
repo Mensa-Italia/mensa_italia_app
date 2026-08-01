@@ -28,6 +28,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.features.receipts.amountFormatted
 import it.mensa.app.features.receipts.fallback
 import it.mensa.app.features.receipts.iconVec
@@ -36,7 +38,6 @@ import it.mensa.app.features.receipts.labelKey
 import it.mensa.app.features.receipts.statusColor
 import it.mensa.app.support.tr
 import it.mensa.shared.model.ReceiptModel
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -50,7 +51,8 @@ fun ReceiptRowCard(
     modifier: Modifier = Modifier,
 ) {
     val kind = receipt.kind
-    val dateString = formatShortDate(receipt.created.toEpochMilliseconds())
+    val locale = rememberAppLocale()
+    val dateString = formatShortDate(receipt.created.toEpochMilliseconds(), locale)
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -105,17 +107,16 @@ fun ReceiptRowCard(
 
             // Amount right-aligned bold
             Column(horizontalAlignment = Alignment.End) {
-                Text(text = receipt.amountFormatted, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text(text = receipt.amountFormatted(locale), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 Icon(imageVector = Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
             }
         }
     }
 }
 
-private fun formatShortDate(epochMs: Long): String {
+private fun formatShortDate(epochMs: Long, locale: Locale): String {
     return try {
-        val fmt = SimpleDateFormat("d MMM yyyy", Locale.ITALIAN)
-        fmt.format(Date(epochMs))
+        AppFormat.format(Date(epochMs), AppFormat.Skeleton.DAY_MONTH_YEAR, locale)
     } catch (_: Exception) {
         "—"
     }

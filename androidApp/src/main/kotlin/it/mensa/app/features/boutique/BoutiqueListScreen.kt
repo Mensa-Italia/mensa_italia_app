@@ -22,6 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -29,7 +31,6 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
 import it.mensa.shared.model.BoutiqueModel
 import org.koin.androidx.compose.koinViewModel
-import java.text.NumberFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -221,7 +222,7 @@ private fun BoutiqueProductCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = formatPrice(product.amount),
+                        text = formatPrice(product.amount, rememberAppLocale()),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -245,9 +246,9 @@ private fun BoutiqueProductCard(
     }
 }
 
-private fun formatPrice(amount: Int): String {
+private fun formatPrice(amount: Int, locale: Locale): String {
     return try {
-        val fmt = NumberFormat.getCurrencyInstance(Locale.ITALY)
+        val fmt = AppFormat.money(locale)
         fmt.maximumFractionDigits = 2
         fmt.minimumFractionDigits = 0
         fmt.format(amount)

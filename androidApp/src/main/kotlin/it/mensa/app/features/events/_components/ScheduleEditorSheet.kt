@@ -1,5 +1,7 @@
 package it.mensa.app.features.events._components
 
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,9 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import it.mensa.app.features.events.ScheduleDraftUi
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
  * ScheduleEditorSheet — Android equivalent of iOS ScheduleEditorSheet.swift.
@@ -64,7 +64,8 @@ fun ScheduleEditorSheet(
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val dtFormatter = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ITALIAN) }
+    val locale = rememberAppLocale()
+    val dtFormatter = remember(locale) { AppFormat.formatter(AppFormat.Skeleton.NUMERIC_DATE_TIME, locale) }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(

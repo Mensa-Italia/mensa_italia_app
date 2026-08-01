@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import it.mensa.app.support.koinAccess
+import it.mensa.app.support.rememberAppLocale
+import it.mensa.app.support.AppFormat
 import it.mensa.app.support.tr
 import it.mensa.shared.model.LocalOfficeAssistantModel
 import it.mensa.shared.model.LocalOfficeTestDateModel
@@ -143,7 +145,7 @@ fun LocalOfficeTestDateEditorSheet(
                 onClick = { showDatePicker = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("${tr("local_office.editor.date", fallback = "Data e ora")}: ${formatDateShort(dateMs)}")
+                Text("${tr("local_office.editor.date", fallback = "Data e ora")}: ${formatDateShort(dateMs, rememberAppLocale())}")
             }
 
             // Location
@@ -248,8 +250,5 @@ fun LocalOfficeTestDateEditorSheet(
     }
 }
 
-private fun formatDateShort(ms: Long): String {
-    val date = Date(ms)
-    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN)
-    return fmt.format(date)
-}
+private fun formatDateShort(ms: Long, locale: Locale): String =
+    AppFormat.format(Date(ms), AppFormat.Skeleton.NUMERIC_DATE, locale)

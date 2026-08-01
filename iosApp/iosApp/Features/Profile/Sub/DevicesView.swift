@@ -86,7 +86,7 @@ private struct DeviceRow: View {
 
     private var subtitle: String {
         let lang = device.firebaseId.isEmpty ? "-" : String(device.firebaseId.prefix(10)) + "…"
-        let when = formatItalianDate(device.updated)
+        let when = formatAppDate(device.updated)
         return "\(lang) · \(when)"
     }
 

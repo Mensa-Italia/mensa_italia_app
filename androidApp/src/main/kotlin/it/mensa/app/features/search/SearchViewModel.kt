@@ -18,6 +18,7 @@ import it.mensa.shared.model.SigModel
 import it.mensa.shared.model.search.SearchHit
 import it.mensa.shared.model.search.SearchResponse
 import it.mensa.shared.repository.SearchRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -116,8 +117,17 @@ class SearchViewModel(private val context: Context) : ViewModel() {
     /** Last backend success payload — kept for re-hydration when caches update */
     private var lastSuccess: Pair<String, SearchResponse>? = null
 
-    /** Dedup guard for in-flight member hydration requests */
-    private val hydratingMembers = mutableSetOf<String>()
+    /**
+     * Soci per cui `getById` è già stato chiamato in questa sessione.
+     *
+     * Resta pieno anche dopo che la richiesta è finita, non solo mentre è in
+     * volo: due terzi del registro non hanno foto, quindi per quei record
+     * `getById` torna `image` vuota e la condizione che fa scattare la
+     * hydration resta vera. Svuotandolo a fine richiesta si ripartiva da capo
+     * ad ogni ricostruzione, e siccome ogni `getById` scriveva sul database
+     * (che a sua volta fa ricostruire) il giro non si chiudeva mai.
+     */
+    private val attemptedMemberHydration = mutableSetOf<String>()
 
     /** Affiliate index built on each buildSections pass */
     private var currentAffiliations: Map<String, List<LocalOfficeAffiliation>> = emptyMap()
@@ -280,11 +290,31 @@ class SearchViewModel(private val context: Context) : ViewModel() {
         }
     }
 
+    /**
+     * Ricostruisce le sezioni quando arrivano dati locali in ritardo.
+     *
+     * Le sette cache chiamano questo metodo indipendentemente e spesso
+     * emettono a raffica: una ricostruzione costa una scansione dell'intero
+     * registro soci (~2700 record), quindi farne una per emissione fa perdere
+     * frame durante lo scroll. Qui ne accodiamo una sola e lasciamo che le
+     * emissioni dello stesso giro si fondano.
+     */
     private fun rebuildIfPossible() {
-        val (query, response) = lastSuccess ?: return
-        val sections = buildSections(query, response)
-        _uiState.update { it.copy(phase = SearchPhase.Results(sections)) }
+        if (lastSuccess == null || rebuildScheduled) return
+        rebuildScheduled = true
+        // `Dispatchers.Main` e non il `Main.immediate` di viewModelScope: con
+        // `immediate` il blocco girerebbe subito, in linea, e non ci sarebbe
+        // nessuna finestra in cui le altre emissioni possono fondersi.
+        viewModelScope.launch(Dispatchers.Main) {
+            rebuildScheduled = false
+            val (query, response) = lastSuccess ?: return@launch
+            val sections = buildSections(query, response)
+            _uiState.update { it.copy(phase = SearchPhase.Results(sections)) }
+        }
     }
+
+    /** True fra la richiesta di ricostruzione e la sua esecuzione. */
+    private var rebuildScheduled = false
 
     // ─── Org chart ────────────────────────────────────────────────────────────
 
@@ -546,15 +576,12 @@ class SearchViewModel(private val context: Context) : ViewModel() {
     // ─── Member hydration (background, deduped) ───────────────────────────────
 
     private fun enqueueMemberHydration(id: String) {
-        if (id.isEmpty() || hydratingMembers.contains(id)) return
-        hydratingMembers.add(id)
+        if (id.isEmpty() || !attemptedMemberHydration.add(id)) return
         viewModelScope.launch {
             try {
                 koin.regSoci.getById(id)
             } catch (e: Exception) {
                 Logger.e("SearchViewModel", "member hydration failed id=$id: ${e.message}")
-            } finally {
-                hydratingMembers.remove(id)
             }
         }
     }

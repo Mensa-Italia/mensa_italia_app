@@ -54,6 +54,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.AppFormat
+import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.features.receipts.amountFormatted
 import it.mensa.app.features.receipts.fallback
 import it.mensa.app.features.receipts.iconVec
@@ -65,7 +67,6 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.ReceiptModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -108,7 +109,7 @@ fun ReceiptDetailScreen(
                         IconButton(onClick = {
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, "Ricevuta Mensa: ${receipt.amountFormatted} — ${receipt.id}")
+                                putExtra(Intent.EXTRA_TEXT, "Ricevuta Mensa: ${receipt.amountFormatted()} — ${receipt.id}")
                             }
                             context.startActivity(Intent.createChooser(shareIntent, null))
                         }) {
@@ -160,7 +161,8 @@ private fun ReceiptContent(
 ) {
     val kind = receipt.kind
     val statusColor = receipt.statusColor
-    val dateString = formatFullDate(receipt.created.toEpochMilliseconds())
+    val locale = rememberAppLocale()
+    val dateString = formatFullDate(receipt.created.toEpochMilliseconds(), locale)
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(20.dp),
@@ -174,7 +176,7 @@ private fun ReceiptContent(
                     Text(text = tr(kind.labelKey, fallback = kind.fallback), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
                 }
                 Text(
-                    text = receipt.amountFormatted,
+                    text = receipt.amountFormatted(locale),
                     style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.ExtraBold, fontSize = 44.sp, letterSpacing = (-0.5).sp),
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -234,10 +236,9 @@ private fun ReceiptInfoRow(
     }
 }
 
-private fun formatFullDate(epochMs: Long): String {
+private fun formatFullDate(epochMs: Long, locale: Locale): String {
     return try {
-        val fmt = SimpleDateFormat("EEEE d MMMM yyyy, HH:mm", Locale.ITALIAN)
-        fmt.format(Date(epochMs))
+        AppFormat.format(Date(epochMs), AppFormat.Skeleton.FULL_WITH_TIME, locale)
     } catch (_: Exception) {
         "—"
     }

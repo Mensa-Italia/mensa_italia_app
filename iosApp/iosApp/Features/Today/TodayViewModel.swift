@@ -34,7 +34,7 @@ final class TodayViewModel {
 
     var membershipExpiry: String {
         guard let u = user else { return "-" }
-        return formatItalianDate(u.expireMembership)
+        return formatAppDate(u.expireMembership)
     }
 
     var memberSince: String { "-" }
@@ -177,15 +177,37 @@ final class TodayViewModel {
 
 // MARK: - Date formatting helper
 
-private let italianDateFormatter: DateFormatter = {
-    let f = DateFormatter()
-    f.locale = Locale(identifier: "it_IT")
-    f.dateFormat = "dd MMM yyyy"
-    return f
-}()
+/// `DateFormatter` cache, one entry per language tag.
+///
+/// Keyed rather than rebuilt on change: the language can be flipped back and
+/// forth from Profilo → Lingua, and a single `let` formatter would keep
+/// serving whichever locale it was first built with — `RootView`'s
+/// `.id(locale.version)` remount re-renders the view tree but does not reset
+/// file-scope state. Building a `DateFormatter` is expensive enough to be
+/// worth caching, cheap enough that one per language costs nothing.
+@MainActor private var appDateFormatters: [String: DateFormatter] = [:]
 
-func formatItalianDate(_ instant: Kotlinx_datetimeInstant?) -> String {
+@MainActor
+private func appDateFormatter() -> DateFormatter {
+    let tag = LocaleManager.shared.activeTag
+    if let cached = appDateFormatters[tag] { return cached }
+    let f = DateFormatter()
+    f.locale = Locale(identifier: tag)
+    // A localised template, not a fixed `dd MMM yyyy` pattern: each language
+    // gets its native order (`2026年8月17日` for ja/zh, `17 de ago. de 2026`
+    // for pt) instead of the Italian layout with translated month names.
+    // Italian itself is unchanged — the template resolves to `dd MMM yyyy`.
+    f.setLocalizedDateFormatFromTemplate("ddMMMyyyy")
+    appDateFormatters[tag] = f
+    return f
+}
+
+/// Formats an instant in the **in-app** language (Profilo → Lingua), which is
+/// deliberately not the device locale: the app ships its own language picker
+/// and `LocaleManager.activeTag` is the single source of truth for it.
+@MainActor
+func formatAppDate(_ instant: Kotlinx_datetimeInstant?) -> String {
     guard let instant = instant, instant.epochSeconds > 0 else { return "-" }
     let date = Date(timeIntervalSince1970: Double(instant.epochSeconds))
-    return italianDateFormatter.string(from: date)
+    return appDateFormatter().string(from: date)
 }

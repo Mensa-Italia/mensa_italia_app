@@ -23,9 +23,12 @@ class EventsRepositoryTest {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
 
-    private fun createInMemoryDb(): MensaDatabase {
+    // `create` va atteso: lo schema è generato in modalità asincrona, quindi
+    // torna un QueryResult e senza `await()` nessuna tabella viene creata
+    // davvero — i test fallivano tutti con "no such table".
+    private suspend fun createInMemoryDb(): MensaDatabase {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        MensaDatabase.Schema.create(driver)
+        MensaDatabase.Schema.create(driver).await()
         return MensaDatabase(driver)
     }
 

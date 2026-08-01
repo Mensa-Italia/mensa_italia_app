@@ -192,6 +192,10 @@ struct RootView: View {
                     })
                 case .main:
                     MainTabView()
+                        // Proposta di attivazione della passkey: una volta sola,
+                        // e solo dopo un accesso con password. Agganciata qui e
+                        // non alla LoginView per non sovrapporsi all'onboarding.
+                        .passkeyEnrollmentPrompt()
                 }
             }
         }

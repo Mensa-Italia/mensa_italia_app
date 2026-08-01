@@ -85,7 +85,7 @@ struct EventMapView: View {
                 }
                 .frame(maxWidth: .infinity).frame(height: 50)
             }
-            .buttonStyle(.glassProminent)
+            .compatGlassProminentButtonStyle()
             .padding(.horizontal)
             Spacer()
         }

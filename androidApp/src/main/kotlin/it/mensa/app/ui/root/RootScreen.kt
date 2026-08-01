@@ -37,6 +37,7 @@ import it.mensa.app.features.onboarding.OnboardingScreen
 import it.mensa.app.features.publicarea.PublicAreaScreen
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.PrimaryButton
+import it.mensa.app.features.auth.PasskeyEnrollmentPrompt
 import it.mensa.app.ui.shell.MainAppShell
 import it.mensa.app.ui.theme.EasingEmphasizedDecelerate
 import it.mensa.app.ui.theme.LocalMensaGradients
@@ -92,7 +93,13 @@ fun RootScreen(
             is RootPhase.Onboarding -> OnboardingScreen(
                 onComplete = { vm.onOnboardingComplete() },
             )
-            is RootPhase.Main -> MainAppShell()
+            is RootPhase.Main -> {
+                MainAppShell()
+                // Proposta di attivazione della passkey: una volta sola, e solo
+                // dopo un accesso con password. Agganciata qui e non alla login
+                // per non sovrapporsi all'onboarding.
+                PasskeyEnrollmentPrompt()
+            }
             is RootPhase.Public -> PublicAreaScreen(
                 onLogin = { vm.exitPublic() },
             )

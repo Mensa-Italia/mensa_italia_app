@@ -34,7 +34,9 @@ class LanguagePickerViewModel(
             }
         }
         viewModelScope.launch {
-            localeManager.currentLocale.collect { locale ->
+            // Observe the override (nullable) — null means "follow the system",
+            // which selects the "Sistema" row in the picker.
+            localeManager.override.collect { locale ->
                 _uiState.update { it.copy(currentLocale = locale) }
             }
         }
