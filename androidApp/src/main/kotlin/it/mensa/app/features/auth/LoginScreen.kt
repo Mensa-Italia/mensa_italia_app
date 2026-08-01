@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.app.ui.root.LogoVariant
 import it.mensa.app.ui.root.MensaLogoMark
@@ -268,7 +269,9 @@ fun LoginScreen(
             // ── Passkey ───────────────────────────────────────────────────────
             // Nascosto sotto API 28, dove Credential Manager non sa gestire le
             // passkey (minSdk qui e' 24, quindi il caso e' reale).
-            if (uiState.passkeySupported) {
+            // `enable_passkeys` off → niente accesso con passkey, a
+            // prescindere dal supporto del dispositivo.
+            if (uiState.passkeySupported && koinAccess().featureFlags.passkeysEnabled) {
                 Spacer(Modifier.height(12.dp))
 
                 OutlinedButton(
@@ -378,7 +381,10 @@ fun LoginScreen(
             }
 
             // ── Explore without account ───────────────────────────────────────
-            if (onBack != null) {
+            // L'azione e' `onBack` (torna alla landing), ma l'etichetta promette
+            // l'area pubblica: a `public_area_enabled` spento sparisce, altrimenti
+            // resta un invito a una sezione che non esiste piu'.
+            if (onBack != null && koinAccess().featureFlags.publicAreaEnabled) {
                 OutlinedButton(
                     onClick = onBack,
                     modifier = Modifier

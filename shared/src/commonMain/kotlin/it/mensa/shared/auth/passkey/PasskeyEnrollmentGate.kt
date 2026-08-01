@@ -3,6 +3,7 @@ package it.mensa.shared.auth.passkey
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.LoginMethod
+import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.model.UserModel
@@ -28,6 +29,7 @@ class PasskeyEnrollmentGate internal constructor(
     private val db: MensaDatabase,
     private val auth: AuthRepository,
     private val passkeys: PasskeyRepository,
+    private val flags: FeatureFlags,
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -38,6 +40,7 @@ class PasskeyEnrollmentGate internal constructor(
      *    chi e' appena entrato *con* una passkey non ha senso, e un cold start
      *    con sessione ripristinata non e' un accesso);
      *  - il marker per questo utente non c'e';
+     *  - `enable_passkeys` e' acceso lato server;
      *  - il dispositivo sa gestire le passkey — [deviceSupportsPasskeys] arriva
      *    dall'app module, perche' lo shared non ha modo di saperlo;
      *  - l'utente non ha ancora nessuna passkey. Si usa [PasskeyRepository.listOrNull]
@@ -47,6 +50,10 @@ class PasskeyEnrollmentGate internal constructor(
      *    dentro le immagini per gli store.
      */
     suspend fun shouldShow(user: UserModel, deviceSupportsPasskeys: Boolean): Boolean {
+        // `enable_passkeys` off: qui si spegne la proposta automatica su
+        // entrambe le piattaforme in un colpo solo. I due punti d'ingresso
+        // manuali (login e settings) sono nascosti lato UI.
+        if (!flags.passkeysEnabled) return false
         if (!deviceSupportsPasskeys) return false
         if (DemoIdentity.enabled) return false
         if (user.id.isEmpty()) return false

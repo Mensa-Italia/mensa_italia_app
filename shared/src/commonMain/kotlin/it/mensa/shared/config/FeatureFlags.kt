@@ -26,6 +26,7 @@ class FeatureFlags(
         val publicArea: Boolean = false,
         val orgChart: Boolean = false,
         val localGroups: Boolean = false,
+        val passkeys: Boolean = false,
     )
 
     private val _flags = MutableStateFlow(Flags())
@@ -34,6 +35,7 @@ class FeatureFlags(
     val publicAreaEnabled: Boolean get() = _flags.value.publicArea
     val orgChartEnabled: Boolean get() = _flags.value.orgChart
     val localGroupsEnabled: Boolean get() = _flags.value.localGroups
+    val passkeysEnabled: Boolean get() = _flags.value.passkeys
 
     /**
      * Restores the cached values, then refreshes from the backend. Safe to call
@@ -53,6 +55,7 @@ class FeatureFlags(
                 publicArea = configs[KEY_PUBLIC_AREA].toFlag(),
                 orgChart = configs[KEY_ORG_CHART].toFlag(),
                 localGroups = configs[KEY_LOCAL_GROUPS].toFlag(),
+                passkeys = configs[KEY_PASSKEYS].toFlag(),
             )
             _flags.value = fresh
             writeCached(fresh)
@@ -64,16 +67,19 @@ class FeatureFlags(
     private suspend fun readCached(): Flags? {
         val raw = db.keyValueQueries.selectById(CACHE_KEY).awaitAsOneOrNull()?.value_ ?: return null
         val parts = raw.split(',')
-        if (parts.size != 3) return null
+        // Length check doubles as a version guard: a cache written by an older
+        // build with fewer flags is discarded rather than read short.
+        if (parts.size != 4) return null
         return Flags(
             publicArea = parts[0] == "1",
             orgChart = parts[1] == "1",
             localGroups = parts[2] == "1",
+            passkeys = parts[3] == "1",
         )
     }
 
     private suspend fun writeCached(flags: Flags) {
-        val encoded = listOf(flags.publicArea, flags.orgChart, flags.localGroups)
+        val encoded = listOf(flags.publicArea, flags.orgChart, flags.localGroups, flags.passkeys)
             .joinToString(",") { if (it) "1" else "0" }
         try {
             db.keyValueQueries.insertOrReplace(key = CACHE_KEY, value_ = encoded)
@@ -93,6 +99,7 @@ class FeatureFlags(
         const val KEY_PUBLIC_AREA = "public_area_enabled"
         const val KEY_ORG_CHART = "org_chart_enabled"
         const val KEY_LOCAL_GROUPS = "local_groups_enabled"
+        const val KEY_PASSKEYS = "enable_passkeys"
         const val CACHE_KEY = "config.feature_flags"
     }
 }

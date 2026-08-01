@@ -118,6 +118,10 @@ struct LoginView: View {
                 // utente prima di poter creare la challenge WebAuthn, quindi il
                 // login usernameless non e' possibile e il flusso resta a due
                 // passi (email → prompt biometrico).
+                // `enable_passkeys` off → via l'intera sezione, footer incluso:
+                // la nota "nessuna passkey su questo dispositivo" non ha senso
+                // se la feature e' spenta.
+                if koin.featureFlags.passkeysEnabled {
                 Section {
                     Button {
                         focus = nil
@@ -151,6 +155,7 @@ struct LoginView: View {
                         .foregroundStyle(.secondary)
                         .padding(.top, 4)
                     }
+                }
                 }
 
                 Section {

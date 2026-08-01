@@ -130,11 +130,13 @@ fun ProfileScreen(
                             title = tr("views.devices.title", fallback = "Dispositivi"),
                             onClick = { onNavigate(ProfileRoute.Devices) },
                         )
-                        ProfileRow(
-                            icon = Icons.Outlined.Fingerprint,
-                            title = tr("views.passkeys.title", fallback = "Passkey"),
-                            onClick = { onNavigate(ProfileRoute.Passkeys) },
-                        )
+                        if (koinAccess().featureFlags.passkeysEnabled) {
+                            ProfileRow(
+                                icon = Icons.Outlined.Fingerprint,
+                                title = tr("views.passkeys.title", fallback = "Passkey"),
+                                onClick = { onNavigate(ProfileRoute.Passkeys) },
+                            )
+                        }
                     }
                 }
             }

@@ -99,7 +99,7 @@ val extrasModule = module {
     // Passkey: HTTP + orchestrazione, piu` il gate che decide se proporre
     // l'attivazione dopo un accesso con password.
     single { PasskeyRepository(get(), get(), get()) }
-    single { PasskeyEnrollmentGate(get(), get(), get()) }
+    single { PasskeyEnrollmentGate(get(), get(), get(), get()) }
 
     // Onboarding gate
     single { OnboardingState(get()) }

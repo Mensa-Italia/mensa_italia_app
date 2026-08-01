@@ -54,11 +54,13 @@ struct ProfileView: View {
                     ProfileRowLabel(icon: "iphone",
                                     title: tr("views.devices.title", fallback: "Dispositivi"))
                 }
-                NavigationLink {
-                    PasskeysView()
-                } label: {
-                    ProfileRowLabel(icon: "person.badge.key",
-                                    title: tr("views.passkeys.title", fallback: "Passkey"))
+                if koin.featureFlags.passkeysEnabled {
+                    NavigationLink {
+                        PasskeysView()
+                    } label: {
+                        ProfileRowLabel(icon: "person.badge.key",
+                                        title: tr("views.passkeys.title", fallback: "Passkey"))
+                    }
                 }
             }
 
