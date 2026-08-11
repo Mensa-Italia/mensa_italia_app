@@ -133,7 +133,12 @@ class TranslationLoader(
                 lastError = t
             }
         }
-        throw lastError ?: IllegalStateException("i18n fetch failed: $url")
+        lastError?.let { throw it }
+        // Irraggiungibile finche` il ciclo sopra ha almeno un tentativo: o si
+        // esce con un body, o lastError e` valorizzato. error() invece di
+        // `throw IllegalStateException(...)` per la regola detekt
+        // UseCheckOrError, che il progetto tiene attiva (vedi detekt.yml).
+        error("i18n fetch failed: $url")
     }
 
     private fun parse(raw: String): Map<String, String> {

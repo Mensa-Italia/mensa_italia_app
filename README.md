@@ -2,18 +2,10 @@
 
 ### Pipeline
 
-[![Release](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/release.yml)
+[![Pipeline](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
 [![Web image](https://img.shields.io/badge/ghcr.io-mensa--web-2496ED?logo=docker&logoColor=white)](https://github.com/Mensa-Italia/mensa_italia_app/pkgs/container/mensa-web)
 [![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
-
-### Quality per area
-
-[![Web](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-web.yml)
-[![Kotlin](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-kotlin.yml)
-[![Swift](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-swift.yml)
-[![Docker](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-docker.yml)
-[![Secrets](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/qa-secrets.yml)
 
 ### Stack
 
@@ -82,79 +74,51 @@ Tre client nativi che condividono lo stesso core di business logic scritto in **
 
 ---
 
-## Pipeline di release
+## Pipeline
 
-Tutto orchestrato da [`.github/workflows/release.yml`](.github/workflows/release.yml). Un singolo workflow gestisce **web, Android e iOS in parallelo** con gating di qualità.
+Un solo workflow, [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.yml), secondo la convenzione dell'organizzazione ([Mensa-Italia/.github](https://github.com/Mensa-Italia/.github), `PIPELINE.md`). Cosa succede lo decide il ref, non il nome del file.
 
-### Trigger
+### Livelli
 
-| Trigger | Effetto |
-|---|---|
-| Push a `main` con `[ALPHA]` nel subject | web `:alpha` + Play `internal` + TestFlight (interno) |
-| Push a `main` con `[BETA]` nel subject | web `:beta` + Play `beta` + TestFlight gruppo `Test open` |
-| Push a `main` con `[RELEASE]` nel subject | web `:latest` + Play `production` + App Store review |
-| Push a `feat/mvp-testing-public` | solo web `:dev` (niente native) |
-| `workflow_dispatch` | input `track` scelto dalla UI |
+| Trigger | Livello | Controlli | Pubblica |
+|---|---|---|---|
+| PR verso `main`, push su un branch di lavoro | `check` | base + segreti | niente |
+| Push su `main` | `dev` | base + segreti | immagine `:dev`, `:sha-xxxxxxx` + redeploy stack dev |
+| Tag `bX.Y.Z` | `staging` | base + segreti + dipendenze + SBOM | immagine `:staging`, `:X.Y.Z` + Play `beta` + TestFlight gruppo `Test open` |
+| Tag `vX.Y.Z` | `release` | tutti | immagine `:latest`, `:X.Y.Z`, `:X.Y` + Play `production` + App Store review + Release firmata |
+| Cron del lunedì | `audit` | solo segreti, dipendenze, SBOM, CodeQL | niente |
 
-Il bump versione è automatico (`VERSION` file, +1 patch). `versionCode` Android = `30000000 + git commit count` (sopra al legacy Flutter). `CFBundleVersion` iOS allineato.
+`workflow_dispatch` ha un input `tier` per forzare un livello a mano; il default `auto` si comporta come un push normale. Forzare `staging` o `release` richiede comunque di essere su un tag: senza tag non esiste una versione, e `plan.yml` si ferma con un errore invece di pubblicare qualcosa senza nome.
+
+La versione viene dal tag (`vX.Y.Z` → `1.2.3`), non più da un bump automatico del file `VERSION`. `versionCode` Android = `30000000 + git commit count` (sopra al legacy Flutter). `CFBundleVersion` iOS allineato.
 
 ### DAG
 
 ```
-prepare ─┬─> web        ─┐
-         ├─> android   ─┐ │
-         │              ↓ │
-         │       play-publish (track-aware)
-         │                ↓
-         ├─> ios          │
-         │    ↓           │
-         │  testflight-publish (fastlane alpha/beta/release)
-         │                ↓
-         ├─> lint-web, typecheck-web, lint-kotlin, lint-swift,
-         │   lint-dockerfile, scan-secrets, scan-vulns,
-         │   codeql-js, codeql-kotlin, codeql-swift
-         │   └─> gate-summary (aggregator)
-         │            ↓
-         └─────> finalize (tag + GitHub Release con AAB+APK+IPA)
-                       ↓
-                cleanup-old-runs (runs > 24h)
+plan ─┬─> check (detekt, astro check, ESLint, hadolint) ─┐
+      ├─> segreti (gitleaks, ogni livello) ─────────────┤
+      ├─> deep (OSV + SBOM; staging, release, audit) ───┤
+      ├─> codeql-js / codeql-kotlin / codeql-swift       │  (non bloccanti)
+      │                                                  │
+      ├─> image (dev/staging) ──> notify (redeploy dev)  │
+      ├─> image-release (release) ──────────────────────┤
+      └─> version-code ─┬─> android ─> play ────────────┤
+                        └─> ios ─────> testflight ──────┤
+                             └─> bundle ────────────────┴─> publish (Release firmata)
 ```
 
-### Quality gate
+### Cancelli
 
-I dieci job sopra alimentano `gate-summary`: se anche solo uno fallisce il publish è bloccato. **Eccezione: track `alpha` bypassa il gate** (per testing rapido sui propri device).
+I job che pubblicano leggono i `result` espliciti dei controlli:
 
----
-
-## Quality & Security
-
-Due livelli.
-
-### Workflow QA per area — radar su ogni push
-
-Ogni area ha il **proprio workflow**, quindi il proprio badge in cima al README. Se uno chip diventa rosso sai subito **dove guardare**. Triggerano su ogni push e PR a `main`.
-
-| Workflow file | Job | Tool | Area |
-|---|---|---|---|
-| [`qa-web.yml`](.github/workflows/qa-web.yml) | `typecheck` | `astro check` + `@astrojs/check` | TS/Astro/React |
-| [`qa-web.yml`](.github/workflows/qa-web.yml) | `lint` | ESLint 9 flat config + typescript-eslint + plugin-astro + react-hooks | JS/TS/TSX/Astro |
-| [`qa-kotlin.yml`](.github/workflows/qa-kotlin.yml) | `detekt` | detekt 1.23 (default + custom config) | shared/ + androidApp/ |
-| [`qa-swift.yml`](.github/workflows/qa-swift.yml) | `swiftlint` | SwiftLint (opt-in rules) | iosApp/ |
-| [`qa-docker.yml`](.github/workflows/qa-docker.yml) | `hadolint` | Hadolint | Dockerfile.web |
-| [`qa-secrets.yml`](.github/workflows/qa-secrets.yml) | `gitleaks` | Gitleaks (org-licensed) | tutta la repo |
-
-### `release.yml` — gate strict
-
-Gli stessi check girano anche nel flusso di release ma in modalità **strict** (no `continue-on-error`). In aggiunta:
-
-| Job extra | Cosa controlla |
+| Job | Deve essere verde |
 |---|---|
-| `scan-vulns` | Trivy filesystem scan, severity CRITICAL+HIGH |
-| `codeql-js` | CodeQL SAST JavaScript/TypeScript |
-| `codeql-kotlin` | CodeQL SAST Java/Kotlin |
-| `codeql-swift` | CodeQL SAST Swift |
+| `image` (dev/staging) | `check`, `segreti`, e `deep` se il livello lo prevede |
+| `image-release` | `check`, `segreti`, `deep` |
+| `play`, `testflight` | `check`, `segreti`, `deep`, build corrispondente |
+| `publish` | `check`, `segreti`, `deep`, `image-release`, `bundle` |
 
-Tutti i SARIF sono caricati nella tab **Security** del repo.
+I tre job CodeQL **non** compaiono in quei cancelli e sono `continue-on-error`: l'organizzazione è sul piano free, senza Advanced Security, e l'API code-scanning risponde `403`. Un CodeQL dentro i `needs` di `publish` renderebbe `publish` irraggiungibile per sempre. Vanno rimessi bloccanti quando l'organizzazione avrà Advanced Security.
 
 ---
 
@@ -175,7 +139,7 @@ Per il setup completo con Traefik + HTTPS automatico via Let's Encrypt vedi [`do
 DOMAIN=app.mensa.it ACME_EMAIL=tuo@dominio.it docker compose up -d
 ```
 
-Esiste anche un webhook Portainer che redeploya lo stack `dev` automaticamente quando un build su `feat/mvp-testing-public` finisce con successo ([`notify.yml`](.github/workflows/notify.yml)).
+Esiste anche un webhook Portainer che redeploya lo stack `dev` automaticamente quando l'immagine `:dev` viene pubblicata, cioè a ogni push su `main` andato a buon fine (job `notify` di [`pipeline.yml`](.github/workflows/pipeline.yml)).
 
 ### Android
 
@@ -198,7 +162,7 @@ xcodegen generate
 open iosApp.xcodeproj
 ```
 
-Build in CI: macos-14 + Xcode 26. Genera `.xcodeproj` con xcodegen, builda XCFramework Release dello shared, importa cert/profile da secrets, archive + exportArchive, upload TestFlight via fastlane (lane `alpha`/`beta`/`production`).
+Build in CI: `macos-latest` + Xcode `latest-stable`. Genera `.xcodeproj` con xcodegen, builda XCFramework Release dello shared, importa cert/profile da secrets, archive + exportArchive, upload TestFlight via fastlane (lane `beta` a staging, `production` a release). Finché il billing macOS è bloccato i job macOS sono `continue-on-error`: la Release esce comunque, con i soli artefatti Android.
 
 ---
 
@@ -259,8 +223,8 @@ d'intent su Android, attivo solo su build debuggable), non simulando tap.
 ## Convenzioni
 
 - **i18n**: chiavi gestite via Tolgee. Vedi [`tools/tolgee-push.sh`](tools/tolgee-push.sh).
-- **Versione**: single source of truth nel file [`VERSION`](VERSION) alla radice, bumpata dalla CI nel job `finalize`.
-- **Commit-driven release**: solo i token `[ALPHA]`, `[BETA]`, `[RELEASE]` sulla prima riga del subject triggerano la pubblicazione. Body libero.
+- **Versione**: la decide il tag. `vX.Y.Z` per una release, `bX.Y.Z` per una staging; un tag di formato diverso non produce niente. Il file [`VERSION`](VERSION) viene scritto dalla CI a partire dal tag, per gradle.
+- **Tag-driven release**: si pubblica taggando, non scrivendo token nel subject del commit. Niente più `[ALPHA]`/`[BETA]`/`[RELEASE]`, niente più bypass del quality gate.
 
 ---
 
