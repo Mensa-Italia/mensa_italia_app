@@ -6,36 +6,44 @@ name: pipeline
 #
 #   pull_request / push su branch  -> check     controlli base, niente pubblicazione
 #   push su main                   -> dev       base + immagine :dev
-#   tag bX.Y.Z                     -> staging   base + immagine :staging + Play beta + TestFlight
-#   tag vX.Y.Z                     -> release   base + scansioni complete + store + Release firmata
+#   tag bX.Y.Z                     -> staging   base + scansioni + immagine :staging + Play beta + TestFlight
+#   tag vX.Y.Z                     -> release   base + scansioni + store + Release firmata
 #   cron del lunedi                -> audit     solo scansioni complete
 #
 # Il livello lo calcola plan.yml: qui non si ricalcola mai.
 #
-# Sostituisce gli otto workflow precedenti: qa-kotlin, qa-web, qa-swift,
-# qa-docker, qa-secrets, release, notify, rescue-flutter-prod.
+# Sostituisce i workflow precedenti: qa-kotlin, qa-web, qa-docker, qa-secrets,
+# release, notify, rescue-flutter-prod.
 #
 # I job che pubblicano usano `if: !cancelled() && <result espliciti>` invece del
-# gating implicito di `needs`. Motivo: `deep` gira solo a livello release e
-# audit, quindi a staging risulta `skipped` e con il gating implicito
-# trascinerebbe skipped anche i publish. Con i result espliciti la regola resta
-# leggibile: `skipped` = non doveva girare, `failure` = cancello chiuso.
+# gating implicito di `needs`. Motivo: alcuni cancelli non girano a tutti i
+# livelli, quindi risultano `skipped` e con il gating implicito trascinerebbero
+# skipped anche i publish. Con i result espliciti la regola resta leggibile:
+# `skipped` = non doveva girare, `failure` = cancello chiuso. Dove un cancello
+# DEVE aver girato (deep prima di uno store o di una Release) la condizione e'
+# `== 'success'` secco, senza scappatoia `|| skipped`.
 
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    # branches-ignore e non branches: [main]. I controlli devono girare su ogni
+    # branch di lavoro anche senza PR aperta, come facevano le qa-*.yml.
+    # Escluso solo dependabot, che apre gia' la PR.
+    branches-ignore: ['dependabot/**']
     tags: ['v*', 'b*']
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
     inputs:
       tier:
-        description: Livello da forzare a mano (serve per provare una release senza taggare).
+        description: Livello da forzare a mano. `auto` = deciso dal ref, come un push normale.
         type: choice
-        options: [check, dev, staging, release, audit]
-        default: check
+        options: [auto, check, dev, staging, release, audit]
+        # `auto` e non `check`: con un default che forza un livello, un dispatch
+        # lanciato su un tag vX.Y.Z senza toccare il menu non pubblicherebbe
+        # niente, perche' forced-tier vince sempre sul ref.
+        default: auto
 
 concurrency:
   group: pipeline-${{ github.ref }}
@@ -52,7 +60,10 @@ jobs:
     uses: Mensa-Italia/.github/.github/workflows/plan.yml@main
     with:
       image: mensa-italia/mensa-web
-      forced-tier: ${{ inputs.tier }}
+      # `auto` -> stringa vuota: plan.yml decide dal ref. Scritto cosi' e non
+      # con il ternario ovvio perche' in una espressione GitHub la stringa
+      # vuota e' falsa e `x == 'auto' && '' || x` restituirebbe 'auto'.
+      forced-tier: ${{ inputs.tier != 'auto' && inputs.tier || '' }}
 
   # ─── Controlli base: i comandi di questo repo ──────────────────────────────
   # Vengono da qa-kotlin.yml, qa-web.yml e qa-docker.yml, identici. Stanno in un
@@ -111,42 +122,70 @@ jobs:
         with:
           dockerfile: Dockerfile.web
 
-  # ─── Controlli base, lato Swift (da qa-swift.yml) ──────────────────────────
-  check-swift:
-    name: controlli Swift
+  # ─── Segreti: a ogni livello ───────────────────────────────────────────────
+  # Prendeva il posto di qa-secrets.yml, che girava su OGNI push. Gitleaks dura
+  # pochi secondi e un segreto committato va intercettato prima del merge, non
+  # al primo tag: per questo la scansione segreti non sta dentro `deep` ma in
+  # una chiamata a parte, senza `if`, che gira anche su check e dev.
+  scan-secrets:
+    name: segreti
     needs: plan
-    if: needs.plan.outputs.tier != 'audit'
-    # macos-latest non ha equivalente self-hosted. continue-on-error finche' il
-    # billing macOS e' bloccato: TOGLIERE `continue-on-error` quando si sblocca,
-    # e aggiungere `needs.check-swift.result == 'success'` alle if dei job che
-    # pubblicano.
-    runs-on: macos-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - run: brew install swiftlint
-      - run: swiftlint lint --quiet iosApp/iosApp
-
-  # ─── Scansioni indipendenti dal linguaggio ─────────────────────────────────
-  # Segreti (gitleaks), vulnerabilita' note delle dipendenze (OSV) e SBOM:
-  # stanno in scan.yml, identiche per tutta l'organizzazione.
-  deep:
-    needs: plan
-    if: needs.plan.outputs.deep == 'true'
     permissions:
       contents: read
-      # osv-scanner-reusable, chiamato da scan.yml, la richiede.
-      security-events: write
     uses: Mensa-Italia/.github/.github/workflows/scan.yml@main
+    with:
+      secrets-scan: true
+      deps-scan: false
+      sbom: false
 
-  # ─── CodeQL: resta locale ──────────────────────────────────────────────────
+  # ─── Scansioni pesanti ─────────────────────────────────────────────────────
+  # Vulnerabilita' note delle dipendenze (OSV) e SBOM. Girano ai livelli deep
+  # (release e audit) E ANCHE a staging: qui staging non e' un'immagine interna,
+  # e' una pubblicazione su Play beta e su TestFlight con distribuzione esterna
+  # al gruppo "Test open". Prima della pipeline unica il quality gate di
+  # release.yml copriva anche il track beta, quindi limitarsi ai controlli base
+  # sarebbe una perdita di copertura su un artefatto che finisce a utenti veri.
+  # I segreti li ha gia' scansionati `scan-secrets`: qui sarebbero un doppione.
+  #
+  # `deps-blocking` resta al default (true): una vulnerabilita' nota ferma la
+  # pubblicazione. Il vecchio release.yml aveva Trivy senza exit-code, quindi
+  # segnalava e basta. Se il primo tag dovesse inciampare su un advisory gia'
+  # presente, la scelta consapevole e' aggiungere `deps-blocking: false` qui,
+  # non togliere il job dai needs.
+  deep:
+    needs: plan
+    if: needs.plan.outputs.deep == 'true' || needs.plan.outputs.tier == 'staging'
+    permissions:
+      # Solo contents: read. scan.yml usa i binari di gitleaks e osv-scanner e
+      # non carica SARIF: il `security-events: write` che serviva al riusabile
+      # di osv-scanner non ha piu' motivo di esistere.
+      contents: read
+    uses: Mensa-Italia/.github/.github/workflows/scan.yml@main
+    with:
+      secrets-scan: false
+      deps-scan: true
+      sbom: true
+
+  # ─── CodeQL: resta locale, e NON blocca ────────────────────────────────────
   # scan.yml non lo include: linguaggi e permessi sono specifici del repo.
-  # Gira agli stessi livelli di `deep` (release e audit).
+  #
+  # Tutti e tre sono `continue-on-error` e NON compaiono nei needs dei job che
+  # pubblicano. L'organizzazione e' sul piano free senza GitHub Advanced
+  # Security: l'upload dei risultati risponde 403
+  # (GET /repos/Mensa-Italia/mensa_italia_app/code-scanning/alerts -> 403), quindi
+  # un CodeQL dentro il cancello di `publish` renderebbe `publish` irraggiungibile
+  # per sempre. Restano perche' il log dell'analisi e' comunque leggibile.
+  #
+  # DA RIMETTERE BLOCCANTI quando l'organizzazione avra' Advanced Security:
+  # togliere `continue-on-error` e rimettere codeql-js / codeql-kotlin /
+  # codeql-swift nei needs e nelle if di image-release, play, testflight e
+  # publish, con `== 'success'`.
   codeql-js:
     name: CodeQL JS/TS
     needs: plan
     if: needs.plan.outputs.deep == 'true'
     runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    continue-on-error: true
     permissions:
       contents: read
       security-events: write
@@ -163,6 +202,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.deep == 'true'
     runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    continue-on-error: true
     permissions:
       contents: read
       security-events: write
@@ -185,8 +225,9 @@ jobs:
     name: CodeQL Swift
     needs: plan
     if: needs.plan.outputs.deep == 'true'
-    # Vedi check-swift: continue-on-error per il blocco billing macOS, va tolto
-    # quando si sblocca.
+    # macos-latest non ha equivalente self-hosted, e il billing macOS e'
+    # bloccato. Sommato al 403 di Advanced Security, doppio motivo per
+    # continue-on-error.
     runs-on: macos-latest
     continue-on-error: true
     permissions:
@@ -231,15 +272,24 @@ jobs:
       - uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
         with: { category: '/language:swift' }
 
-  # ─── Immagine web su GHCR ──────────────────────────────────────────────────
+  # ─── Immagine web su GHCR: dev e staging ───────────────────────────────────
   # I tag li ha gia' calcolati plan.yml. `prepare` costruisce la libreria
   # KMP/JS che Dockerfile.web si aspetta di trovare gia' pronta.
+  #
+  # Due job immagine e non uno: il cancello di release e' piu' stretto (vedi
+  # image-release) e una `if` sola con `|| skipped` lo aprirebbe anche quando
+  # `deep` fallisce. A dev `deep` non gira e vale `skipped`; a staging gira e
+  # deve essere verde.
   image:
-    needs: [plan, check, check-swift]
+    name: immagine (dev/staging)
+    needs: [plan, check, scan-secrets, deep]
     if: >-
       !cancelled()
       && needs.plan.outputs.publish == 'true'
+      && needs.plan.outputs.tier != 'release'
       && needs.check.result == 'success'
+      && needs.scan-secrets.result == 'success'
+      && (needs.deep.result == 'success' || needs.deep.result == 'skipped')
     permissions:
       contents: read
       packages: write
@@ -248,6 +298,35 @@ jobs:
       image: mensa-italia/mensa-web
       tags: ${{ needs.plan.outputs.tags }}
       file: Dockerfile.web
+      license: LicenseRef-Proprietary
+      prepare: |
+        export JAVA_HOME="${JAVA_HOME_21_X64:-$JAVA_HOME}"
+        ./gradlew :shared:jsBrowserProductionLibraryDistribution \
+          -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon --stacktrace
+
+  # ─── Immagine web su GHCR: release ─────────────────────────────────────────
+  # Stessa cosa, ma i tag di questo livello sono :latest, :X.Y.Z e :X.Y, cioe'
+  # quelli che i deploy in produzione seguono. Qui `deep` deve essere `success`
+  # davvero: niente `|| skipped`, altrimenti una scansione fallita lascerebbe
+  # comunque sovrascrivere :latest.
+  image-release:
+    name: immagine (release)
+    needs: [plan, check, scan-secrets, deep]
+    if: >-
+      !cancelled()
+      && needs.plan.outputs.tier == 'release'
+      && needs.check.result == 'success'
+      && needs.scan-secrets.result == 'success'
+      && needs.deep.result == 'success'
+    permissions:
+      contents: read
+      packages: write
+    uses: Mensa-Italia/.github/.github/workflows/image.yml@main
+    with:
+      image: mensa-italia/mensa-web
+      tags: ${{ needs.plan.outputs.tags }}
+      file: Dockerfile.web
+      license: LicenseRef-Proprietary
       prepare: |
         export JAVA_HOME="${JAVA_HOME_21_X64:-$JAVA_HOME}"
         ./gradlew :shared:jsBrowserProductionLibraryDistribution \
@@ -301,11 +380,12 @@ jobs:
   # ─── Android: AAB + APK firmati ────────────────────────────────────────────
   android:
     name: Android
-    needs: [plan, check, check-swift, version-code]
+    needs: [plan, check, scan-secrets, version-code]
     if: >-
       !cancelled()
       && needs.version-code.result == 'success'
       && needs.check.result == 'success'
+      && needs.scan-secrets.result == 'success'
     runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     env:
       VERSION: ${{ needs.plan.outputs.version }}
@@ -315,6 +395,14 @@ jobs:
 
       - name: Write VERSION file (per gradle)
         run: |
+          set -euo pipefail
+          # Cintura e bretelle: plan.yml rifiuta gia' un livello release/staging
+          # senza tag, ma un versionName vuoto caricato sugli store non si
+          # disfa. Meglio un job rosso.
+          if [ -z "${VERSION:-}" ]; then
+            echo "::error::Versione vuota: non si costruisce un artefatto da pubblicare senza un tag vX.Y.Z o bX.Y.Z."
+            exit 1
+          fi
           echo "$VERSION" > VERSION
           echo "Building Android v$VERSION (versionCode $VERSION_CODE)"
 
@@ -367,13 +455,14 @@ jobs:
   # ─── iOS: .ipa firmato per App Store ───────────────────────────────────────
   ios:
     name: iOS
-    needs: [plan, check, check-swift, version-code]
+    needs: [plan, check, scan-secrets, version-code]
     if: >-
       !cancelled()
       && needs.version-code.result == 'success'
       && needs.check.result == 'success'
-    # Vedi check-swift: continue-on-error per il blocco billing macOS, va tolto
-    # quando si sblocca.
+      && needs.scan-secrets.result == 'success'
+    # macos-latest non ha equivalente self-hosted. continue-on-error finche' il
+    # billing macOS e' bloccato: TOGLIERE `continue-on-error` quando si sblocca.
     runs-on: macos-latest
     continue-on-error: true
     env:
@@ -381,6 +470,16 @@ jobs:
       VERSION_CODE: ${{ needs.version-code.outputs.value }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Verifica la versione
+        run: |
+          set -euo pipefail
+          # Stesso motivo del job Android: MARKETING_VERSION vuoto produce un
+          # .ipa che App Store Connect accetta e non si ritira piu'.
+          if [ -z "${VERSION:-}" ]; then
+            echo "::error::Versione vuota: non si costruisce un .ipa da pubblicare senza un tag vX.Y.Z o bX.Y.Z."
+            exit 1
+          fi
 
       - name: Select latest Xcode (project.yml usa iOS 26)
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
@@ -525,20 +624,20 @@ jobs:
           retention-days: 7
 
   # ─── Play Store ────────────────────────────────────────────────────────────
-  # Niente esce prima dei controlli: a livello release il cancello comprende
-  # anche `deep` e i CodeQL. A livello staging quei job non girano affatto e
-  # risultano `skipped`, che qui vale come "non doveva girare".
+  # Niente esce prima dei controlli. `deep` gira sia a staging che a release
+  # (vedi il commento del job), quindi qui la condizione e' `== 'success'`
+  # secco: nessun `|| skipped` che aprirebbe il cancello quando la scansione
+  # e' rossa. I CodeQL non compaiono: sono non bloccanti finche' l'org non ha
+  # Advanced Security (vedi il blocco CodeQL).
   play:
     name: Play (${{ needs.plan.outputs.tier }})
-    needs: [plan, check, check-swift, deep, codeql-js, codeql-kotlin, codeql-swift, android]
+    needs: [plan, check, scan-secrets, deep, android]
     if: >-
       !cancelled()
       && needs.android.result == 'success'
       && needs.check.result == 'success'
-      && (needs.deep.result == 'success' || needs.deep.result == 'skipped')
-      && (needs.codeql-js.result == 'success' || needs.codeql-js.result == 'skipped')
-      && (needs.codeql-kotlin.result == 'success' || needs.codeql-kotlin.result == 'skipped')
-      && (needs.codeql-swift.result == 'success' || needs.codeql-swift.result == 'skipped')
+      && needs.scan-secrets.result == 'success'
+      && needs.deep.result == 'success'
     runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     steps:
       - name: Download AAB
@@ -570,19 +669,19 @@ jobs:
           inAppUpdatePriority: 2
 
   # ─── TestFlight / App Store ────────────────────────────────────────────────
+  # Stesso cancello di `play`: a staging la lane beta distribuisce al gruppo
+  # esterno "Test open", quindi non e' meno pubblico di una release.
   testflight:
     name: iOS publish (${{ needs.plan.outputs.tier }})
-    needs: [plan, check, check-swift, deep, codeql-js, codeql-kotlin, codeql-swift, ios]
+    needs: [plan, check, scan-secrets, deep, ios]
     if: >-
       !cancelled()
       && needs.ios.result == 'success'
       && needs.check.result == 'success'
-      && (needs.deep.result == 'success' || needs.deep.result == 'skipped')
-      && (needs.codeql-js.result == 'success' || needs.codeql-js.result == 'skipped')
-      && (needs.codeql-kotlin.result == 'success' || needs.codeql-kotlin.result == 'skipped')
-      && (needs.codeql-swift.result == 'success' || needs.codeql-swift.result == 'skipped')
-    # Vedi check-swift: continue-on-error per il blocco billing macOS, va tolto
-    # quando si sblocca.
+      && needs.scan-secrets.result == 'success'
+      && needs.deep.result == 'success'
+    # macos-latest non ha equivalente self-hosted. continue-on-error finche' il
+    # billing macOS e' bloccato: TOGLIERE `continue-on-error` quando si sblocca.
     runs-on: macos-latest
     continue-on-error: true
     env:
@@ -737,16 +836,18 @@ jobs:
           retention-days: 7
 
   # ─── Release firmata ───────────────────────────────────────────────────────
+  # L'ultimo cancello, e il piu' stretto: controlli base, segreti, scansioni
+  # pesanti e immagine :latest devono essere tutti verdi. I CodeQL restano
+  # fuori dai needs finche' l'org e' sul piano free (vedi il blocco CodeQL).
   publish:
-    needs: [plan, check, check-swift, deep, codeql-js, codeql-kotlin, codeql-swift, image, bundle]
+    needs: [plan, check, scan-secrets, deep, image-release, bundle]
     if: >-
       !cancelled()
       && needs.plan.outputs.tier == 'release'
       && needs.check.result == 'success'
+      && needs.scan-secrets.result == 'success'
       && needs.deep.result == 'success'
-      && needs.codeql-js.result == 'success'
-      && needs.codeql-kotlin.result == 'success'
-      && needs.image.result == 'success'
+      && needs.image-release.result == 'success'
       && needs.bundle.result == 'success'
     permissions:
       contents: write
