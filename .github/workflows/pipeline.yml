@@ -23,7 +23,7 @@ name: pipeline
 # DEVE aver girato (deep prima di uno store o di una Release) la condizione e'
 # `== 'success'` secco, senza scappatoia `|| skipped`.
 
-# ATTENZIONE, questo repo NON pubblica piu'.
+# ATTENZIONE, questo repo pubblica SOLO le app mobili, mai l'immagine web.
 #
 # mensa_italia_app sta per essere archiviato in favore di mensa-hub, e i due
 # pubblicano sullo stesso identico nome immagine: ghcr.io/mensa-italia/mensa-web.
@@ -32,16 +32,21 @@ name: pipeline
 # dev con l'immagine sbagliata. E' successo davvero l'11 agosto 2026, run
 # 31547011487.
 #
-# Quindi restano solo i trigger che NON pubblicano: pull_request e
-# workflow_dispatch producono il livello `check`, che ha publish=false. Il push
-# su branch e sui tag, il cron e la distribuzione agli store sono spenti.
+# Il 12 agosto 2026 e' tornato il solo trigger `push: tags: ['b*']`, cioe' le
+# beta pubbliche (Play track beta + TestFlight "Test open"): sono artefatti
+# mobili, non toccano ghcr. La collisione resta chiusa da due lati:
+#   - i job immagine non girano a staging (vedi la `if` di `image`);
+#   - il push su branch, i tag `v*` e il cron restano spenti, quindi release,
+#     dev e audit da qui non partono.
 #
-# Quando il repo verra' archiviato questo file smettera' di girare da solo. Se
-# invece si decidesse di tenerlo vivo, prima va cambiato il nome immagine:
-# rimettere i trigger senza toccare quello ricrea la collisione.
+# Se un giorno serve rimettere anche l'immagine o le release, prima va cambiato
+# il nome immagine: riaprire quei trigger senza toccarlo ricrea la collisione.
 on:
   pull_request:
     branches: [main]
+  push:
+    # Solo beta. `v*` (release) resta fuori: pubblicherebbe anche :latest.
+    tags: ['b*']
   workflow_dispatch:
     inputs:
       tier:
@@ -288,13 +293,18 @@ jobs:
   # image-release) e una `if` sola con `|| skipped` lo aprirebbe anche quando
   # `deep` fallisce. A dev `deep` non gira e vale `skipped`; a staging gira e
   # deve essere verde.
+  # NB: a staging questo job NON gira. Le beta mobili escono da qui, l'immagine
+  # web no: `ghcr.io/mensa-italia/mensa-web` e' la stessa di mensa-hub e
+  # ripubblicarla da questo repo ricrea la collisione dell'11 agosto 2026.
+  # Togliere `tier != 'staging'` solo dopo aver cambiato il nome immagine.
   image:
-    name: immagine (dev/staging)
+    name: immagine (dev)
     needs: [plan, check, scan-secrets, deep]
     if: >-
       !cancelled()
       && needs.plan.outputs.publish == 'true'
       && needs.plan.outputs.tier != 'release'
+      && needs.plan.outputs.tier != 'staging'
       && needs.check.result == 'success'
       && needs.scan-secrets.result == 'success'
       && (needs.deep.result == 'success' || needs.deep.result == 'skipped')
