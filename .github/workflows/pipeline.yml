@@ -178,6 +178,18 @@ jobs:
       secrets-scan: false
       deps-scan: true
       sbom: true
+      # A staging esce solo roba mobile (AAB e IPA) e le vulnerabilita' note
+      # di questo repo sono tutte npm — astro, vite, esbuild, postcss, sharp,
+      # ws, yaml... — cioe' web app e tooling: dentro l'AAB e l'IPA non ce n'e'
+      # una. Zero advisory su Gradle/Maven e zero su CocoaPods (osv-scanner,
+      # run 31633267972: 69 vulnerabilita', 1 solo ecosistema). Bloccare la beta
+      # mobile su quelle e' un cancello fuori posto, quindi a staging la
+      # scansione riporta e basta.
+      #
+      # A release resta bloccante, perche' li' si pubblica anche l'immagine
+      # web, che quei pacchetti se li porta dentro davvero. Non e' un
+      # `deps-blocking: false` secco proprio per questo.
+      deps-blocking: ${{ needs.plan.outputs.tier != 'staging' }}
 
   # ─── CodeQL: resta locale, e NON blocca ────────────────────────────────────
   # scan.yml non lo include: linguaggi e permessi sono specifici del repo.
