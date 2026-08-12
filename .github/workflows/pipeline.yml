@@ -434,10 +434,21 @@ jobs:
         uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
       - name: Decode signing keystore
+        env:
+          STORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          set -euo pipefail
           mkdir -p androidApp/keystore
           echo "${{ secrets.KEY_JKS }}" | base64 -d > androidApp/keystore/release.jks
-          file androidApp/keystore/release.jks
+          # Qui c'era `file androidApp/keystore/release.jks`: sul runner
+          # self-hosted `file(1)` non esiste e il job moriva con exit 127 prima
+          # ancora di compilare (run 31633267972). Un accertamento diagnostico
+          # non deve poter fermare una pubblicazione, e questo dice anche di
+          # piu': che il base64 ha prodotto un keystore che si apre davvero con
+          # la password che useremo per firmare.
+          test -s androidApp/keystore/release.jks
+          keytool -list -keystore androidApp/keystore/release.jks \
+            -storepass "$STORE_PASSWORD" >/dev/null
 
       - name: Build AAB + APK
         env:
