@@ -86,7 +86,12 @@ jobs:
     name: controlli
     needs: plan
     if: needs.plan.outputs.tier != 'audit'
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    # Sui livelli che pubblicano si va su runner GitHub: il 12 agosto 2026 il
+    # self-hosted ha fatto fallire due run di fila su download Gradle
+    # (services.gradle.org e poi github.com:443 che non rispondeva), fermando
+    # una pubblicazione gia' verificata. Sulle PR resta LINUX_RUNNER, dove una
+    # rete ballerina costa solo un "Re-run jobs".
+    runs-on: ${{ needs.plan.outputs.publish == 'true' && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
