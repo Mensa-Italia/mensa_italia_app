@@ -416,12 +416,29 @@ jobs:
       && needs.version-code.result == 'success'
       && needs.check.result == 'success'
       && needs.scan-secrets.result == 'success'
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    # Runner GitHub e non LINUX_RUNNER, unico job insieme a iOS: l'immagine
+    # self-hosted non ha l'Android SDK (run 31640535098) e non ha nemmeno gli
+    # strumenti per installarcelo in modo affidabile — le manca perfino
+    # `file(1)`. Qui l'SDK c'e' gia'. Da rimettere su LINUX_RUNNER quando
+    # l'immagine includera' l'SDK.
+    runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.plan.outputs.version }}
       VERSION_CODE: ${{ needs.version-code.outputs.value }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      # Il runner self-hosted ha il JDK ma non l'Android SDK, e senza SDK AGP
+      # si ferma su "SDK location not found" appena chiede android.jar: questo
+      # job non era mai riuscito a compilare (run 31640535098). L'immagine dei
+      # runner GitHub l'SDK ce l'ha gia', con ANDROID_HOME impostato, quindi lo
+      # installiamo qui invece di dipendere da cosa c'e' sul runner. Se un
+      # giorno l'immagine self-hosted includera' l'SDK, questo step si toglie e
+      # il job torna su LINUX_RUNNER.
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
 
       - name: Write VERSION file (per gradle)
         run: |
