@@ -6,7 +6,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -245,7 +247,14 @@ fun MainAppShell() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                // La bottom bar copre gia' la navigation bar di sistema quando e'
+                // visibile: senza consumare l'inset, le schermate interne
+                // (MensaScaffold consuma navigationBars) lo pagherebbero due volte.
+                // Sulle destinazioni drill la bar non c'e', l'inset resta intero e
+                // la schermata se lo prende — cosi' il FAB non finisce sotto la
+                // barra di sistema.
+                .consumeWindowInsets(innerPadding),
         ) {
             // ── Master NavHost ────────────────────────────────────────────────
             NavHost(
@@ -344,6 +353,10 @@ fun MainAppShell() {
                     controller = audioController,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        // Zero quando la bottom bar e' visibile (inset gia'
+                        // consumato sopra), altezza piena della navigation bar
+                        // sulle destinazioni drill.
+                        .navigationBarsPadding()
                         .padding(bottom = 8.dp, start = 12.dp, end = 12.dp),
                 )
             }

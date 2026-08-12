@@ -6,7 +6,9 @@ import app.cash.sqldelight.coroutines.mapToList
 import it.mensa.shared.api.FilePart
 import it.mensa.shared.api.endpoints.EventSchedulesApi
 import it.mensa.shared.api.endpoints.EventsApi
+import it.mensa.shared.api.endpoints.LocationsApi
 import it.mensa.shared.db.MensaDatabase
+import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.EventScheduleModel
 import it.mensa.shared.model.LocationModel
@@ -62,6 +64,7 @@ class EventsRepository(
     private val db: MensaDatabase,
     private val json: Json,
     private val schedulesApi: EventSchedulesApi? = null,
+    private val locationsApi: LocationsApi? = null,
 ) {
     fun observeAll(): Flow<List<EventModel>> =
         db.eventQueries.selectAll()
@@ -74,6 +77,55 @@ class EventsRepository(
         db.transaction {
             db.eventQueries.deleteAll()
             items.forEach { e -> upsertRow(e) }
+        }
+        repairMissingStates(items)
+    }
+
+    /**
+     * Richiede al server la regione delle posizioni che ce l'hanno illeggibile.
+     *
+     * Il filtro "Regione" della lista eventi confronta `positions.state`. Il
+     * backend di norma lo riempie, ma qualche record e' rimasto indietro con
+     * `NaN` pur essendo in Italia — al 12 agosto 2026 erano 3 su 267, fra cui
+     * i due eventi in cima alla lista (Vicoforte e Caramanico Terme) — e senza
+     * regione un evento non compare sotto nessuna chip.
+     *
+     * `GET /api/position/state?lat=&lon=` risponde ancora correttamente per
+     * quelle coordinate, quindi glielo si richiede: una volta per posizione,
+     * con la risposta (compreso un `NaN` legittimo, tipo l'evento a Perth)
+     * messa in KeyValue, cosi' ai refresh successivi non si ripete. Gira dopo
+     * il salvataggio: la lista appare subito e le regioni arrivano con una
+     * seconda emissione del Flow.
+     */
+    private suspend fun repairMissingStates(events: List<EventModel>) {
+        val locations = locationsApi ?: return
+        val pending = events
+            .mapNotNull { it.position }
+            .filter { position ->
+                ItalianRegions.canonical(position.state) == null &&
+                    position.id.isNotBlank() &&
+                    (position.lat != 0.0 || position.lon != 0.0)
+            }
+            .distinctBy { it.id }
+        if (pending.isEmpty()) return
+
+        val resolved = mutableMapOf<String, String>()
+        pending.forEach { position ->
+            val cacheKey = STATE_CACHE_PREFIX + position.id
+            val answer = db.keyValueQueries.selectById(cacheKey).awaitAsOneOrNull()?.value_
+                ?: runCatching { locations.locateState(position.lat, position.lon).state }
+                    .getOrNull()
+                    ?.also { db.keyValueQueries.insertOrReplace(key = cacheKey, value_ = it) }
+                ?: return@forEach
+            ItalianRegions.canonical(answer)?.let { region -> resolved[position.id] = region }
+        }
+        if (resolved.isEmpty()) return
+
+        db.transaction {
+            events.forEach { event ->
+                val region = resolved[event.position?.id] ?: return@forEach
+                upsertRow(event.withPositionState(region))
+            }
         }
     }
 
@@ -177,6 +229,10 @@ class EventsRepository(
             },
             updatedAt = Clock.System.now().toEpochMilliseconds()
         )
+    }
+
+    private companion object {
+        const val STATE_CACHE_PREFIX = "position_state:"
     }
 }
 

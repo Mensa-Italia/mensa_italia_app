@@ -29,3 +29,14 @@ internal fun Event.toModel(json: Json): EventModel {
         expand = location?.let { EventExpand(position = it) },
     )
 }
+
+/**
+ * Copia dell'evento con la regione scritta sulla posizione. La usa
+ * [EventsRepository] dopo aver richiesto `/api/position/state` per i record che
+ * il backend ha lasciato senza regione leggibile.
+ */
+internal fun EventModel.withPositionState(state: String): EventModel {
+    val position = position ?: return this
+    if (position.state == state) return this
+    return copy(expand = (expand ?: EventExpand()).copy(position = position.copy(state = state)))
+}

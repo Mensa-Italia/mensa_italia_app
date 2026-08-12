@@ -520,7 +520,7 @@
   "events.filter.label": "Filtri",
   "events.filter.region.all": "Tutte",
   "events.filter.region.count": "%d selezionate",
-  "events.filter.region.footer": "Confrontato con l'indirizzo dell'evento.",
+  "events.filter.region.hint": "La regione viene dedotta dalla posizione dell'evento.",
   "events.filter.reset": "Azzera",
   "events.filter.section.distance": "Distanza",
   "events.filter.section.region": "Regione",

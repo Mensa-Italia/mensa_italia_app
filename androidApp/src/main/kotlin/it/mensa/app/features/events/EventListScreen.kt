@@ -169,7 +169,10 @@ fun EventListScreen(
                     else -> {
                         LazyColumn(
                             state = listState,
-                            contentPadding = PaddingValues(bottom = 80.dp, top = 8.dp),
+                            // 96dp = altezza dell'ExtendedFAB + margine. La
+                            // navigation bar di sistema la scala gia'
+                            // MensaScaffold via innerPadding.
+                            contentPadding = PaddingValues(bottom = 96.dp, top = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             if (upcoming.isNotEmpty()) {
