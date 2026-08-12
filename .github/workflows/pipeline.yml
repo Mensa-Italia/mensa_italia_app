@@ -23,17 +23,25 @@ name: pipeline
 # DEVE aver girato (deep prima di uno store o di una Release) la condizione e'
 # `== 'success'` secco, senza scappatoia `|| skipped`.
 
+# ATTENZIONE, questo repo NON pubblica piu'.
+#
+# mensa_italia_app sta per essere archiviato in favore di mensa-hub, e i due
+# pubblicano sullo stesso identico nome immagine: ghcr.io/mensa-italia/mensa-web.
+# Finche' entrambi hanno il trigger su push, quello deprecato sovrascrive il tag
+# :dev di quello che sopravvive e il webhook Portainer ridistribuisce lo stack
+# dev con l'immagine sbagliata. E' successo davvero l'11 agosto 2026, run
+# 31547011487.
+#
+# Quindi restano solo i trigger che NON pubblicano: pull_request e
+# workflow_dispatch producono il livello `check`, che ha publish=false. Il push
+# su branch e sui tag, il cron e la distribuzione agli store sono spenti.
+#
+# Quando il repo verra' archiviato questo file smettera' di girare da solo. Se
+# invece si decidesse di tenerlo vivo, prima va cambiato il nome immagine:
+# rimettere i trigger senza toccare quello ricrea la collisione.
 on:
   pull_request:
     branches: [main]
-  push:
-    # branches-ignore e non branches: [main]. I controlli devono girare su ogni
-    # branch di lavoro anche senza PR aperta, come facevano le qa-*.yml.
-    # Escluso solo dependabot, che apre gia' la PR.
-    branches-ignore: ['dependabot/**']
-    tags: ['v*', 'b*']
-  schedule:
-    - cron: '0 6 * * 1'
   workflow_dispatch:
     inputs:
       tier:
