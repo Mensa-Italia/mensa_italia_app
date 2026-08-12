@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -176,7 +175,9 @@ fun PassportScreen(
                     onClick = onNavigateToScanner,
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary,
-                    modifier = Modifier.navigationBarsPadding(),
+                    // Niente navigationBarsPadding: ci pensa MensaScaffold con
+                    // contentWindowInsets = navigationBars, altrimenti il FAB
+                    // sale del doppio.
                 )
             }
         },

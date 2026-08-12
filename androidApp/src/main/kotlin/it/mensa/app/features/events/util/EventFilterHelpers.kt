@@ -1,6 +1,7 @@
 package it.mensa.app.features.events.util
 
 import android.location.Location
+import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.EventModel
 
 /**
@@ -14,14 +15,9 @@ enum class EventType(val label: String, val icon: String) {
     ONLINE("Online", "wifi"),
 }
 
-object ItalianRegions {
-    val all = listOf(
-        "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
-        "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
-        "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana",
-        "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto",
-    )
-}
+// L'elenco delle regioni vive in :shared (it.mensa.shared.geo.ItalianRegions):
+// chip del filtro, resolver, iOS e web devono leggere gli stessi identici nomi,
+// altrimenti il confronto non trova mai niente.
 
 object DistanceSteps {
     val kmValues = listOf(5, 25, 50, 100, 200, 500)
@@ -65,13 +61,18 @@ object EventFilterHelpers {
         return types.contains(typeOf(event))
     }
 
-    fun matchesRegion(event: EventModel, regions: Set<String>): Boolean {
-        if (regions.isEmpty()) return true
-        val address = event.position?.address ?: return false
-        if (address.isBlank()) return false
-        val lower = address.lowercase()
-        return regions.any { lower.contains(it.lowercase()) }
-    }
+    /**
+     * Confronta la regione della posizione con quelle selezionate.
+     *
+     * Prima si cercava il nome della regione dentro l'indirizzo: gli indirizzi
+     * italiani la regione non la scrivono ("11100 Aosta AO"), le vie invece
+     * spesso si', e filtrando per Sicilia usciva l'evento di "Via Sicilia" a
+     * Chieri. Ora si legge `position.state`, che e' il campo che il backend
+     * calcola con `/api/position/state` e che EventsRepository riempie quando
+     * arriva vuoto.
+     */
+    fun matchesRegion(event: EventModel, regions: Set<String>): Boolean =
+        ItalianRegions.matches(event.position?.state, regions)
 
     fun matchesDistance(
         event: EventModel,

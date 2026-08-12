@@ -38,7 +38,10 @@ val contentModule = module {
     single { RegSociApi(get()) }
 
     // Offline-first repositories
-    single { EventsRepository(get(), get(), get(), get()) }
+    // Il 5° parametro e' LocationsApi: richiede /api/position/state per le
+    // posizioni rimaste senza regione, altrimenti quegli eventi non compaiono
+    // sotto nessuna chip del filtro.
+    single { EventsRepository(get(), get(), get(), get(), get()) }
     single { EventSchedulesRepository(get(), get()) }
     single { DealsRepository(get(), get(), get()) }
     single { SigsRepository(get(), get(), get()) }

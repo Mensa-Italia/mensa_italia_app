@@ -296,8 +296,10 @@ struct EventFiltersSheet: View {
                 }
             }
         } footer: {
-            Text(tr("events.filter.region.footer",
-                    fallback: "Confrontato con l'indirizzo dell'evento."))
+            // Chiave nuova: la vecchia (`…region.footer`) diceva "confrontato
+            // con l'indirizzo", che descriveva il filtro rotto.
+            Text(tr("events.filter.region.hint",
+                    fallback: "La regione viene dedotta dalla posizione dell'evento."))
         }
     }
 

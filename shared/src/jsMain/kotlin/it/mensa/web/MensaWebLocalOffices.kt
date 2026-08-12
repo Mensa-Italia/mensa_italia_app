@@ -4,6 +4,7 @@ package it.mensa.web
 
 import it.mensa.shared.MensaSdk
 import it.mensa.shared.api.endpoints.LocalOfficesApi
+import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.LocalOfficeAdminModel
 import it.mensa.shared.model.LocalOfficeAssistantModel
 import it.mensa.shared.model.LocalOfficeLinkRecord
@@ -286,7 +287,10 @@ internal fun LocalOfficeModel.toJs(): MensaWebLocalOffice {
         name = name,
         kicker = "",
         bio = bio,
-        region = region,
+        // Stessa normalizzazione della regione degli eventi: la pagina del
+        // gruppo locale confronta le due con `===` per elencare i prossimi
+        // eventi, e una grafia diversa da una parte svuoterebbe la lista.
+        region = ItalianRegions.canonical(region) ?: region,
         coverUrl = cover,
     )
 }

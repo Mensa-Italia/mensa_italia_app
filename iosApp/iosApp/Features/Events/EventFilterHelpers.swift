@@ -29,13 +29,12 @@ enum EventType: String, CaseIterable, Identifiable, Codable, Hashable {
 }
 
 /// Canonical list of Italian regions used for region chip matching.
+///
+/// Comes from the shared module (`ItalianRegions` in `it.mensa.shared.geo`) so
+/// the chips, the resolver and the Android/web filters all speak the exact same
+/// strings.
 enum ItalianRegions {
-    static let all: [String] = [
-        "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
-        "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
-        "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana",
-        "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
-    ]
+    static let all: [String] = Shared.ItalianRegions.shared.all
 }
 
 /// Discrete distance steps in km. `nil` means "illimitato".
@@ -105,11 +104,21 @@ enum EventFilterHelpers {
         return types.contains(type(of: event))
     }
 
+    /// Region of the event: the backend-computed `positions.state`.
+    static func region(of event: EventModel) -> String? {
+        Shared.ItalianRegions.shared.canonical(raw: event.position?.state)
+    }
+
+    /// Compares the event's region against the selected ones.
+    ///
+    /// This used to look for the region name inside the address. Italian
+    /// addresses almost never spell the region out ("11100 Aosta AO"), while
+    /// streets very often do: filtering by Sicilia surfaced the event in "Via
+    /// Sicilia" at Chieri (Piemonte) and hid everything else. The region now
+    /// comes from `positions.state`, which the backend fills from
+    /// `/api/position/state` and `EventsRepository` back-fills when empty.
     static func matchesRegion(_ event: EventModel, regions: Set<String>) -> Bool {
-        guard !regions.isEmpty else { return true }
-        guard let address = event.position?.address, !address.isEmpty else { return false }
-        let lower = address.lowercased()
-        return regions.contains { lower.contains($0.lowercased()) }
+        Shared.ItalianRegions.shared.matches(state: event.position?.state, selected: regions)
     }
 
     static func matchesDistance(_ event: EventModel,

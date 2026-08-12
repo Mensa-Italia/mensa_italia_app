@@ -44,7 +44,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 import it.mensa.app.features.events.util.DistanceSteps
 import it.mensa.app.features.events.util.EventFilterState
 import it.mensa.app.features.events.util.EventType
-import it.mensa.app.features.events.util.ItalianRegions
+import it.mensa.app.support.tr
+import it.mensa.shared.geo.ItalianRegions
 
 /**
  * EventFiltersSheet — Android equivalent of iOS EventFiltersSheet.swift.
@@ -83,21 +84,27 @@ fun EventFiltersSheet(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextButton(onClick = { draft = draft.reset() }) {
-                    Text("Reset", color = if (draft.isEmpty) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.primary)
+                    Text(
+                        tr("events.filter.reset", fallback = "Azzera"),
+                        color = if (draft.isEmpty) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.primary,
+                    )
                 }
-                Text("Filtri", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+                Text(
+                    tr("events.filter.title", fallback = "Filtri"),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                )
                 Button(onClick = { onApply(draft); onDismiss() }) {
-                    Text("Applica")
+                    Text(tr("events.filter.apply", fallback = "Applica"))
                 }
             }
 
             // Type section
-            FilterSectionLabel("Tipo evento")
+            FilterSectionLabel(tr("events.filter.section.type", fallback = "Tipo evento"))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 EventType.values().forEach { type ->
                     val selected = draft.types.contains(type)
                     FilterChip(
-                        text = type.label,
+                        text = type.localizedLabel(),
                         selected = selected,
                         onClick = {
                             draft = draft.copy(
@@ -108,17 +115,24 @@ fun EventFiltersSheet(
                 }
             }
             if (draft.types.isEmpty()) {
-                Text("Nessuna selezione = mostra tutto", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    tr("events.filter.type.hint", fallback = "Nessuna selezione = mostra tutto"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             // Distance section
-            FilterSectionLabel("Distanza")
+            FilterSectionLabel(tr("events.filter.section.distance", fallback = "Distanza"))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Usa la mia posizione", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    tr("events.filter.distance.use_my_location", fallback = "Usa la mia posizione"),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
                 Switch(
                     checked = draft.useMyLocation,
                     onCheckedChange = { enabled ->
@@ -132,13 +146,20 @@ fun EventFiltersSheet(
             }
             if (draft.useMyLocation) {
                 if (!locationPermission.status.isGranted) {
-                    Text("Autorizza la posizione nelle impostazioni.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        tr("events.filter.distance.denied.body", fallback = "Autorizza la posizione nelle impostazioni."),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 } else {
                     val stepIndex = draft.maxDistanceKm?.let { km ->
                         DistanceSteps.kmValues.indexOf(km).takeIf { it >= 0 }
                     } ?: DistanceSteps.kmValues.size
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Raggio", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            tr("events.filter.distance.radius", fallback = "Raggio"),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                         Text(
                             DistanceSteps.label(draft.maxDistanceKm),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
@@ -157,14 +178,22 @@ fun EventFiltersSheet(
                         steps = DistanceSteps.kmValues.size - 1,
                     )
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("5 km", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Illimitato", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            tr("events.filter.distance.min", fallback = "5 km"),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            tr("events.filter.distance.unlimited", fallback = "Illimitato"),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
 
             // Region section
-            FilterSectionLabel("Regione")
+            FilterSectionLabel(tr("events.filter.section.region", fallback = "Regione"))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ItalianRegions.all.forEach { region ->
                     val selected = draft.regions.contains(region)
@@ -179,11 +208,23 @@ fun EventFiltersSheet(
                     )
                 }
             }
-            Text("Confrontato con l'indirizzo dell'evento.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                tr("events.filter.region.hint", fallback = "La regione viene dedotta dalla posizione dell'evento."),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
             Spacer(Modifier.height(8.dp))
         }
     }
+}
+
+/** Etichetta tradotta della chip di tipo; il valore hardcoded resta da fallback. */
+@Composable
+private fun EventType.localizedLabel(): String = when (this) {
+    EventType.NATIONAL -> tr("events.type.national", fallback = label)
+    EventType.LOCAL -> tr("events.type.local", fallback = label)
+    EventType.ONLINE -> tr("events.type.online", fallback = label)
 }
 
 @Composable

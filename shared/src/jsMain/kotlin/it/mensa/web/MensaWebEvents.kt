@@ -5,6 +5,7 @@ package it.mensa.web
 import it.mensa.shared.MensaSdk
 import it.mensa.shared.api.endpoints.EventSchedulesApi
 import it.mensa.shared.api.endpoints.EventsApi
+import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.EventScheduleModel
 import it.mensa.shared.repository.EventsRepository
@@ -334,7 +335,11 @@ internal fun EventModel.toJs(): MensaWebEvent {
         isOnline = positionId == null && pos == null,
         isPublic = isPublic,
         isSpot = isSpot,
-        region = pos?.state ?: "",
+        // `positions.state` lo riempie EventsRepository via /api/position/state
+        // quando il backend l'ha lasciato vuoto. canonical() normalizza le
+        // grafie vecchie e scarta il "NaN" che il server restituisce fuori
+        // dall'Italia, cosi' il confronto con ITALIAN_REGIONS lato React torna.
+        region = ItalianRegions.canonical(pos?.state) ?: "",
         locationName = pos?.name ?: "",
         locationAddress = pos?.address ?: "",
         locationId = positionId ?: pos?.id ?: "",
