@@ -200,7 +200,7 @@ struct DealDetailView: View {
     private func heroImage(for deal: DealModel) -> some View {
         let url: URL? = {
             guard let att = deal.attachment, !att.isEmpty else { return nil }
-            return Files.url(collection: "deals", recordId: deal.id, filename: att, thumb: "1000x600")
+            return Files.url(collection: "deals", recordId: deal.id, filename: att, thumb: "800x0")
         }()
 
         CachedAsyncImage(url: url) { img in

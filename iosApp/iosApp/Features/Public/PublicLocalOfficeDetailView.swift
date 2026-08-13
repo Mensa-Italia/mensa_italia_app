@@ -437,7 +437,7 @@ struct PublicLocalOfficeDetailView: View {
             collection: "view_local_office_admins",
             recordId: admin.id,
             filename: admin.image,
-            thumb: "400x400"
+            thumb: "200x200"
         )
     }
 

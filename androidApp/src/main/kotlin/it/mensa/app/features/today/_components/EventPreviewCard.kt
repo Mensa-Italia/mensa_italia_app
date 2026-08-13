@@ -91,7 +91,7 @@ fun EventPreviewCard(
                     collection = "events",
                     recordId = event.id,
                     filename = event.image,
-                    thumb = "1000x600",
+                    thumb = "800x0",
                 )
             } else null
 

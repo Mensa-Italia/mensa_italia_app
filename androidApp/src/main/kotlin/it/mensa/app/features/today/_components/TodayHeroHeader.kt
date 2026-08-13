@@ -74,7 +74,7 @@ fun TodayHeroHeader(
 
     val avatarUrl = user?.let { u ->
         if (u.avatar.isNotBlank()) {
-            FilesUrl.build(collection = "users", recordId = u.id, filename = u.avatar, thumb = "100x100")
+            FilesUrl.build(collection = "users", recordId = u.id, filename = u.avatar, thumb = "200x200")
         } else null
     }
 

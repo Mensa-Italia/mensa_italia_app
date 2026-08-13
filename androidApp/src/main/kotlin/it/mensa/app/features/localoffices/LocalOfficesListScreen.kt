@@ -172,7 +172,7 @@ private fun LocalOfficeListCard(
 ) {
     val coverUrl = remember(office) {
         if (office.image.isEmpty()) null
-        else FilesUrl.build("local_offices", office.id, office.image, "800x450")
+        else FilesUrl.build("local_offices", office.id, office.image, "800x0")
     }
 
     Card(

@@ -52,7 +52,7 @@ fun DealPreviewCard(
                     collection = "deals",
                     recordId = deal.id,
                     filename = attachment,
-                    thumb = "320x200",
+                    thumb = "800x0",
                 )
             } else null
 

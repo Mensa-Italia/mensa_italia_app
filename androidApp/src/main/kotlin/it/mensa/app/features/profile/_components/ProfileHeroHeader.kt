@@ -86,7 +86,7 @@ fun ProfileHeroHeader(
     }
     val avatarUrl = user?.let { u ->
         if (u.avatar.isNotBlank()) {
-            FilesUrl.build(collection = "users", recordId = u.id, filename = u.avatar, thumb = "300x300")
+            FilesUrl.build(collection = "users", recordId = u.id, filename = u.avatar, thumb = "200x200")
         } else null
     }
     val initials = remember(user?.name, user?.username, user?.email) {

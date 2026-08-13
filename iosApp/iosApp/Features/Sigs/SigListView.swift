@@ -447,18 +447,27 @@ private struct SigRowCard: View {
 
     @ViewBuilder
     private var heroImage: some View {
+        // L'immagine entrava per intero (.fit) dentro una finestra alta al
+        // massimo 200: le copertine dei SIG sono banner larghe due volte e
+        // mezza la loro altezza, quindi restava gradiente scoperto sopra e
+        // sotto. Ora e' il contenitore a prendere il rapporto dell'immagine
+        // vera, dentro i limiti di CoverRatioStore, e l'immagine riempie.
+        let ratio = CoverRatioStore.shared.ratio(for: imageURL?.absoluteString)
         ZStack(alignment: .topLeading) {
             Group {
                 if let url = imageURL {
-                    CachedAsyncImage(url: url) { img in
-                        img.resizable().aspectRatio(contentMode: .fit)
+                    CachedAsyncImage(
+                        url: url,
+                        onLoad: { CoverRatioStore.shared.remember($0, for: url.absoluteString) }
+                    ) { img in
+                        img.resizable().aspectRatio(contentMode: .fill)
                     } placeholder: {
-                        gradientPlaceholder.frame(height: 160)
+                        gradientPlaceholder
                     }
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(maxHeight: 200)
+            .aspectRatio(ratio, contentMode: .fit)
             .clipped()
 
             // Top scrim for chip readability.

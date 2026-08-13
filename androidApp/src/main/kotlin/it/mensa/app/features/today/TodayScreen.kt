@@ -303,7 +303,7 @@ private fun UserAvatar(
                 collection = "users",
                 recordId = u.id,
                 filename = u.avatar,
-                thumb = "100x100",
+                thumb = "200x200",
             )
         } else null
     }

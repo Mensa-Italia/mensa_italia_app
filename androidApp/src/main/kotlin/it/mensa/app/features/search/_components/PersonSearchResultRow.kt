@@ -173,7 +173,7 @@ fun MemberAvatar(
             collection = "members_registry",
             recordId = member.id,
             filename = member.image,
-            thumb = "100x100",
+            thumb = "200x200",
         )
     } else null
 
@@ -250,7 +250,7 @@ fun LeanPersonSearchResultRow(
     modifier: Modifier = Modifier,
 ) {
     val imageUrl = if (imageFilename.isNotEmpty()) {
-        FilesUrl.build("members_registry", id, imageFilename, "100x100")
+        FilesUrl.build("members_registry", id, imageFilename, "200x200")
     } else null
 
     Row(

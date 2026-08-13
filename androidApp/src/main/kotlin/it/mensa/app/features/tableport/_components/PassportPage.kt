@@ -298,7 +298,7 @@ private fun StampGrid(
                                 collection = "stamp",
                                 recordId = r.id,
                                 filename = r.image,
-                                thumb = "600x400",
+                                thumb = "800x0",
                             )
                         } else null
                     }

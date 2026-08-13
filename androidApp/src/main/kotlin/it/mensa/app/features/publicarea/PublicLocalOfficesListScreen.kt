@@ -138,7 +138,7 @@ private fun PublicLocalOfficeRow(
 ) {
     val coverUrl = remember(office.id, office.image) {
         if (office.image.isEmpty()) null
-        else FilesUrl.build("view_local_office", office.id, office.image, "800x450")
+        else FilesUrl.build("view_local_office", office.id, office.image, "800x0")
     }
 
     MensaCard(

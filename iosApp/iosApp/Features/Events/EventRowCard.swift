@@ -59,14 +59,20 @@ struct EventRowCard: View {
 
     @ViewBuilder
     private var heroImage: some View {
+        // Stesso intervento della lista dei SIG: niente altezza massima fissa,
+        // il contenitore prende il rapporto della locandina vera. Le locandine
+        // piu' alte di 220 venivano tagliate sopra e sotto.
+        let ratio = CoverRatioStore.shared.ratio(for: imageURL?.absoluteString)
         ZStack(alignment: .topLeading) {
             Group {
                 if let url = imageURL {
-                    CachedAsyncImage(url: url) { img in
-                        img.resizable().aspectRatio(contentMode: .fit)
+                    CachedAsyncImage(
+                        url: url,
+                        onLoad: { CoverRatioStore.shared.remember($0, for: url.absoluteString) }
+                    ) { img in
+                        img.resizable().aspectRatio(contentMode: .fill)
                     } placeholder: {
                         gradientPlaceholder
-                            .frame(height: 160)
                     }
                 } else {
                     ZStack {
@@ -75,11 +81,10 @@ struct EventRowCard: View {
                             .font(.system(size: 40, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.9))
                     }
-                    .frame(height: 160)
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(maxHeight: 220)
+            .aspectRatio(ratio, contentMode: .fit)
             .clipped()
 
             // Subtle dark scrim on top so chips stay readable on any image.

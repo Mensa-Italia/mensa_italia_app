@@ -102,24 +102,37 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     let url: URL?
     let content: (Image) -> Content
     let placeholder: () -> Placeholder
+    /// Dimensione in pixel dell'immagine decodificata, appena si conosce.
+    ///
+    /// La closure `content` riceve una `SwiftUI.Image`, che non espone `.size`:
+    /// senza questo aggancio il chiamante non ha nessun modo di sapere quanto
+    /// e' larga e alta davvero la copertina. Serve alle card che si
+    /// dimensionano sul rapporto dell'immagine (vedi `CoverRatio`).
+    /// Opzionale con default nil: i 35 punti che gia' usano questa view non
+    /// cambiano di una riga.
+    let onLoad: ((CGSize) -> Void)?
 
     @State private var loaded: UIImage?
 
     init(
         url: URL?,
+        onLoad: ((CGSize) -> Void)? = nil,
         @ViewBuilder content: @escaping (Image) -> Content,
         @ViewBuilder placeholder: @escaping () -> Placeholder
     ) {
         self.url = url
+        self.onLoad = onLoad
         self.content = content
         self.placeholder = placeholder
         // Seed state synchronously from the memory cache so recycled List/LazyVStack
         // cells render the image on the first frame — no placeholder flash on scroll.
         // Chiave canonica → due URL diversi che puntano allo stesso file
         // PocketBase condividono la stessa entry RAM.
-        self._loaded = State(initialValue: url.flatMap {
+        let seeded = url.flatMap {
             MensaImageMemoryCache.shared.image(for: canonicalCacheKey(for: $0))
-        })
+        }
+        self._loaded = State(initialValue: seeded)
+        if let seeded { onLoad?(seeded.size) }
     }
 
     var body: some View {
@@ -130,8 +143,14 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         // il path "seed da memory cache" l'immagine è già presente al primo
         // frame → niente animazione, niente flash su scroll di celle riciclate.
         ZStack {
-            placeholder()
-            if let img = loaded {
+            // Il placeholder esce di scena quando l'immagine c'e'. Prima
+            // restava sotto, sempre: con un'altezza fissa piu' grande
+            // dell'immagine, il suo gradiente spuntava sopra e sotto — ed era
+            // esattamente lo "spazio vuoto" delle copertine dei SIG, che sono
+            // banner larghe piu' del doppio di quanto sono alte.
+            if loaded == nil {
+                placeholder()
+            } else if let img = loaded {
                 content(Image(uiImage: img))
                     .transition(.opacity)
             }
@@ -146,6 +165,7 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         // 1. Memory cache (RAM) sulla chiave canonica.
         if let cached = MensaImageMemoryCache.shared.image(for: cacheKey) {
             self.loaded = cached
+            onLoad?(cached.size)
             return
         }
 
@@ -158,6 +178,7 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             withAnimation(.easeOut(duration: 0.25)) {
                 self.loaded = img
             }
+            onLoad?(img.size)
             return
         }
 
@@ -204,6 +225,7 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                 withAnimation(.easeOut(duration: 0.25)) {
                     self.loaded = img
                 }
+                onLoad?(img.size)
             }
         } catch {
             // Swallow — placeholder stays visible.

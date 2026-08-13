@@ -92,7 +92,7 @@ fun OrgRoleSearchResultRow(
     val brandColor = MaterialTheme.colorScheme.primary
     val imageUrl = if (member.image.isNotEmpty()) {
         if (member.image.startsWith("http")) member.image
-        else FilesUrl.build("members_registry", member.userId, member.image, "100x100")
+        else FilesUrl.build("members_registry", member.userId, member.image, "200x200")
     } else null
 
     Row(

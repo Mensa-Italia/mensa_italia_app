@@ -40,7 +40,7 @@ fun EventSearchResultRow(
     modifier: Modifier = Modifier,
 ) {
     val imageUrl = if (event.image.isNotEmpty()) {
-        FilesUrl.build("events", event.id, event.image, "400x0")
+        FilesUrl.build("events", event.id, event.image, "800x0")
     } else null
 
     val dateStr = formatEventDate(event)

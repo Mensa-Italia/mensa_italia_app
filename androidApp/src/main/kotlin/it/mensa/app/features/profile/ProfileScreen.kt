@@ -387,7 +387,7 @@ private fun ProfileHeader(user: UserModel?) {
                 collection = "users",
                 recordId = u.id,
                 filename = u.avatar,
-                thumb = "300x300",
+                thumb = "200x200",
             )
         } else null
     }

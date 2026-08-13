@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.app.ui.components.rememberCoverRatio
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
@@ -258,10 +259,16 @@ fun SigRowCard(
     ) {
         Column {
             // Hero image zone
+            //
+            // L'altezza era fissa a 140dp con Crop, quindi le copertine
+            // quadrate perdevano piu' di meta' inquadratura. Ora e' il
+            // rapporto dell'immagine vera a decidere, dentro i limiti di
+            // [CoverRatio].
+            val cover = rememberCoverRatio(imageUrl)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp),
+                    .aspectRatio(cover.ratio),
             ) {
                 if (imageUrl != null) {
                     CachedAsyncImage(
@@ -269,6 +276,7 @@ fun SigRowCard(
                         contentDescription = sig.name,
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
                         contentScale = ContentScale.Crop,
+                        onState = cover.onImageState,
                     )
                 } else {
                     Box(

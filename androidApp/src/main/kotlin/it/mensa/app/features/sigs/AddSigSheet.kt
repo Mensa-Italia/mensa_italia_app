@@ -78,7 +78,7 @@ fun AddSigSheet(
     val remoteCoverUrl = remember(initial) {
         if (initial == null || initial.image.isEmpty()) null
         else if (initial.image.startsWith("http")) initial.image
-        else FilesUrl.build("sigs", initial.id, initial.image, "1500x600")
+        else FilesUrl.build("sigs", initial.id, initial.image, "1200x0")
     }
 
     ModalBottomSheet(

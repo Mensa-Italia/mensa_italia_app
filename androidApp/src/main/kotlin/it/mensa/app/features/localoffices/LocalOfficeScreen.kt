@@ -155,7 +155,7 @@ fun LocalOfficeScreen(
                 ) {
                     // ── Hero image ──────────────────────────────────────────
                     val coverUrl = if (office.image.isEmpty()) null
-                    else FilesUrl.build("local_offices", office.id, office.image, "1200x800")
+                    else FilesUrl.build("local_offices", office.id, office.image, "1200x0")
 
                     Box(
                         modifier = Modifier
@@ -734,7 +734,7 @@ private fun PersonGroup(
             people.forEachIndexed { idx, p ->
                 val imageUrl = remember(p.recordId, p.image) {
                     if (p.image.isEmpty()) null
-                    else FilesUrl.build(collection, p.recordId, p.image, "400x400")
+                    else FilesUrl.build(collection, p.recordId, p.image, "200x200")
                 }
                 ListItem(
                     headlineContent = { Text(titleCaseName(p.name, rememberAppLocale())) },

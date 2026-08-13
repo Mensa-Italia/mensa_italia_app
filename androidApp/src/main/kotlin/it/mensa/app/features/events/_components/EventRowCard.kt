@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import it.mensa.app.features.events.util.EventDateFormatter
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.app.ui.components.rememberCoverRatio
 import it.mensa.app.ui.theme.MensaCyan
 import it.mensa.shared.model.EventModel
 
@@ -76,11 +77,16 @@ fun EventRowCard(
         interactionSource = interactionSource,
     ) {
         Column {
-            // Hero Image 16:9
+            // Hero image
+            //
+            // Il rapporto era fisso a 16:9, e le locandine che 16:9 non sono
+            // venivano tagliate sopra e sotto. Ora lo detta l'immagine vera,
+            // dentro i limiti di [CoverRatio].
+            val cover = rememberCoverRatio(imageUrl)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
+                    .aspectRatio(cover.ratio)
                     .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             ) {
                 if (imageUrl != null) {
@@ -88,7 +94,12 @@ fun EventRowCard(
                         model = imageUrl,
                         contentDescription = event.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxWidth(),
+                        // matchParentSize e non fillMaxWidth: con la sola
+                        // larghezza l'immagine si dimensionava in altezza sul
+                        // proprio rapporto e a ritagliarla finiva il clip del
+                        // Box, quindi fuori centro invece che dal Crop.
+                        modifier = Modifier.matchParentSize(),
+                        onState = cover.onImageState,
                     )
                 } else {
                     Box(

@@ -52,7 +52,7 @@ struct StampConfirmSheet: View {
                             collection: "stamps",
                             recordId: stamp.id,
                             filename: stamp.image,
-                            thumb: "800x600"
+                            thumb: "800x0"
                        ) {
                         CachedAsyncImage(url: url) { img in
                             img.resizable().aspectRatio(contentMode: .fill)

@@ -422,7 +422,7 @@ private fun DealDetailContent(
 @Composable
 private fun HeroImage(deal: DealModel, modifier: Modifier = Modifier) {
     val imageUrl = deal.attachment?.takeIf { it.isNotEmpty() }?.let {
-        FilesUrl.build(collection = "deals", recordId = deal.id, filename = it, thumb = "1000x600")
+        FilesUrl.build(collection = "deals", recordId = deal.id, filename = it, thumb = "800x0")
     }
 
     Box(

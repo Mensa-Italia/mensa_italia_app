@@ -23,7 +23,7 @@ object StampImagePrefetcher {
                 collection = "stamp",
                 recordId = record.id,
                 filename = record.image,
-                thumb = "600x400",
+                thumb = "800x0",
             )
             val request = ImageRequest.Builder(context)
                 .data(url)

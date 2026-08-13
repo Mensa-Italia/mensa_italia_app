@@ -50,7 +50,7 @@ fun SigPreviewCard(
                 collection = "sigs",
                 recordId = sig.id,
                 filename = sig.image,
-                thumb = "100x100",
+                thumb = "200x200",
             )
         } else null
 

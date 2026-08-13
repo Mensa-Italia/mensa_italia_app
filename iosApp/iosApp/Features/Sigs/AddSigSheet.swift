@@ -316,7 +316,7 @@ struct AddSigSheet: View {
             collection: "sigs",
             recordId: sig.id,
             filename: sig.image,
-            thumb: "1500x600"
+            thumb: "1200x0"
         )
     }
 

@@ -102,7 +102,7 @@ fun PublicLocalOfficeDetailScreen(
                                 "view_local_office_admins",
                                 admin.id,
                                 admin.image,
-                                "400x400",
+                                "200x200",
                             ),
                             officeName = state.office!!.name,
                             region = state.office!!.region,
@@ -166,7 +166,7 @@ private fun OfficeContent(
 ) {
     val coverUrl = remember(office.id, office.image) {
         if (office.image.isEmpty()) null
-        else FilesUrl.build("view_local_office", office.id, office.image, "1200x800")
+        else FilesUrl.build("view_local_office", office.id, office.image, "1200x0")
     }
 
     Column(
@@ -396,7 +396,7 @@ internal fun TestDateCard(
 private fun AdminRow(admin: LocalOfficeAdminModel, onClick: () -> Unit) {
     val imageUrl = remember(admin.id, admin.image) {
         if (admin.image.isEmpty()) null
-        else FilesUrl.build("view_local_office_admins", admin.id, admin.image, "400x400")
+        else FilesUrl.build("view_local_office_admins", admin.id, admin.image, "200x200")
     }
     PersonRow(
         imageUrl = imageUrl,
