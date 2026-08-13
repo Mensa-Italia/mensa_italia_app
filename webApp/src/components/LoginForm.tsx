@@ -12,9 +12,16 @@ export function LoginForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const MVP_DEMO_ROUTES: Record<string, string> = {
-    "marco@rossi.it": "/public/mvp/dashboard",
-  };
+  // Scorciatoia per le demo dell'MVP: attiva solo se il deploy imposta
+  // PUBLIC_MVP_DEMO_EMAIL. In produzione la variabile non c'e' e questo ramo
+  // non esiste. Prima l'indirizzo stava scritto qui, ed essendo il cookie
+  // `mensa_session` l'unica cosa che il middleware guarda per /console,
+  // /keystatic e /api/keystatic, bastava digitarlo per entrare.
+  const demoEmail = ((import.meta as any).env?.PUBLIC_MVP_DEMO_EMAIL || "")
+    .trim()
+    .toLowerCase();
+  const demoRouteFor = (value: string) =>
+    demoEmail && value === demoEmail ? "/public/mvp/dashboard" : null;
 
   function getNextParam(): string | null {
     try {
@@ -28,7 +35,7 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     const emailLower = email.trim().toLowerCase();
-    const demoRoute = MVP_DEMO_ROUTES[emailLower];
+    const demoRoute = demoRouteFor(emailLower);
     if (demoRoute) {
       document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
       window.location.href = getNextParam() ?? demoRoute;
@@ -40,12 +47,6 @@ export function LoginForm() {
       const next = getNextParam();
       if (next) window.location.href = next;
     } catch (err) {
-      const fallbackRoute = MVP_DEMO_ROUTES[emailLower];
-      if (fallbackRoute) {
-        document.cookie = "mensa_session=1; path=/; max-age=2592000; SameSite=Lax";
-        window.location.href = getNextParam() ?? fallbackRoute;
-        return;
-      }
       setError(err instanceof Error ? err.message : t("login.form.error_generic", "Errore"));
     } finally {
       setBusy(false);
