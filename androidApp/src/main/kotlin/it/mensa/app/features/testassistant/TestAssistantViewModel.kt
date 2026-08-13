@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import it.mensa.shared.auth.Powers
 
 data class TestAssistantUiState(
     val currentUser: UserModel? = null,
@@ -39,6 +40,6 @@ class TestAssistantViewModel : ViewModel() {
      * Mirrors iOS `hasPower("testmakers", user: user)`.
      */
     fun hasTestmakersPower(): Boolean {
-        return _uiState.value.currentUser?.powers?.contains("testmakers") == true
+        return Powers.canManageTests(_uiState.value.currentUser?.powers)
     }
 }

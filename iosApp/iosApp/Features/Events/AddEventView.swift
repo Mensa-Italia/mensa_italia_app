@@ -15,9 +15,7 @@ struct EventPermissions {
     }
 
     func has(_ power: String) -> Bool {
-        powers.contains(power)
-            || powers.contains("\(power)_helper")
-            || powers.contains("super")
+        Powers.shared.has(powers: powers, power: power)
     }
 
     var allowControlEvents: Bool { has("events") }

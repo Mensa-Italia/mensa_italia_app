@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import it.mensa.shared.auth.Powers
 
 /**
  * Stato UI per la schermata Discover.
@@ -77,7 +78,7 @@ class DiscoverViewModel : ViewModel() {
     // ── Costruttore sezioni ──────────────────────────────────────────────────
 
     private fun buildSections(user: UserModel?): List<ResolvedDiscoverSection> {
-        val canSeeTestAssistant = user?.powers?.contains("testmakers") == true
+        val canSeeTestAssistant = Powers.canManageTests(user?.powers)
 
         return discoverSections.map { section ->
             val cats = if (section.titleKey == "discover.section.addons") {

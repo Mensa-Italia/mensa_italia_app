@@ -29,7 +29,7 @@ struct DealDetailView: View {
     /// from the JWT and never change mid-session.
     private var canEditDeal: Bool {
         let user = koin.auth.currentUser.value as? UserModel
-        return hasAnyPower(["super", "admin", "deals", "deals_admin"], user: user)
+        return Powers.shared.canManageDeals(powers: user?.powers)
     }
 
     var body: some View {
@@ -125,11 +125,6 @@ struct DealDetailView: View {
         return d.name
     }
 
-    private func hasAnyPower(_ keys: [String], user: UserModel?) -> Bool {
-        guard let u = user else { return false }
-        let set = Set(keys)
-        return u.powers.contains { set.contains($0) }
-    }
 
     // MARK: - Layout
 

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import it.mensa.shared.auth.Powers
 
 // ─── UI state ────────────────────────────────────────────────────────────────
 
@@ -25,11 +26,7 @@ data class DealDetailUiState(
     val canEdit: Boolean
         get() {
             val user = currentUser ?: return false
-            // Mirrors Flutter/web: the `deals` power is what the backend
-            // grants to convention managers. `super`/`admin`/`deals_admin`
-            // are kept as aliases for legacy/server-admin accounts.
-            val allowed = setOf("super", "admin", "deals", "deals_admin")
-            return user.powers.any { it in allowed }
+            return Powers.canManageDeals(user.powers)
         }
 }
 

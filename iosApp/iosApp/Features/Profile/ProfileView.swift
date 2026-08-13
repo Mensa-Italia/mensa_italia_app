@@ -138,7 +138,7 @@ struct ProfileView: View {
                 }
                 .buttonStyle(.plain)
 
-                Button(action: { openURL("https://www.mensa.it/termini") }) {
+                Button(action: { openURL("https://www.mensa.it/privacy-policy/") }) {
                     ProfileRow(icon: "doc.text", title: tr("app.profile.terms", fallback: "Termini di utilizzo"), action: {}) // i18n
                 }
                 .buttonStyle(.plain)

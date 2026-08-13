@@ -71,7 +71,7 @@ struct LoginView: View {
                         Spacer()
                         Link(
                             tr("views.signin.form.button.recover_password.text", fallback: "Password dimenticata?"),
-                            destination: URL(string: "https://www.mensa.it/area-soci/password-dimenticata/")!
+                            destination: URL(string: "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734")!
                         )
                     }
                 }

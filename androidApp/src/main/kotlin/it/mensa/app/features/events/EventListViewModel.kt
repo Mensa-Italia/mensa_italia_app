@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import it.mensa.shared.auth.Powers
 
 data class EventListUiState(
     val events: List<EventModel> = emptyList(),
@@ -57,10 +58,7 @@ class EventListViewModel : ViewModel() {
         auth.currentUser
             .onEach { user ->
                 val powers = user?.powers ?: emptyList()
-                val canAdd = powers.contains("super") ||
-                    powers.contains("events") ||
-                    powers.contains("events_helper") ||
-                    powers.contains("canAddEvent")
+                val canAdd = Powers.canManageEvents(powers)
                 _uiState.update { it.copy(canAddEvent = canAdd) }
             }
             .launchIn(viewModelScope)

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import it.mensa.shared.auth.Powers
 
 data class ScheduleDraftUi(
     val stableId: String = java.util.UUID.randomUUID().toString(),
@@ -69,7 +70,7 @@ class AddEventViewModel(private val eventId: String? = null) : ViewModel() {
     private fun initUser() {
         val user = auth.currentUser.value
         val powers = user?.powers ?: emptyList()
-        val canControl = powers.contains("super") || powers.contains("events") || powers.contains("events_helper")
+        val canControl = Powers.canManageEvents(powers)
         _uiState.update { it.copy(canControlEvents = canControl, ownerId = user?.id ?: "") }
     }
 

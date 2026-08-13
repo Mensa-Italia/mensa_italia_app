@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import it.mensa.shared.auth.Powers
 
 // ─── UI state ────────────────────────────────────────────────────────────────
 
@@ -50,8 +51,7 @@ data class DealListUiState(
     val canAddDeal: Boolean
         get() {
             val user = currentUser ?: return false
-            val allowed = setOf("super", "admin", "deals", "deals_admin")
-            return user.powers.any { it in allowed }
+            return Powers.canManageDeals(user.powers)
         }
 }
 

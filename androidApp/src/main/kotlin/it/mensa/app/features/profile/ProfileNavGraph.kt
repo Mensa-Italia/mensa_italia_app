@@ -122,7 +122,7 @@ fun ProfileNavGraph(
         composable(ProfileRoute.Terms.route) {
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mensa.it/termini")))
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mensa.it/privacy-policy/")))
                 navController.popBackStack()
             }
         }

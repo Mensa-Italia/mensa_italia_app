@@ -89,8 +89,10 @@ struct EventListView: View {
     /// (e introduceva snap visivo all'arrivo della prima emit).
     private var canAddEvent: Bool {
         let user = koin.auth.currentUser.value as? UserModel
-        let powers = user?.powers ?? []
-        return powers.contains("super") || powers.contains("canAddEvent")
+        // Prima: `super || canAddEvent`. `canAddEvent` non esiste fra i powers
+        // del server, quindi chi ha `events` o `events_helper` non vedeva il
+        // bottone mentre su Android lo vedeva.
+        return Powers.shared.canManageEvents(powers: user?.powers)
     }
 
     // Filter sheet state. Persisted as JSON so it survives app launches.

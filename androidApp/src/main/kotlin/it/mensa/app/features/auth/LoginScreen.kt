@@ -339,7 +339,7 @@ fun LoginScreen(
             // ── Forgot password ───────────────────────────────────────────────
             TextButton(
                 onClick = {
-                    val uri = Uri.parse("https://www.mensa.it/area-soci/password-dimenticata/")
+                    val uri = Uri.parse("https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734")
                     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
                 },
             ) {

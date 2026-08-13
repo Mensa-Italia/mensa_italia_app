@@ -88,8 +88,6 @@ final class DealListViewModel {
 
     var canAddDeal: Bool {
         guard let user = currentUser else { return false }
-        // Flutter app uses 'super' / 'deals_admin' / 'admin' interchangeably.
-        let allowed: Set<String> = ["super", "admin", "deals_admin"]
-        return !user.powers.filter { allowed.contains($0) }.isEmpty
+        return Powers.shared.canManageDeals(powers: user.powers)
     }
 }

@@ -3,13 +3,12 @@ import Shared
 
 /// True if the user has `p`, `p_helper`, or `super` in `user.powers`.
 /// `super` always passes.
+///
+/// La regola sta in `:shared` (`Powers`), cosi' Android e iOS non possono
+/// divergere come e' successo con `canAddEvent` e `deals_admin`.
 func hasPower(_ p: String, user: UserModel?) -> Bool {
     guard let user else { return false }
-    let powers = Set(user.powers)
-    if powers.contains("super") { return true }
-    if powers.contains(p) { return true }
-    if powers.contains("\(p)_helper") { return true }
-    return false
+    return Powers.shared.has(powers: user.powers, power: p)
 }
 
 /// True if the user is allowed to see/open the given addon, based on

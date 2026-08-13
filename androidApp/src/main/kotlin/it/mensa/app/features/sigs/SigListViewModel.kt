@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import it.mensa.shared.auth.Powers
 
 data class SigListUiState(
     val sigs: List<SigModel> = emptyList(),
@@ -62,11 +63,8 @@ class SigListViewModel : ViewModel() {
             .launchIn(viewModelScope)
     }
 
-    private fun hasPower(power: String, user: UserModel?): Boolean {
-        if (user == null) return false
-        val powers = user.powers.toSet()
-        return powers.contains("super") || powers.contains(power) || powers.contains("${power}_helper")
-    }
+    private fun hasPower(power: String, user: UserModel?): Boolean =
+        Powers.has(user?.powers, power)
 
     fun refresh(showSpinner: Boolean = true) {
         viewModelScope.launch {
