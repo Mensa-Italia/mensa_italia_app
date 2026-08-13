@@ -20,7 +20,6 @@ struct WatchPayload: Codable, Equatable {
         var fullName: String
         var expiryFormatted: String
         var isActive: Bool
-        var qrPng: Data?
     }
 
     struct EventSnapshot: Codable, Equatable {

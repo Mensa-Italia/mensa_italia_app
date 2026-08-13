@@ -21,7 +21,6 @@ import it.mensa.app.services.calendar.CalendarHelper
 import it.mensa.app.services.location.LocationProvider
 import it.mensa.app.services.push.PushTokenStore
 import it.mensa.app.services.stripe.StripeService
-import it.mensa.app.services.wallet.WalletService
 import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.ThemeManager
 import org.koin.android.ext.koin.androidContext
@@ -40,7 +39,6 @@ import org.koin.dsl.module
  * - Audio player controller (Media3)
  * - Calendar helper (CalendarContract)
  * - Stripe payment service
- * - Google Wallet service
  * - Locale manager (DataStore)
  */
 val appModule = module {
@@ -61,8 +59,6 @@ val appModule = module {
     // shared PaymentMethodsRepository registered by MensaSdk.
     single { StripeService(androidContext(), get()) }
 
-    // Google Wallet service
-    single { WalletService(androidContext()) }
 
     // Locale manager (DataStore-backed)
     single { LocaleManager(androidContext()) }

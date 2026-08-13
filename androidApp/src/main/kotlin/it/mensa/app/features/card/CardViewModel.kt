@@ -2,7 +2,6 @@ package it.mensa.app.features.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.mensa.app.services.wallet.WalletService
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,18 +21,13 @@ data class CardUiState(
     val membershipCode: String? = null,
     val expirationDate: String? = null,
     val cardStatus: CardStatus = CardStatus.Active,
-    val qrPayload: String? = null,
     val loading: Boolean = true,
-    val walletLoading: Boolean = false,
     val snackbarMessage: String? = null,
 )
 
 class CardViewModel : ViewModel() {
 
     private val auth = koinAccess().auth
-    private val walletService: WalletService by lazy {
-        org.koin.mp.KoinPlatform.getKoin().get()
-    }
 
     private val _uiState = MutableStateFlow(CardUiState())
     val uiState: StateFlow<CardUiState> = _uiState.asStateFlow()
@@ -49,13 +43,11 @@ class CardViewModel : ViewModel() {
 
         val expiry = formatExpiry(user)
         val status = computeStatus(user)
-        val qr = buildQrPayload(user, expiry)
         return prev.copy(
             user = user,
             membershipCode = user.id,
             expirationDate = expiry,
             cardStatus = status,
-            qrPayload = qr,
             loading = false,
         )
     }
@@ -82,10 +74,6 @@ class CardViewModel : ViewModel() {
         }
     }
 
-    private fun buildQrPayload(user: UserModel, expiry: String): String {
-        val name = if (user.name.isNotBlank()) user.name else user.username
-        return "MENSA-IT|id:${user.id}|user:${user.username}|exp:$expiry"
-    }
 
     fun refresh() {
         // currentUser StateFlow auto-updates; trigger a re-emit by marking loading
@@ -94,36 +82,6 @@ class CardViewModel : ViewModel() {
         _uiState.update { buildState(it, it.user) }
     }
 
-    fun onAddToWalletClick() {
-        val user = _uiState.value.user ?: return
-        _uiState.update { it.copy(walletLoading = true) }
-        walletService.checkAvailability { available ->
-            if (!available) {
-                _uiState.update {
-                    it.copy(
-                        walletLoading = false,
-                        snackbarMessage = "Google Wallet non disponibile su questo dispositivo",
-                    )
-                }
-                return@checkAvailability
-            }
-            // In a real implementation we'd get a signed JWT from backend
-            walletService.addMembershipCard(
-                signedJwt = "",
-                onSuccess = {
-                    _uiState.update { it.copy(walletLoading = false) }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            walletLoading = false,
-                            snackbarMessage = "Setup Google Wallet richiesto",
-                        )
-                    }
-                },
-            )
-        }
-    }
 
     fun onRenewClick() {
         // TODO: wire to RenewMembershipScreen navigation

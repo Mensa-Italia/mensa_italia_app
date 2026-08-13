@@ -22,7 +22,6 @@ struct WatchPayload: Codable, Equatable {
         var isActive: Bool
         /// PNG del QR generato lato iOS (CoreImage non risolve come modulo su
         /// watchOS in questa toolchain, quindi il QR arriva pre-renderizzato).
-        var qrPng: Data?
     }
 
     struct EventSnapshot: Codable, Equatable {

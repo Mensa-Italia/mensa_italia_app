@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { Share2, Copy, Check, Download, AlertTriangle } from "lucide-react";
 import { MensaProvider, useMensa } from "../../lib/MensaProvider";
-import { QrCode, qrSvg } from "./QrCode";
 
 const LS_USER_KEY = "mensa.auth.user";
 const API_BASE = "https://svc.mensa.it";
@@ -126,7 +125,6 @@ function Inner() {
 
   const status = tesseraStatus(user.expireMembershipMs);
   const expiryStr = formatItalianDateLong(user.expireMembershipMs);
-  const qrPayload = `MENSA-IT|id:${user.id}|user:${user.username}|exp:${user.expireMembershipMs}`;
 
   const showRenewBanner = status === "expired" || (days >= 0 && days <= 30);
 
@@ -163,10 +161,6 @@ function Inner() {
     try {
       const W = 1080;
       const H = 680; // 1.586 aspect
-      const qr = qrSvg(qrPayload);
-      // Strip outer <svg> wrapper if present to safely embed inside our SVG.
-      const qrInner = qr.replace(/<\?xml[^?]*\?>/g, "");
-
       // Try to inline the avatar as data-url so the canvas isn't tainted.
       let avatarHref = "";
       const rawUrl = avatarUrlFor(user.id, user.avatar);
@@ -216,10 +210,6 @@ function Inner() {
   <text x="60" y="${H - 110}" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="600" fill="white" fill-opacity="0.8" letter-spacing="2">SOCIO #${escapeXml(user.id)}</text>
   <text x="60" y="${H - 70}" font-family="-apple-system, system-ui, sans-serif" font-size="20" fill="white" fill-opacity="0.75">Valida fino al ${escapeXml(expiryStr)}</text>
   <text x="60" y="${H - 32}" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" fill="white" fill-opacity="0.85" letter-spacing="4">MENSA ITALIA</text>
-  <g transform="translate(${W - 220}, ${H - 220})">
-    <rect width="180" height="180" rx="16" fill="white"/>
-    <g transform="translate(12, 12) scale(0.84)">${qrInner}</g>
-  </g>
 </svg>`;
 
       const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
@@ -333,16 +323,6 @@ function Inner() {
         </section>
 
         <aside className="ta__panel">
-          <section className="ta__section">
-            <h2 className="ta__section-head">QR per gli eventi</h2>
-            <p className="ta__qr-hint">
-              Mostra questo codice al personale degli eventi per verificare la tua iscrizione.
-            </p>
-            <div className="ta__qr-center">
-              <QrCode payload={qrPayload} size={180} label="QR di accesso eventi Mensa Italia" />
-            </div>
-          </section>
-
           <section className="ta__section">
             <h2 className="ta__section-head">Azioni</h2>
             <div className="ta__share-row">
@@ -506,8 +486,6 @@ function Inner() {
           padding-block-end: var(--spacing-2);
           border-block-end: 1px solid var(--color-border-subtle);
         }
-        .ta__qr-hint { margin: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); line-height: 1.55; }
-        .ta__qr-center { display: flex; align-items: center; justify-content: center; }
         .ta__share-row { display: flex; gap: var(--spacing-3); flex-wrap: wrap; }
         .ta__btn-secondary {
           display: inline-flex; align-items: center; gap: var(--spacing-2);

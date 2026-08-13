@@ -1,7 +1,4 @@
 import Foundation
-import CoreImage
-import CoreImage.CIFilterBuiltins
-import UIKit
 import WatchConnectivity
 import WidgetKit
 import Shared
@@ -22,9 +19,6 @@ import Shared
 /// tra processi dello stesso device, NON tra iPhone e Watch paired. Il
 /// canale corretto cross-device e' WatchConnectivity. Vedi
 /// `WatchSessionMirror.swift` lato Watch per il delegate ricevente.
-///
-/// Il QR PNG viene generato qui (CoreImage su iOS e' disponibile, su watchOS
-/// non risolve come modulo in questa toolchain).
 @MainActor
 final class WatchPayloadWriter: NSObject {
     static let shared = WatchPayloadWriter()
@@ -107,7 +101,6 @@ final class WatchPayloadWriter: NSObject {
         guard let user = lastUser else { return nil }
         let fullName = user.name.isEmpty ? user.username : user.name
         let expiryFormatted = formatAppDate(user.expireMembership)
-        let qrPayload = "MENSA-IT|id:\(user.id)|user:\(user.username)|exp:\(expiryFormatted)"
         let isActive: Bool = {
             // Stessa euristica di CardView: scadenza nel futuro = attiva.
             let nowSec = Int64(Date().timeIntervalSince1970)
@@ -117,8 +110,7 @@ final class WatchPayloadWriter: NSObject {
             memberId: user.id,
             fullName: fullName,
             expiryFormatted: expiryFormatted,
-            isActive: isActive,
-            qrPng: generateQrPng(qrPayload)
+            isActive: isActive
         )
     }
 
@@ -142,22 +134,6 @@ final class WatchPayloadWriter: NSObject {
         )
     }
 
-    // MARK: QR generation
-
-    private let qrContext = CIContext()
-    private let qrFilter = CIFilter.qrCodeGenerator()
-
-    private func generateQrPng(_ payload: String) -> Data? {
-        qrFilter.message = Data(payload.utf8)
-        qrFilter.correctionLevel = "M"
-        guard
-            let output = qrFilter.outputImage?.transformed(by: CGAffineTransform(scaleX: 8, y: 8)),
-            let cg = qrContext.createCGImage(output, from: output.extent)
-        else {
-            return nil
-        }
-        return UIImage(cgImage: cg).pngData()
-    }
 }
 
 // MARK: - WCSessionDelegate

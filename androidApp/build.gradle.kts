@@ -157,9 +157,6 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
 
-    // Google Wallet
-    implementation(libs.play.services.pay)
-
     // Chrome Custom Tabs
     implementation(libs.androidx.browser)
 

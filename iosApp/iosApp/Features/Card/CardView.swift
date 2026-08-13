@@ -1,40 +1,5 @@
 import SwiftUI
 import Shared
-import CoreImage.CIFilterBuiltins
-
-// MARK: - QR Code View
-
-struct QRCodeView: View {
-    let payload: String
-    let size: CGFloat
-    var body: some View {
-        if !payload.isEmpty, let image = generate() {
-            Image(uiImage: image)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
-                .frame(width: size, height: size)
-                .background(.white)
-                .clipShape(.rect(cornerRadius: 12))
-        } else {
-            Image(systemName: "qrcode")
-                .resizable().scaledToFit()
-                .frame(width: size, height: size)
-                .foregroundStyle(.secondary)
-        }
-    }
-    private func generate() -> UIImage? {
-        let filter = CIFilter.qrCodeGenerator()
-        filter.message = Data(payload.utf8)
-        filter.correctionLevel = "M"
-        guard let outputImage = filter.outputImage else { return nil }
-        let scaleX = size * UIScreen.main.scale / outputImage.extent.size.width
-        let scaled = outputImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleX))
-        let context = CIContext()
-        guard let cg = context.createCGImage(scaled, from: scaled.extent) else { return nil }
-        return UIImage(cgImage: cg)
-    }
-}
 
 // MARK: - Printable Card View (for ShareLink export)
 
@@ -42,7 +7,6 @@ struct CardShareImage {
     let name: String
     let memberId: String
     let expiry: String
-    let qrPayload: String
 }
 
 /// Renders the same membership hero used in-app at a fixed size for share-sheet export.
@@ -69,13 +33,10 @@ struct PrintableCardView: View {
 // MARK: - Card View
 
 /// "La tua tessera" — rebuilt under iOS 26 / Liquid Glass HIG.
-/// Apple Wallet-flavored layout: hero pass at the top, grouped information
+/// Layout in stile pass: hero in alto, informazioni raggruppate
 /// rows below, glass action buttons at the bottom. Adapts to light & dark.
 struct CardView: View {
     @State private var vm = CardViewModel()
-    @State private var showWalletSheet = false
-    @State private var walletLoading = false
-    @State private var walletError: String?
 
     private var renewalURL: URL? {
         URL(string: "https://cloud32.mensa.it/rinnovo")
@@ -103,21 +64,6 @@ struct CardView: View {
         .navigationTitle(tr("app.card.title", fallback: "La tua tessera"))
         .navigationBarTitleDisplayMode(.large)
         .tint(AppTheme.Colors.brandTintAdaptive)
-        .sheet(isPresented: $showWalletSheet) {
-            walletComingSoonSheet
-        }
-        .alert(
-            tr("card.wallet.error_title", fallback: "Wallet"),
-            isPresented: Binding(
-                get: { walletError != nil },
-                set: { if !$0 { walletError = nil } }
-            ),
-            presenting: walletError
-        ) { _ in
-            Button(tr("app.ok", fallback: "OK"), role: .cancel) { walletError = nil }
-        } message: { msg in
-            Text(msg)
-        }
         .task { await vm.load() }
     }
 
@@ -243,41 +189,15 @@ struct CardView: View {
         .contentShape(Rectangle())
     }
 
-    // MARK: - Action buttons (Wallet + Share)
+    // MARK: - Action button (Share)
 
     @ViewBuilder
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            if WalletService.canAddPasses {
-                walletButton
-            }
             if vm.user != nil {
                 shareButton
             }
         }
-    }
-
-    private var walletButton: some View {
-        Button {
-            Task { await addToWallet() }
-        } label: {
-            HStack(spacing: 8) {
-                if walletLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .tint(.white)
-                } else {
-                    Image(systemName: "wallet.pass.fill")
-                }
-                Text(tr("card.add_to_wallet", fallback: "Aggiungi al Wallet"))
-                    .fontWeight(.semibold)
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .tint(AppTheme.Colors.mensaBlue)
-        .disabled(walletLoading)
     }
 
     private var shareButton: some View {
@@ -293,7 +213,7 @@ struct CardView: View {
             .fontWeight(.semibold)
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .tint(AppTheme.Colors.mensaBlue)
     }
@@ -310,62 +230,12 @@ struct CardView: View {
             .accessibilityAddTraits(.isHeader)
     }
 
-    private var walletComingSoonSheet: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "wallet.pass.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-                .padding(.top, 40)
-            Text(tr("card.wallet.coming_title", fallback: "Apple Wallet"))
-                .font(.title2.bold())
-            Text(tr("card.wallet.coming_body", fallback: "Presto potrai aggiungere la tessera al tuo Wallet."))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-            Spacer()
-            Button {
-                showWalletSheet = false
-            } label: {
-                Text(tr("app.ok", fallback: "OK"))
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .tint(AppTheme.Colors.brandPrimary)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
-        }
-        .presentationDetents([.medium])
-    }
-
-    @MainActor
-    private func addToWallet() async {
-        guard !walletLoading else { return }
-        walletLoading = true
-        defer { walletLoading = false }
-        do {
-            try await WalletService.presentAddMembershipPass()
-        } catch WalletService.WalletError.notAvailable,
-                WalletService.WalletError.fetchFailed(404),
-                WalletService.WalletError.invalidPass {
-            showWalletSheet = true
-        } catch let err as WalletService.WalletError {
-            walletError = err.errorDescription
-        } catch {
-            walletError = error.localizedDescription
-        }
-    }
-
     @MainActor
     private func cardImage() -> Image {
         let content = PrintableCardView(data: CardShareImage(
             name: vm.fullName,
             memberId: vm.memberId,
-            expiry: vm.expiry,
-            qrPayload: vm.qrPayload
+            expiry: vm.expiry
         ))
         let renderer = ImageRenderer(content: content)
         renderer.scale = UIScreen.main.scale

@@ -26,8 +26,7 @@ struct MensaWatchApp: App {
                 memberId: "12345",
                 fullName: "Matteo Sipione",
                 expiryFormatted: "31 dic 2026",
-                isActive: true,
-                qrPng: nil
+                isActive: true
             ),
             nextEvent: .init(
                 id: "evt-001",

@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.PersonOff
 import androidx.compose.material.icons.outlined.Receipt
@@ -51,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.card._components.PrintableCard
-import it.mensa.app.features.card._components.QrCodeView
 import it.mensa.app.features.card._components.shareCardImage
 import it.mensa.app.features.profile._components.ProfileRow
 import it.mensa.app.features.profile._components.ProfileSectionGroup
@@ -75,7 +73,7 @@ import org.koin.androidx.compose.koinViewModel
  *  - Shape: 32dp pillowy hero card (morphs to 28dp on press)
  *  - Size: displayMediumEmphasized "Tessera socio" headline; headlineMediumEmphasized name
  *  - Motion: bouncy entrance, breathing halo, flip 180° on Y axis via spring
- *  - Containment: gradient hero + drenched card + white QR back face
+ *  - Containment: gradient hero + drenched card
  */
 @Composable
 fun CardScreen(
@@ -126,7 +124,6 @@ fun CardScreen(
             state.user == null -> EmptyCardState(modifier = Modifier.fillMaxSize().padding(innerPadding))
             else -> CardContent(
                 state = state,
-                onAddToWalletClick = vm::onAddToWalletClick,
                 onRenewClick = vm::onRenewClick,
                 onTicketsClick = onTicketsClick,
                 onReceiptsClick = onReceiptsClick,
@@ -144,7 +141,6 @@ fun CardScreen(
 @Composable
 private fun CardContent(
     state: CardUiState,
-    onAddToWalletClick: () -> Unit,
     onRenewClick: () -> Unit,
     onTicketsClick: () -> Unit,
     onReceiptsClick: () -> Unit,
@@ -316,20 +312,13 @@ private fun CardContent(
             Spacer(Modifier.height(16.dp))
         }
 
-        // ── Action buttons: Wallet + Share ──
+        // ── Action button: Share ──
         item(key = "actions") {
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 PrimaryButton(
-                    text = tr("card.action_wallet", fallback = "Aggiungi al wallet"),
-                    onClick = onAddToWalletClick,
-                    icon = Icons.Outlined.AccountBalanceWallet,
-                    modifier = Modifier.fillMaxWidth(),
-                    loading = state.walletLoading,
-                )
-                SecondaryButton(
                     text = tr("card.action_share", fallback = "Condividi tessera"),
                     onClick = onShareClick,
                     icon = Icons.Outlined.Share,

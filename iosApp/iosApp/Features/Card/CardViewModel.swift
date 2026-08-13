@@ -33,10 +33,6 @@ final class CardViewModel {
         return Files.url(collection: "users", recordId: u.id, filename: u.avatar)
     }
 
-    var qrPayload: String {
-        guard let u = user else { return "" }
-        return "MENSA-IT|id:\(u.id)|user:\(u.username)|exp:\(expiry)"
-    }
 
     /// Mantenuto per back-compat col chiamante `.task { await vm.load() }` —
     /// no-op ora che il `user` è derivato sincrono. Resta come hook per un

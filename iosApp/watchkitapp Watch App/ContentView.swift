@@ -34,11 +34,10 @@ struct CardWatchView: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            QRCodeView(pngData: card.qrPng)
-                .frame(width: 110, height: 110)
-                .padding(6)
-                .background(Color.white)
-                .cornerRadius(8)
+            Text(card.memberId)
+                .font(.title3.weight(.bold).monospacedDigit())
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
 
             Text(card.fullName)
                 .font(.caption2.weight(.semibold))
@@ -106,34 +105,3 @@ struct EmptyStateView: View {
     }
 }
 
-// MARK: - QR
-
-/// Renderizza il PNG del QR generato lato iOS. CoreImage non risolve come
-/// modulo sul Watch SDK in questa toolchain, quindi il QR arriva
-/// pre-renderizzato nel payload (vedi `WatchPayloadWriter` lato iosApp).
-struct QRCodeView: View {
-    let pngData: Data?
-
-    var body: some View {
-        if let pngData,
-           let provider = CGDataProvider(data: pngData as CFData),
-           let cg = CGImage(
-                pngDataProviderSource: provider,
-                decode: nil,
-                shouldInterpolate: false,
-                intent: .defaultIntent
-           ) {
-            Image(decorative: cg, scale: 1, orientation: .up)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
-        } else {
-            ZStack {
-                Color.white
-                Image(systemName: "qrcode")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.black)
-            }
-        }
-    }
-}
