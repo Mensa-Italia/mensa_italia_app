@@ -96,10 +96,23 @@ struct AreaDocumentsView: View {
         }
     }
 
+    /// PDF diretto quando il file c'e', altrimenti il risolutore per id.
+    @ViewBuilder
+    private func documentDestination(for d: DocumentModel) -> some View {
+        if !d.file.isEmpty,
+           let url = Files.url(collection: "documents", recordId: d.id, filename: d.file) {
+            PDFViewerView(url: url)
+        } else {
+            DocumentDetailView(documentId: d.id)
+        }
+    }
+
     @ViewBuilder private var contentList: some View {
         List {
             ForEach(vm.filtered, id: \.id) { d in
-                NavigationLink(destination: DocumentDetailView(documentId: d.id)) {
+                // Il file lo abbiamo gia': si va dritti al PDF, senza
+                // passare da una scheda intermedia.
+                NavigationLink(destination: documentDestination(for: d)) {
                     DocumentRow(
                         doc: d,
                         dateString: dateFmt.string(from: Date(

@@ -19,6 +19,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.rememberAppLocale
+import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
@@ -32,7 +33,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AreaDocumentsScreen(
-    onNavigateToDetail: (String) -> Unit,
+    onOpenDocument: (String) -> Unit,
     onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -165,7 +166,17 @@ fun AreaDocumentsScreen(
                                         doc = doc,
                                         dateString = dateStr,
                                         localizedCat = vm.localizedCategory(doc.category),
-                                        onClick = { onNavigateToDetail(doc.id) },
+                                        onClick = {
+                                            if (doc.file.isNotEmpty()) {
+                                                onOpenDocument(
+                                                    FilesUrl.build(
+                                                        collection = "documents",
+                                                        recordId = doc.id,
+                                                        filename = doc.file,
+                                                    )
+                                                )
+                                            }
+                                        },
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 }

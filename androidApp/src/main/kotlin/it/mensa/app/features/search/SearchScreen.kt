@@ -100,6 +100,7 @@ import it.mensa.app.features.search._components.OrgGroupSearchResultRow
 import it.mensa.app.features.search._components.OrgRoleSearchResultRow
 import it.mensa.app.features.search._components.PersonSearchResultRow
 import it.mensa.app.features.search._components.SigSearchResultRow
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import androidx.compose.ui.text.font.FontWeight
 import it.mensa.app.ui.components.LoadingDots
@@ -126,7 +127,7 @@ private data class FilterChipModel(
     val icon: ImageVector,
 )
 
-private val filterChips = listOf(
+private val allFilterChips = listOf(
     FilterChipModel("all", "views.community.chip.all", "Tutti", null, Icons.Outlined.AutoAwesome),
     FilterChipModel("user", "app.search.filter.people", "Persone", "user", Icons.Outlined.Person),
     FilterChipModel("event", "views.events.title", "Eventi", "event", Icons.Outlined.CalendarMonth),
@@ -135,6 +136,13 @@ private val filterChips = listOf(
     FilterChipModel("document", "addons.documents.title", "Documenti", "document", Icons.Outlined.Bookmark),
     FilterChipModel("org", "app.search.filter.org", "Organigramma", "org", Icons.Outlined.Apartment),
 )
+
+/**
+ * Le chip dei tipi spenti dai flag di config spariscono: filtrare su un tipo
+ * che non produce risultati e' solo un vicolo cieco.
+ */
+private val filterChips: List<FilterChipModel>
+    get() = allFilterChips.filter { it.typeKey == null || koinAccess().featureFlags.allowsSearchType(it.typeKey) }
 
 // ─── SearchScreen ─────────────────────────────────────────────────────────────
 

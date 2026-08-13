@@ -343,10 +343,15 @@ class SearchViewModel(private val context: Context) : ViewModel() {
             "addon"
         )
         val typeFilter = _uiState.value.selectedType
+        val flags = koin.featureFlags
 
         val sections = mutableListOf<HydratedSection>()
         for (type in order) {
             if (typeFilter != null && typeFilter != type) continue
+            // Organigramma e gruppi locali stanno dietro un flag di config: se
+            // e' spento la schermata non e' raggiungibile, quindi i risultati
+            // non devono nemmeno comparire.
+            if (!flags.allowsSearchType(type)) continue
             val backendHits = backendHitsFor(type, response)
             val merged = mergeWithLocal(type, backendHits, q)
             if (merged.isEmpty()) continue

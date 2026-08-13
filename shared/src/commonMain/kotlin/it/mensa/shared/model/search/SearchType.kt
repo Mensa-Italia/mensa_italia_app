@@ -11,4 +11,10 @@ object SearchType {
     const val DOCUMENT = "document"
     const val SIG = "sig"
     const val ADDON = "addon"
+
+    /** Organigramma: gruppi e cariche. Dietro il flag `org_chart_enabled`. */
+    const val ORG = "org"
+
+    /** Gruppi locali (linktree). Dietro il flag `local_groups_enabled`. */
+    const val LINKTREE_LINK = "linktree_link"
 }

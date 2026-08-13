@@ -29,7 +29,8 @@ fun NavGraphBuilder.documentsNavGraph(navController: NavController) {
         popExitTransition = { slideOutHorizontally(animationSpec = spring(0.8f, 300f)) { it } + fadeOut() },
     ) {
         AreaDocumentsScreen(
-            onNavigateToDetail = { docId -> navController.navigate(DocumentsRoutes.detail(docId)) },
+            // La lista ha gia' il file: si apre il PDF senza passaggi intermedi.
+            onOpenDocument = { url -> navController.navigate(DocumentsRoutes.pdf(url)) },
             onBack = { navController.popBackStack() },
         )
     }
@@ -43,10 +44,16 @@ fun NavGraphBuilder.documentsNavGraph(navController: NavController) {
         popExitTransition = { slideOutHorizontally(animationSpec = spring(0.8f, 300f)) { it } + fadeOut() },
     ) { backStackEntry ->
         val docId = backStackEntry.arguments?.getString("docId").orEmpty()
-        DocumentDetailScreen(
+        DocumentOpenerScreen(
             docId = docId,
             onBack = { navController.popBackStack() },
-            onOpenPdf = { url -> navController.navigate(DocumentsRoutes.pdf(url)) },
+            onOpenPdf = { url ->
+                navController.navigate(DocumentsRoutes.pdf(url)) {
+                    // Fuori dallo stack: "indietro" dal PDF torna alla lista,
+                    // non a questa schermata di passaggio.
+                    popUpTo(DocumentsRoutes.DETAIL) { inclusive = true }
+                }
+            },
         )
     }
 

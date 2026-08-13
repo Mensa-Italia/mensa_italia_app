@@ -35,6 +35,8 @@ struct SearchView: View {
         let systemImage: String
     }
 
+    /// Le chip dei tipi spenti dai flag di config spariscono: filtrare su un
+    /// tipo che non produce risultati e' solo un vicolo cieco.
     private var filterChips: [FilterChip] {
         [
             FilterChip(id: "all", label: tr("views.community.chip.all", fallback: "Tutti"), key: nil, systemImage: "circle.grid.2x2"), // i18n
@@ -51,6 +53,10 @@ struct SearchView: View {
             // ("chi fa cosa in Mensa"). Vedi `SearchViewModel.orgMatches`.
             FilterChip(id: "org", label: tr("app.search.filter.org", fallback: "Organigramma"), key: "org", systemImage: "rectangle.connected.to.line.below") // i18n
         ]
+        .filter { chip in
+            guard let key = chip.key else { return true }
+            return koin.featureFlags.allowsSearchType(type: key)
+        }
     }
 
     var body: some View {

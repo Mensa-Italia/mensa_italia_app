@@ -6,6 +6,7 @@ import it.mensa.shared.db.MensaDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import it.mensa.shared.model.search.SearchType
 
 /**
  * Server-driven feature switches, from the PocketBase `configs` collection.
@@ -27,7 +28,24 @@ class FeatureFlags(
         val orgChart: Boolean = false,
         val localGroups: Boolean = false,
         val passkeys: Boolean = false,
-    )
+    ) {
+        /**
+         * True se i risultati di ricerca di [type] vanno mostrati.
+         *
+         * I flag spegnevano solo le voci di menu, non la ricerca: con
+         * `org_chart_enabled = false` l'organigramma spariva dal profilo ma i
+         * suoi risultati continuavano a uscire nella ricerca globale, e
+         * aprirli portava a una schermata che non doveva essere
+         * raggiungibile. Stessa cosa per i gruppi locali.
+         *
+         * I tipi che non dipendono da nessun flag passano sempre.
+         */
+        fun allowsSearchType(type: String): Boolean = when (type) {
+            SearchType.ORG -> orgChart
+            SearchType.LINKTREE_LINK -> localGroups
+            else -> true
+        }
+    }
 
     private val _flags = MutableStateFlow(Flags())
     val flags: StateFlow<Flags> = _flags.asStateFlow()
@@ -36,6 +54,9 @@ class FeatureFlags(
     val orgChartEnabled: Boolean get() = _flags.value.orgChart
     val localGroupsEnabled: Boolean get() = _flags.value.localGroups
     val passkeysEnabled: Boolean get() = _flags.value.passkeys
+
+    /** Vedi [Flags.allowsSearchType]. */
+    fun allowsSearchType(type: String): Boolean = _flags.value.allowsSearchType(type)
 
     /**
      * Restores the cached values, then refreshes from the backend. Safe to call

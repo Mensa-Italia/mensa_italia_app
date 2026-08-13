@@ -270,6 +270,10 @@ final class SearchViewModel {
         var sections: [HydratedSection] = []
         for type in order {
             if let typeFilter, typeFilter != type { continue }
+            // Organigramma e gruppi locali stanno dietro un flag di config: se
+            // e' spento la schermata non e' raggiungibile, quindi i risultati
+            // non devono nemmeno comparire.
+            if !koin.featureFlags.allowsSearchType(type: type) { continue }
             let backendHits = backendHits(for: type, in: response)
             let merged = mergeWithLocal(type: type, backendHits: backendHits, normalizedQuery: q)
             if merged.isEmpty { continue }

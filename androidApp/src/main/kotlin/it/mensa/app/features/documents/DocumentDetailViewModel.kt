@@ -12,13 +12,15 @@ import kotlinx.coroutines.launch
 
 data class DocumentDetailUiState(
     val document: DocumentModel? = null,
-    val summary: String? = null,
     val loading: Boolean = true,
-    val summaryLoading: Boolean = false,
-    val summaryFailed: Boolean = false,
     val error: String? = null,
 )
 
+/**
+ * Risolve `docId` nel file da aprire. Non c'e' piu' una schermata di dettaglio:
+ * toccare un documento apre direttamente il PDF, e il riassunto AI non viene
+ * nemmeno richiesto al backend.
+ */
 class DocumentDetailViewModel(private val docId: String) : ViewModel() {
 
     private val repo = koinAccess().documents
@@ -35,23 +37,7 @@ class DocumentDetailViewModel(private val docId: String) : ViewModel() {
             _uiState.update { it.copy(loading = true) }
             val doc = runCatching { repo.getById(docId) }.getOrNull()
             _uiState.update { it.copy(document = doc, loading = false) }
-            if (doc != null) loadSummary(doc.elaborated)
         }
     }
 
-    private fun loadSummary(elaboratedId: String) {
-        if (elaboratedId.isEmpty()) {
-            _uiState.update { it.copy(summaryFailed = true) }
-            return
-        }
-        viewModelScope.launch {
-            _uiState.update { it.copy(summaryLoading = true, summaryFailed = false) }
-            val elab = runCatching { repo.getElaborated(elaboratedId) }.getOrNull()
-            if (elab != null) {
-                _uiState.update { it.copy(summary = elab.iaResume, summaryLoading = false) }
-            } else {
-                _uiState.update { it.copy(summaryFailed = true, summaryLoading = false) }
-            }
-        }
-    }
 }
