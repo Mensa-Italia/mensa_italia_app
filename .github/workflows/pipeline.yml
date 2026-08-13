@@ -395,6 +395,14 @@ jobs:
   # Monotonico e sopra al legacy Flutter (~21M). Lo calcolava `prepare` nel
   # vecchio release.yml; sta in un job suo perche' lo leggono sia Android che
   # iOS e la formula deve restare scritta in un posto solo.
+  #
+  # La base era 30M e il 13 agosto 2026 la beta b22.0.6 si e' fermata su
+  # "Version code 30000901 has already been used": in quella banda ci sono gia'
+  # codici piu' alti del numero di commit di oggi, quindi contare i commit non
+  # basta piu' a salire. Alzando la base a 31M si riparte sopra tutto quello che
+  # e' stato caricato, e la formula resta monotonica.
+  # NB: e' una porta a senso unico — su Play un versionCode non si riusa e non
+  # si torna indietro. Se ricapita, alzare ancora la base, non toccare il conteggio.
   version-code:
     name: versionCode
     needs: plan
@@ -410,7 +418,7 @@ jobs:
         run: |
           set -euo pipefail
           commit_count=$(git rev-list --count HEAD)
-          echo "value=$((30000000 + commit_count))" >> "$GITHUB_OUTPUT"
+          echo "value=$((31000000 + commit_count))" >> "$GITHUB_OUTPUT"
 
   # ─── Android: AAB + APK firmati ────────────────────────────────────────────
   android:
