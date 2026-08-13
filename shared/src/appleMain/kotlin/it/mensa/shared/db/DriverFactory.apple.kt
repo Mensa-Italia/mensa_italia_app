@@ -90,7 +90,7 @@ actual class DriverFactory {
         private const val DB_NAME = "mensa.db"
         private val TABLES = listOf(
             "Event", "Deal", "Sig", "Stamp", "RegSoci", "Notification",
-            "Boutique", "Document", "DocumentElaborated",
+            "Document", "DocumentElaborated",
             "Ticket", "Receipt", "StampUser", "Device",
             "EventSchedule", "Calendar", "PaymentMethod", "Addon", "KeyValue",
         )

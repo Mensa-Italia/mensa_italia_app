@@ -112,7 +112,6 @@ struct DebugLaunchSelector: View {
                     case "deals": DealListView()
                     case "sigs": SigListView()
                     case "members": MembersDirectoryView()
-                    case "boutique": BoutiqueView()
                     case "tableport": TableportStampView()
                     case "notifications": NotificationsListView()
                     case "addonsHub": AddonsHubView()

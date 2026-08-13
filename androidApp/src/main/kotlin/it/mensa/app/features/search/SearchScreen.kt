@@ -91,7 +91,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import it.mensa.app.features.search._components.BoutiqueSearchResultRow
 import it.mensa.app.features.search._components.DealSearchResultRow
 import it.mensa.app.features.search._components.DocumentSearchResultRow
 import it.mensa.app.features.search._components.EventSearchResultRow
@@ -133,7 +132,6 @@ private val filterChips = listOf(
     FilterChipModel("event", "views.events.title", "Eventi", "event", Icons.Outlined.CalendarMonth),
     FilterChipModel("deal", "app.search.filter.deals", "Offerte", "deal", Icons.Outlined.LocalOffer),
     FilterChipModel("sig", "app.discover.groups", "SIG", "sig", Icons.Outlined.Groups),
-    FilterChipModel("boutique", "addons.boutique.title", "Boutique", "boutique", Icons.Outlined.ShoppingBag),
     FilterChipModel("document", "addons.documents.title", "Documenti", "document", Icons.Outlined.Bookmark),
     FilterChipModel("org", "app.search.filter.org", "Organigramma", "org", Icons.Outlined.Apartment),
 )
@@ -970,7 +968,6 @@ private fun sectionKicker(type: String): String = when (type) {
     "deal" -> "DEAL"
     "sig" -> "GRUPPI"
     "document" -> "DOCUMENTI"
-    "boutique" -> "BOUTIQUE"
     "addon" -> "ADDON"
     "org" -> "ORGANIGRAMMA"
     "quid_issue" -> "QUID"
@@ -985,7 +982,6 @@ private fun sectionTitle(type: String): String = when (type) {
     "deal" -> "Offerte"
     "sig" -> "Gruppi e interessi"
     "document" -> "Documenti"
-    "boutique" -> "Boutique"
     "addon" -> "Addon"
     "org" -> "Organigramma"
     "quid_issue" -> "Numeri Quid"
@@ -1052,7 +1048,6 @@ private fun ResultRowContent(hit: HydratedHit, type: String) {
         is HydratedHit.Payload.Deal -> DealSearchResultRow(deal = p.deal)
         is HydratedHit.Payload.Sig -> SigSearchResultRow(sig = p.sig)
         is HydratedHit.Payload.Document -> DocumentSearchResultRow(document = p.document)
-        is HydratedHit.Payload.Boutique -> BoutiqueSearchResultRow(product = p.product)
         is HydratedHit.Payload.Addon -> LeanSearchResultRow(
             title = p.addon.name,
             subtitle = p.addon.description,
@@ -1089,7 +1084,6 @@ private fun iconForType(type: String): ImageVector = when (type) {
     "deal" -> Icons.Outlined.LocalOffer
     "sig" -> Icons.Outlined.Groups
     "document" -> Icons.Outlined.Bookmark
-    "boutique" -> Icons.Outlined.ShoppingBag
     "org" -> Icons.Outlined.Apartment
     "quid_issue" -> Icons.Outlined.Inventory
     "quid_article" -> Icons.Outlined.Newspaper

@@ -1,7 +1,6 @@
 package it.mensa.shared.di
 
 import it.mensa.shared.api.endpoints.AddonsApi
-import it.mensa.shared.api.endpoints.BoutiqueApi
 import it.mensa.shared.api.endpoints.LocalOfficesApi
 import it.mensa.shared.api.endpoints.CalendarLinksApi
 import it.mensa.shared.api.endpoints.DevicesApi
@@ -27,7 +26,6 @@ import it.mensa.shared.i18n.TranslationLoader
 import it.mensa.shared.iqtest.MensaTestClient
 import it.mensa.shared.onboarding.OnboardingState
 import it.mensa.shared.repository.AddonsRepository
-import it.mensa.shared.repository.BoutiqueRepository
 import it.mensa.shared.repository.LocalOfficesRepository
 import it.mensa.shared.repository.CalendarLinksRepository
 import it.mensa.shared.repository.DevicesRepository
@@ -55,7 +53,6 @@ val extrasModule = module {
     single { AddonsApi(get(), get()) }
     single { LocationsApi(get(), get()) }
     single { DocumentsApi(get()) }
-    single { BoutiqueApi(get()) }
     single { SearchApi(get()) }
     single { TicketsApi(get()) }
     single { ReceiptsApi(get(), get()) }
@@ -82,7 +79,6 @@ val extrasModule = module {
     single { AddonsRepository(get(), get(), get()) }
     single { LocationsRepository(get(), get(), get()) }
     single { SearchRepository(get()) }
-    single { BoutiqueRepository(get(), get(), get()) }
     single { DocumentsRepository(get(), get()) }
     single { DevicesRepository(get(), get()) }
     single { TicketsRepository(get(), get(), get(), get()) }

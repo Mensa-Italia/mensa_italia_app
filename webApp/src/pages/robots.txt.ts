@@ -25,7 +25,6 @@ Disallow: /chapters
 Disallow: /documents
 Disallow: /podcasts
 Disallow: /quid
-Disallow: /boutique
 Disallow: /addons
 Disallow: /tableport
 Disallow: /search

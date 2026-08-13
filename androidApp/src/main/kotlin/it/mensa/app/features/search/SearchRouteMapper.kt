@@ -1,6 +1,5 @@
 package it.mensa.app.features.search
 
-import it.mensa.app.features.boutique.BoutiqueRoutes
 import it.mensa.app.features.deals.DealsRoute
 import it.mensa.app.features.documents.DocumentsRoutes
 import it.mensa.app.features.events.EventRoutes
@@ -20,7 +19,6 @@ fun HydratedHit.toDetailRoute(): String? = when (val p = payload) {
     is HydratedHit.Payload.Deal     -> DealsRoute.detail(p.deal.id)
     is HydratedHit.Payload.Sig      -> SigsRoutes.detail(p.sig.id)
     is HydratedHit.Payload.Document -> DocumentsRoutes.detail(p.document.id)
-    is HydratedHit.Payload.Boutique -> BoutiqueRoutes.product(p.product.id)
     is HydratedHit.Payload.OrgGroup -> null  // no dedicated screen
     is HydratedHit.Payload.OrgRole  -> {
         // Navigate to the member detail using userId

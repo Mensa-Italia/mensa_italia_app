@@ -7,7 +7,6 @@ import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.onboarding.OnboardingState
 import it.mensa.shared.repository.AddonsRepository
-import it.mensa.shared.repository.BoutiqueRepository
 import it.mensa.shared.repository.CalendarLinksRepository
 import it.mensa.shared.repository.DealsRepository
 import it.mensa.shared.repository.DevicesRepository
@@ -48,7 +47,6 @@ class KoinAccess(
     val addons: AddonsRepository,
     val search: SearchRepository,
     val regSoci: RegSociRepository,
-    val boutique: BoutiqueRepository,
     val documents: DocumentsRepository,
     val tickets: TicketsRepository,
     val receipts: ReceiptsRepository,
@@ -82,7 +80,6 @@ fun koinAccess(): KoinAccess = KoinAccess(
     addons = KoinPlatform.getKoin().get(),
     search = KoinPlatform.getKoin().get(),
     regSoci = KoinPlatform.getKoin().get(),
-    boutique = KoinPlatform.getKoin().get(),
     documents = KoinPlatform.getKoin().get(),
     tickets = KoinPlatform.getKoin().get(),
     receipts = KoinPlatform.getKoin().get(),

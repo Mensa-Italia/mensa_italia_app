@@ -28,7 +28,6 @@ type FilterType =
   | "documenti"
   | "quid"
   | "quid-articoli"
-  | "boutique"
   | "gruppi-locali"
   | "addon"
   | "linktree";
@@ -42,7 +41,6 @@ const FILTERS: { id: FilterType; label: string; hitType?: string }[] = [
   { id: "documenti",      label: "Documenti",     hitType: "document" },
   { id: "quid",           label: "Quid",          hitType: "quid" },
   { id: "quid-articoli",  label: "Articoli Quid", hitType: "quid_article" },
-  { id: "boutique",       label: "Boutique",      hitType: "boutique" },
   { id: "gruppi-locali",  label: "Gruppi locali", hitType: "local_office" },
   { id: "addon",          label: "Addons",        hitType: "addon" },
   { id: "linktree",       label: "Link locali",   hitType: "linktree_link" },
@@ -56,7 +54,6 @@ const TYPE_LABELS: Record<string, string> = {
   document:      "Documenti",
   quid:          "Quid",
   quid_article:  "Articoli Quid",
-  boutique:      "Boutique",
   local_office:  "Gruppi locali",
   addon:         "Addons",
   linktree_link: "Link locali",

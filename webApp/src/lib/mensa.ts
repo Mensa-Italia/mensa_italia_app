@@ -32,8 +32,6 @@ import {
   type MensaWebAddon as KotlinAddon,
   type MensaWebAddons as KotlinAddons,
   type MensaWebAuth as KotlinAuth,
-  type MensaWebBoutique as KotlinBoutique,
-  type MensaWebBoutiqueProduct as KotlinBoutiqueProduct,
   type MensaWebDeal as KotlinDeal,
   type MensaWebDealContact as KotlinDealContact,
   type MensaWebDeals as KotlinDeals,
@@ -312,17 +310,6 @@ export interface MensaWebDocumentSummary {
   id: string;
   documentId: string;
   markdown: string;
-}
-
-export interface MensaWebBoutiqueProduct {
-  id: string;
-  name: string;
-  description: string;
-  priceCents: number;
-  imageUrl: string;
-  imageUrls: readonly string[];
-  orderUrl: string;
-  alternativeOf: string;
 }
 
 export interface MensaWebAddon {
@@ -791,19 +778,6 @@ function snapshotDocumentSummary(s: KotlinDocumentSummary): MensaWebDocumentSumm
   };
 }
 
-function snapshotBoutiqueProduct(p: KotlinBoutiqueProduct): MensaWebBoutiqueProduct {
-  return {
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    priceCents: p.priceCents,
-    imageUrl: p.imageUrl,
-    imageUrls: [...p.imageUrls],
-    orderUrl: p.orderUrl,
-    alternativeOf: p.alternativeOf,
-  };
-}
-
 function snapshotAddon(a: KotlinAddon): MensaWebAddon {
   return {
     id: a.id,
@@ -913,7 +887,6 @@ class MensaWebSdkBridge {
   private readonly quid_: KotlinQuid;
   private readonly podcasts_: KotlinPodcasts;
   private readonly documents_: KotlinDocuments;
-  private readonly boutique_: KotlinBoutique;
   private readonly addons_: KotlinAddons;
   private readonly search_: KotlinSearch;
   private readonly metadata_: KotlinMetadata;
@@ -936,7 +909,6 @@ class MensaWebSdkBridge {
     this.quid_ = this.sdk.quid;
     this.podcasts_ = this.sdk.podcasts;
     this.documents_ = this.sdk.documents;
-    this.boutique_ = this.sdk.boutique;
     this.addons_ = this.sdk.addons;
     this.search_ = this.sdk.search;
     this.metadata_ = this.sdk.metadata;
@@ -1646,24 +1618,6 @@ class MensaWebSdkBridge {
     },
   };
 
-  readonly boutique = {
-    subscribeAll: (cb: (products: readonly MensaWebBoutiqueProduct[]) => void): (() => void) =>
-      deferredSubscribe<Array<KotlinBoutiqueProduct>>(
-        () => this.initialize(),
-        () => (inner) => this.boutique_.subscribeAll(inner),
-        (arr) => cb(arr.map(snapshotBoutiqueProduct)),
-      ),
-    refresh: async (): Promise<void> => {
-      await this.initialize();
-      return this.boutique_.refresh();
-    },
-    getById: async (id: string): Promise<MensaWebBoutiqueProduct | null> => {
-      await this.initialize();
-      const p = await this.boutique_.getById(id);
-      return p ? snapshotBoutiqueProduct(p) : null;
-    },
-  };
-
   readonly addons = {
     subscribeAll: (cb: (addons: readonly MensaWebAddon[]) => void): (() => void) =>
       deferredSubscribe<Array<KotlinAddon>>(
@@ -1793,7 +1747,6 @@ export interface MensaApi {
   quid: MensaWebSdkBridge["quid"];
   podcasts: MensaWebSdkBridge["podcasts"];
   documents: MensaWebSdkBridge["documents"];
-  boutique: MensaWebSdkBridge["boutique"];
   addons: MensaWebSdkBridge["addons"];
   search: MensaWebSdkBridge["search"];
   metadata: MensaWebSdkBridge["metadata"];

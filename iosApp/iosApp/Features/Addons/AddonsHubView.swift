@@ -64,8 +64,6 @@ struct AddonsHubView: View {
             switch route {
             case .stamp:
                 TableportStampView()
-            case .boutique:
-                BoutiqueView()
             case .quid:
                 QuidIssuesView()
             case .podcasts:
@@ -76,9 +74,6 @@ struct AddonsHubView: View {
                 ContentUnavailableView(title, systemImage: "wrench.and.screwdriver")
                     .navigationTitle(title)
             }
-        }
-        .navigationDestination(for: BoutiqueProductRoute.self) { route in
-            BoutiqueProductView(productId: route.productId)
         }
         .navigationDestination(for: QuidArticleRoute.self) { route in
             QuidArticleView(articleId: route.articleId)
@@ -123,7 +118,6 @@ struct AddonsHubView: View {
 
 enum AddonRoute: Hashable {
     case stamp
-    case boutique
     case quid
     case podcasts
     case external(id: String, url: String)
@@ -136,7 +130,6 @@ enum AddonRoute: Hashable {
         }
         switch addon.id {
         case "stamp": return .stamp
-        case "boutique": return .boutique
         case "quid": return .quid
         case "podcasts": return .podcasts
         default:
@@ -145,9 +138,6 @@ enum AddonRoute: Hashable {
     }
 }
 
-struct BoutiqueProductRoute: Hashable {
-    let productId: String
-}
 
 struct QuidArticleRoute: Hashable {
     let articleId: Int64

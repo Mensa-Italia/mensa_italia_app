@@ -25,7 +25,6 @@ enum KoinHelper {
     static var addons: AddonsRepository { koin.addons }
     static var search: SearchRepository { koin.search }
     static var regSoci: RegSociRepository { koin.regSoci }
-    static var boutique: BoutiqueRepository { koin.boutique }
     static var quid: QuidRepository { koin.quid }
     static var mensaTest: MensaTestClient { koin.mensaTest }
     static var podcasts: PodcastsRepository { koin.podcasts }

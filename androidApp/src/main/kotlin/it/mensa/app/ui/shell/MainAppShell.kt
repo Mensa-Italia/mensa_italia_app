@@ -39,8 +39,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.mensa.app.features.addonshub.AddonsHubRoutes
 import it.mensa.app.features.addonshub.addonsHubNavGraph
-import it.mensa.app.features.boutique.BoutiqueRoutes
-import it.mensa.app.features.boutique.boutiqueNavGraph
 import it.mensa.app.features.card.CardScreen
 import it.mensa.app.features.contacts.ContactsRoutes
 import it.mensa.app.features.contacts.contactsNavGraph
@@ -150,7 +148,6 @@ private fun harnessRoute(alias: String): String? = when (alias.lowercase()) {
     "localoffices" -> LocalOfficesRoutes.LIST
     "documents" -> DocumentsRoutes.LIST
     "notifications" -> NotificationsRoutes.LIST
-    "boutique" -> BoutiqueRoutes.LIST
     "tableport" -> TableportRoutes.PASSPORT
     "quid" -> QuidRoute.ISSUES
     "podcasts" -> PodcastsRoutes.LIST
@@ -339,7 +336,6 @@ fun MainAppShell() {
                 contactsNavGraph(navController)
                 externalNavGraph(navController)
                 tableportNavGraph(navController)
-                boutiqueNavGraph(navController)
                 testAssistantNavGraph(navController)
                 addonsHubNavGraph(
                     navController = navController,
@@ -397,7 +393,6 @@ private fun NavController.navigateToTab(tab: MainTab) {
 private fun NavController.navigateAddon(addonId: String) {
     val route = when (addonId.lowercase()) {
         "tableport", "stamp"        -> TableportRoutes.PASSPORT
-        "boutique"                  -> BoutiqueRoutes.LIST
         "podcasts", "podcast"       -> PodcastsRoutes.LIST
         "contacts"                  -> ContactsRoutes.LIST
         "quid"                      -> QuidRoute.ISSUES

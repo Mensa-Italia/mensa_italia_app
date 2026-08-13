@@ -74,10 +74,6 @@ const TILES: readonly Tile[] = [
     labelKey: "web.discover.tile.podcasts.label",   labelFallback: "Podcasts",
     metaKey: "web.discover.tile.podcasts.meta",     metaFallback: "Voci dei soci Mensa",
     iconPath: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1zM16 14h3a1 1 0 0 1 1 1v5a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM3 14a9 9 0 0 1 18 0" },
-  { href: "/boutique", group: "resources",
-    labelKey: "web.discover.tile.boutique.label",   labelFallback: "Boutique",
-    metaKey: "web.discover.tile.boutique.meta",     metaFallback: "Gadget e merchandise",
-    iconPath: "M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" },
 
   // ── Personale ───────────────────────────────────────────────────────────
   { href: "/card", group: "personal",

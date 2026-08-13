@@ -9,7 +9,6 @@ enum DiscoverRoute: Hashable {
     case sigs
     case members
     case addonsHub
-    case boutique
     case documents
     case tableport
     case quid
@@ -77,10 +76,6 @@ struct DiscoverView: View {
                     color: .cyan,
                     title: tr("addons.podcasts.title", fallback: "Podcast"),
                     route: .podcasts)
-                row(icon: "bag.fill",
-                    color: .red,
-                    title: tr("addons.boutique.title", fallback: "Boutique"),
-                    route: .boutique)
                 if canSeeTestAssistant {
                     row(icon: "graduationcap.fill",
                         color: .brown,
@@ -138,7 +133,6 @@ struct DiscoverView: View {
         case .sigs:             SigListView()
         case .members:          MembersDirectoryView()
         case .addonsHub:        AddonsHubView()
-        case .boutique:         BoutiqueView()
         case .documents:        AreaDocumentsView()
         case .tableport:        TableportStampView()
         case .quid:             QuidIssuesView()

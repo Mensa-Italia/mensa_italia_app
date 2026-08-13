@@ -98,7 +98,6 @@ class MensaWebSdk {
     val quid: MensaWebQuid = MensaWebQuid(scope, this)
     val podcasts: MensaWebPodcasts = MensaWebPodcasts(scope, this)
     val documents: MensaWebDocuments = MensaWebDocuments(scope, this)
-    val boutique: MensaWebBoutique = MensaWebBoutique(scope, this)
     val addons: MensaWebAddons = MensaWebAddons(scope, this)
     val search: MensaWebSearch = MensaWebSearch(scope, this)
     val devices: MensaWebDevices = MensaWebDevices(scope, this)

@@ -84,11 +84,6 @@ enum class DiscoverCategory(
         labelFallback = "Tableport",
         icon = Icons.Outlined.QrCodeScanner,
     ),
-    Boutique(
-        labelKey = "discover.category.boutique",
-        labelFallback = "Boutique",
-        icon = Icons.Outlined.Store,
-    ),
     Contacts(
         labelKey = "discover.category.contacts",
         labelFallback = "Contatti",
@@ -162,7 +157,6 @@ val discoverSections: List<DiscoverSection> = listOf(
             DiscoverCategory.Tableport,
             DiscoverCategory.Quid,
             DiscoverCategory.Podcasts,
-            DiscoverCategory.Boutique,
             DiscoverCategory.AddonsHub,
             // TestAssistant iniettato dinamicamente dal ViewModel se user ha power "testmakers"
         ),

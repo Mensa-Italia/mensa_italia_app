@@ -62,7 +62,7 @@ class MensaWebSearch internal constructor(
 
 @JsExport
 data class MensaWebSearchHit(
-    val type: String,    // "event" | "deal" | "user" | "document" | "boutique" | "sig" | "addon"
+    val type: String,    // "event" | "deal" | "user" | "document" | "sig" | "addon"
     val id: String,
     val label: String,   // title
     val sublabel: String, // subtitle

@@ -22,7 +22,6 @@ const TYPE_LABELS: Record<string, string> = {
   document:      "Documenti",
   quid:          "Quid",
   quid_article:  "Articoli Quid",
-  boutique:      "Boutique",
   local_office:  "Gruppi locali",
   addon:         "Addons",
   linktree_link: "Link locali",
@@ -30,7 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const TYPE_ORDER = [
   "member", "event", "deal", "sig", "document",
-  "quid", "quid_article", "local_office", "boutique", "addon", "linktree_link",
+  "quid", "quid_article", "local_office", "addon", "linktree_link",
 ];
 
 /** Max risultati per tipo nel dropdown (versione compatta). */
@@ -67,7 +66,6 @@ function urlForHit(hit: MensaWebSearchHit): string {
     case "document":      return `/documents/${hit.id}`;
     case "quid":          return `/quid/${hit.id}`;
     case "quid_article":  return `/quid/articles/${hit.id}`;
-    case "boutique":      return `/boutique/${hit.id}`;
     case "local_office":  return `/chapters/${hit.id}`;
     case "linktree_link": return hit.url || "#";
     case "addon":         return `/addons`;

@@ -6,7 +6,7 @@ import Shared
 /// Strategy:
 /// 1. Subscribe to `SearchRepository.state` — that gives us the backend index hits.
 /// 2. Hold local snapshots of every entity cache (members, events, deals, sigs,
-///    documents, boutique). They are kept fresh by the existing observe flows.
+///    documents). They are kept fresh by the existing observe flows.
 /// 3. When the backend returns, *merge* its hits with local substring matches so
 ///    we don't miss anything the index hasn't ranked. This is what fixes the
 ///    "few people" bug — the local `members_registry` SQLDelight cache contains
@@ -73,7 +73,6 @@ final class SearchViewModel {
             case deal(DealModel)
             case sig(SigModel)
             case document(DocumentModel)
-            case boutique(BoutiqueModel)
             case addon(AddonModel)
             /// Numero di Quid — reusa `QuidIssueCard` come row di ricerca.
             /// L'id di routing (WP category id) viene parsato da `deep_link`
@@ -112,7 +111,6 @@ final class SearchViewModel {
     private var deals: [DealModel] = []
     private var sigs: [SigModel] = []
     private var documents: [DocumentModel] = []
-    private var boutique: [BoutiqueModel] = []
     private var addons: [AddonModel] = []
 
     /// userId → (role, groupTitle) — populated once per session.
@@ -131,7 +129,6 @@ final class SearchViewModel {
     private var dealsSub: Closeable?
     private var sigsSub: Closeable?
     private var documentsSub: Closeable?
-    private var boutiqueSub: Closeable?
     private var addonsSub: Closeable?
 
     /// Last backend `Success` payload — kept so we can re-hydrate when caches
@@ -191,7 +188,6 @@ final class SearchViewModel {
         dealsSub?.close();     dealsSub = nil
         sigsSub?.close();      sigsSub = nil
         documentsSub?.close(); documentsSub = nil
-        boutiqueSub?.close();  boutiqueSub = nil
         addonsSub?.close();    addonsSub = nil
     }
 
@@ -269,7 +265,7 @@ final class SearchViewModel {
         // Organigramma in cima: chi cerca un cognome che è anche un ruolo
         // (es. "vacca" → Presidente) vede prima la carica e poi tutti i soci
         // con quel cognome. Le entità "macro" precedono quelle puntuali.
-        let order = ["org", "user", "linktree_link", "event", "deal", "sig", "document", "quid_issue", "quid_pdf", "quid_article", "boutique", "addon"]
+        let order = ["org", "user", "linktree_link", "event", "deal", "sig", "document", "quid_issue", "quid_pdf", "quid_article", "addon"]
 
         var sections: [HydratedSection] = []
         for type in order {
@@ -400,10 +396,6 @@ final class SearchViewModel {
             localMatches = documents
                 .filter { $0.matchesQuery(q) }
                 .map { HydratedHit(id: $0.id, leanTitle: $0.name, leanSubtitle: $0.description_ ?? "", leanImage: "", payload: .document($0)) }
-        case "boutique":
-            localMatches = boutique
-                .filter { $0.matchesQuery(q) }
-                .map { HydratedHit(id: $0.id, leanTitle: $0.name, leanSubtitle: $0.description_, leanImage: $0.image.first ?? "", payload: .boutique($0)) }
         case "addon":
             localMatches = addons
                 .filter { $0.matchesQuery(q) }
@@ -471,10 +463,6 @@ final class SearchViewModel {
         case "document":
             if let m = documents.first(where: { $0.id == id }) {
                 return HydratedHit(id: id, leanTitle: title, leanSubtitle: subtitle, leanImage: image, payload: .document(m))
-            }
-        case "boutique":
-            if let m = boutique.first(where: { $0.id == id }) {
-                return HydratedHit(id: id, leanTitle: title, leanSubtitle: subtitle, leanImage: image, payload: .boutique(m))
             }
         case "addon":
             if let m = addons.first(where: { $0.id == id }) {
@@ -746,14 +734,6 @@ final class SearchViewModel {
             },
             onError: { _ in }
         )
-        boutiqueSub = FlowBridgeKt.subscribe(
-            flow: koin.boutique.observeAll(),
-            onEach: { [weak self] value in
-                let list = (value as? [BoutiqueModel]) ?? []
-                Task { @MainActor in self?.boutique = list; self?.rebuildIfPossible() }
-            },
-            onError: { _ in }
-        )
         addonsSub = FlowBridgeKt.subscribe(
             flow: koin.addons.observeAll(),
             onEach: { [weak self] value in
@@ -913,13 +893,6 @@ private extension DocumentModel {
     }
 }
 
-private extension BoutiqueModel {
-    func matchesQuery(_ q: String) -> Bool {
-        if q.isEmpty { return false }
-        return name.folded().contains(q)
-            || description_.folded().contains(q)
-    }
-}
 
 private extension AddonModel {
     func matchesQuery(_ q: String) -> Bool {

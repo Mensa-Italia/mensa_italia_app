@@ -14,7 +14,7 @@ struct SearchView: View {
     /// Max rows per section in the "Tutti" overview before collapsing into a
     /// "Mostra tutto" footer that selects the dedicated chip. Apple HIG-ish
     /// — keeps the unified scroll digestible without forcing the user to
-    /// scroll past 50 deals to see boutique.
+    /// scroll past 50 deals to see gli addon.
     private let previewLimit: Int = 6
 
     // Wrapped Hashable navigation values so each detail destination is
@@ -43,7 +43,6 @@ struct SearchView: View {
             FilterChip(id: "deal", label: tr("app.search.filter.deals", fallback: "Deals"), key: "deal", systemImage: "tag"), // i18n
             FilterChip(id: "sig", label: tr("app.discover.groups", fallback: "Gruppi e interessi"), key: "sig", systemImage: "person.3"), // i18n
             FilterChip(id: "document", label: tr("addons.documents.title", fallback: "Documenti"), key: "document", systemImage: "doc.text"), // i18n
-            FilterChip(id: "boutique", label: tr("addons.boutique.title", fallback: "Boutique"), key: "boutique", systemImage: "bag"), // i18n
             FilterChip(id: "quid_issue", label: tr("app.search.filter.quid_issues", fallback: "Numeri Quid"), key: "quid_issue", systemImage: "books.vertical"), // i18n
             FilterChip(id: "quid_article", label: tr("app.search.filter.quid_articles", fallback: "Articoli Quid"), key: "quid_article", systemImage: "newspaper"), // i18n
             FilterChip(id: "linktree_link", label: tr("app.search.filter.linktree_link", fallback: "Gruppi locali"), key: "linktree_link", systemImage: "building.2"), // i18n
@@ -215,7 +214,7 @@ struct SearchView: View {
             }
             Text(tr(
                 "app.search.empty.hero.body",
-                fallback: "Cerca soci, eventi, deal, gruppi, documenti, boutique e addon. Tutto da qui."
+                fallback: "Cerca soci, eventi, deal, gruppi, documenti e addon. Tutto da qui."
             ))
             .font(.subheadline)
             .foregroundStyle(.secondary)
@@ -553,7 +552,7 @@ struct SearchView: View {
 
     /// Footer-style row that switches the chip filter to the section's type.
     /// Used for sections that already live inside the default inset-grouped
-    /// card (users / deals / sigs / documents / boutique / addon / org) —
+    /// card (users / deals / sigs / documents / addon / org) —
     /// renders as an inline row and shares the section's rounded card.
     @ViewBuilder
     private func listShowAllRow(type: String, total: Int) -> some View {
@@ -737,7 +736,7 @@ struct SearchView: View {
             .listRowSeparator(.hidden)
 
         case .deal(let deal):
-            // Same approach as `BoutiqueSearchResultRow`: a compact HStack-only
+            // Compact HStack-only
             // row works cleanly inside the search `List`, while the full
             // `DealCardView` (with `.glassEffect`) is reserved for `DealListView`
             // (which lives in a `LazyVStack`, where the card hit-tests fine).
@@ -755,10 +754,6 @@ struct SearchView: View {
                 DocumentRow(doc: doc, dateString: documentDateString(doc))
             }
 
-        case .boutique(let product):
-            NavigationLink(value: BoutiqueProductRoute(productId: product.id)) {
-                BoutiqueSearchResultRow(product: product)
-            }
 
         case .quidIssue(let issue):
             // Riusa la stessa card che si vede nell'hub dei numeri.
@@ -799,7 +794,6 @@ struct SearchView: View {
         case .linktreeLink(let slug, let linkTitle, let linkSubtitle, let imageURL, _):
             // Lean row — un link del linktree di un gruppo locale. Tap apre la
             // pagina del gruppo (`LocalOfficeView`). Layout compatto in stile
-            // BoutiqueSearchResultRow.
             NavigationLink(value: LocalOfficeSlugRoute(slug: slug)) {
                 LinktreeLinkSearchResultRow(
                     title: linkTitle,
@@ -859,7 +853,6 @@ struct SearchView: View {
         case "deal":     return tr("app.search.filter.deals", fallback: "Deals") // i18n
         case "sig":      return tr("app.discover.groups", fallback: "Gruppi e interessi") // i18n
         case "document": return tr("addons.documents.title", fallback: "Documenti") // i18n
-        case "boutique": return tr("addons.boutique.title", fallback: "Boutique") // i18n
         case "addon":    return tr("addons.title", fallback: "Addon") // i18n
         case "quid_issue":   return tr("app.search.header.quid_issues", fallback: "Numeri Quid") // i18n
         case "quid_article": return tr("app.search.header.quid_articles", fallback: "Articoli Quid") // i18n
@@ -876,7 +869,6 @@ struct SearchView: View {
         case "deal":     return "tag"
         case "sig":      return "person.3"
         case "document": return "doc.text"
-        case "boutique": return "bag"
         case "addon":    return "puzzlepiece.extension"
         case "quid_issue":   return "books.vertical"
         case "quid_article": return "newspaper"

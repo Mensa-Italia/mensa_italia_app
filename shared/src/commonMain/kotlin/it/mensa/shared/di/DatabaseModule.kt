@@ -72,7 +72,7 @@ suspend fun initializeMensaDatabase(factory: DriverFactory) {
  * to keep migrations stable.
  */
 private val ALL_TABLES = listOf(
-    "Addon", "Boutique", "Calendar", "Deal", "Device", "Document",
+    "Addon", "Calendar", "Deal", "Device", "Document",
     "DocumentElaborated", "Event", "EventSchedule", "KeyValue", "Location",
     "Notification", "PaymentMethod", "Receipt", "RegSoci", "Sig", "Stamp",
     "StampUser", "Ticket",

@@ -34,7 +34,6 @@ enum DebugRefreshHarness {
             await step("notifications") { try await koin.notifications.refresh() }
             await step("addons") { try await koin.addons.refresh() }
             await step("regSoci") { try await koin.regSoci.refresh() }
-            await step("boutique") { try await koin.boutique.refresh() }
             await step("documents") { try await koin.documents.refresh() }
             await step("tickets") { try await koin.tickets.refresh() }
             await step("receipts") { try await koin.receipts.refresh() }

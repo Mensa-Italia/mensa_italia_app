@@ -3,7 +3,6 @@ package it.mensa.app
 import android.app.Application
 import it.mensa.app.di.appModule
 import it.mensa.app.features.addonshub.addonsHubModule
-import it.mensa.app.features.boutique.boutiqueModule
 import it.mensa.app.features.contacts.contactsModule
 import it.mensa.app.features.deals.dealsModule
 import it.mensa.app.features.documents.documentsModule
@@ -45,7 +44,6 @@ class MensaApplication : Application() {
                 appModule,
                 // Feature modules (alphabetical)
                 addonsHubModule,
-                boutiqueModule,
                 contactsModule,
                 dealsModule,
                 documentsModule,

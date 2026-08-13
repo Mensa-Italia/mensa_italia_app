@@ -1,7 +1,6 @@
 package it.mensa.app.navigation
 
 import it.mensa.app.features.addonshub.AddonsHubRoutes
-import it.mensa.app.features.boutique.BoutiqueRoutes
 import it.mensa.app.features.contacts.ContactsRoutes
 import it.mensa.app.features.deals.DealsRoute
 import it.mensa.app.features.discover.DiscoverCategory
@@ -33,7 +32,6 @@ fun DiscoverCategory.toRoute(): String? = when (this) {
     DiscoverCategory.Tableport     -> TableportRoutes.PASSPORT
     DiscoverCategory.Quid          -> QuidRoute.ISSUES
     DiscoverCategory.Podcasts      -> PodcastsRoutes.LIST
-    DiscoverCategory.Boutique      -> BoutiqueRoutes.LIST
     DiscoverCategory.TestAssistant -> TestAssistantRoutes.DASHBOARD
     DiscoverCategory.AddonsHub     -> AddonsHubRoutes.HUB
     DiscoverCategory.Contacts      -> ContactsRoutes.LIST

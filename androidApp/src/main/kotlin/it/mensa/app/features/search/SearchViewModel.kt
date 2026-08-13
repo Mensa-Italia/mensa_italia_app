@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.AddonModel
-import it.mensa.shared.model.BoutiqueModel
 import it.mensa.shared.model.DealModel
 import it.mensa.shared.model.DocumentModel
 import it.mensa.shared.model.EventModel
@@ -77,7 +76,6 @@ data class HydratedHit(
         data class Deal(val deal: DealModel) : Payload()
         data class Sig(val sig: SigModel) : Payload()
         data class Document(val document: DocumentModel) : Payload()
-        data class Boutique(val product: BoutiqueModel) : Payload()
         data class Addon(val addon: AddonModel) : Payload()
         data class OrgGroup(val group: OrgChartGroup) : Payload()
         data class OrgRole(
@@ -107,7 +105,6 @@ class SearchViewModel(private val context: Context) : ViewModel() {
     private var deals: List<DealModel> = emptyList()
     private var sigs: List<SigModel> = emptyList()
     private var documents: List<DocumentModel> = emptyList()
-    private var boutique: List<BoutiqueModel> = emptyList()
     private var addons: List<AddonModel> = emptyList()
 
     /** userId → (role, groupTitle) */
@@ -279,9 +276,6 @@ class SearchViewModel(private val context: Context) : ViewModel() {
             }
         }
         viewModelScope.launch {
-            koin.boutique.observeAll().collect { list ->
-                boutique = list; rebuildIfPossible()
-            }
         }
         viewModelScope.launch {
             koin.addons.observeAll().collect { list ->
@@ -346,7 +340,7 @@ class SearchViewModel(private val context: Context) : ViewModel() {
         val order = listOf(
             "org", "user", "linktree_link", "event", "deal",
             "sig", "document", "quid_issue", "quid_pdf", "quid_article",
-            "boutique", "addon"
+            "addon"
         )
         val typeFilter = _uiState.value.selectedType
 
@@ -445,11 +439,6 @@ class SearchViewModel(private val context: Context) : ViewModel() {
                 .map { doc ->
                     HydratedHit(doc.id, doc.name, doc.description ?: "", "", HydratedHit.Payload.Document(doc))
                 }
-            "boutique" -> boutique
-                .filter { it.matchesQuery(q) }
-                .map { p ->
-                    HydratedHit(p.id, p.name, p.description, p.image.firstOrNull() ?: "", HydratedHit.Payload.Boutique(p))
-                }
             "addon" -> addons
                 .filter { it.matchesQuery(q) }
                 .map { a ->
@@ -507,11 +496,6 @@ class SearchViewModel(private val context: Context) : ViewModel() {
             "document" -> {
                 val doc = documents.firstOrNull { it.id == id }
                 if (doc != null) HydratedHit(id, title, subtitle, image, HydratedHit.Payload.Document(doc))
-                else HydratedHit(id, title, subtitle, image, HydratedHit.Payload.Lean)
-            }
-            "boutique" -> {
-                val p = boutique.firstOrNull { it.id == id }
-                if (p != null) HydratedHit(id, title, subtitle, image, HydratedHit.Payload.Boutique(p))
                 else HydratedHit(id, title, subtitle, image, HydratedHit.Payload.Lean)
             }
             "addon" -> {
@@ -667,10 +651,6 @@ private fun DocumentModel.matchesQuery(q: String): Boolean {
     return category.folded().contains(q)
 }
 
-private fun BoutiqueModel.matchesQuery(q: String): Boolean {
-    if (q.isEmpty()) return false
-    return name.folded().contains(q) || description.folded().contains(q)
-}
 
 private fun AddonModel.matchesQuery(q: String): Boolean {
     if (q.isEmpty()) return false

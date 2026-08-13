@@ -9,7 +9,6 @@ object SearchType {
     const val DEAL = "deal"
     const val USER = "user"
     const val DOCUMENT = "document"
-    const val BOUTIQUE = "boutique"
     const val SIG = "sig"
     const val ADDON = "addon"
 }

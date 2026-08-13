@@ -20,7 +20,6 @@ function resolveAddonUrl(addon: MensaWebAddon): string {
   const id = addon.id.toLowerCase();
   if (id.includes("quid")) return "/quid";
   if (id.includes("podcast")) return "/podcasts";
-  if (id.includes("boutique")) return "/boutique";
   if (id.includes("tableport") || id.includes("stamp")) return "/tableport";
   if (id.includes("documenti") || id.includes("document")) return "/documents";
   console.warn(`[addons] No route for addon id="${addon.id}"`);
