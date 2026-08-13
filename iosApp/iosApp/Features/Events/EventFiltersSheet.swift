@@ -361,6 +361,13 @@ private struct RegionPicker: View {
                                     .fontWeight(.semibold)
                             }
                         }
+                        // Con .buttonStyle(.plain) l'area sensibile e' il
+                        // contenuto disegnato: lo Spacer non disegna niente,
+                        // quindi il tap prendeva solo sul nome della regione e
+                        // il resto della riga sembrava morto. contentShape
+                        // rende tutta la riga toccabile, com'e' lecito
+                        // aspettarsi da una riga di List.
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }

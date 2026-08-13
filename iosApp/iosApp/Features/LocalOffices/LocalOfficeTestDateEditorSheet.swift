@@ -126,6 +126,10 @@ struct LocalOfficeTestDateEditorSheet: View {
                                             .fontWeight(.semibold)
                                     }
                                 }
+                                // Senza contentShape con .buttonStyle(.plain) il
+                                // tap prende solo sul nome: lo Spacer non
+                                // disegna niente e quindi non e' toccabile.
+                                .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
                         }

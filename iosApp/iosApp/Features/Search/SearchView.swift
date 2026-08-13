@@ -308,6 +308,10 @@ struct SearchView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        // Il padding sposta, non disegna: senza contentShape
+                        // meta' riga (lo Spacer e i margini) non risponde al
+                        // tocco e la ricerca recente sembra non funzionare.
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     if idx < vm.recent.count - 1 {
