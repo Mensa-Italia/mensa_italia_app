@@ -10,6 +10,7 @@ import it.mensa.shared.repository.ScheduleDraft
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -58,6 +59,7 @@ class AddEventViewModel(private val eventId: String? = null) : ViewModel() {
 
     private val eventsRepo get() = koinAccess().events
     private val schedulesRepo get() = koinAccess().eventSchedules
+    private val locationsRepo get() = koinAccess().locations
     private val auth get() = koinAccess().auth
 
     val isEditing: Boolean get() = eventId != null
@@ -120,6 +122,17 @@ class AddEventViewModel(private val eventId: String? = null) : ViewModel() {
     fun updateStartDate(v: Long) = _uiState.update { it.copy(startDateMillis = v) }
     fun updateEndDate(v: Long) = _uiState.update { it.copy(endDateMillis = v) }
     fun updatePosition(v: LocationModel?) = _uiState.update { it.copy(position = v) }
+
+    /**
+     * Il picker restituisce solo l'id: la posizione e' gia' nel DB locale, sia
+     * che l'utente l'abbia scelta dalla lista sia che l'abbia appena creata.
+     */
+    fun selectPositionById(id: String) {
+        viewModelScope.launch {
+            val loc = locationsRepo.observeAll().first().firstOrNull { it.id == id } ?: return@launch
+            _uiState.update { it.copy(position = loc) }
+        }
+    }
     fun updateIsOnline(v: Boolean) = _uiState.update { it.copy(isOnline = v) }
     fun updateIsNational(v: Boolean) = _uiState.update { it.copy(isNational = v) }
     fun updateIsSpot(v: Boolean) = _uiState.update { it.copy(isSpot = v) }

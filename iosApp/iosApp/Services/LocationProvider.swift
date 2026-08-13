@@ -21,6 +21,11 @@ final class LocationProvider: NSObject, CLLocationManagerDelegate {
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
     }
 
+    /// Stato di autorizzazione corrente. Sola lettura: serve a chi deve
+    /// decidere *se* centrare la mappa sull'utente senza far comparire il
+    /// prompt di sistema come effetto collaterale dell'apertura di una pagina.
+    var authorizationStatus: CLAuthorizationStatus { manager.authorizationStatus }
+
     /// Ritorna la posizione più recente (cached) oppure ne richiede una nuova.
     /// Non lancia mai — `nil` significa "non disponibile / negata / timeout".
     func requestOnce(timeoutSeconds: Double = 8) async -> CLLocation? {

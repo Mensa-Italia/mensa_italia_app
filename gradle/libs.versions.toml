@@ -41,6 +41,10 @@ media3 = "1.4.1"
 maps-compose = "6.2.1"
 play-services-maps = "19.0.0"
 play-services-location = "21.3.0"
+# Places SDK — autocomplete del picker posizioni. Fermi alla linea 4.x: e' quella
+# fissata per il picker, e le uniche API usate (FindAutocompletePredictions +
+# FetchPlace) sono identiche in 5.x, quindi salire e' un cambio di questa riga.
+places = "4.4.1"
 
 # Accompanist
 accompanist = "0.36.0"
@@ -150,6 +154,7 @@ androidx-media3-common = { module = "androidx.media3:media3-common", version.ref
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 
 # Accompanist
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }

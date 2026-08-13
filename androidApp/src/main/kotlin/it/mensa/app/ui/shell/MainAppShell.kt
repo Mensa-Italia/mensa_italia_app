@@ -53,6 +53,7 @@ import it.mensa.app.features.events.eventsNavGraph
 import it.mensa.app.features.external.ExternalRoutes
 import it.mensa.app.features.external.externalNavGraph
 import it.mensa.app.features.localoffices.LocalOfficesRoutes
+import it.mensa.app.features.locations.locationsNavGraph
 import it.mensa.app.features.localoffices.localOfficesNavGraph
 import it.mensa.app.features.members.MembersRoutes
 import it.mensa.app.features.members.membersNavGraph
@@ -323,6 +324,7 @@ fun MainAppShell() {
                 // ── Drill nav graphs ──────────────────────────────────────────
 
                 eventsNavGraph(navController)
+                locationsNavGraph(navController)
                 dealsNavGraph(navController)
                 ticketsNavGraph(navController)
                 receiptsNavGraph(navController)

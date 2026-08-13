@@ -492,16 +492,35 @@ jobs:
           keytool -list -keystore androidApp/keystore/release.jks \
             -storepass "$STORE_PASSWORD" >/dev/null
 
+      # La chiave di Google Maps finisce nel manifest via manifestPlaceholders
+      # (androidApp/build.gradle.kts). Il controllo e' bloccante di proposito:
+      # senza chiave l'SDK non carica le tile e la mappa esce grigia, senza
+      # crash e senza errore visibile. E' andata avanti cosi' per mesi perche'
+      # il default della proprieta' Gradle e' la stringa vuota e nessuno
+      # passava niente: un .aab pubblicato con la mappa rotta non si ritira.
+      - name: Verifica la chiave di Google Maps
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MAPS_API_KEY:-}" ]; then
+            echo "::error::Il segreto MAPS_API_KEY non e' impostato: la mappa uscirebbe grigia."
+            echo "Impostalo con: gh secret set MAPS_API_KEY --repo ${{ github.repository }}"
+            exit 1
+          fi
+
       - name: Build AAB + APK
         env:
           ANDROID_STORE_FILE: ${{ github.workspace }}/androidApp/keystore/release.jks
           ANDROID_STORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ANDROID_KEY_ALIAS: key
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: |
           ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease \
             -Dorg.gradle.java.home="$JAVA_HOME" \
             -PandroidVersionCodeOverride="$VERSION_CODE" \
+            -PMAPS_API_KEY="$MAPS_API_KEY" \
             --no-daemon --stacktrace
 
       - name: Rename artifacts

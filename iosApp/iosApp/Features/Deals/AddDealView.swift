@@ -180,7 +180,7 @@ final class AddDealViewModel {
 
 /// Native rewrite of the Flutter `AddonDealsAddView` — create / edit a deal
 /// plus its primary contact in a single SwiftUI form. Reuses
-/// `LocationPickerSheet` (same component as the Add Event flow) for picking
+/// `LocationPickerFlowView` (same component as the Add Event flow) for picking
 /// the deal's optional location.
 struct AddDealView: View {
     @Environment(\.dismiss) private var dismiss
@@ -208,14 +208,10 @@ struct AddDealView: View {
         )
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbar }
-        .sheet(isPresented: $showLocationPicker) {
-            LocationPickerSheet(
-                onPicked: { loc in
-                    vm.position = loc
-                    showLocationPicker = false
-                },
-                onCancelled: { showLocationPicker = false }
-            )
+        .fullScreenCover(isPresented: $showLocationPicker) {
+            LocationPickerFlowView(initial: vm.position) { loc in
+                vm.position = loc
+            }
         }
         .alert(
             tr("app.error.title", fallback: "Errore"),

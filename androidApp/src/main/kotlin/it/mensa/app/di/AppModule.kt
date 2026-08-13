@@ -3,6 +3,9 @@ package it.mensa.app.di
 import it.mensa.app.features.auth.LoginViewModel
 import it.mensa.app.features.card.CardViewModel
 import it.mensa.app.features.discover.DiscoverViewModel
+import it.mensa.app.features.locations.LocationSearchService
+import it.mensa.app.features.locations.NewLocationViewModel
+import it.mensa.app.features.locations.ReverseGeocoderService
 import it.mensa.app.features.profile.ProfileViewModel
 import it.mensa.app.features.profile.sub.CalendarLinkerViewModel
 import it.mensa.app.features.profile.sub.DevicesViewModel
@@ -45,6 +48,8 @@ val appModule = module {
 
     // Location
     single { LocationProvider(androidContext()) }
+    single { LocationSearchService(androidContext()) }
+    single { ReverseGeocoderService(androidContext()) }
 
     // Push token store (DataStore-backed)
     single { PushTokenStore(androidContext()) }
@@ -71,6 +76,7 @@ val appModule = module {
     viewModel { DiscoverViewModel() }
     viewModel { TodayViewModel(get()) }
     viewModel { SearchViewModel(androidContext()) }
+    viewModel { NewLocationViewModel(get(), get(), get()) }
 
     // Profile ViewModels
     viewModel { ProfileViewModel(get(), get()) }

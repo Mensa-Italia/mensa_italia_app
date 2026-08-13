@@ -9,6 +9,7 @@ import it.mensa.shared.repository.DealsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -125,6 +126,17 @@ class AddDealViewModel(private val dealId: String?) : ViewModel() {
     fun setVatNumber(v: String) = _state.update { it.copy(vatNumber = v) }
     fun setLink(v: String) = _state.update { it.copy(link = v) }
     fun setPosition(v: LocationModel?) = _state.update { it.copy(position = v) }
+
+    /**
+     * Il picker restituisce solo l'id: la sede e' gia' nel DB locale, sia che
+     * l'utente l'abbia scelta dalla lista sia che l'abbia appena creata.
+     */
+    fun selectPositionById(id: String) {
+        viewModelScope.launch {
+            val loc = koinAccess().locations.observeAll().first().firstOrNull { it.id == id } ?: return@launch
+            _state.update { it.copy(position = loc) }
+        }
+    }
     fun setHasValidity(v: Boolean) = _state.update { it.copy(hasValidity = v) }
     fun setStartDate(v: Instant) = _state.update { it.copy(startDate = v) }
     fun setEndDate(v: Instant) = _state.update { it.copy(endDate = v) }

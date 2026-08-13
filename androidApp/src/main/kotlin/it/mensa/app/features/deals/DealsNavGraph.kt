@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import it.mensa.app.features.locations.navigateToLocationPicker
 
 // ─── Route constants ─────────────────────────────────────────────────────────
 
@@ -68,9 +69,11 @@ fun NavGraphBuilder.dealsNavGraph(navController: NavController) {
         )
     }
 
-    composable(DealsRoute.ADD) {
+    composable(DealsRoute.ADD) { backStackEntry ->
         AddDealScreen(
             dealId = null,
+            backStackEntry = backStackEntry,
+            onPickLocationClick = { current -> navController.navigateToLocationPicker(current?.id) },
             onBack = { navController.popBackStack() },
         )
     }
@@ -84,6 +87,8 @@ fun NavGraphBuilder.dealsNavGraph(navController: NavController) {
         val dealId = backStackEntry.arguments?.getString(DealsRoute.ARG_DEAL_ID) ?: return@composable
         AddDealScreen(
             dealId = dealId,
+            backStackEntry = backStackEntry,
+            onPickLocationClick = { current -> navController.navigateToLocationPicker(current?.id) },
             onBack = { navController.popBackStack() },
         )
     }

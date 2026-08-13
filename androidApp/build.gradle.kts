@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.android")
@@ -31,6 +33,19 @@ val releaseKeyAlias: String = (project.findProperty("ANDROID_KEY_ALIAS") as Stri
 val releaseKeyPassword: String? = (project.findProperty("ANDROID_KEY_PASSWORD") as String?)
     ?: System.getenv("ANDROID_KEY_PASSWORD")
 
+// Chiave Google Maps. Gradle NON carica local.properties come project property
+// (solo l'AGP la legge, e solo per sdk.dir), quindi va parsata a mano: senza
+// questo passaggio metterla lì non ha mai avuto effetto e ogni build usciva con
+// il placeholder vuoto. Vuota resta un caso legittimo — MapsKey.hasMapsApiKey()
+// degrada la UI a runtime invece di far fallire la build.
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+}
+val mapsApiKey: String = (project.findProperty("MAPS_API_KEY") as String?)
+    ?: System.getenv("MAPS_API_KEY")
+    ?: localProperties.getProperty("MAPS_API_KEY")
+    ?: ""
+
 android {
     namespace = "it.mensa.app"
     compileSdk = 36
@@ -42,8 +57,7 @@ android {
         versionCode = appVersionCode
         versionName = appVersionName
 
-        // Maps API key placeholder — override in local.properties or via CI secret
-        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("MAPS_API_KEY") ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     signingConfigs {
@@ -138,6 +152,7 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation(libs.places)
 
     // Accompanist
     implementation(libs.accompanist.permissions)

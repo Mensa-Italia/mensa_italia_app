@@ -68,11 +68,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import it.mensa.app.features.events._components.EventCardBuilderSheet
-import it.mensa.app.features.events._components.LocationPickerSheet
 import it.mensa.app.features.events._components.ScheduleListSheet
+import it.mensa.app.features.locations.LocationRoutes
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.shared.model.LocationModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.Calendar
@@ -86,6 +89,8 @@ import java.util.Date
 @Composable
 fun AddEventScreen(
     eventId: String? = null,
+    backStackEntry: NavBackStackEntry,
+    onPickLocationClick: (LocationModel?) -> Unit,
     onDismiss: () -> Unit = {},
     vm: AddEventViewModel = koinViewModel { parametersOf(eventId) },
 ) {
@@ -98,7 +103,6 @@ fun AddEventScreen(
     var showImageOptions by remember { mutableStateOf(false) }
     var showPhotoPicker by remember { mutableStateOf(false) }
     var showCardBuilder by remember { mutableStateOf(false) }
-    var showLocationPicker by remember { mutableStateOf(false) }
     var showScheduleList by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var showStartDatePicker by remember { mutableStateOf(false) }
@@ -111,6 +115,19 @@ fun AddEventScreen(
                 val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
                 val ext = if (mimeType.contains("png")) "png" else "jpg"
                 vm.updateImage(bytes, "cover.$ext", mimeType)
+            }
+        }
+    }
+
+    // La posizione scelta torna dal picker come id sul SavedStateHandle: si
+    // rimuove appena letta, altrimenti riselezionerebbe da sola alla prossima
+    // ricomposizione della schermata.
+    LaunchedEffect(backStackEntry) {
+        backStackEntry.savedStateHandle.let { handle ->
+            val locationId = handle.get<String>(LocationRoutes.RESULT_LOCATION_ID)
+            if (!locationId.isNullOrEmpty()) {
+                vm.selectPositionById(locationId)
+                handle.remove<String>(LocationRoutes.RESULT_LOCATION_ID)
             }
         }
     }
@@ -171,7 +188,7 @@ fun AddEventScreen(
             if (!state.isOnline) {
                 Text("Dove", style = MaterialTheme.typography.labelLarge)
                 Surface(
-                    modifier = Modifier.fillMaxWidth().clickable { showLocationPicker = true },
+                    modifier = Modifier.fillMaxWidth().clickable { onPickLocationClick(state.position) },
                     shape = RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     tonalElevation = 2.dp,
@@ -179,10 +196,10 @@ fun AddEventScreen(
                     Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             if (state.position != null) {
-                                Text(state.position!!.name.ifBlank { "Posizione" }, style = MaterialTheme.typography.bodyMedium)
+                                Text(state.position!!.name.ifBlank { tr("events.add.location.unnamed", fallback = "Posizione") }, style = MaterialTheme.typography.bodyMedium)
                                 if (state.position!!.address.isNotBlank()) Text(state.position!!.address, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else {
-                                Text("Seleziona una posizione", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(tr("events.add.location.pick", fallback = "Seleziona una posizione"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
@@ -237,12 +254,6 @@ fun AddEventScreen(
             EventCardBuilderSheet(
                 onConfirmed = { bytes -> vm.updateImage(bytes, "event_card.png", "image/png"); showCardBuilder = false },
                 onDismiss = { showCardBuilder = false },
-            )
-        }
-        if (showLocationPicker) {
-            LocationPickerSheet(
-                onPicked = { loc -> vm.updatePosition(loc); showLocationPicker = false },
-                onDismiss = { showLocationPicker = false },
             )
         }
         if (showScheduleList) {

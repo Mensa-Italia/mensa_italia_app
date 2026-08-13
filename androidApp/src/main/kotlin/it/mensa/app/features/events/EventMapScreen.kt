@@ -2,8 +2,10 @@ package it.mensa.app.features.events
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,6 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
@@ -33,6 +37,8 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.locations.hasMapsApiKey
+import it.mensa.app.support.tr
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -50,6 +56,8 @@ fun EventMapScreen(
     val geoEvents = remember(state.events) { vm.geoEvents() }
     val selectedEvent = remember(state.selectedEventId, state.events) { vm.selectedEvent() }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val context = LocalContext.current
+    val hasMapsKey = remember { context.hasMapsApiKey() }
 
     // Default camera: Italy center
     val cameraPositionState = rememberCameraPositionState {
@@ -64,21 +72,41 @@ fun EventMapScreen(
             )
         },
     ) { innerPadding ->
-        GoogleMap(
-            modifier = Modifier.padding(innerPadding),
-            cameraPositionState = cameraPositionState,
-        ) {
-            geoEvents.forEach { event ->
-                val pos = event.position ?: return@forEach
-                Marker(
-                    state = MarkerState(position = LatLng(pos.lat, pos.lon)),
-                    title = event.name,
-                    snippet = if (event.isNational) "Nazionale" else "Locale",
-                    onClick = {
-                        vm.selectEvent(event.id)
-                        false
-                    },
+        // Senza chiave la mappa e' un rettangolo grigio muto: si dice perche',
+        // invece di lasciare l'utente a fissare il vuoto.
+        if (!hasMapsKey) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = tr(
+                        "app.location.map.unavailable",
+                        fallback = "Mappa non disponibile. Puoi comunque cercare un indirizzo.",
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(32.dp),
                 )
+            }
+        } else {
+            GoogleMap(
+                modifier = Modifier.padding(innerPadding),
+                cameraPositionState = cameraPositionState,
+            ) {
+                geoEvents.forEach { event ->
+                    val pos = event.position ?: return@forEach
+                    Marker(
+                        state = MarkerState(position = LatLng(pos.lat, pos.lon)),
+                        title = event.name,
+                        snippet = if (event.isNational) "Nazionale" else "Locale",
+                        onClick = {
+                            vm.selectEvent(event.id)
+                            false
+                        },
+                    )
+                }
             }
         }
 

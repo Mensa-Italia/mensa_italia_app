@@ -270,14 +270,10 @@ struct AddEventView: View {
         )
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
-        .sheet(isPresented: $showLocationPicker) {
-            LocationPickerSheet(
-                onPicked: { loc in
-                    vm.position = loc
-                    showLocationPicker = false
-                },
-                onCancelled: { showLocationPicker = false }
-            )
+        .fullScreenCover(isPresented: $showLocationPicker) {
+            LocationPickerFlowView(initial: vm.position) { loc in
+                vm.position = loc
+            }
         }
         .sheet(isPresented: $showScheduleList) {
             ScheduleListSheet(

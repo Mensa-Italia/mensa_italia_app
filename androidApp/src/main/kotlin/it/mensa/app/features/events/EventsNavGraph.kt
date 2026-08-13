@@ -4,8 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import it.mensa.app.features.locations.navigateToLocationPicker
 
 /**
  * EventsNavGraph — NavGraphBuilder extension for the Events feature.
@@ -48,9 +48,11 @@ fun NavGraphBuilder.eventsNavGraph(navController: NavController) {
         )
     }
 
-    composable(route = EventRoutes.ADD) {
+    composable(route = EventRoutes.ADD) { backStackEntry ->
         AddEventScreen(
             eventId = null,
+            backStackEntry = backStackEntry,
+            onPickLocationClick = { current -> navController.navigateToLocationPicker(current?.id) },
             onDismiss = { navController.popBackStack() },
         )
     }
@@ -62,6 +64,8 @@ fun NavGraphBuilder.eventsNavGraph(navController: NavController) {
         val eventId = backStackEntry.arguments?.getString(EventRoutes.ARG_EVENT_ID) ?: return@composable
         AddEventScreen(
             eventId = eventId,
+            backStackEntry = backStackEntry,
+            onPickLocationClick = { current -> navController.navigateToLocationPicker(current?.id) },
             onDismiss = { navController.popBackStack() },
         )
     }

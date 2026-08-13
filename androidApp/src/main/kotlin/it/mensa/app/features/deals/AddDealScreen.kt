@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -49,7 +50,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import it.mensa.app.features.locations.LocationRoutes
 import it.mensa.app.support.tr
+import it.mensa.shared.model.LocationModel
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -62,14 +66,17 @@ import org.koin.core.parameter.parametersOf
  * iOS parity: AddDealView.swift
  * Sections:
  * 1. Informazioni (name, sector, VAT, link)
- * 2. Validità (toggle + date pickers)
- * 3. Dettagli (description, eligibility picker, howToGet)
- * 4. Contatto principale (name, email, phone, note)
+ * 2. Sede (posizione opzionale, scelta dal picker posizioni)
+ * 3. Validità (toggle + date pickers)
+ * 4. Dettagli (description, eligibility picker, howToGet)
+ * 5. Contatto principale (name, email, phone, note)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddDealScreen(
     dealId: String?,
+    backStackEntry: NavBackStackEntry,
+    onPickLocationClick: (LocationModel?) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AddDealViewModel = koinViewModel(parameters = { parametersOf(dealId) }),
@@ -82,6 +89,18 @@ fun AddDealScreen(
     // Dismiss on success
     LaunchedEffect(state.dismissed) {
         if (state.dismissed) onBack()
+    }
+
+    // La sede scelta torna dal picker come id sul SavedStateHandle: si rimuove
+    // appena letta, altrimenti si riselezionerebbe da sola a ogni ricomposizione.
+    LaunchedEffect(backStackEntry) {
+        backStackEntry.savedStateHandle.let { handle ->
+            val locationId = handle.get<String>(LocationRoutes.RESULT_LOCATION_ID)
+            if (!locationId.isNullOrEmpty()) {
+                viewModel.selectPositionById(locationId)
+                handle.remove<String>(LocationRoutes.RESULT_LOCATION_ID)
+            }
+        }
     }
 
     // Error dialog
@@ -263,7 +282,16 @@ fun AddDealScreen(
                 )
             }
 
-            // Section 2: Validity
+            // Section 2: Sede
+            FormSection(title = tr("addons.deals.add.section.location", fallback = "Sede")) {
+                LocationRow(
+                    position = state.position,
+                    onPick = { onPickLocationClick(state.position) },
+                    onRemove = { viewModel.setPosition(null) },
+                )
+            }
+
+            // Section 3: Validity
             FormSection(title = tr("addons.deals.add.section.validity", fallback = "Validità")) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -307,7 +335,7 @@ fun AddDealScreen(
                 }
             }
 
-            // Section 3: Details
+            // Section 4: Details
             FormSection(title = tr("addons.deals.add.section.description", fallback = "Dettagli")) {
                 OutlinedTextField(
                     value = state.details,
@@ -333,7 +361,7 @@ fun AddDealScreen(
                 )
             }
 
-            // Section 4: Contact
+            // Section 5: Contact
             FormSection(
                 title = tr("addons.deals.add.section.contact", fallback = "Contatto principale"),
                 footer = tr("addons.deals.add.section.contact.footer", fallback = "(Nascosto al pubblico)"),
@@ -410,6 +438,57 @@ private fun FormSection(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+/**
+ * LocationRow — la sede della convenzione. Riga cliccabile invece di un campo
+ * di testo: la posizione la sceglie il picker, qui non si scrive niente a mano.
+ */
+@Composable
+private fun LocationRow(
+    position: LocationModel?,
+    onPick: () -> Unit,
+    onRemove: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onPick)
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            if (position != null) {
+                Text(
+                    text = position.name.ifBlank {
+                        tr("addons.deals.add.location.unnamed", fallback = "Posizione")
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                if (position.address.isNotBlank()) {
+                    Text(
+                        text = position.address,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                Text(
+                    text = tr("addons.deals.add.location.pick", fallback = "Seleziona sede (opzionale)"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (position != null) {
+            TextButton(onClick = onRemove) {
+                Text(tr("addons.deals.add.location.remove", fallback = "Rimuovi sede"))
+            }
+        } else {
+            Icon(Icons.Outlined.ChevronRight, contentDescription = null)
         }
     }
 }
