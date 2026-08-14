@@ -116,10 +116,12 @@ class SigListViewModel : ViewModel() {
     // Derived
 
     fun filtered(state: SigListUiState): List<SigModel> {
-        val base = if (state.filterKey == "all") {
+        val base = if (state.filterKey == ALL) {
             state.sigs
         } else {
-            state.sigs.filter { it.groupType.lowercase().contains(state.filterKey) }
+            // Confronto esatto, non `contains`: con il contains il filtro
+            // "chat" tirava dentro anche chat_whatsapp e chat_telegram.
+            state.sigs.filter { canonicalKey(it.groupType) == state.filterKey }
         }
         val q = state.query.trim().lowercase()
         if (q.isEmpty()) return base
@@ -130,43 +132,28 @@ class SigListViewModel : ViewModel() {
 
     fun availableFilterKeys(state: SigListUiState): List<String> {
         val seen = mutableSetOf<String>()
-        val keys = mutableListOf<String>()
         for (s in state.sigs) {
-            val key = canonicalKey(s.groupType) ?: continue
-            if (seen.add(key)) keys.add(key)
+            canonicalKey(s.groupType)?.let(seen::add)
         }
-        val preferred = listOf("sig", "chat", "local")
-        val ordered = preferred.filter { seen.contains(it) } +
-            keys.filter { it !in preferred }.sorted()
-        return listOf("all") + ordered
+        // I tipi che il server conosce vengono prima, nel loro ordine; quelli
+        // che non conosciamo ancora seguono in fondo invece di sparire.
+        val ordered = SigGroupType.entries.map { it.rawValue }.filter { it in seen } +
+            seen.filter { key -> SigGroupType.entries.none { it.rawValue == key } }.sorted()
+        return listOf(ALL) + ordered
     }
 
-    fun canonicalKey(raw: String): String? {
-        val lower = raw.lowercase()
-        return when {
-            lower.contains("chat") -> "chat"
-            lower.contains("local") -> "local"
-            lower.contains("sig") -> "sig"
-            lower.isNotEmpty() -> lower
-            else -> null
-        }
-    }
+    /**
+     * Il `group_type` cosi' com'e', senza accorpamenti.
+     *
+     * Prima questa funzione schiacciava i sei tipi del server in tre secchi
+     * per sottostringa, e `chat` veniva controllato per primo: i gruppi
+     * WhatsApp finivano nel secchio "chat" insieme ai Telegram, sotto un chip
+     * che diceva "Gruppi Telegram". Erano nell'elenco, ma nessuno poteva
+     * trovarli, e la loro card diceva la cosa sbagliata.
+     */
+    fun canonicalKey(raw: String): String? = raw.lowercase().ifEmpty { null }
 
-    fun filterLabel(key: String): String = when (key) {
-        "all" -> "Tutti"
-        "sig" -> "SIG"
-        "chat" -> "Gruppi Telegram"
-        "local" -> "Gruppi ufficiali"
-        else -> key.replace("_", " ").replaceFirstChar { it.uppercase() }
-    }
-
-    fun shortLabel(groupType: String): String {
-        val lower = groupType.lowercase()
-        return when {
-            lower.contains("chat") -> "Gruppi Telegram"
-            lower.contains("local") -> "Gruppi ufficiali"
-            lower.contains("sig") -> "SIG"
-            else -> groupType.replace("_", " ").replaceFirstChar { it.uppercase() }
-        }
+    companion object {
+        const val ALL = "all"
     }
 }

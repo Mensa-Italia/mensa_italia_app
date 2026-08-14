@@ -42,6 +42,28 @@ import it.mensa.app.ui.theme.MensaMotion
 import it.mensa.shared.model.SigModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * L'etichetta di un `group_type`.
+ *
+ * Le sei etichette esistono gia' in Tolgee come `sigs.type.*` — le usa il
+ * selettore con cui si crea un gruppo. La lista se le riscriveva a mano, in
+ * italiano, e per giunta sbagliate: i gruppi WhatsApp comparivano sotto
+ * "Gruppi Telegram". Sta qui e non nel ViewModel perche' tr() e' @Composable.
+ */
+@Composable
+private fun sigTypeLabel(groupType: String): String {
+    val key = groupType.lowercase()
+    return tr("sigs.type.$key", fallback = SigGroupType.entries
+        .firstOrNull { it.rawValue == key }?.label
+        ?: key.replace("_", " ").replaceFirstChar { it.uppercase() })
+}
+
+/** Come [sigTypeLabel], piu' la voce "Tutti" che non e' un tipo del server. */
+@Composable
+private fun sigFilterLabel(key: String): String =
+    if (key == SigListViewModel.ALL) tr("community.filter.all", fallback = "Tutti")
+    else sigTypeLabel(key)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SigListScreen(
@@ -101,7 +123,7 @@ fun SigListScreen(
                         FilterChip(
                             selected = state.filterKey == key,
                             onClick = { vm.setFilter(key) },
-                            label = { Text(vm.filterLabel(key)) },
+                            label = { Text(sigFilterLabel(key)) },
                             leadingIcon = if (state.filterKey == key) ({
                                 Icon(Icons.Outlined.Tune, contentDescription = null, modifier = Modifier.size(16.dp))
                             }) else null,
@@ -164,7 +186,7 @@ fun SigListScreen(
                                     )
                                     SigRowCard(
                                         sig = sig,
-                                        shortLabel = vm.shortLabel(sig.groupType),
+                                        shortLabel = sigTypeLabel(sig.groupType),
                                         onClick = { onSigClick(sig.id) },
                                         onEditClick = if (state.canControl) ({ editingSig = sig }) else null,
                                         onDeleteClick = if (state.canControl) ({ deletingSig = sig }) else null,

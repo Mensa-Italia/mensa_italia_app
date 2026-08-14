@@ -94,12 +94,11 @@ private struct PendingDelete: Identifiable {
     var id: String { sig.id }
 }
 
-/// Community filter chip values. "all" matches every group, the others
-/// use a substring match against `SigModel.groupType` (which contains
-/// values like `sig`, `sig_facebook`, `chat`, `local`, …).
+/// Valori dei chip di filtro. "all" prende tutto, gli altri sono il
+/// `group_type` cosi' come arriva dal server, senza accorpamenti.
 private enum CommunityFilter: Hashable {
     case all
-    case type(String) // canonical key, e.g. "sig", "chat", "local"
+    case type(String) // il group_type vero, es. "chat_whatsapp"
 
     var key: String {
         switch self {
@@ -111,52 +110,49 @@ private enum CommunityFilter: Hashable {
     func matches(_ groupType: String) -> Bool {
         switch self {
         case .all: return true
-        case .type(let k): return groupType.lowercased().contains(k)
+        // Uguaglianza e non `contains`: con il contains il filtro "chat"
+        // tirava dentro anche chat_whatsapp e chat_telegram.
+        case .type(let k): return groupType.lowercased() == k
         }
     }
 }
 
 private enum CommunityType {
-    /// Friendly label for a known group_type key. Falls back to the raw
-    /// (prettified) string for any future type we haven't mapped.
-    static func label(forKey key: String) -> String {
-        switch key {
-        case "all":    return tr("community.filter.all", fallback: "Tutti")
-        case "sig":    return tr("community.filter.sig", fallback: "SIG")
-        case "chat":   return tr("community.filter.telegram", fallback: "Gruppi Telegram")
-        case "local":  return tr("community.filter.local", fallback: "Gruppi ufficiali")
-        default:
-            return key
-                .replacingOccurrences(of: "_", with: " ")
-                .capitalized
-        }
+    /// L'etichetta di un `group_type`.
+    ///
+    /// I sei tipi che il server usa hanno gia' la loro etichetta in Tolgee
+    /// (`sigs.type.*`), quelle del selettore con cui si crea un gruppo. Questa
+    /// lista se le riscriveva a mano e le sbagliava: schiacciava i sei tipi in
+    /// tre secchi per sottostringa, controllando "chat" per primo, e chiamava
+    /// quel secchio "Gruppi Telegram". I gruppi WhatsApp c'erano, ma stavano
+    /// sotto un chip che diceva Telegram e la loro card pure.
+    static func label(forGroupType raw: String) -> String {
+        let key = raw.lowercased()
+        let fallback = SigGroupType(rawValue: key)?.label
+            ?? key.replacingOccurrences(of: "_", with: " ").capitalized
+        return tr("sigs.type.\(key)", fallback: fallback)
     }
 
-    /// Short chip label shown overlaid on each tile.
-    static func shortLabel(forGroupType raw: String) -> String {
-        let lower = raw.lowercased()
-        if lower.contains("chat") { return tr("community.filter.telegram", fallback: "Gruppi Telegram") }
-        if lower.contains("local") { return tr("community.filter.local", fallback: "Gruppi ufficiali") }
-        if lower.contains("sig") { return tr("community.filter.sig", fallback: "SIG") }
-        return raw.replacingOccurrences(of: "_", with: " ").capitalized
+    /// Come [label], piu' la voce "Tutti" che non e' un tipo del server.
+    static func label(forKey key: String) -> String {
+        key == "all"
+            ? tr("community.filter.all", fallback: "Tutti")
+            : label(forGroupType: key)
     }
 
     static func systemIcon(forGroupType raw: String) -> String {
         let lower = raw.lowercased()
         if lower.contains("facebook") { return "f.cursive.circle.fill" }
+        if lower.contains("whatsapp") { return "bubble.left.and.bubble.right.fill" }
         if lower.contains("chat") { return "paperplane.fill" }
         if lower.contains("local") { return "mappin.and.ellipse" }
         return "person.3.fill"
     }
 
-    /// Canonical filter key for a raw group_type ("sig_facebook" → "sig").
+    /// Il `group_type` cosi' com'e', che e' anche la chiave del filtro.
     static func canonicalKey(forGroupType raw: String) -> String? {
         let lower = raw.lowercased()
-        if lower.contains("chat") { return "chat" }
-        if lower.contains("local") { return "local" }
-        if lower.contains("sig") { return "sig" }
-        guard !lower.isEmpty else { return nil }
-        return lower
+        return lower.isEmpty ? nil : lower
     }
 }
 
@@ -169,9 +165,8 @@ struct SigListView: View {
     @State private var editingSig: EditingSig?
     @State private var pendingDelete: PendingDelete?
 
-    /// Stable, ordered list of filter keys present in the current dataset.
-    /// "sig" / "chat" / "local" surface first (in that order); anything
-    /// else is appended alphabetically so future group_types appear too.
+    /// I chip che servono davvero: un `group_type` per ogni tipo presente nei
+    /// dati, nell'ordine del selettore di creazione, piu' "Tutti" in testa.
     private var availableFilters: [CommunityFilter] {
         var seen: Set<String> = []
         var canonicalKeys: [String] = []
@@ -181,9 +176,11 @@ struct SigListView: View {
                 canonicalKeys.append(key)
             }
         }
-        let preferredOrder = ["sig", "chat", "local"]
-        let ordered = preferredOrder.filter(seen.contains)
-            + canonicalKeys.filter { !preferredOrder.contains($0) }.sorted()
+        // I tipi che il server conosce vengono prima, nel loro ordine; quelli
+        // che non conosciamo ancora seguono in fondo invece di sparire.
+        let known = SigGroupType.allCases.map(\.rawValue)
+        let ordered = known.filter(seen.contains)
+            + canonicalKeys.filter { !known.contains($0) }.sorted()
         return [.all] + ordered.map { CommunityFilter.type($0) }
     }
 
@@ -493,7 +490,7 @@ private struct SigRowCard: View {
         HStack(spacing: 6) {
             Image(systemName: CommunityType.systemIcon(forGroupType: sig.groupType))
                 .font(.caption2)
-            Text(CommunityType.shortLabel(forGroupType: sig.groupType))
+            Text(CommunityType.label(forGroupType: sig.groupType))
                 .font(.caption2.weight(.semibold))
                 .lineLimit(1)
         }
@@ -512,7 +509,7 @@ private struct SigRowCard: View {
         HStack(spacing: 6) {
             Image(systemName: CommunityType.systemIcon(forGroupType: sig.groupType))
                 .font(.caption2)
-            Text(CommunityType.shortLabel(forGroupType: sig.groupType))
+            Text(CommunityType.label(forGroupType: sig.groupType))
                 .font(.caption2.weight(.semibold))
                 .lineLimit(1)
         }
