@@ -4,7 +4,6 @@
 
 [![Pipeline](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
-[![Web image](https://img.shields.io/badge/ghcr.io-mensa--web-2496ED?logo=docker&logoColor=white)](https://github.com/Mensa-Italia/mensa_italia_app/pkgs/container/mensa-web)
 [![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
 
 ### Stack
@@ -13,30 +12,29 @@
 ![Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-007AFF?logo=swift&logoColor=white)
-![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=white)
-![React](https://img.shields.io/badge/React%2019-61DAFB?logo=react&logoColor=black)
-![Tailwind](https://img.shields.io/badge/Tailwind%204-06B6D4?logo=tailwindcss&logoColor=white)
-![Bun](https://img.shields.io/badge/Bun-000?logo=bun&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?logo=gradle&logoColor=white)
 ![Ktor](https://img.shields.io/badge/Ktor-087CFA?logo=kotlin&logoColor=white)
 ![SQLDelight](https://img.shields.io/badge/SQLDelight-003545?logo=sqlite&logoColor=white)
 ![Koin](https://img.shields.io/badge/Koin-FFD700?logoColor=black)
-![Keystatic](https://img.shields.io/badge/Keystatic-000?logo=markdown&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-635BFF?logo=stripe&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
 ![PocketBase](https://img.shields.io/badge/PocketBase-B8DBE4?logo=pocketbase&logoColor=black)
-![Traefik](https://img.shields.io/badge/Traefik-24A1C1?logo=traefikproxy&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
 ### Platforms
 
 ![iOS 26+](https://img.shields.io/badge/iOS-26+-000?logo=apple&logoColor=white)
 ![Android 7+](https://img.shields.io/badge/Android-7+%20(SDK%2024)-3DDC84?logo=android&logoColor=white)
-![Web](https://img.shields.io/badge/Web-app.mensa.it-blue)
 
-App ufficiale di **Mensa Italia**: tessera digitale, eventi, sedi locali, notifiche, area pubblica, console editoriale, autenticazione e onboarding nuovi soci.
+App ufficiale di **Mensa Italia**: tessera digitale, eventi, sedi locali, notifiche, area pubblica, autenticazione e onboarding nuovi soci.
 
-Tre client nativi che condividono lo stesso core di business logic scritto in **Kotlin Multiplatform**.
+Due client nativi che condividono lo stesso core di business logic scritto in **Kotlin Multiplatform**.
+
+> Il client web viveva in `webApp/` (Astro + React + Keystatic) e non esiste
+> piu': e' stato eliminato insieme ai target Kotlin/JS e Kotlin/Wasm della
+> shared, al `Dockerfile.web` e a tutti i job della pipeline che pubblicavano
+> `ghcr.io/mensa-italia/mensa-web`. Il sito resta a
+> [mensa-hub](https://github.com/Mensa-Italia), che quell'immagine la pubblica
+> per conto suo.
 
 ---
 
@@ -50,25 +48,24 @@ Tre client nativi che condividono lo stesso core di business logic scritto in **
 │                 DB locale (SQLDelight), realtime (SSE),          │
 │                 auth & TokenStore, DI (Koin)                     │
 │                                                                  │
-│  Targets: jvm (Android), iosX64/Arm64, jsIr (Web)                │
-└──────────────┬───────────────┬─────────────────┬─────────────────┘
-               │               │                 │
-        ┌──────▼──────┐ ┌──────▼──────┐  ┌───────▼────────┐
-        │ androidApp/ │ │  iosApp/    │  │  webApp/       │
-        │             │ │             │  │                │
-        │ Jetpack     │ │ SwiftUI +   │  │ Astro SSR +    │
-        │ Compose,    │ │ Liquid      │  │ React 19 +     │
-        │ Material 3  │ │ Glass (iOS  │  │ Tailwind 4 +   │
-        │ Expressive  │ │ 26)         │  │ Keystatic CMS  │
-        └─────────────┘ └─────────────┘  └────────────────┘
+│  Targets: android (jvm), iosX64/Arm64/SimulatorArm64, watchOS    │
+└──────────────────────┬───────────────┬───────────────────────────┘
+                       │               │
+                ┌──────▼──────┐ ┌──────▼──────┐
+                │ androidApp/ │ │  iosApp/    │
+                │             │ │             │
+                │ Jetpack     │ │ SwiftUI +   │
+                │ Compose,    │ │ Liquid      │
+                │ Material 3  │ │ Glass (iOS  │
+                │ Expressive  │ │ 26)         │
+                └─────────────┘ └─────────────┘
 ```
 
 | Modulo | Stack | Output |
 |---|---|---|
-| `shared/` | Kotlin Multiplatform, Ktor 3, SQLDelight, Koin 5 | `.aar` (Android), XCFramework (iOS), JS lib (Web) |
+| `shared/` | Kotlin Multiplatform, Ktor 3, SQLDelight, Koin 5 | `.aar` (Android), XCFramework (iOS + watchOS) |
 | `androidApp/` | Jetpack Compose, Material 3 Expressive, Coil 3 | `.aab` + `.apk` |
 | `iosApp/` | SwiftUI iOS 26, Liquid Glass, Stripe SDK, Firebase | `.ipa` |
-| `webApp/` | Astro 6 SSR, React 19, Tailwind 4, Keystatic, Unlayer | Docker image `ghcr.io/mensa-italia/mensa-web` |
 | `tools/` | Bash + Tolgee | Sincronizzazione traduzioni i18n |
 | `tools/storekit/` | Bun + TypeScript, simctl/adb, Chromium headless | Screenshot e metadata per App Store e Google Play |
 
@@ -83,10 +80,12 @@ Un solo workflow, [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.
 | Trigger | Livello | Controlli | Pubblica |
 |---|---|---|---|
 | PR verso `main`, push su un branch di lavoro | `check` | base + segreti | niente |
-| Push su `main` | `dev` | base + segreti | immagine `:dev`, `:sha-xxxxxxx` + redeploy stack dev |
-| Tag `bX.Y.Z` | `staging` | base + segreti + dipendenze + SBOM | immagine `:staging`, `:X.Y.Z` + Play `beta` + TestFlight gruppo `Test open` |
-| Tag `vX.Y.Z` | `release` | tutti | immagine `:latest`, `:X.Y.Z`, `:X.Y` + Play `production` + App Store review + Release firmata |
+| Push su `main` | `dev` | base + segreti | niente |
+| Tag `bX.Y.Z` | `staging` | base + segreti + dipendenze + SBOM | Play `beta` + TestFlight gruppo `Test open` |
+| Tag `vX.Y.Z` | `release` | tutti | Play `production` + App Store review + Release firmata |
 | Cron del lunedì | `audit` | solo segreti, dipendenze, SBOM, CodeQL | niente |
+
+Da quando `webApp/` è stato eliminato la pipeline non costruisce più nessuna immagine Docker: `plan` viene chiamato senza input `image` e i job `image`, `image-release` e `notify` non esistono più. Restano solo gli artefatti mobili.
 
 `workflow_dispatch` ha un input `tier` per forzare un livello a mano; il default `auto` si comporta come un push normale. Forzare `staging` o `release` richiede comunque di essere su un tag: senza tag non esiste una versione, e `plan.yml` si ferma con un errore invece di pubblicare qualcosa senza nome.
 
@@ -95,13 +94,11 @@ La versione viene dal tag (`vX.Y.Z` → `1.2.3`), non più da un bump automatico
 ### DAG
 
 ```
-plan ─┬─> check (detekt, astro check, ESLint, hadolint) ─┐
+plan ─┬─> check (detekt) ────────────────────────────────┐
       ├─> segreti (gitleaks, ogni livello) ─────────────┤
       ├─> deep (OSV + SBOM; staging, release, audit) ───┤
-      ├─> codeql-js / codeql-kotlin / codeql-swift       │  (non bloccanti)
+      ├─> codeql-kotlin / codeql-swift                   │  (non bloccanti)
       │                                                  │
-      ├─> image (dev/staging) ──> notify (redeploy dev)  │
-      ├─> image-release (release) ──────────────────────┤
       └─> version-code ─┬─> android ─> play ────────────┤
                         └─> ios ─────> testflight ──────┤
                              └─> bundle ────────────────┴─> publish (Release firmata)
@@ -113,33 +110,14 @@ I job che pubblicano leggono i `result` espliciti dei controlli:
 
 | Job | Deve essere verde |
 |---|---|
-| `image` (dev/staging) | `check`, `segreti`, e `deep` se il livello lo prevede |
-| `image-release` | `check`, `segreti`, `deep` |
 | `play`, `testflight` | `check`, `segreti`, `deep`, build corrispondente |
-| `publish` | `check`, `segreti`, `deep`, `image-release`, `bundle` |
+| `publish` | `check`, `segreti`, `deep`, `bundle` |
 
-I tre job CodeQL **non** compaiono in quei cancelli e sono `continue-on-error`: l'organizzazione è sul piano free, senza Advanced Security, e l'API code-scanning risponde `403`. Un CodeQL dentro i `needs` di `publish` renderebbe `publish` irraggiungibile per sempre. Vanno rimessi bloccanti quando l'organizzazione avrà Advanced Security.
+I due job CodeQL **non** compaiono in quei cancelli e sono `continue-on-error`: l'organizzazione è sul piano free, senza Advanced Security, e l'API code-scanning risponde `403`. Un CodeQL dentro i `needs` di `publish` renderebbe `publish` irraggiungibile per sempre. Vanno rimessi bloccanti quando l'organizzazione avrà Advanced Security.
 
 ---
 
 ## Build e deploy
-
-### Web (Docker container)
-
-L'immagine è pubblicata su **GHCR** ad ogni release. Pull e run con:
-
-```bash
-docker pull ghcr.io/mensa-italia/mensa-web:latest
-docker run --rm -p 4321:4321 ghcr.io/mensa-italia/mensa-web:latest
-```
-
-Per il setup completo con Traefik + HTTPS automatico via Let's Encrypt vedi [`docker-compose.example.yml`](docker-compose.example.yml). Sulla macchina di destinazione:
-
-```bash
-DOMAIN=app.mensa.it ACME_EMAIL=tuo@dominio.it docker compose up -d
-```
-
-Esiste anche un webhook Portainer che redeploya lo stack `dev` automaticamente quando l'immagine `:dev` viene pubblicata, cioè a ogni push su `main` andato a buon fine (job `notify` di [`pipeline.yml`](.github/workflows/pipeline.yml)).
 
 ### Android
 
@@ -172,18 +150,9 @@ Build in CI: `macos-latest` + Xcode `latest-stable`. Genera `.xcodeproj` con xco
 
 - **Java 17+** (Android Gradle Plugin)
 - **Xcode 26+** (solo per iOS, su Mac)
-- **Bun** 1.2+ (per webApp)
 - **Android Studio Hedgehog+** (consigliato per Android)
 - **xcodegen** (`brew install xcodegen`)
-
-### Web
-
-```bash
-cd webApp
-bun install
-bun run build:shared    # builda mensa-shared via gradle
-bun dev                 # http://localhost:4321
-```
+- **Bun** 1.2+ (solo per `tools/storekit`)
 
 ### Android
 

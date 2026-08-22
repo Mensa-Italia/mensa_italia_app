@@ -66,7 +66,8 @@ class MensaApplication : Application() {
         // Initialize the SQLDelight database synchronously before any UI composable
         // can instantiate a ViewModel that calls koinAccess().
         // AndroidSqliteDriver.createDriver() completes synchronously despite being declared
-        // suspend (it only needs the suspend wrapper for wasmJs compatibility).
+        // suspend (the suspend wrapper only exists because the SQLDelight schema
+        // is generated in async mode).
         runBlocking {
             val factory = KoinPlatform.getKoin().get<DriverFactory>()
             initializeMensaDatabase(factory)

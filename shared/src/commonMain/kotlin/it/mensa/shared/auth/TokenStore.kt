@@ -16,10 +16,6 @@ import com.russhwolf.settings.set
  *  - **Android** → `SharedPreferencesSettings` wrapping `EncryptedSharedPreferences`
  *    (AES-256-GCM, master key in the Android Keystore / StrongBox when
  *    available).
- *  - **Web (js + wasmJs)** → `StorageSettings` on `localStorage`. NOT
- *    encrypted; same threat model as before (any in-page script can read it).
- *    A backend-set HttpOnly cookie is the only meaningful upgrade and is out
- *    of scope.
  *
  * `Settings` itself is synchronous (in-memory cached, flushed lazily on
  * platforms that need it). We wrap the calls in `suspend` to keep the
@@ -35,11 +31,9 @@ class TokenStore(
     /**
      * Key under which the serialised OidcSession JSON is stored. Defaults to
      * the historical `auth_token` so the Android `EncryptedSharedPreferences`
-     * upgrade migrates transparently (same prefs file + key). The web target
-     * overrides this in `PlatformModule.js.kt` to `it.mensa.app.auth_token`
-     * so the localStorage key matches the iOS Keychain naming convention
-     * (`KeychainSettings(service = "it.mensa.app.auth")` produces an entry
-     * displayed as `it.mensa.app.auth_token` in Keychain viewers).
+     * upgrade migrates transparently (same prefs file + key). Su iOS la
+     * chiave la compone `KeychainSettings(service = "it.mensa.app.auth")`, che
+     * produce una voce mostrata come `it.mensa.app.auth_token`.
      */
     private val key: String = "auth_token",
 ) : ITokenStore {

@@ -12,9 +12,8 @@ import kotlin.concurrent.Volatile
  * main dispatcher — observed concretely: defaultRequest never emitted an
  * Authorization header even though the token was on disk).
  *
- * Persistent storage (EncryptedSharedPreferences / NSUserDefaults /
- * localStorage) remains the source of truth across launches; this is just
- * the hot path.
+ * Persistent storage (EncryptedSharedPreferences su Android, Keychain su iOS)
+ * remains the source of truth across launches; this is just the hot path.
  */
 object AuthHolder {
     @Volatile

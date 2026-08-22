@@ -10,15 +10,15 @@ import org.koin.dsl.module
 /**
  * Database wiring.
  *
- * After enabling SQLDelight's `generateAsync = true` (required by the wasmJs
- * WebWorkerDriver), `DriverFactory.createDriver()` is `suspend`. Koin's
- * `single { }` lambda cannot suspend, and `runBlocking` is unavailable on
- * wasmJs — so the database is registered as a lazy holder. Callers in suspend
- * contexts use [requireMensaDatabase] (which delegates to Koin) after the
- * host has called [initializeMensaDatabase] once during application bootstrap.
+ * SQLDelight gira con `generateAsync = true`, quindi
+ * `DriverFactory.createDriver()` e' `suspend`. Il lambda `single { }` di Koin
+ * non puo' sospendere, percio' il database e' registrato come holder pigro.
+ * Chi sta in un contesto suspend usa [requireMensaDatabase] (che delega a
+ * Koin) dopo che l'host ha chiamato [initializeMensaDatabase] una volta sola
+ * durante il bootstrap dell'applicazione.
  *
  * Host responsibilities:
- *  - iOS / Android / wasmJs hosts MUST call `initializeMensaDatabase(get())`
+ *  - iOS e Android MUST call `initializeMensaDatabase(get())`
  *    from a suspend bootstrap path BEFORE the first repository call.
  *  - If they don't, `get<MensaDatabase>()` throws an explicit IllegalStateException
  *    rather than silently constructing on the wrong thread.
@@ -30,10 +30,9 @@ val databaseModule = module {
 }
 
 internal object MensaDatabaseHolder {
-    // No @Volatile: kotlin.concurrent.Volatile is not available on wasmJs.
-    // Reads/writes happen on the platform's main bootstrap path (Swift main thread
-    // for iOS, Android main thread for Android, JS event loop for wasmJs) before
-    // any repository call observes the field, so the visibility we need is fence-free.
+    // No @Volatile: reads/writes happen on the platform's main bootstrap path
+    // (Swift main thread for iOS, Android main thread for Android) before any
+    // repository call observes the field, so the visibility we need is fence-free.
     private var instance: MensaDatabase? = null
     private var driver: SqlDriver? = null
 

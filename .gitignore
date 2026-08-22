@@ -19,7 +19,6 @@ androidApp/keystore/
 
 # Kotlin Multiplatform / native
 *.klib
-kotlin-js-store/
 
 # macOS
 .DS_Store
@@ -53,16 +52,8 @@ iosApp/iosApp.xcodeproj/
 .env.local
 secrets.properties
 
-# JavaScript / Web (Astro, Node, Bun)
-node_modules/
-**/node_modules/
-.astro/
-**/.astro/
-**/dist/
-.cache/
-**/.cache/
+# Log
 *.log
-**/bun-debug-*.log
 
 # Editor / OS
 .DS_Store

@@ -15,14 +15,9 @@ compose-bom = "2024.10.01"
 androidx-activity = "1.9.3"
 koin-android = "4.0.4"
 
-# Compose Multiplatform (wasmJs + future :webApp)
-compose-multiplatform = "1.8.2"
-
 # Navigation & Lifecycle
 androidx-navigation = "2.8.4"
 androidx-lifecycle = "2.8.7"
-# JetBrains fork of navigation-compose — multiplatform (wasmJs + Android + iOS)
-jetbrains-navigation-compose = "2.8.0-alpha13"
 
 # DataStore
 androidx-datastore = "1.1.1"
@@ -117,9 +112,8 @@ androidx-credentials = { module = "androidx.credentials:credentials", version.re
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
 
 # Multiplatform Settings (Russhwolf) — cross-platform key/value with native
-# secure backends: KeychainSettings (iOS), SharedPreferencesSettings wrapping
-# EncryptedSharedPreferences (Android), StorageSettings backed by localStorage
-# (web). Used for ITokenStore.
+# secure backends: KeychainSettings (iOS) e SharedPreferencesSettings che
+# incarta EncryptedSharedPreferences (Android). Usato da ITokenStore.
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
@@ -185,15 +179,6 @@ zxing-core = { module = "com.google.zxing:core", version.ref = "zxing-core" }
 # Gson
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
-# --- wasmJs / web ---
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
-sqldelight-web-worker-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
-# Browser DOM/storage bindings for Kotlin/Wasm (`kotlinx.browser.localStorage`, `org.w3c.dom.*`).
-kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.3" }
-# JetBrains multiplatform navigation-compose (supports wasmJs, Android, iOS)
-jetbrains-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jetbrains-navigation-compose" }
-
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -203,4 +188,3 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

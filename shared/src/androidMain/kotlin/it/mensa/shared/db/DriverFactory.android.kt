@@ -6,9 +6,10 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 
 actual class DriverFactory(private val context: Context) {
-    // Suspend because the wasmJs WebWorkerDriver setup is async; AndroidSqliteDriver
-    // initialises synchronously inside the suspend wrapper. The async-mode schema
-    // is adapted to the synchronous driver via `.synchronous()`.
+    // Suspend solo perche' lo schema e' generato in modalita' async
+    // (`generateAsync = true`): AndroidSqliteDriver si inizializza in modo
+    // sincrono dentro il wrapper, e lo schema async gli viene adattato con
+    // `.synchronous()`.
     actual suspend fun createDriver(): SqlDriver =
         AndroidSqliteDriver(MensaDatabase.Schema.synchronous(), context, "mensa.db")
 }

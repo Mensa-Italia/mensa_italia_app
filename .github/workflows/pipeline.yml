@@ -12,8 +12,8 @@ name: pipeline
 #
 # Il livello lo calcola plan.yml: qui non si ricalcola mai.
 #
-# Sostituisce i workflow precedenti: qa-kotlin, qa-web, qa-docker, qa-secrets,
-# release, notify, rescue-flutter-prod.
+# Sostituisce i workflow precedenti: qa-kotlin, qa-secrets, release,
+# rescue-flutter-prod.
 #
 # I job che pubblicano usano `if: !cancelled() && <result espliciti>` invece del
 # gating implicito di `needs`. Motivo: alcuni cancelli non girano a tutti i
@@ -23,24 +23,15 @@ name: pipeline
 # DEVE aver girato (deep prima di uno store o di una Release) la condizione e'
 # `== 'success'` secco, senza scappatoia `|| skipped`.
 
-# ATTENZIONE, questo repo pubblica SOLO le app mobili, mai l'immagine web.
+# Questo repo pubblica SOLO le app mobili. Non c'e' piu' nessuna immagine
+# Docker da costruire: il modulo `webApp/`, il `Dockerfile.web` e i job
+# `image` / `image-release` / `notify` sono stati eliminati. Il sito resta a
+# mensa-hub, che pubblica `ghcr.io/mensa-italia/mensa-web` per conto suo — ed
+# e' anche il motivo per cui pubblicarlo anche da qui era sbagliato: la
+# collisione sul tag :dev dell'11 agosto 2026 (run 31547011487).
 #
-# mensa_italia_app sta per essere archiviato in favore di mensa-hub, e i due
-# pubblicano sullo stesso identico nome immagine: ghcr.io/mensa-italia/mensa-web.
-# Finche' entrambi hanno il trigger su push, quello deprecato sovrascrive il tag
-# :dev di quello che sopravvive e il webhook Portainer ridistribuisce lo stack
-# dev con l'immagine sbagliata. E' successo davvero l'11 agosto 2026, run
-# 31547011487.
-#
-# Il 12 agosto 2026 e' tornato il solo trigger `push: tags: ['b*']`, cioe' le
-# beta pubbliche (Play track beta + TestFlight "Test open"): sono artefatti
-# mobili, non toccano ghcr. La collisione resta chiusa da due lati:
-#   - i job immagine non girano a staging (vedi la `if` di `image`);
-#   - il push su branch, i tag `v*` e il cron restano spenti, quindi release,
-#     dev e audit da qui non partono.
-#
-# Se un giorno serve rimettere anche l'immagine o le release, prima va cambiato
-# il nome immagine: riaprire quei trigger senza toccarlo ricrea la collisione.
+# `plan` viene invocato senza input `image`, quindi non calcola tag GHCR: la
+# pipeline e' tutta e solo mobile.
 on:
   pull_request:
     branches: [main]
@@ -72,16 +63,18 @@ jobs:
   plan:
     uses: Mensa-Italia/.github/.github/workflows/plan.yml@main
     with:
-      image: mensa-italia/mensa-web
+      # Nessun input `image`: qui non si pubblicano immagini, quindi plan.yml
+      # non deve calcolare nessun tag GHCR.
+      #
       # `auto` -> stringa vuota: plan.yml decide dal ref. Scritto cosi' e non
       # con il ternario ovvio perche' in una espressione GitHub la stringa
       # vuota e' falsa e `x == 'auto' && '' || x` restituirebbe 'auto'.
       forced-tier: ${{ inputs.tier != 'auto' && inputs.tier || '' }}
 
   # ─── Controlli base: i comandi di questo repo ──────────────────────────────
-  # Vengono da qa-kotlin.yml, qa-web.yml e qa-docker.yml, identici. Stanno in un
-  # job solo perche' condividono il checkout, il JDK e la libreria KMP/JS: prima
-  # ognuno dei tre la ricostruiva per conto suo.
+  # Viene da qa-kotlin.yml. Con `webApp/` e `Dockerfile.web` eliminati non ci
+  # sono piu' controlli web (astro check, ESLint) ne' hadolint: resta detekt,
+  # l'unico linter che gira su Linux per questo repo.
   check:
     name: controlli
     needs: plan
@@ -109,36 +102,9 @@ jobs:
       - name: Run detekt
         run: |
           ./detekt-cli-1.23.6/bin/detekt-cli \
-            --input shared/src/commonMain,shared/src/androidMain,shared/src/jsMain,androidApp/src/main \
+            --input shared/src/commonMain,shared/src/androidMain,androidApp/src/main \
             --config detekt.yml \
             --build-upon-default-config
-
-      # --- Web (da qa-web.yml) ---
-      # Qui la libreria KMP/JS e' quella vera, quindi lo stub che qa-web.yml
-      # scriveva a mano per far girare ESLint senza gradle non serve piu'.
-      - name: Build shared JS library
-        run: ./gradlew :shared:jsBrowserProductionLibraryDistribution -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with: { node-version: '22' }
-
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-
-      - run: bun install --frozen-lockfile
-        working-directory: webApp
-
-      - name: Astro check (TS)
-        run: bun astro check
-        working-directory: webApp
-
-      - name: ESLint
-        run: bun run lint
-        working-directory: webApp
-
-      # --- Dockerfile (da qa-docker.yml) ---
-      - uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
-        with:
-          dockerfile: Dockerfile.web
 
   # ─── Segreti: a ogni livello ───────────────────────────────────────────────
   # Prendeva il posto di qa-secrets.yml, che girava su OGNI push. Gitleaks dura
@@ -183,18 +149,14 @@ jobs:
       secrets-scan: false
       deps-scan: true
       sbom: true
-      # A staging esce solo roba mobile (AAB e IPA) e le vulnerabilita' note
-      # di questo repo sono tutte npm — astro, vite, esbuild, postcss, sharp,
-      # ws, yaml... — cioe' web app e tooling: dentro l'AAB e l'IPA non ce n'e'
-      # una. Zero advisory su Gradle/Maven e zero su CocoaPods (osv-scanner,
-      # run 31633267972: 69 vulnerabilita', 1 solo ecosistema). Bloccare la beta
-      # mobile su quelle e' un cancello fuori posto, quindi a staging la
-      # scansione riporta e basta.
-      #
-      # A release resta bloccante, perche' li' si pubblica anche l'immagine
-      # web, che quei pacchetti se li porta dentro davvero. Non e' un
-      # `deps-blocking: false` secco proprio per questo.
-      deps-blocking: ${{ needs.plan.outputs.tier != 'staging' }}
+      # Le 69 vulnerabilita' che osv-scanner riportava (run 31633267972)
+      # stavano tutte in un solo ecosistema, npm — astro, vite, esbuild,
+      # postcss, sharp, ws, yaml — cioe' la web app e il suo tooling, adesso
+      # eliminati. Su Gradle/Maven e CocoaPods gli advisory erano zero. Con il
+      # solo albero mobile rimasto la scansione torna bloccante a ogni livello:
+      # se esce un advisory adesso riguarda davvero cio' che finisce dentro
+      # l'AAB o l'IPA, e fermare la pubblicazione e' la cosa giusta.
+      deps-blocking: true
 
   # ─── CodeQL: resta locale, e NON blocca ────────────────────────────────────
   # scan.yml non lo include: linguaggi e permessi sono specifici del repo.
@@ -207,26 +169,11 @@ jobs:
   # per sempre. Restano perche' il log dell'analisi e' comunque leggibile.
   #
   # DA RIMETTERE BLOCCANTI quando l'organizzazione avra' Advanced Security:
-  # togliere `continue-on-error` e rimettere codeql-js / codeql-kotlin /
-  # codeql-swift nei needs e nelle if di image-release, play, testflight e
-  # publish, con `== 'success'`.
-  codeql-js:
-    name: CodeQL JS/TS
-    needs: plan
-    if: needs.plan.outputs.deep == 'true'
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
-    continue-on-error: true
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
-        with: { languages: 'javascript-typescript', build-mode: 'none' }
-      - uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
-        with: { category: '/language:javascript-typescript' }
-
+  # togliere `continue-on-error` e rimettere codeql-kotlin / codeql-swift nei
+  # needs e nelle if di play, testflight e publish, con `== 'success'`.
+  #
+  # `codeql-js` e' stato eliminato con la web app: nel repo non resta una riga
+  # di JavaScript o TypeScript da analizzare.
   codeql-kotlin:
     name: CodeQL Kotlin
     needs: plan
@@ -301,95 +248,6 @@ jobs:
             -allowProvisioningUpdates=NO || true
       - uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
         with: { category: '/language:swift' }
-
-  # ─── Immagine web su GHCR: dev e staging ───────────────────────────────────
-  # I tag li ha gia' calcolati plan.yml. `prepare` costruisce la libreria
-  # KMP/JS che Dockerfile.web si aspetta di trovare gia' pronta.
-  #
-  # Due job immagine e non uno: il cancello di release e' piu' stretto (vedi
-  # image-release) e una `if` sola con `|| skipped` lo aprirebbe anche quando
-  # `deep` fallisce. A dev `deep` non gira e vale `skipped`; a staging gira e
-  # deve essere verde.
-  # NB: a staging questo job NON gira. Le beta mobili escono da qui, l'immagine
-  # web no: `ghcr.io/mensa-italia/mensa-web` e' la stessa di mensa-hub e
-  # ripubblicarla da questo repo ricrea la collisione dell'11 agosto 2026.
-  # Togliere `tier != 'staging'` solo dopo aver cambiato il nome immagine.
-  image:
-    name: immagine (dev)
-    needs: [plan, check, scan-secrets, deep]
-    if: >-
-      !cancelled()
-      && needs.plan.outputs.publish == 'true'
-      && needs.plan.outputs.tier != 'release'
-      && needs.plan.outputs.tier != 'staging'
-      && needs.check.result == 'success'
-      && needs.scan-secrets.result == 'success'
-      && (needs.deep.result == 'success' || needs.deep.result == 'skipped')
-    permissions:
-      contents: read
-      packages: write
-    uses: Mensa-Italia/.github/.github/workflows/image.yml@main
-    with:
-      image: mensa-italia/mensa-web
-      tags: ${{ needs.plan.outputs.tags }}
-      file: Dockerfile.web
-      license: LicenseRef-Proprietary
-      prepare: |
-        export JAVA_HOME="${JAVA_HOME_21_X64:-$JAVA_HOME}"
-        ./gradlew :shared:jsBrowserProductionLibraryDistribution \
-          -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon --stacktrace
-
-  # ─── Immagine web su GHCR: release ─────────────────────────────────────────
-  # Stessa cosa, ma i tag di questo livello sono :latest, :X.Y.Z e :X.Y, cioe'
-  # quelli che i deploy in produzione seguono. Qui `deep` deve essere `success`
-  # davvero: niente `|| skipped`, altrimenti una scansione fallita lascerebbe
-  # comunque sovrascrivere :latest.
-  image-release:
-    name: immagine (release)
-    needs: [plan, check, scan-secrets, deep]
-    if: >-
-      !cancelled()
-      && needs.plan.outputs.tier == 'release'
-      && needs.check.result == 'success'
-      && needs.scan-secrets.result == 'success'
-      && needs.deep.result == 'success'
-    permissions:
-      contents: read
-      packages: write
-    uses: Mensa-Italia/.github/.github/workflows/image.yml@main
-    with:
-      image: mensa-italia/mensa-web
-      tags: ${{ needs.plan.outputs.tags }}
-      file: Dockerfile.web
-      license: LicenseRef-Proprietary
-      prepare: |
-        export JAVA_HOME="${JAVA_HOME_21_X64:-$JAVA_HOME}"
-        ./gradlew :shared:jsBrowserProductionLibraryDistribution \
-          -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon --stacktrace
-
-  # ─── Redeploy dello stack dev (da notify.yml) ──────────────────────────────
-  # Prima girava sul branch feat/mvp-testing-public, che pubblicava :dev.
-  # Adesso :dev lo produce main, quindi il webhook segue main.
-  notify:
-    name: redeploy dev
-    needs: [plan, image]
-    if: >-
-      !cancelled()
-      && needs.plan.outputs.tier == 'dev'
-      && needs.image.result == 'success'
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
-    steps:
-      - name: Trigger Portainer redeploy webhook
-        env:
-          WEBHOOK_URL: ${{ secrets.REDEPLOY_URL }}
-        run: |
-          code=$(curl -X POST -s -o /dev/null -w "%{http_code}" "$WEBHOOK_URL" --insecure)
-          echo "HTTP $code"
-          # Portainer ritorna 204 No Content sul webhook valido.
-          if [ "$code" != "204" ] && [ "$code" != "200" ]; then
-            echo "Webhook unexpected status: $code"
-            exit 1
-          fi
 
   # ─── versionCode per gli store ─────────────────────────────────────────────
   # Monotonico e sopra al legacy Flutter (~21M). Lo calcolava `prepare` nel
@@ -927,17 +785,16 @@ jobs:
 
   # ─── Release firmata ───────────────────────────────────────────────────────
   # L'ultimo cancello, e il piu' stretto: controlli base, segreti, scansioni
-  # pesanti e immagine :latest devono essere tutti verdi. I CodeQL restano
+  # pesanti e artefatti mobili devono essere tutti verdi. I CodeQL restano
   # fuori dai needs finche' l'org e' sul piano free (vedi il blocco CodeQL).
   publish:
-    needs: [plan, check, scan-secrets, deep, image-release, bundle]
+    needs: [plan, check, scan-secrets, deep, bundle]
     if: >-
       !cancelled()
       && needs.plan.outputs.tier == 'release'
       && needs.check.result == 'success'
       && needs.scan-secrets.result == 'success'
       && needs.deep.result == 'success'
-      && needs.image-release.result == 'success'
       && needs.bundle.result == 'success'
     permissions:
       contents: write

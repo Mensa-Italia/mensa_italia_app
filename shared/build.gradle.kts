@@ -1,5 +1,3 @@
-@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
@@ -30,36 +28,6 @@ kotlin {
         }
     }
 
-    // wasmJs browser target. `:shared` is a library; we don't call `binaries.executable()`.
-    wasmJs {
-        outputModuleName = "shared"
-        browser {
-            // No webpack/karma overrides at the shared level — :webApp owns those.
-        }
-    }
-
-    // js(IR) browser target. Produces a regular JS library + auto-generated .d.ts
-    // consumed by the Astro+React frontend as an npm dependency.
-    //
-    // - `binaries.library()`: emit a library (no executable bundle), so downstream
-    //   bundlers (Astro/Vite) can tree-shake and inline as needed.
-    // - `generateTypeScriptDefinitions()`: write `.d.ts` next to the `.js` for
-    //   `@JsExport`-annotated declarations under `it.mensa.web.*`.
-    // - `outputModuleName = "shared"`: pin the emitted JS module/package name
-    //   so the consumer imports a predictable `shared` artifact.
-    js(IR) {
-        outputModuleName = "shared"
-        browser {
-            // Astro owns webpack/vite config; nothing to override at shared level.
-        }
-        binaries.library()
-        generateTypeScriptDefinitions()
-        // Emit ES modules instead of UMD. UMD's sibling-file resolution doesn't
-        // work cleanly under Vite/bun symlinked file-deps; ESM resolves via
-        // standard import statements that bundlers handle natively.
-        useEsModules()
-    }
-
     sourceSets {
         commonMain.dependencies {
             implementation(libs.ktor.client.core)
@@ -76,7 +44,7 @@ kotlin {
             // `Schema.synchronous()` adapter used by iOS/Android driver factories.
             implementation(libs.sqldelight.async.extensions)
             // Cross-platform key/value with secure backends (Keychain on iOS,
-            // EncryptedSharedPreferences on Android, localStorage on web).
+            // EncryptedSharedPreferences on Android).
             implementation(libs.multiplatform.settings)
         }
 
@@ -107,31 +75,6 @@ kotlin {
             implementation(libs.ktor.client.darwin)
             implementation(libs.sqldelight.native.driver)
         }
-
-        val wasmJsMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.js)
-                implementation(libs.sqldelight.web.worker.driver)
-                implementation(libs.kotlinx.browser)
-                // Koin core + kotlinx-* are already in commonMain and resolve to -wasm-js variants.
-            }
-        }
-
-        // js(IR) source set. Notes vs wasmJs:
-        //  - `ktor-client-js` and `sqldelight-web-worker-driver` publish a -js
-        //    variant; we reuse the same aliases.
-        //  - `kotlinx-browser:0.3` is wasm-only (no js variant published). On
-        //    js(IR) the equivalent symbols (`kotlinx.browser.localStorage`,
-        //    `org.w3c.dom.*`) ship in `kotlin-stdlib-js` itself, so no extra
-        //    dependency is needed.
-        //  - Koin core + kotlinx-* in commonMain resolve to -js variants
-        //    automatically via Gradle metadata.
-        val jsMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.js)
-                implementation(libs.sqldelight.web.worker.driver)
-            }
-        }
     }
 }
 
@@ -151,12 +94,11 @@ sqldelight {
     databases {
         create("MensaDatabase") {
             packageName.set("it.mensa.shared.db")
-            // Required for the wasmJs WebWorkerDriver. Forces SQLDelight to generate
-            // `suspend awaitAs*()` query APIs instead of blocking `executeAs*()` ones,
-            // plus suspend `transaction { }` and suspend mutators (insertOrReplace, etc.).
-            // All call sites on Android/iOS must use the suspend form.
+            // `generateAsync` resta acceso: tutte le call site di Android e iOS
+            // usano la forma suspend (`awaitAs*`, `suspend transaction { }`).
+            // Spegnerlo ora vorrebbe dire riscriverle tutte, senza guadagnarci
+            // niente.
             generateAsync.set(true)
         }
     }
 }
-

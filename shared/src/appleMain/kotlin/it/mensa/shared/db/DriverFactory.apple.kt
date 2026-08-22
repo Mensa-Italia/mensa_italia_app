@@ -24,10 +24,10 @@ import platform.Foundation.NSSearchPathForDirectoriesInDomains
  * cached data is best-effort (just a network mirror) so the repositories
  * will refresh from the API on first use.
  *
- * Note: createDriver is suspend because the wasmJs WebWorkerDriver setup is
- * async; native drivers complete synchronously inside the suspend wrapper.
- * `MensaDatabase.Schema` is async (generateAsync = true) so we adapt it
- * to the synchronous native driver via `.synchronous()`.
+ * Note: createDriver is suspend only because `MensaDatabase.Schema` is
+ * generated in async mode (`generateAsync = true`); the native driver itself
+ * completes synchronously inside the suspend wrapper, and the async schema is
+ * adapted to it via `.synchronous()`.
  */
 @OptIn(ExperimentalForeignApi::class)
 actual class DriverFactory {
