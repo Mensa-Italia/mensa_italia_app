@@ -131,6 +131,43 @@ class AuthRepository(
     }
 
     /**
+     * Rilegge il record utente dal server e lo ripubblica su [currentUser].
+     *
+     * Serve perche' `/api/cs/me` e' l'unico posto da cui arrivano scadenza
+     * tessera, `powers` e `addons`: la risposta di refresh OIDC porta solo i
+     * token, e il record allegato al login e' vecchio quanto il login. Finora
+     * lo si chiamava solo dentro [init], cioe' un avvio a freddo: un'app
+     * rimasta aperta per giorni, o un `/me` fallito una volta perche' offline,
+     * continuavano a mostrare la tessera con i dati di allora.
+     *
+     * Da chiamare a ogni ritorno in foreground e da ogni pull-to-refresh che
+     * mostra dati del socio. E' l'alternativa a tenersi email e password sul
+     * telefono per "rifare il login" a ogni avvio: quella non aggiornerebbe
+     * niente di piu' (il record lo scrive comunque il server, non le
+     * credenziali) e in cambio metterebbe una password in chiaro sul
+     * dispositivo. Il refresh_token nel Keychain / EncryptedSharedPreferences
+     * fa gia' il lavoro di tenere viva la sessione.
+     *
+     * Ritorna il record aggiornato, o null se non c'e' sessione, se la rete
+     * non ha risposto o se la sessione era morta (in quest'ultimo caso lo
+     * stato e' gia' passato ad anonimo).
+     */
+    suspend fun refreshCurrentUser(): UserModel? {
+        if (_authState.value !is AuthState.Authenticated) return null
+        return when (val outcome = fetchMeOrWipe()) {
+            is MeOutcome.Ok -> {
+                db.keyValueQueries.insertOrReplace(
+                    key = KEY_CURRENT_USER,
+                    value_ = json.encodeToString(UserModel.serializer(), outcome.user),
+                )
+                DemoIdentity.redact(outcome.user).also { _currentUser.value = it }
+            }
+            MeOutcome.Offline -> null
+            MeOutcome.Wiped -> null
+        }
+    }
+
+    /**
      * Strategy when /api/cs/me fails. Wipe is reserved for the single case
      * "the auth proxy itself says this identity is no longer welcome", i.e.
      * 401/403 from SVC even after a forced token refresh. Anything else —

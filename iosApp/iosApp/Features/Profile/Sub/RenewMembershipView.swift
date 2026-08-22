@@ -166,9 +166,12 @@ final class RenewMembershipViewModel {
         return Date(timeIntervalSince1970: Double(u.expireMembership.epochSeconds))
     }
 
+    /// Delega a `Membership` (:shared): è la stessa regola che decide se l'app
+    /// si apre sul muro del rinnovo. Prima questa proprietà rispondeva
+    /// "scaduta" anche quando la data mancava, cioè diceva il contrario del
+    /// gate sullo stesso record.
     var isExpired: Bool {
-        guard let d = expiryDate else { return true }
-        return d < Date()
+        Membership.shared.isExpired(user: user)
     }
 
     var expiryString: String {

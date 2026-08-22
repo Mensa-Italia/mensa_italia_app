@@ -15,18 +15,23 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.lifecycleScope
 import it.mensa.app.navigation.MensaNavGraph
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.services.push.DeviceRegistrar
 import it.mensa.app.support.LaunchHarness
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.ThemeManager
 import it.mensa.app.support.ThemeMode
 import it.mensa.app.ui.theme.MensaTheme
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
     private val audioPlayerController: AudioPlayerController by inject()
     private val themeManager: ThemeManager by inject()
+    private val deviceRegistrar: DeviceRegistrar by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +82,28 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         audioPlayerController.bind(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Rilegge il socio da `/api/cs/me` a ogni ritorno in primo piano.
+        //
+        // `AuthRepository.init()` lo fa solo all'avvio a freddo: un'app rimasta
+        // in background per giorni, o un `/me` fallito una volta perche'
+        // offline, continuava a mostrare scadenza tessera, `powers` e `addons`
+        // di allora. Da qui arriva anche la riapertura del gate del rinnovo,
+        // che e' derivato da `auth.currentUser`.
+        //
+        // Non serve rifare il login: quei campi li scrive il server sul record,
+        // non le credenziali.
+        lifecycleScope.launch {
+            runCatching { koinAccess().auth.refreshCurrentUser() }
+            // Stesso momento buono per riverificare che questo telefono
+            // risulti ancora fra i dispositivi registrati (vedi
+            // `DeviceRegistrar`): se e' stato cancellato dal server, si
+            // ripubblica adesso.
+            runCatching { deviceRegistrar.ensureRegistered() }
+        }
     }
 
     override fun onStop() {

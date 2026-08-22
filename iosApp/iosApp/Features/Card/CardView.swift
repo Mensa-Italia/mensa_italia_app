@@ -42,9 +42,10 @@ struct CardView: View {
         URL(string: "https://cloud32.mensa.it/rinnovo")
     }
 
+    /// Stessa regola del muro del rinnovo (`Membership` in :shared), così la
+    /// scritta qui e la schermata che blocca l'app non possono contraddirsi.
     private var membershipExpired: Bool {
-        guard let inst = vm.user?.expireMembership else { return false }
-        return inst.epochSeconds < Int64(Date().timeIntervalSince1970)
+        Membership.shared.isExpired(user: vm.user)
     }
 
     var body: some View {

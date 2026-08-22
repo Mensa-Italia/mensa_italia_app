@@ -7,6 +7,7 @@ import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
+import it.mensa.shared.auth.Membership
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
  *
  * State machine:
  *   Unknown   ─init()──► Loading
+ *   Loading   ─auth.Authenticated + tessera scaduta──► MembershipExpired
  *   Loading   ─auth.Authenticated + user + onboarding──► Onboarding | Main
  *   Loading   ─auth.Anonymous──► Anonymous
  *   Anonymous ─user taps Login──► (stays Anonymous, RootScreen shows Login)
@@ -32,6 +34,13 @@ sealed class RootPhase {
     data object Onboarding : RootPhase()
     data object Main : RootPhase()
     data object Public : RootPhase()
+
+    /**
+     * Tessera scaduta: l'unica cosa che si vede e' la pagina di rinnovo.
+     * Prima questo stato non esisteva e con la tessera scaduta si entrava
+     * nell'app come se niente fosse.
+     */
+    data object MembershipExpired : RootPhase()
 }
 
 class RootViewModel(
@@ -136,6 +145,10 @@ class RootViewModel(
                 // Screenshot harness always wants the authenticated shell —
                 // a fresh automation login would otherwise land on onboarding.
                 RootPhase.Main
+            } else if (Membership.isExpired(user)) {
+                // Prima dell'onboarding: chi non e' in regola non entra, e non
+                // ha senso fargli fare il giro di presentazione dell'app.
+                RootPhase.MembershipExpired
             } else {
                 val showOnboarding = onboarding.shouldShow(user)
                 if (showOnboarding) RootPhase.Onboarding else RootPhase.Main
@@ -143,6 +156,27 @@ class RootViewModel(
         }
         is AuthState.Anonymous -> RootPhase.Anonymous
         is AuthState.Unknown -> RootPhase.Loading
+    }
+
+    /**
+     * Rilegge il socio da `/api/cs/me`.
+     *
+     * Chiamata da [it.mensa.app.MainActivity] a ogni ON_RESUME. `auth.init()`
+     * lo fa solo all'avvio a freddo, quindi un'app rimasta in background per
+     * giorni — o un `/me` fallito una volta perche' offline — continuava a
+     * mostrare scadenza tessera, `powers` e `addons` di allora. Non serve
+     * rifare il login: il record lo scrive il server, non le credenziali.
+     *
+     * Se il rinnovo e' andato a buon fine, la nuova scadenza arriva di qui e
+     * il gate [RootPhase.MembershipExpired] si riapre da solo, perche' la
+     * fase e' derivata da `auth.currentUser`.
+     */
+    fun refreshUser() {
+        viewModelScope.launch {
+            runCatching { auth.refreshCurrentUser() }.onFailure { e ->
+                Logger.w("RootVM", "refreshUser", "failed: ${e.message}")
+            }
+        }
     }
 
     /** Called when the onboarding flow completes. */

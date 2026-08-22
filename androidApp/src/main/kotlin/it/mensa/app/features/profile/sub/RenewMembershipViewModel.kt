@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.AppFormat
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.auth.Membership
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,10 +38,13 @@ class RenewMembershipViewModel : ViewModel() {
         return java.util.Date(user.expireMembership.toEpochMilliseconds())
     }
 
-    fun isExpired(user: UserModel?): Boolean {
-        val d = expiryDate(user) ?: return true
-        return d.before(java.util.Date())
-    }
+    /**
+     * Delega a [Membership] in :shared: e' la stessa regola che decide se
+     * l'app si apre sul muro del rinnovo. Prima questa funzione rispondeva
+     * "scaduta" anche quando la data mancava, cioe' diceva il contrario del
+     * gate sullo stesso record.
+     */
+    fun isExpired(user: UserModel?): Boolean = Membership.isExpired(user)
 
     /** [locale] is passed in from the composable so the row re-renders on a language switch. */
     fun expiryString(user: UserModel?, locale: java.util.Locale = AppFormat.locale()): String {

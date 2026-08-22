@@ -116,6 +116,20 @@ final class RootViewModel {
         }
     }
 
+    /// Rilegge il socio da `/api/cs/me` e riverifica che questo iPhone
+    /// risulti fra i dispositivi registrati.
+    ///
+    /// `auth.doInit()` fa il `/me` solo all'avvio a freddo: un'app rimasta in
+    /// background per giorni, o un `/me` fallito una volta perché offline,
+    /// continuava a mostrare scadenza tessera, `powers` e `addons` di allora.
+    /// Non serve rifare il login con email e password: quei campi li scrive il
+    /// server sul record, non le credenziali — e il refresh_token nel Keychain
+    /// tiene già viva la sessione.
+    func refreshOnForeground() async {
+        _ = try? await koin.auth.refreshCurrentUser()
+        await PushTokenStore.shared.ensureRegistered()
+    }
+
     private func evaluatePhase() async {
         let state = koin.auth.authState.value
         if state is AuthStateAuthenticated {
@@ -124,6 +138,14 @@ final class RootViewModel {
             // subscription will re-call evaluatePhase when it arrives.
             guard let user = koin.auth.currentUser.value as? UserModel else {
                 phase = .loading
+                return
+            }
+            // Tessera scaduta: si passa dal muro del rinnovo, prima
+            // dell'onboarding. Chi non è in regola non entra, e non ha senso
+            // fargli fare il giro di presentazione dell'app. La regola sta in
+            // `Membership` (:shared) così Android chiude nello stesso momento.
+            if Membership.shared.isExpired(user: user) {
+                phase = .membershipExpired
                 return
             }
             #if DEBUG
@@ -169,6 +191,8 @@ struct RootView: View {
         return 0
     }()
 
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some View {
         Group {
             if previewOnboarding {
@@ -201,6 +225,9 @@ struct RootView: View {
                     OnboardingView(onComplete: { [weak vm] in
                         vm?.phase = .main
                     })
+                case .membershipExpired:
+                    MembershipExpiredView()
+                        .transition(.opacity)
                 case .main:
                     MainTabView()
                         // Proposta di attivazione della passkey: una volta sola,
@@ -227,6 +254,13 @@ struct RootView: View {
             }
         }
         .onDisappear { vm.stop() }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            // Il gate del rinnovo si riapre da qui: la fase è derivata da
+            // `auth.currentUser`, quindi appena il record aggiornato arriva,
+            // `evaluatePhase` rivaluta da solo.
+            Task { await vm.refreshOnForeground() }
+        }
         .animation(.smooth, value: vm.phase)
     }
 }

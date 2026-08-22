@@ -27,4 +27,10 @@ enum RootPhase: Equatable {
     case anonymous
     case onboarding
     case main
+
+    /// Tessera scaduta: l'unica cosa che si vede e' la pagina di rinnovo.
+    /// Prima questo stato non esisteva e con la tessera scaduta si entrava
+    /// nell'app come se niente fosse. La regola sta in `Membership` (:shared),
+    /// cosi' Android e iOS chiudono la porta nello stesso momento.
+    case membershipExpired
 }
