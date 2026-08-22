@@ -59,9 +59,11 @@ struct MainTabView: View {
             // Ask for push permission once we're past auth + onboarding.
             // Non-blocking; the system dialog is owned by UNUserNotificationCenter.
             _ = await PushPermissionRequester.requestIfNeeded()
-            // If FCM has already produced a token before login completed,
-            // flush it to the backend now that we know the user id.
-            await PushTokenStore.shared.uploadIfPossible()
+            // Se FCM ha già prodotto un token prima che il login finisse, lo
+            // si pubblica adesso che l'id utente c'è. `ensureRegistered`
+            // verifica contro il server, quindi copre anche il caso in cui il
+            // device sia stato cancellato dall'elenco nel frattempo.
+            await PushTokenStore.shared.ensureRegistered()
         }
         .onReceive(NotificationCenter.default.publisher(for: .mensaDeepLink)) { note in
             if let target = note.userInfo?[PushDeepLinkRouter.payloadKey] as? NotificationTarget {

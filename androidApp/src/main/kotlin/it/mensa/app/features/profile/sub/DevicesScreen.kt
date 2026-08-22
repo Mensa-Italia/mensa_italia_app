@@ -101,6 +101,7 @@ fun DevicesScreen(
                         items(uiState.devices, key = { it.id }) { device ->
                             DeviceListItem(
                                 device = device,
+                                isCurrent = uiState.isCurrent(device),
                                 onDeleteClick = { pendingDelete = device },
                             )
                             HorizontalDivider(
@@ -155,6 +156,7 @@ fun DevicesScreen(
 @Composable
 private fun DeviceListItem(
     device: DeviceModel,
+    isCurrent: Boolean,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -195,19 +197,33 @@ private fun DeviceListItem(
             )
         },
         supportingContent = {
+            val lastSeen = tr("app.devices.last_seen", fallback = "Ultimo accesso") + ": " + updated
             Text(
-                text = tr("app.devices.last_seen", fallback = "Ultimo accesso") + ": " + updated,
+                text = if (isCurrent) {
+                    tr("app.devices.current", fallback = "Questo dispositivo") + " · " + lastSeen
+                } else {
+                    lastSeen
+                },
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (isCurrent) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
             )
         },
         trailingContent = {
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = tr("app.devices.delete", fallback = "Rimuovi"),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+            // Niente cestino sul telefono in uso: si resterebbe senza
+            // notifiche e la riga tornerebbe al primo `ensureRegistered`. Per
+            // sganciare questo telefono si usa un altro dispositivo.
+            if (!isCurrent) {
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = tr("app.devices.delete", fallback = "Rimuovi"),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         colors = ListItemDefaults.colors(

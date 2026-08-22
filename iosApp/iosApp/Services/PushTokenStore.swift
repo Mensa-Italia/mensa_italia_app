@@ -2,66 +2,77 @@ import Foundation
 import UIKit
 import Shared
 
-/// Bridges FCM registration tokens to the shared `DevicesRepository`.
+/// Tiene allineata la riga di questo iPhone nella collection `users_devices`.
 ///
-/// Mirrors Flutter `Api.addDevice` (api.dart):
-///   1. Wait for an authenticated user.
-///   2. Register the device with `{user, firebase_id, device_name, language}`.
-///   3. Skip re-registration when the same `(userId, token)` pair has already
-///      been uploaded — persisted in UserDefaults so we don't hammer the API
-///      on every cold launch / token refresh callback.
+/// La versione precedente registrava il device una volta e poi si ricordava di
+/// averlo fatto in `UserDefaults` (`push.token.lastUploaded = "<userId>|<token>"`).
+/// Quel promemoria era il bug: cancellando il dispositivo dal server e
+/// rifacendo login, la chiave era ancora lì, la POST non partiva più e il
+/// telefono restava fuori dall'elenco — e senza notifiche — fino a una
+/// reinstallazione. Peggio: la chiave veniva scritta anche quando la
+/// registrazione falliva.
 ///
-/// We do NOT delete duplicates from other users here (Flutter's
-/// `removeSimilarDevice`): the backend already de-dupes via `findByFirebaseId`,
-/// and on this side `register()` will fail with a unique-constraint error which
-/// we swallow.
+/// Adesso la verità su chi è registrato ce l'ha il server e gliela si chiede:
+/// `DevicesRepository.ensureRegistered` (:shared) fa una GET filtrata per
+/// `firebase_id` e la POST solo se manca davvero. Qui resta un promemoria di
+/// sola sessione, così non si ripete la verifica a ogni callback FCM dello
+/// stesso avvio, ma ogni avvio a freddo e ogni login ricontrollano.
 @MainActor
 final class PushTokenStore {
     static let shared = PushTokenStore()
     private init() {}
 
-    private let lastUploadedKey = "push.token.lastUploaded"
+    /// Ultimo `(userId, token)` verificato **in questo processo**. Non
+    /// persistito: è esattamente ciò che rendeva il bug permanente.
+    private var verifiedInThisSession: String?
 
     /// Latest FCM token observed in this process. Set by `AppDelegate`'s
     /// `MessagingDelegate.messaging(_:didReceiveRegistrationToken:)`.
     private(set) var currentToken: String?
 
-    /// Called by the `MessagingDelegate` callback. Stashes the token and
-    /// attempts an upload (no-op if user not yet authenticated — the next
-    /// post-login call to `uploadIfPossible()` will retry).
+    /// Chiamata dal callback `MessagingDelegate`. Mette da parte il token e
+    /// prova a registrarlo (no-op se l'utente non è ancora autenticato — ci
+    /// riprova la `ensureRegistered()` dopo il login).
     func handle(token: String) {
+        if token != currentToken {
+            // Token ruotato: la verifica precedente non vale più.
+            verifiedInThisSession = nil
+        }
         currentToken = token
-        Task { await uploadIfPossible() }
+        Task { await ensureRegistered() }
     }
 
-    /// Call after a successful login (or from `MainTabView.onAppear`) to
-    /// flush the latest token to the backend now that we know the user id.
-    func uploadIfPossible() async {
+    /// Da chiamare dopo il login, dall'`onAppear` di `MainTabView` e a ogni
+    /// ritorno in primo piano. Idempotente.
+    func ensureRegistered() async {
         guard let token = currentToken, !token.isEmpty else { return }
         guard let user = koin.auth.currentUser.value as? UserModel, !user.id.isEmpty else {
             return
         }
 
-        let cacheKey = "\(user.id)|\(token)"
-        if UserDefaults.standard.string(forKey: lastUploadedKey) == cacheKey {
-            return
-        }
+        let key = "\(user.id)|\(token)"
+        if verifiedInThisSession == key { return }
 
-        let deviceName = await UIDevice.current.model
-        let language = Locale.current.identifier
+        let deviceName = UIDevice.current.name.isEmpty
+            ? UIDevice.current.model
+            : UIDevice.current.name
 
-        do {
-            _ = try await koin.devices.register(
-                userId: user.id,
-                firebaseToken: token,
-                deviceName: deviceName,
-                language: language
-            )
-            UserDefaults.standard.set(cacheKey, forKey: lastUploadedKey)
-        } catch {
-            // Likely unique-constraint (token already registered for this user
-            // by a previous install). Cache anyway so we don't retry forever.
-            UserDefaults.standard.set(cacheKey, forKey: lastUploadedKey)
+        let registered = try? await koin.devices.ensureRegistered(
+            userId: user.id,
+            firebaseToken: token,
+            deviceName: deviceName,
+            language: Locale.current.identifier
+        )
+        // Si segna solo ciò che è andato a buon fine: un fallimento di rete
+        // deve poter essere ritentato al prossimo foreground.
+        if registered != nil {
+            verifiedInThisSession = key
         }
+    }
+
+    /// Da chiamare al logout: la prossima sessione riparte da zero e
+    /// ripubblica il device per il nuovo utente.
+    func reset() {
+        verifiedInThisSession = nil
     }
 }

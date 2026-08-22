@@ -14,7 +14,17 @@ data class DevicesUiState(
     val devices: List<DeviceModel> = emptyList(),
     val loading: Boolean = true,
     val errorMessage: String? = null,
-)
+    /**
+     * Token FCM di questo telefono. La riga che ce l'ha e' "questo
+     * dispositivo" e non si puo' rimuovere: sganciarsi da soli lascerebbe
+     * l'utente senza notifiche senza motivo, e il record tornerebbe comunque
+     * al primo `ensureRegistered`.
+     */
+    val currentFirebaseId: String? = null,
+) {
+    fun isCurrent(device: DeviceModel): Boolean =
+        currentFirebaseId != null && device.firebaseId == currentFirebaseId
+}
 
 class DevicesViewModel : ViewModel() {
 
@@ -33,6 +43,10 @@ class DevicesViewModel : ViewModel() {
                 _uiState.update { it.copy(devices = list, loading = false) }
             }
         }
+        viewModelScope.launch {
+            val current = runCatching { devices.currentFirebaseId() }.getOrNull()
+            _uiState.update { it.copy(currentFirebaseId = current) }
+        }
         viewModelScope.launch { refresh() }
     }
 
@@ -47,6 +61,9 @@ class DevicesViewModel : ViewModel() {
 
     fun delete(id: String) {
         viewModelScope.launch {
+            // `delete` risponde false sul dispositivo in uso, e la UI per
+            // quello non mostra nemmeno il cestino: qui interessa solo
+            // l'errore di rete.
             runCatching { devices.delete(id) }.onFailure { e ->
                 _uiState.update { it.copy(errorMessage = e.message) }
             }

@@ -51,6 +51,10 @@ final class ProfileViewModel {
         defer { loggingOut = false }
         do {
             try await koin.auth.logout()
+            // Il promemoria "device già verificato" vale per l'utente uscito:
+            // al prossimo login questo iPhone va ripubblicato, e senza questo
+            // reset la verifica verrebbe saltata per tutta la sessione.
+            PushTokenStore.shared.reset()
         } catch {
             errorMessage = error.localizedDescription
         }

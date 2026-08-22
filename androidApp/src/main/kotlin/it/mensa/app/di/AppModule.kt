@@ -22,6 +22,7 @@ import it.mensa.app.ui.root.RootViewModel
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.calendar.CalendarHelper
 import it.mensa.app.services.location.LocationProvider
+import it.mensa.app.services.push.DeviceRegistrar
 import it.mensa.app.services.push.PushTokenStore
 import it.mensa.app.services.stripe.StripeService
 import it.mensa.app.support.LocaleManager
@@ -51,8 +52,10 @@ val appModule = module {
     single { LocationSearchService(androidContext()) }
     single { ReverseGeocoderService(androidContext()) }
 
-    // Push token store (DataStore-backed)
+    // Push token store (DataStore-backed) + registrazione del device sul
+    // server. `DeviceRegistrar` la chiama MainActivity a ogni onResume.
     single { PushTokenStore(androidContext()) }
+    single { DeviceRegistrar(androidContext(), get()) }
 
     // Audio player controller (singleton — owns MediaController connection)
     single { AudioPlayerController(androidContext()) }
