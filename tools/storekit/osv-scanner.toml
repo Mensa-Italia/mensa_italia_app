@@ -1,0 +1,23 @@
+# Eccezioni della scansione OSV per `tools/storekit`.
+#
+# Questa e' l'unica cartella con un lockfile npm rimasta nel repo: storekit e'
+# lo strumento con cui si catturano gli screenshot per App Store e Play, gira
+# sul Mac di chi pubblica e non finisce dentro nessun artefatto — non nell'AAB,
+# non nell'IPA.
+
+[[IgnoredVulns]]
+id = "GHSA-jmr9-qjv8-65gv"
+# `extract-zip` non ha una versione corretta: l'advisory copre ogni release
+# fino alla 2.0.1 compresa, che e' l'ultima pubblicata ("0 vulnerabilities can
+# be fixed" nel report). Non c'e' niente da aggiornare.
+#
+# Arriva come dipendenza transitiva di `@puppeteer/browsers`, che a sua volta
+# entra da `puppeteer-core` fra le devDependencies. L'unico zip che quella
+# catena estrae e' l'archivio del browser scaricato dalla CDN di Google: la
+# vulnerabilita' e' un path traversal via symlink dentro un archivio
+# *malevolo*, e qui l'archivio non lo sceglie un attaccante.
+#
+# Da rivedere alla data qui sotto: se nel frattempo esce una versione corretta,
+# o se storekit inizia ad aprire zip che arrivano da fuori, questa riga va via.
+ignoreUntil = 2027-02-28
+reason = "extract-zip: nessuna versione corretta esiste; transitiva di puppeteer-core (devDependency), estrae solo l'archivio del browser dalla CDN di Google, e storekit non entra in nessun artefatto pubblicato."

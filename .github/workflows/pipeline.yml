@@ -149,13 +149,21 @@ jobs:
       secrets-scan: false
       deps-scan: true
       sbom: true
-      # Le 69 vulnerabilita' che osv-scanner riportava (run 31633267972)
-      # stavano tutte in un solo ecosistema, npm — astro, vite, esbuild,
-      # postcss, sharp, ws, yaml — cioe' la web app e il suo tooling, adesso
-      # eliminati. Su Gradle/Maven e CocoaPods gli advisory erano zero. Con il
-      # solo albero mobile rimasto la scansione torna bloccante a ogni livello:
-      # se esce un advisory adesso riguarda davvero cio' che finisce dentro
-      # l'AAB o l'IPA, e fermare la pubblicazione e' la cosa giusta.
+      # Bloccante a ogni livello. Le 69 vulnerabilita' che osv-scanner
+      # riportava (run 31633267972) stavano tutte in npm — astro, vite,
+      # esbuild, postcss, sharp, ws, yaml — cioe' la web app, che non c'e'
+      # piu'. Su Gradle/Maven e CocoaPods gli advisory erano zero.
+      #
+      # Di npm resta solo `tools/storekit`, lo strumento degli screenshot per
+      # gli store: gira sul Mac di chi pubblica e non entra in nessun
+      # artefatto. Le sue eccezioni stanno in `tools/storekit/osv-scanner.toml`,
+      # una per advisory e con una data di revisione — non in un
+      # `deps-blocking: false` che spegne il cancello per tutti.
+      #
+      # Questo `true` ha gia' fermato una beta (b22.1.0, run 32581243501) su un
+      # advisory di `extract-zip` transitivo di puppeteer. E' il
+      # comportamento voluto: un advisory nuovo lo si guarda, non lo si
+      # scavalca in silenzio.
       deps-blocking: true
 
   # ─── CodeQL: resta locale, e NON blocca ────────────────────────────────────
