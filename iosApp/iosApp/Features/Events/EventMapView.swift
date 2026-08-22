@@ -47,9 +47,10 @@ struct EventMapView: View {
         )) {
             ForEach(vm.geoEvents, id: \.id) { e in
                 if let pos = e.position {
-                    Marker(e.name, systemImage: "calendar",
+                    let scope = EventFilterHelpers.type(of: e)
+                    Marker(e.name, systemImage: scope.systemImage,
                            coordinate: CLLocationCoordinate2D(latitude: pos.lat, longitude: pos.lon))
-                        .tint(e.isNational ? AppTheme.Colors.brandPrimary : AppTheme.Colors.brandSecondary)
+                        .tint(scope.tint)
                         .tag(e.id)
                 }
             }

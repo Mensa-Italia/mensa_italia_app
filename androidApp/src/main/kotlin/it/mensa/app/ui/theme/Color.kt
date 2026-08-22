@@ -8,6 +8,15 @@ import androidx.compose.ui.graphics.Color
 val MensaBlue = Color(0xFF184295)
 val MensaCyan = Color(0xFF6AC9F0)
 val MensaInk = Color(0xFF575656)
+
+/**
+ * Verde-acqua degli eventi internazionali. Non e' un colore di brand: serve a
+ * separare a colpo d'occhio "Internazionale" da "Nazionale" (MensaBlue) e da
+ * "Locale" (MensaCyan), che sono due blu e da soli non si distinguono, e da
+ * "Spot" (arancio). Vive qui e non nel punto d'uso perche' lo leggono la chip
+ * della lista, il badge del dettaglio e il pin della mappa.
+ */
+val MensaTeal = Color(0xFF12A594)
 val BackdropDark = Color(0xFF061F2E)
 val Parchment = Color(0xFFFCFBF7)
 

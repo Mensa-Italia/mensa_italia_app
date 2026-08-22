@@ -1,29 +1,48 @@
 import Foundation
+import SwiftUI
 import CoreLocation
 import Shared
 
-/// Type of event for filter purposes.
+/// Ambito di un evento, per il filtro e per le etichette.
 ///
-/// `online` is inferred from `event.position == nil` — there is no explicit
-/// "isOnline" field on `EventModel`. `national` and `local` come from
-/// `event.isNational`.
+/// Chi lo decide e' `EventScopes` in :shared, cosi' Android e iOS raccontano la
+/// stessa cosa. Prima qui c'erano solo tre casi e `international` mancava:
+/// `event.isNational` da solo non distingue un raduno fuori dall'Italia da un
+/// evento nazionale italiano, e i due uscivano graficamente identici.
+///
+/// `online` resta dedotto dall'assenza di posizione — su `EventModel` non
+/// esiste un campo `isOnline`.
 enum EventType: String, CaseIterable, Identifiable, Codable, Hashable {
-    case national, local, online
+    case national, international, local, online
     var id: String { rawValue }
 
     var label: String {
         switch self {
-        case .national: return tr("events.type.national", fallback: "Nazionale")
-        case .local:    return tr("events.type.local", fallback: "Locale")
-        case .online:   return tr("events.type.online", fallback: "Online")
+        case .national:      return tr("events.type.national", fallback: "Nazionale")
+        case .international: return tr("events.type.international", fallback: "Internazionale")
+        case .local:         return tr("events.type.local", fallback: "Locale")
+        case .online:        return tr("events.type.online", fallback: "Online")
         }
     }
 
     var systemImage: String {
         switch self {
-        case .national: return "globe.europe.africa"
-        case .local:    return "mappin.and.ellipse"
-        case .online:   return "wifi"
+        case .national:      return "flag.fill"
+        case .international: return "globe"
+        case .local:         return "mappin.and.ellipse"
+        case .online:        return "wifi"
+        }
+    }
+
+    /// Tinta di chip, badge e pin. Nazionale e Locale restano i due blu di
+    /// brand; internazionale ha il suo verde-acqua perche' un terzo blu non si
+    /// sarebbe distinto e l'arancio e' gia' di "Spot".
+    var tint: Color {
+        switch self {
+        case .national:      return AppTheme.Colors.brandPrimary
+        case .international: return AppTheme.Colors.eventInternational
+        case .local:         return AppTheme.Colors.brandSecondary
+        case .online:        return .secondary
         }
     }
 }
@@ -31,7 +50,7 @@ enum EventType: String, CaseIterable, Identifiable, Codable, Hashable {
 /// Canonical list of Italian regions used for region chip matching.
 ///
 /// Comes from the shared module (`ItalianRegions` in `it.mensa.shared.geo`) so
-/// the chips, the resolver and the Android/web filters all speak the exact same
+/// the chips, the resolver and the Android filters all speak the exact same
 /// strings.
 enum ItalianRegions {
     static let all: [String] = Shared.ItalianRegions.shared.all
@@ -94,9 +113,16 @@ struct EventFilterState: Equatable, Codable {
 
 /// Pure filter predicate. Keep deterministic and side-effect free.
 enum EventFilterHelpers {
+    /// Delega a `EventScopes` in :shared. Le `if` a catena invece di uno
+    /// `switch` perche' un enum Kotlin arriva in Swift come classe, non come
+    /// enum Swift: si confronta con `==`, come gia' si fa con
+    /// `PasskeyStartStatus` in LoginViewModel.
     static func type(of event: EventModel) -> EventType {
-        if event.position == nil { return .online }
-        return event.isNational ? .national : .local
+        let scope = Shared.EventScopes.shared.of(event: event)
+        if scope == Shared.EventScope.online { return .online }
+        if scope == Shared.EventScope.national { return .national }
+        if scope == Shared.EventScope.international { return .international }
+        return .local
     }
 
     static func matchesType(_ event: EventModel, types: Set<EventType>) -> Bool {

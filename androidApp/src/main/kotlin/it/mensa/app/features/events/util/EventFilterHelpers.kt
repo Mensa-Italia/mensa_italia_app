@@ -1,6 +1,8 @@
 package it.mensa.app.features.events.util
 
 import android.location.Location
+import it.mensa.shared.geo.EventScope
+import it.mensa.shared.geo.EventScopes
 import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.EventModel
 
@@ -9,10 +11,11 @@ import it.mensa.shared.model.EventModel
  * Pure, deterministic filter predicates with no side effects.
  */
 
-enum class EventType(val label: String, val icon: String) {
-    NATIONAL("Nazionale", "globe"),
-    LOCAL("Locale", "mappin"),
-    ONLINE("Online", "wifi"),
+enum class EventType(val label: String, val scope: EventScope) {
+    NATIONAL("Nazionale", EventScope.NATIONAL),
+    INTERNATIONAL("Internazionale", EventScope.INTERNATIONAL),
+    LOCAL("Locale", EventScope.LOCAL),
+    ONLINE("Online", EventScope.ONLINE),
 }
 
 // L'elenco delle regioni vive in :shared (it.mensa.shared.geo.ItalianRegions):
@@ -50,10 +53,16 @@ data class EventFilterState(
 }
 
 object EventFilterHelpers {
-    fun typeOf(event: EventModel): EventType = when {
-        event.position == null -> EventType.ONLINE
-        event.isNational -> EventType.NATIONAL
-        else -> EventType.LOCAL
+    /**
+     * Chi decide l'ambito e' [EventScopes] in :shared, cosi' la chip della
+     * lista, il badge del dettaglio, il pin sulla mappa e iOS raccontano tutti
+     * la stessa cosa.
+     */
+    fun typeOf(event: EventModel): EventType = when (EventScopes.of(event)) {
+        EventScope.ONLINE -> EventType.ONLINE
+        EventScope.LOCAL -> EventType.LOCAL
+        EventScope.NATIONAL -> EventType.NATIONAL
+        EventScope.INTERNATIONAL -> EventType.INTERNATIONAL
     }
 
     fun matchesType(event: EventModel, types: Set<EventType>): Boolean {

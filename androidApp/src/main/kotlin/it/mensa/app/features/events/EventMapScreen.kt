@@ -37,8 +37,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.events.util.label
 import it.mensa.app.features.locations.hasMapsApiKey
 import it.mensa.app.support.tr
+import it.mensa.shared.geo.EventScopes
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -100,7 +102,7 @@ fun EventMapScreen(
                     Marker(
                         state = MarkerState(position = LatLng(pos.lat, pos.lon)),
                         title = event.name,
-                        snippet = if (event.isNational) "Nazionale" else "Locale",
+                        snippet = EventScopes.of(event).label(),
                         onClick = {
                             vm.selectEvent(event.id)
                             false

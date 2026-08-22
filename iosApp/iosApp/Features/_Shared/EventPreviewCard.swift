@@ -29,17 +29,22 @@ struct EventPreviewCard: View {
                         .lineLimit(2)
                     Spacer()
                     if isPast {
-                        // Chip "Concluso" — quando entrambe (Nazionale +
+                        // Chip "Concluso" — quando entrambe (ambito +
                         // Concluso) sarebbero presenti, "Concluso" vince:
                         // è l'informazione più rilevante per chi scorre.
                         Label(tr("events.tag.past", fallback: "Concluso"),
                               systemImage: "checkmark.seal.fill")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
-                    } else if event.isNational {
-                        Label(tr("events.preview.national", fallback: "Nazionale"), systemImage: "globe")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                    } else {
+                        // Nazionale, internazionale o online. "Locale" no: e' il
+                        // caso ordinario e la sede sta gia' in fondo alla card.
+                        let scope = EventFilterHelpers.type(of: event)
+                        if scope != .local {
+                            Label(scope.label, systemImage: scope.systemImage)
+                                .font(.caption2)
+                                .foregroundStyle(scope.tint)
+                        }
                     }
                 }
 

@@ -3,6 +3,7 @@ package it.mensa.app.features.events._components
 import it.mensa.app.support.rememberAppLocale
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -36,14 +37,19 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.mensa.app.features.events.util.EventDateFormatter
+import it.mensa.app.features.events.util.icon
+import it.mensa.app.features.events.util.label
+import it.mensa.app.features.events.util.tint
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.rememberCoverRatio
 import it.mensa.app.ui.theme.MensaCyan
+import it.mensa.shared.geo.EventScopes
 import it.mensa.shared.model.EventModel
 
 /**
@@ -108,7 +114,10 @@ fun EventRowCard(
                             .matchParentSize()
                             .background(
                                 Brush.linearGradient(
-                                    colors = listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.65f), MensaCyan.copy(alpha = 0.55f))
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.65f),
+                                        MensaCyan.copy(alpha = 0.55f),
+                                    )
                                 )
                             )
                     )
@@ -130,11 +139,10 @@ fun EventRowCard(
                         EventTagChip(text = "Concluso", tint = Color.Gray)
                         Spacer(Modifier.width(6.dp))
                     }
-                    if (event.isNational) {
-                        EventTagChip(text = "Nazionale", tint = MaterialTheme.colorScheme.primary)
-                    } else {
-                        EventTagChip(text = "Locale", tint = MensaCyan)
-                    }
+                    // Nazionale, Internazionale, Locale o Online: la decide
+                    // EventScopes, non `is_national` da solo.
+                    val scope = EventScopes.of(event)
+                    EventTagChip(text = scope.label(), tint = scope.tint(), icon = scope.icon)
                     if (event.isSpot) {
                         Spacer(Modifier.width(6.dp))
                         EventTagChip(text = "Spot", tint = Color(0xFFFFA500))
@@ -203,19 +211,42 @@ fun EventRowCard(
     }
 }
 
+/**
+ * Pillola sopra la locandina.
+ *
+ * `tint` prima arrivava e veniva buttato via: il fondo era sempre bianco al 18%
+ * e il testo sempre bianco, quindi Nazionale e Locale uscivano identici — ed e'
+ * per questo che aggiungere "Internazionale" senza toccare questa funzione non
+ * si sarebbe visto. Adesso il fondo e' nero pieno (contrasto AA su qualunque
+ * immagine, come su iOS) e il colore lo portano il bordo e l'icona.
+ */
 @Composable
-private fun EventTagChip(text: String, tint: Color) {
+private fun EventTagChip(text: String, tint: Color, icon: ImageVector? = null) {
     Surface(
         shape = RoundedCornerShape(50),
-        color = Color.White.copy(alpha = 0.18f),
+        color = Color.Black.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, tint),
         tonalElevation = 0.dp,
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White,
+        Row(
             modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(12.dp),
+                )
+                Spacer(Modifier.width(4.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White,
+            )
+        }
     }
 }
 

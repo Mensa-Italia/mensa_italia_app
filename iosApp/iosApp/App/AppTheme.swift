@@ -56,6 +56,28 @@ enum AppTheme {
             return mensaBlue
             #endif
         }()
+
+        /// Verde-acqua degli eventi internazionali.
+        ///
+        /// Non e' un colore di brand: serve a separare a colpo d'occhio
+        /// "Internazionale" da "Nazionale" (`mensaBlue`) e da "Locale"
+        /// (`mensaCyan`), che sono due blu e da soli non si distinguono, e da
+        /// "Spot" (arancio). Adattivo per lo stesso motivo di
+        /// `brandTintAdaptive`: il teal pieno su fondo chiaro non tiene la AA.
+        static let eventInternational: Color = {
+            #if canImport(UIKit)
+            return Color(UIColor { trait in
+                switch trait.userInterfaceStyle {
+                case .dark:
+                    return UIColor(red: 46/255, green: 211/255, blue: 190/255, alpha: 1)  // #2ED3BE
+                default:
+                    return UIColor(red: 11/255, green: 124/255, blue: 111/255, alpha: 1)  // #0B7C6F
+                }
+            })
+            #else
+            return Color(red: 18/255, green: 165/255, blue: 148/255)
+            #endif
+        }()
     }
 
     enum Spacing {

@@ -44,6 +44,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import it.mensa.app.features.events.util.DistanceSteps
 import it.mensa.app.features.events.util.EventFilterState
 import it.mensa.app.features.events.util.EventType
+import it.mensa.app.features.events.util.label
 import it.mensa.app.support.tr
 import it.mensa.shared.geo.ItalianRegions
 
@@ -219,13 +220,9 @@ fun EventFiltersSheet(
     }
 }
 
-/** Etichetta tradotta della chip di tipo; il valore hardcoded resta da fallback. */
+/** Etichetta tradotta della chip di tipo. Una sola fonte: `EventScope.label()`. */
 @Composable
-private fun EventType.localizedLabel(): String = when (this) {
-    EventType.NATIONAL -> tr("events.type.national", fallback = label)
-    EventType.LOCAL -> tr("events.type.local", fallback = label)
-    EventType.ONLINE -> tr("events.type.online", fallback = label)
-}
+private fun EventType.localizedLabel(): String = scope.label()
 
 @Composable
 private fun FilterSectionLabel(text: String) {

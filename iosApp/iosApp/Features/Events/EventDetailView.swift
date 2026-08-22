@@ -260,13 +260,17 @@ struct EventDetailView: View {
             }
 
             HStack(spacing: 6) {
-                if event.isNational {
-                    Label(tr("events.tag.national", fallback: "Nazionale"), systemImage: "globe")
+                // Ambito dell'evento: nazionale, internazionale, locale o
+                // online. "Locale" non si mostra — e' il caso ordinario e la
+                // sede sta gia' scritta due righe sopra.
+                let scope = EventFilterHelpers.type(of: event)
+                if scope != .local {
+                    Label(scope.label, systemImage: scope.systemImage)
                         .labelStyle(.titleAndIcon)
                         .font(.caption.weight(.semibold))
                         .padding(.horizontal, 10).padding(.vertical, 4)
-                        .background(AppTheme.Colors.brandPrimary.opacity(0.15), in: Capsule())
-                        .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
+                        .background(scope.tint.opacity(0.15), in: Capsule())
+                        .foregroundStyle(scope.tint)
                 }
                 if event.isSpot {
                     Label(tr("events.tag.spot", fallback: "Spot"), systemImage: "sparkles")

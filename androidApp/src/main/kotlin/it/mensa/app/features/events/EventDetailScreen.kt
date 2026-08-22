@@ -80,7 +80,11 @@ import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
+import it.mensa.app.features.events.util.label
+import it.mensa.app.features.events.util.tint
 import it.mensa.app.ui.theme.MensaCyan
+import it.mensa.shared.geo.EventScope
+import it.mensa.shared.geo.EventScopes
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.EventScheduleModel
 import it.mensa.shared.model.LocationModel
@@ -174,9 +178,17 @@ fun EventDetailScreen(
                         }
                         Box(modifier = Modifier.fillMaxWidth().height(80.dp).align(Alignment.BottomStart)
                             .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.45f)))))
-                        if (event.isNational) {
+                        // Nazionale e internazionale erano lo stesso badge:
+                        // `is_national` non distingue un raduno all'estero da
+                        // un evento nazionale italiano. Ora lo dice EventScopes.
+                        val scope = EventScopes.of(event)
+                        if (scope == EventScope.NATIONAL || scope == EventScope.INTERNATIONAL) {
                             Column(modifier = Modifier.align(Alignment.BottomStart).padding(horizontal = 16.dp, vertical = 12.dp)) {
-                                Text(text = tr("events.tag.national", fallback = "EVENTO NAZIONALE"), style = MaterialTheme.typography.labelSmall, color = MensaCyan)
+                                Text(
+                                    text = scope.label().uppercase(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = scope.tint(),
+                                )
                             }
                         }
                     }

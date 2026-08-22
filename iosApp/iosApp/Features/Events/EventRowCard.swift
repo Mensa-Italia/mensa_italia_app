@@ -25,6 +25,11 @@ struct EventRowCard: View {
     /// netto senza nascondere il contenuto (l'utente può ancora aprirlo).
     private var isPast: Bool { EventDateUtil.isPast(event) }
 
+    /// Nazionale, internazionale, locale o online. Prima la chip la decideva
+    /// `event.isNational` da solo, e un raduno fuori dall'Italia usciva con la
+    /// stessa scritta e lo stesso colore di un evento nazionale italiano.
+    private var scope: EventType { EventFilterHelpers.type(of: event) }
+
     private var gradientPlaceholder: some View {
         LinearGradient(
             colors: [
@@ -105,7 +110,7 @@ struct EventRowCard: View {
     private var tagChips: some View {
         HStack(spacing: 6) {
             // "Concluso" prevale visivamente: quando l'evento è passato il
-            // resto dei tag (Nazionale/Spot) è informativamente meno
+            // resto dei tag (ambito/Spot) è informativamente meno
             // rilevante. Lo mostriamo davanti agli altri tag, in stile
             // capsule grigia coerente con le linee guida.
             if isPast {
@@ -115,19 +120,7 @@ struct EventRowCard: View {
                     tint: .gray
                 )
             }
-            if event.isNational {
-                chip(
-                    text: tr("events.tag.national", fallback: "Nazionale"),
-                    icon: "globe",
-                    tint: AppTheme.Colors.brandPrimary
-                )
-            } else {
-                chip(
-                    text: tr("events.tag.local", fallback: "Locale"),
-                    icon: "mappin",
-                    tint: AppTheme.Colors.brandSecondary
-                )
-            }
+            chip(text: scope.label, icon: scope.systemImage, tint: scope.tint)
             if event.isSpot {
                 chip(
                     text: tr("events.tag.spot", fallback: "Spot"),
@@ -201,15 +194,7 @@ struct EventRowCard: View {
                            icon: "checkmark.seal.fill",
                            tint: .gray)
             }
-            if event.isNational {
-                inlineChip(text: tr("events.tag.national", fallback: "Nazionale"),
-                           icon: "globe",
-                           tint: AppTheme.Colors.brandPrimary)
-            } else {
-                inlineChip(text: tr("events.tag.local", fallback: "Locale"),
-                           icon: "mappin",
-                           tint: AppTheme.Colors.brandSecondary)
-            }
+            inlineChip(text: scope.label, icon: scope.systemImage, tint: scope.tint)
             if event.isSpot {
                 inlineChip(text: tr("events.tag.spot", fallback: "Spot"),
                            icon: "sparkles",
