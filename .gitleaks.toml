@@ -17,6 +17,21 @@ regexes = [
   '''AIzaSyB2aoF70O1oDQv0BQ3SG6WFQaayIEVEMPE''',
 ]
 paths = [
+  # Config client Firebase per Android, generato dalla console.
+  #
+  # `current_key` e' una chiave client, pubblica per design: viaggia dentro
+  # l'APK ed e' estraibile da chiunque scarichi l'app. La protezione vera sono
+  # le restrizioni per package name + SHA-1 sulla Google Cloud Console, non la
+  # segretezza del valore. Stessa natura della chiave dentro
+  # `GoogleService-Info.plist`, committato qui accanto dal primo giorno — con
+  # la differenza che quella non fa scattare la regola `gcp-api-key` e questa
+  # si', quindi va detto a mano invece di passare per caso.
+  #
+  # Allowlist per percorso e non per valore: cosi' regge anche a una rotazione
+  # della chiave. Il file lo genera Firebase e contiene solo config client; se
+  # un giorno ci finisse dentro altro, questa riga andrebbe ristretta.
+  '''^androidApp/google-services\.json$''',
+
   # Flutter legacy: tutto sotto lib/, ios/Runner/, android/app/ era la vecchia
   # app Flutter. Contiene Firebase/Maps client keys che sono pubbliche per
   # design. Le chiavi vanno comunque ruotate (compromesse da > 1 anno) ma
