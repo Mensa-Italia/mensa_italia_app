@@ -206,6 +206,13 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with: { distribution: temurin, java-version: '21' }
       - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
+      # `autobuild` lancia `./gradlew assemble`, e AGP senza SDK si ferma su
+      # "SDK location not found": il job falliva sempre, e non per il 403 di
+      # Advanced Security che i commenti qui sopra davano per scontato.
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
       - uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
         with: { languages: 'java-kotlin', build-mode: 'autobuild' }
       - name: Build kotlin (best-effort)
@@ -724,6 +731,14 @@ jobs:
                 changelog: "Build automatica #{ENV['VERSION']} (production)"
               )
               deliver(
+                # Il binario l'ha gia' caricato `upload_to_testflight` qui
+                # sopra. Senza questo, `deliver` prova a ricaricare lo stesso
+                # IPA e App Store Connect lo rifiuta contro se stesso: "The
+                # bundle version must be higher than the previously uploaded
+                # version" (run 32638635004, v22.2.0 - build 31000919). Non era
+                # mai emerso perche' la lane `production` non era mai girata:
+                # il trigger `v*` e' rimasto spento fino ad oggi.
+                skip_binary_upload: true,
                 submit_for_review: true,
                 automatic_release: true,
                 force: true,
