@@ -1,66 +1,117 @@
 package it.mensa.app.services.push
 
+import android.Manifest
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+import it.mensa.app.MainActivity
+import it.mensa.app.R
 import it.mensa.app.support.Logger
-import it.mensa.app.support.koinAccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-
-// NOTE: FirebaseMessagingService is commented out to avoid a compile error
-// when firebase-messaging-ktx is commented out in build.gradle.kts.
-// Uncomment both the import AND the parent class once google-services.json
-// is present and Firebase deps are re-enabled.
-//
-// import com.google.firebase.messaging.FirebaseMessagingService
-// import com.google.firebase.messaging.RemoteMessage
+import org.koin.mp.KoinPlatform
+import kotlin.random.Random
 
 /**
- * MensaMessagingService — Firebase Cloud Messaging service skeleton.
+ * Servizio FCM di Android.
  *
- * Handles:
- * - [onNewToken]: persist token via [PushTokenStore], upload to PocketBase devices collection
- * - [onMessageReceived]: parse payload via [PushDeepLinkRouter], show notification
+ * Per mesi questa classe non e' stata un `Service`: l'ereditarieta' da
+ * [FirebaseMessagingService] era commentata via, il `<service>` nel manifest
+ * stava dentro un commento XML, le dipendenze Firebase erano fuori dal
+ * `build.gradle.kts` e l'upload del token era un `TODO`. Risultato: Android non
+ * compariva fra i dispositivi registrati e non riceveva niente, mentre iOS
+ * funzionava. Adesso il giro e' chiuso.
  *
- * TODO:
- *  1. Uncomment FirebaseMessagingService inheritance and imports
- *  2. Implement NotificationManager channel creation in Application.onCreate
- *  3. Build and show Notification using NotificationCompat.Builder
- *  4. Route incoming deep-links to live NavController via a shared StateFlow
- *  5. Handle data-only messages (no notification body) for silent syncs
+ * Due responsabilita':
+ *
+ *  - [onNewToken]: il token nuovo o ruotato finisce in [PushTokenStore] e viene
+ *    pubblicato subito con [DeviceRegistrar].
+ *  - [onMessageReceived]: mostra la notifica. Serve per i messaggi che arrivano
+ *    con l'app in primo piano e per quelli `data`-only; per gli altri, con
+ *    l'app in background, ci pensa il sistema.
+ *
+ * Il tap apre l'app. Portare l'utente sulla schermata specifica non e' ancora
+ * cablato su Android — [PushDeepLinkRouter] sa gia' interpretare il payload e
+ * [it.mensa.app.navigation.DeepLinkHandler] sa gia' navigare, ma manca il pezzo
+ * che tiene il target da parte fra il tap e la comparsa del NavController (su
+ * iOS lo fa `PendingDeepLink`). Finche' non c'e', il payload viaggia negli
+ * extra dell'Intent e nessuno lo legge.
  */
-// class MensaMessagingService : FirebaseMessagingService() {
-class MensaMessagingService {
+class MensaMessagingService : FirebaseMessagingService() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val pushTokenStore: PushTokenStore by lazy {
-        PushTokenStore(appContext())
-    }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onNewToken(token: String) {
-        Logger.i("Push", "onNewToken", "New FCM token received")
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        Logger.i("Push", "onNewToken", "nuovo token FCM")
         scope.launch {
-            pushTokenStore.set(token)
-            // Upload to PocketBase devices collection
             runCatching {
-                // TODO: koinAccess().devices.registerToken(token)
+                KoinPlatform.getKoin().get<PushTokenStore>().set(token)
+                // Se l'utente non e' ancora loggato qui non succede niente:
+                // ci ripensa MainActivity.onResume al primo avvio da autenticato.
+                KoinPlatform.getKoin().get<DeviceRegistrar>().ensureRegistered()
             }.onFailure { e ->
-                Logger.e("Push", "onNewToken", "Failed to upload token", e)
+                Logger.e("Push", "onNewToken", "registrazione device fallita", e)
             }
         }
     }
 
-    // Stub for when FirebaseMessagingService is enabled
-    // override fun onMessageReceived(message: RemoteMessage) {
-    //     val target = PushDeepLinkRouter.parse(message.data)
-    //     Logger.i("Push", "onMessageReceived", "Target: $target")
-    //     // TODO: show notification + store pending deep link
-    // }
+    override fun onMessageReceived(message: RemoteMessage) {
+        super.onMessageReceived(message)
 
-    private fun appContext(): android.content.Context {
-        // TODO: replace with injected Context from Koin when FirebaseMessagingService is active
-        throw UnsupportedOperationException("Use FirebaseMessagingService context")
+        val notification = message.notification
+        val title = notification?.title ?: message.data[KEY_TITLE] ?: return
+        val body = notification?.body ?: message.data[KEY_BODY].orEmpty()
+
+        // Il controllo non e' solo per lint (`MissingPermission` su notify()
+        // farebbe fallire lintVitalRelease): su Android 13+ senza permesso la
+        // notifica non si vedrebbe comunque, tanto vale non costruirla.
+        if (!canPostNotifications()) {
+            Logger.w("Push", "onMessageReceived", "POST_NOTIFICATIONS non concesso")
+            return
+        }
+
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            message.data.forEach { (key, value) -> putExtra(key, value) }
+        }
+        val pending = PendingIntent.getActivity(
+            this,
+            Random.nextInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val built = NotificationCompat.Builder(this, getString(R.string.default_notification_channel_id))
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(pending)
+            .build()
+
+        getSystemService(NotificationManager::class.java)
+            ?.notify(Random.nextInt(), built)
+    }
+
+    private fun canPostNotifications(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+    }
+
+    private companion object {
+        const val KEY_TITLE = "title"
+        const val KEY_BODY = "body"
     }
 }

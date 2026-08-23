@@ -4,8 +4,10 @@ plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.android")
     alias(libs.plugins.kotlin.compose)
-    // NOTE: Uncomment after placing google-services.json in this directory
-    // alias(libs.plugins.google.services)
+    // Legge `androidApp/google-services.json` e ne genera le risorse che
+    // FirebaseApp.initializeApp() si aspetta. Senza quel file il plugin fa
+    // fallire la build: i due vanno insieme.
+    alias(libs.plugins.google.services)
 }
 
 // Versione letta dal file `VERSION` alla radice del repo (single source of truth
@@ -157,11 +159,11 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.permissions)
 
-    // Firebase (BOM-driven — comment out until google-services.json is present)
-    // val firebaseBom = platform(libs.firebase.bom)
-    // implementation(firebaseBom)
-    // implementation(libs.firebase.messaging.ktx)
-    // implementation(libs.firebase.analytics.ktx)
+    // Firebase (BOM-driven)
+    val firebaseBom = platform(libs.firebase.bom)
+    implementation(firebaseBom)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.analytics.ktx)
 
     // Stripe
     implementation(libs.stripe.android)

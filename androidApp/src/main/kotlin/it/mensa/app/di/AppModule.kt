@@ -55,7 +55,7 @@ val appModule = module {
     // Push token store (DataStore-backed) + registrazione del device sul
     // server. `DeviceRegistrar` la chiama MainActivity a ogni onResume.
     single { PushTokenStore(androidContext()) }
-    single { DeviceRegistrar(androidContext(), get()) }
+    single { DeviceRegistrar(get()) }
 
     // Audio player controller (singleton — owns MediaController connection)
     single { AudioPlayerController(androidContext()) }

@@ -83,6 +83,7 @@ import it.mensa.app.features.tickets.ticketsNavGraph
 import it.mensa.app.features.today.TodayScreen
 import it.mensa.app.navigation.toRoute
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.services.push.PushPermissionRequester
 import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaNavItem
@@ -171,6 +172,14 @@ fun MainAppShell() {
     val accountConfirmationRequest by accountConfirmationController.current.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
+
+    // Permesso notifiche (Android 13+). Il composable esisteva da sempre ma non
+    // lo chiamava nessuno, quindi il permesso non veniva mai chiesto e le push
+    // non si sarebbero viste comunque. Sta qui, come su iOS in MainTabView:
+    // dopo auth e onboarding, non sulla login. Il token FCM viene rilasciato
+    // anche senza permesso, quindi la registrazione del device (MainActivity.
+    // onResume) non dipende da questo.
+    PushPermissionRequester()
 
     // Automation entry point (screenshot capture). A tab alias becomes the
     // NavHost start destination so the shell opens directly on it; a drill

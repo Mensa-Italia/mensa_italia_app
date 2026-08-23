@@ -1,6 +1,9 @@
 package it.mensa.app
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import it.mensa.app.di.appModule
 import it.mensa.app.features.addonshub.addonsHubModule
 import it.mensa.app.features.contacts.contactsModule
@@ -63,6 +66,12 @@ class MensaApplication : Application() {
             )
         }
 
+        // Il canale su cui FCM consegna: senza, su Android 8+ le notifiche
+        // finirebbero in un canale di ripiego creato dal sistema, con nome e
+        // importanza non nostri. L'id e' lo stesso che il manifest dichiara in
+        // `com.google.firebase.messaging.default_notification_channel_id`.
+        createDefaultNotificationChannel()
+
         // Initialize the SQLDelight database synchronously before any UI composable
         // can instantiate a ViewModel that calls koinAccess().
         // AndroidSqliteDriver.createDriver() completes synchronously despite being declared
@@ -81,5 +90,21 @@ class MensaApplication : Application() {
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             KoinPlatform.getKoin().get<StripeService>().bootstrap()
         }
+    }
+
+    private fun createDefaultNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val manager = getSystemService(NotificationManager::class.java) ?: return
+        val id = getString(R.string.default_notification_channel_id)
+        if (manager.getNotificationChannel(id) != null) return
+        manager.createNotificationChannel(
+            NotificationChannel(
+                id,
+                getString(R.string.default_notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ).apply {
+                description = getString(R.string.default_notification_channel_desc)
+            }
+        )
     }
 }
