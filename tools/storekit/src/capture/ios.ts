@@ -124,6 +124,23 @@ export async function shutdownSimulator(udid: string): Promise<void> {
 // ─── Build ───────────────────────────────────────────────────────────────────
 
 const DERIVED_DATA = join(WORK_ROOT, "ios-derived-data");
+/**
+ * Where SwiftPM clones the package dependencies.
+ *
+ * Without this, resolution goes through the shared cache in
+ * `~/Library/Caches/org.swift.swiftpm`, and Stripe and Firebase get fetched
+ * concurrently against it. When that races, xcodebuild dies asking git for the
+ * remote of a cache entry that is no longer on disk:
+ *
+ *   Git command 'git -C .../repositories/stripe-ios-spm-da2db8fe config
+ *   --get remote.origin.url' failed: fatal: cannot change to '...'
+ *
+ * It is a coin flip, not a project problem: the same commit resolved fine one
+ * run earlier with 94 GB free. Keeping the clones next to DerivedData makes
+ * resolution hermetic per checkout — and locally they survive between runs, so
+ * nothing is re-cloned for the privilege.
+ */
+const SPM_CLONES = join(WORK_ROOT, "ios-spm-clones");
 const APP_PATH = join(DERIVED_DATA, "Build/Products/Debug-iphonesimulator/iosApp.app");
 
 /**
@@ -177,6 +194,8 @@ export async function buildIosApp(config: StorekitConfig, force: boolean): Promi
         "generic/platform=iOS Simulator",
         "-derivedDataPath",
         DERIVED_DATA,
+        "-clonedSourcePackagesDirPath",
+        SPM_CLONES,
         // Ad-hoc signing, NOT `CODE_SIGNING_ALLOWED=NO`.
         //
         // An unsigned simulator build gets no keychain-access-group
