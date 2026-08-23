@@ -18,7 +18,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.OpenInBrowser
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -71,6 +73,7 @@ fun MembershipExpiredScreen() {
     val user by auth.currentUser.collectAsStateWithLifecycle()
     var checking by remember { mutableStateOf(false) }
     var loggingOut by remember { mutableStateOf(false) }
+    var recheck by remember { mutableStateOf<RecheckOutcome?>(null) }
 
     val expiryText = remember(user, locale) {
         val instant = user?.expireMembership
@@ -182,8 +185,24 @@ fun MembershipExpiredScreen() {
                 onClick = {
                     if (checking) return@OutlinedButton
                     checking = true
+                    recheck = null
                     scope.launch {
-                        runCatching { auth.refreshCurrentUser() }
+                        // `reloadUser` rifa' il login per intero quando le
+                        // credenziali ci sono — email e password rimandate a
+                        // `/api/cs/auth-with-zitadel`, come uscire e rientrare
+                        // — e ricade su `/api/cs/me` per chi e' entrato con la
+                        // passkey. Torna il record se il server ha risposto,
+                        // anche quando risponde "ancora scaduta", e null solo
+                        // se non si e' letto niente: sono due esiti diversi e
+                        // vanno detti, altrimenti il tasto sembra morto.
+                        val refreshed = runCatching { auth.reloadUser() }.getOrNull()
+                        recheck = when {
+                            refreshed == null -> RecheckOutcome.UNREACHABLE
+                            Membership.isExpired(refreshed) -> RecheckOutcome.STILL_EXPIRED
+                            // Non piu' scaduta: RootViewModel rivaluta la fase
+                            // sul nuovo `currentUser` e questa schermata sparisce.
+                            else -> null
+                        }
                         checking = false
                     }
                 },
@@ -212,6 +231,11 @@ fun MembershipExpiredScreen() {
                     )
                 }
             }
+
+            recheck?.let { outcome ->
+                Spacer(Modifier.height(12.dp))
+                RecheckNotice(outcome)
+            }
             Spacer(Modifier.height(16.dp))
 
             TextButton(
@@ -227,6 +251,54 @@ fun MembershipExpiredScreen() {
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
+        }
+    }
+}
+
+/**
+ * Esito dell'ultimo "Ho rinnovato". Nessun caso "andata bene": se il rinnovo
+ * risulta, la fase cambia e questa schermata sparisce, quindi un messaggio di
+ * successo non farebbe in tempo a vedersi.
+ */
+private enum class RecheckOutcome { STILL_EXPIRED, UNREACHABLE }
+
+@Composable
+private fun RecheckNotice(outcome: RecheckOutcome) {
+    val text = when (outcome) {
+        RecheckOutcome.STILL_EXPIRED -> tr(
+            "app.renew.gate.still_expired",
+            fallback = "Il rinnovo non risulta ancora registrato. Se lo hai appena pagato può volerci qualche minuto.",
+        )
+        RecheckOutcome.UNREACHABLE -> tr(
+            "app.renew.gate.unreachable",
+            fallback = "Non riesco a contattare il server. Controlla la connessione e riprova.",
+        )
+    }
+    val icon = when (outcome) {
+        RecheckOutcome.STILL_EXPIRED -> Icons.Outlined.Schedule
+        RecheckOutcome.UNREACHABLE -> Icons.Outlined.CloudOff
+    }
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = Color.White.copy(alpha = 0.14f),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.9f),
+            )
         }
     }
 }

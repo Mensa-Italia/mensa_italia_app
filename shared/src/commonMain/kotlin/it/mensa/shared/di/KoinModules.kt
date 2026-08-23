@@ -25,7 +25,7 @@ val sharedModule = module {
             AuthRefresherHolder.refresher = it
         }
     }
-    single { AuthRepository(get(), get(), get(), get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get(), get(), get(), get()) }
     single { SpotlightSyncEngine(regSoci = get(), httpClient = get(), db = get()) }
 }
 

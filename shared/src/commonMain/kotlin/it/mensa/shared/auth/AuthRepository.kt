@@ -30,6 +30,7 @@ class AuthRepository(
     private val json: Json,
     private val discovery: OidcDiscoveryCache,
     private val tokenRefresher: TokenRefresher,
+    private val credentials: ICredentialStore,
 ) {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unknown)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -49,6 +50,46 @@ class AuthRepository(
      * [it.mensa.shared.auth.passkey.PasskeyEnrollmentGate].
      */
     val lastLoginMethod: StateFlow<LoginMethod?> = _lastLoginMethod.asStateFlow()
+
+    /**
+     * Rifa' il login per intero con le credenziali salvate: rimanda email e
+     * password a `/api/cs/auth-with-zitadel`, esattamente come farebbe l'utente
+     * uscendo e rientrando.
+     *
+     * Esiste perche' un `/api/cs/me` non e' bastato: con la tessera rinnovata,
+     * il tasto "Ho rinnovato" non sbloccava niente mentre un logout seguito da
+     * un login sbloccava. Il record allegato alla risposta di login e' quindi
+     * piu' fresco di quello che torna da `/me`.
+     *
+     * Torna null quando non c'e' niente da rimandare (accesso con passkey,
+     * credenziali mai salvate) o quando il login non riesce: in entrambi i casi
+     * chi chiama ricade su [refreshCurrentUser].
+     *
+     * `method = null` di proposito: questo non e' un accesso fatto dall'utente,
+     * e marcarlo come PASSWORD farebbe comparire la proposta di attivazione
+     * della passkey a ogni avvio (vedi [it.mensa.shared.auth.passkey.PasskeyEnrollmentGate]).
+     */
+    suspend fun reloginWithStoredCredentials(): UserModel? {
+        val stored = runCatching { credentials.read() }.getOrNull() ?: return null
+        return runCatching {
+            adoptTokens(
+                tokens = api.loginWithZitadel(stored.email, stored.password),
+                method = null,
+                source = "/auth-with-zitadel (relogin)",
+            )
+        }.getOrNull()
+    }
+
+    /**
+     * Rilegge il socio nel modo piu' forte disponibile: rifa' il login se le
+     * credenziali ci sono, altrimenti si limita a `/api/cs/me`.
+     *
+     * E' il punto d'ingresso per il tasto "Ho rinnovato" e per qualunque
+     * pull-to-refresh che mostri dati della tessera. Torna null solo quando
+     * nessuna delle due strade ha prodotto un record.
+     */
+    suspend fun reloadUser(): UserModel? =
+        reloginWithStoredCredentials() ?: refreshCurrentUser()
 
     init {
         tokenRefresher.onSessionLost = {
@@ -80,6 +121,14 @@ class AuthRepository(
     }
 
     private suspend fun initImpl() {
+        // Login vero a ogni avvio, quando le credenziali ci sono. E' la
+        // richiesta esplicita: la sessione ripristinata da disco piu' un
+        // `/api/cs/me` non bastava a far arrivare la scadenza tessera
+        // aggiornata. Se il login non riesce — offline, password cambiata,
+        // server giu' — si prosegue con la sessione persistita di sempre, che
+        // resta la strada normale per chi entra con la passkey.
+        if (reloginWithStoredCredentials() != null) return
+
         val stored = readStoredSession()
         if (stored == null) {
             goAnonymous()
@@ -148,9 +197,16 @@ class AuthRepository(
      * dispositivo. Il refresh_token nel Keychain / EncryptedSharedPreferences
      * fa gia' il lavoro di tenere viva la sessione.
      *
-     * Ritorna il record aggiornato, o null se non c'e' sessione, se la rete
-     * non ha risposto o se la sessione era morta (in quest'ultimo caso lo
-     * stato e' gia' passato ad anonimo).
+     * Ritorna il record aggiornato — e non null — quando il server ha
+     * risposto, *anche se* quel record dice ancora tessera scaduta. Torna null
+     * solo quando la lettura non e' avvenuta: nessuna sessione, rete muta, o
+     * sessione morta (in quest'ultimo caso lo stato e' gia' passato ad
+     * anonimo e chi chiama si ritrova sulla login).
+     *
+     * La differenza fra i due casi non e' un dettaglio: e' cio' che permette a
+     * chi chiama di distinguere "ho chiesto, il rinnovo non risulta ancora" da
+     * "non sono riuscito a chiedere". Il muro del rinnovo la buttava via e il
+     * suo tasto "Ho rinnovato" sembrava morto in entrambi i casi.
      */
     suspend fun refreshCurrentUser(): UserModel? {
         if (_authState.value !is AuthState.Authenticated) return null
@@ -234,6 +290,7 @@ class AuthRepository(
     private suspend fun wipeAndGoAnonymous() {
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
+        runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
@@ -245,7 +302,11 @@ class AuthRepository(
             tokens = api.loginWithZitadel(email, password),
             method = LoginMethod.PASSWORD,
             source = "/auth-with-zitadel",
-        )
+        ).also {
+            // Da qui in poi l'app sa rifare questo stesso login da sola.
+            // Vedi [CredentialStore] per dove finiscono e perche'.
+            runCatching { credentials.save(email, password) }
+        }
     }
 
     /**
@@ -262,7 +323,7 @@ class AuthRepository(
      */
     internal suspend fun adoptTokens(
         tokens: OidcTokenResponse,
-        method: LoginMethod,
+        method: LoginMethod?,
         source: String,
     ): UserModel {
         require(tokens.access_token.isNotBlank()) { "Empty access_token in $source response" }
@@ -288,6 +349,7 @@ class AuthRepository(
     suspend fun logout() {
         AuthHolder.session = null
         tokenStore.clear()
+        runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
@@ -327,6 +389,12 @@ class AuthRepository(
     private suspend fun goAnonymous() {
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
+        // Le credenziali NON si toccano qui. Questo e' il ramo "non c'e' una
+        // sessione su disco", che si imbocca anche dopo un avvio offline in cui
+        // il relogin non e' riuscito: cancellarle li' vorrebbe dire perderle per
+        // sempre al primo avvio senza rete. Si cancellano solo con un logout
+        // esplicito e in wipeAndGoAnonymous, cioe' quando e' il server a dire
+        // che quell'identita' non e' piu' valida.
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null

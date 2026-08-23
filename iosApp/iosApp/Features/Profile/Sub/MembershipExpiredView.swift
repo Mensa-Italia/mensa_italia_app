@@ -15,6 +15,12 @@ struct MembershipExpiredView: View {
     @State private var checking = false
     @State private var loggingOut = false
 
+    /// Esito dell'ultimo "Ho rinnovato". Nessun caso "andata bene": se il
+    /// rinnovo risulta, `RootView` cambia fase e questa view sparisce, quindi
+    /// un messaggio di successo non farebbe in tempo a vedersi.
+    private enum RecheckOutcome { case stillExpired, unreachable }
+    @State private var recheck: RecheckOutcome?
+
     private var renewURL: URL? { URL(string: Membership.shared.RENEWAL_URL) }
 
     private var expiryString: String {
@@ -61,6 +67,7 @@ struct MembershipExpiredView: View {
 
                     renewButton
                     recheckButton
+                    recheckNotice
 
                     Button {
                         guard !loggingOut else { return }
@@ -91,6 +98,37 @@ struct MembershipExpiredView: View {
         .onDisappear {
             userSub?.close()
             userSub = nil
+        }
+    }
+
+    private func noticeText(_ outcome: RecheckOutcome) -> String {
+        switch outcome {
+        case .stillExpired:
+            return tr("app.renew.gate.still_expired",
+                      fallback: "Il rinnovo non risulta ancora registrato. Se lo hai appena pagato può volerci qualche minuto.")
+        case .unreachable:
+            return tr("app.renew.gate.unreachable",
+                      fallback: "Non riesco a contattare il server. Controlla la connessione e riprova.")
+        }
+    }
+
+    private func noticeIcon(_ outcome: RecheckOutcome) -> String {
+        switch outcome {
+        case .stillExpired: return "clock.badge.exclamationmark"
+        case .unreachable:  return "wifi.exclamationmark"
+        }
+    }
+
+    @ViewBuilder
+    private var recheckNotice: some View {
+        if let recheck {
+            Label(noticeText(recheck), systemImage: noticeIcon(recheck))
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+                .background(Color.white.opacity(0.14),
+                            in: RoundedRectangle(cornerRadius: 14))
         }
     }
 
@@ -137,8 +175,24 @@ struct MembershipExpiredView: View {
         Button {
             guard !checking else { return }
             checking = true
+            recheck = nil
             Task {
-                _ = try? await koin.auth.refreshCurrentUser()
+                // `reloadUser` rifà il login per intero quando le credenziali
+                // ci sono — email e password rimandate a
+                // `/api/cs/auth-with-zitadel`, come uscire e rientrare — e
+                // ricade su `/api/cs/me` per chi è entrato con la passkey.
+                // Torna il record se il server ha risposto, anche quando
+                // risponde "ancora scaduta", e nil solo se non si è letto
+                // niente: sono due esiti diversi e vanno detti, altrimenti il
+                // tasto sembra morto.
+                let refreshed = try? await koin.auth.reloadUser()
+                if refreshed == nil {
+                    recheck = .unreachable
+                } else if Membership.shared.isExpired(user: refreshed) {
+                    recheck = .stillExpired
+                }
+                // Se non è più scaduta non si imposta niente: RootView rivaluta
+                // la fase sul nuovo `currentUser` e smonta questa schermata.
                 checking = false
             }
         } label: {

@@ -2,6 +2,8 @@ package it.mensa.shared.di
 
 import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.Settings
+import it.mensa.shared.auth.CredentialStore
+import it.mensa.shared.auth.ICredentialStore
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.TokenStore
 import it.mensa.shared.db.DriverFactory
@@ -36,5 +38,7 @@ import org.koin.dsl.module
 actual val platformModule: Module = module {
     single<Settings> { KeychainSettings(service = "it.mensa.app.auth") }
     single { TokenStore(get()) } bind ITokenStore::class
+    // Stesso store sicuro del token, chiave diversa. Vedi CredentialStore.
+    single { CredentialStore(get()) } bind ICredentialStore::class
     single { DriverFactory() }
 }

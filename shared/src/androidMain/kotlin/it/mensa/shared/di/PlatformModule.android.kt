@@ -4,6 +4,8 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
+import it.mensa.shared.auth.CredentialStore
+import it.mensa.shared.auth.ICredentialStore
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.TokenStore
 import it.mensa.shared.db.DriverFactory
@@ -34,5 +36,7 @@ actual val platformModule: Module = module {
         SharedPreferencesSettings(prefs)
     }
     single { TokenStore(get()) } bind ITokenStore::class
+    // Stesso store sicuro del token, chiave diversa. Vedi CredentialStore.
+    single { CredentialStore(get()) } bind ICredentialStore::class
     single { DriverFactory(androidContext()) }
 }
