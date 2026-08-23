@@ -53,6 +53,24 @@ const config: StorekitConfig = {
         enabled: true,
       },
       {
+        id: "iphone-6-5",
+        label: 'iPhone 6.5"',
+        // Non esiste piu' un simulatore da 6.5": l'ultimo era l'iPhone 11 Pro
+        // Max, che Xcode 26 non porta piu'. Si cattura sullo stesso 17 Pro Max
+        // del 6.9" e si riscala nella tela che ASC vuole per quello slot.
+        //
+        // Lo slot serve ancora: le schede aperte quando 6.5" era la misura di
+        // riferimento continuano a chiederlo, e ASC non lo deriva da quella da
+        // 6.9" - la 22.2.1 e' finita esattamente contro questo.
+        deviceType: "iPhone 17 Pro Max",
+        runtime: "iOS 26.4",
+        simulatorName: "storekit-iPhone-6.5",
+        store: { width: 1242, height: 2688 },
+        deliverTarget: "APP_IPHONE_65",
+        frame: { style: "iphone", bezel: 0.021, radius: 0.115, camera: "island" },
+        enabled: true,
+      },
+      {
         id: "ipad-13",
         label: 'iPad 13"',
         deviceType: "iPad Pro 13-inch (M4)",
