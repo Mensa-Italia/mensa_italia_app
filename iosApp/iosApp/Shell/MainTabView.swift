@@ -1,5 +1,8 @@
 import SwiftUI
 import Combine
+// Serve per `UserModel` e per i tipi Kotlin dietro `koin`: finora questo file
+// toccava solo tipi Swift e non ne aveva bisogno.
+import Shared
 
 /// 5-tab shell with iOS 26 Liquid Glass tab bar.
 /// iOS 26 automatically applies the Liquid Glass style to TabView.
@@ -64,6 +67,14 @@ struct MainTabView: View {
             // verifica contro il server, quindi copre anche il caso in cui il
             // device sia stato cancellato dall'elenco nel frattempo.
             await PushTokenStore.shared.ensureRegistered()
+            // La versione dell'app al server. Qui e non dentro
+            // `ensureRegistered`: quello esce subito se non c'e' un token push,
+            // quindi chi ha negato le notifiche non riporterebbe mai niente.
+            if let user = koin.auth.currentUser.value as? UserModel {
+                let version = Bundle.main
+                    .infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+                try? await koin.metadata.syncAppVersion(userId: user.id, version: version)
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .mensaDeepLink)) { note in
             if let target = note.userInfo?[PushDeepLinkRouter.payloadKey] as? NotificationTarget {

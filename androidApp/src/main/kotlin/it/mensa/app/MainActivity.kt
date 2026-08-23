@@ -112,6 +112,21 @@ class MainActivity : ComponentActivity() {
             // `DeviceRegistrar`): se e' stato cancellato dal server, si
             // ripubblica adesso.
             runCatching { deviceRegistrar.ensureRegistered() }
+            // La versione dell'app al server. Qui e non dentro
+            // `ensureRegistered`: quello esce subito se non c'e' un token push,
+            // quindi chi ha negato le notifiche non riporterebbe mai niente.
+            runCatching {
+                // `packageManager` e non `BuildConfig`: `buildConfig` non e'
+                // fra le buildFeatures, quindi quella classe non viene
+                // generata. E' anche il modo con cui la versione arriva gia'
+                // nella riga "Versione" del profilo.
+                val version = packageManager
+                    .getPackageInfo(packageName, 0).versionName.orEmpty()
+                koinAccess().metadata.syncAppVersion(
+                    userId = koinAccess().auth.currentUser.value?.id.orEmpty(),
+                    version = version,
+                )
+            }
         }
     }
 

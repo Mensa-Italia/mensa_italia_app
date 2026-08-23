@@ -12,13 +12,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -69,6 +71,12 @@ class RealtimeClient(
                 attempt = 0
                 registerSubscriptions(clientId, subscriptions)
                 eventFlow.collect { emit(it) }
+                // Arrivare qui significa che il server ha chiuso senza errore.
+                // Prima non succedeva mai — lo SharedFlow non terminava — e
+                // senza questa pausa il `while` riaprirebbe la connessione
+                // all'istante, in un ciclo stretto: `attempt` viene azzerato a
+                // ogni connect riuscito, quindi il backoff non entrerebbe mai.
+                delay(1_000L)
             } catch (ce: CancellationException) {
                 throw ce
             } catch (e: Throwable) {
@@ -81,7 +89,15 @@ class RealtimeClient(
 
     private suspend fun connect(): Pair<String, Flow<RealtimeEvent>> {
         val deferredClientId = CompletableDeferred<String>()
-        val events = MutableSharedFlow<RealtimeEvent>(extraBufferCapacity = 64)
+        // Un Channel e non un MutableSharedFlow: un canale si chiude *con una
+        // causa*, e questa e' l'unica via per cui un errore dello stream possa
+        // raggiungere il collector di `observe`. Uno SharedFlow non finisce
+        // mai, quindi anche solo ingoiare l'eccezione qui lascerebbe
+        // `eventFlow.collect` appeso per sempre su uno stream morto.
+        val events = Channel<RealtimeEvent>(
+            capacity = 64,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
 
         val session = client.serverSentEventsSession(urlString = "/api/realtime")
         val streamScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -98,12 +114,36 @@ class RealtimeClient(
                             deferredClientId.complete(cid)
                         }.onFailure { deferredClientId.completeExceptionally(it) }
                     } else {
-                        runCatching {
-                            val msg = json.decodeFromString(RealtimeMessage.serializer(), data)
-                            events.tryEmit(RealtimeEvent(topic = type, message = msg))
-                        }
+                        // Solo il parsing e' tollerante: un payload malformato
+                        // si salta. `trySend` resta fuori dal runCatching, per
+                        // non trasformare una cancellazione in un no-op.
+                        val msg = runCatching {
+                            json.decodeFromString(RealtimeMessage.serializer(), data)
+                        }.getOrNull()
+                        if (msg != null) events.trySend(RealtimeEvent(topic = type, message = msg))
                     }
                 }
+                // Lo stream e' finito senza errori: il server ha chiuso.
+                events.close()
+            } catch (ce: CancellationException) {
+                events.close(ce)
+                throw ce
+            } catch (t: Throwable) {
+                // QUESTO catch e' il motivo per cui l'app non muore piu'.
+                //
+                // Questa e' una coroutine radice di uno scope staccato, senza
+                // CoroutineExceptionHandler: un'eccezione che esce di qui non
+                // viene vista dal `catch` di `observe` (sta su un'altra
+                // coroutine), va all'handler globale e su Android quello e'
+                // KillApplicationHandler. Bastava una `SSEClientException:
+                // Software caused connection abort` — cioe' una connessione
+                // mobile che cade — per chiudere l'app in produzione.
+                //
+                // Chiudendo il canale con la causa, l'errore arriva dove
+                // doveva arrivare fin dall'inizio: al collector di `observe`,
+                // che riconnette con backoff.
+                deferredClientId.completeExceptionally(t)
+                events.close(t)
             } finally {
                 streamScope.cancel()
             }
@@ -113,10 +153,12 @@ class RealtimeClient(
             ?: run {
                 job.cancel()
                 streamScope.cancel()
+                events.close()
                 error("PB realtime: missing clientId after timeout")
             }
 
-        return clientId to events.onCompletion { job.cancel(); streamScope.cancel() }
+        return clientId to events.receiveAsFlow()
+            .onCompletion { job.cancel(); streamScope.cancel() }
     }
 
     private suspend fun registerSubscriptions(clientId: String, subs: Set<String>) {

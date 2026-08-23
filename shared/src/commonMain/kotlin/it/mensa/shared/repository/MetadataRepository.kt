@@ -27,4 +27,34 @@ class MetadataRepository(
     }
 
     fun get(key: String): String? = _state.value[key]
+
+    /**
+     * Pubblica la versione dell'app in esecuzione sotto [KEY_APP_VERSION].
+     *
+     * Prima di questo, il backend non aveva alcun modo di sapere che versione
+     * stesse usando un socio: la versione esisteva solo a schermo, nella riga
+     * "Versione" del profilo, e non usciva mai dal dispositivo. Per chi arriva
+     * da Flutter il valore era anche peggio che assente — era fermo all'ultima
+     * versione Flutter aperta, quindi sembrava un dato valido.
+     *
+     * La versione la passa la piattaforma: `BuildConfig.VERSION_NAME` su
+     * Android, `CFBundleShortVersionString` su iOS. Il modulo condiviso non ha
+     * modo di leggerla da solo.
+     *
+     * Scrive solo quando il valore cambia davvero. Il chiamante gira a ogni
+     * ritorno in foreground, quindi senza il confronto sarebbe una scrittura
+     * per ogni volta che l'utente riapre l'app.
+     */
+    suspend fun syncAppVersion(userId: String, version: String) {
+        if (userId.isBlank() || version.isBlank()) return
+        // La cache e' in memoria e parte vuota a ogni avvio: senza una lettura
+        // il confronto qui sotto sarebbe sempre "diverso" e riscriverebbe.
+        if (_state.value.isEmpty()) runCatching { refresh(userId) }
+        if (_state.value[KEY_APP_VERSION] == version) return
+        runCatching { set(userId, KEY_APP_VERSION, version) }
+    }
+
+    companion object {
+        const val KEY_APP_VERSION: String = "mobile_app_version"
+    }
 }
