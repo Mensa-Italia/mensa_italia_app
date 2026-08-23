@@ -163,9 +163,17 @@ class AuthRepository(
         // only tokens, so /me is the only path that picks up server-side
         // membership / powers / addons changes.
         val cachedJson = db.keyValueQueries.selectById(KEY_CURRENT_USER).awaitAsOneOrNull()?.value_
-        _currentUser.value = DemoIdentity.redact(
-            cachedJson?.let { runCatching { json.decodeFromString<UserModel>(it) }.getOrNull() },
-        )
+        val decoded = cachedJson?.let {
+            runCatching { json.decodeFromString<UserModel>(it) }.getOrNull()
+        }
+        val cachedUser = decoded.takeIfUsable()
+        if (cachedJson != null && cachedUser == null) {
+            // Cache inservibile: buttala, o tornerebbe identica al prossimo
+            // avvio. Il caso vero e' l'aggiornamento dalla vecchia app
+            // Flutter, che ha lasciato qui un record con altre chiavi.
+            runCatching { db.keyValueQueries.deleteById(KEY_CURRENT_USER) }
+        }
+        _currentUser.value = DemoIdentity.redact(cachedUser)
         when (val outcome = fetchMeOrWipe()) {
             is MeOutcome.Ok -> {
                 db.keyValueQueries.insertOrReplace(
@@ -212,16 +220,44 @@ class AuthRepository(
         if (_authState.value !is AuthState.Authenticated) return null
         return when (val outcome = fetchMeOrWipe()) {
             is MeOutcome.Ok -> {
+                // Un record senza `id` non lo si pubblica e non lo si mette in
+                // cache, nemmeno se la chiamata e' andata a buon fine: questo
+                // gira a ogni ritorno in foreground, quindi pubblicarlo
+                // vorrebbe dire sostituire un socio buono con uno vuoto.
+                val user = outcome.user.takeIfUsable() ?: return null
                 db.keyValueQueries.insertOrReplace(
                     key = KEY_CURRENT_USER,
-                    value_ = json.encodeToString(UserModel.serializer(), outcome.user),
+                    value_ = json.encodeToString(UserModel.serializer(), user),
                 )
-                DemoIdentity.redact(outcome.user).also { _currentUser.value = it }
+                DemoIdentity.redact(user).also { _currentUser.value = it }
             }
             MeOutcome.Offline -> null
             MeOutcome.Wiped -> null
         }
     }
+
+    /**
+     * Il record, oppure null se non e' utilizzabile.
+     *
+     * Un `UserModel` senza `id` non e' un socio con qualche campo mancante: e'
+     * un decode fallito in silenzio. Ogni campo del modello ha un default
+     * vuoto e il parser gira con `ignoreUnknownKeys` e `coerceInputValues`,
+     * quindi un JSON con altre chiavi — quello lasciato dalla vecchia app
+     * Flutter — non solleva nessuna eccezione: produce un oggetto con tutti i
+     * campi vuoti, che `runCatching { }.getOrNull()` considera un successo.
+     *
+     * Il risultato lo ha visto un socio: "Buonasera Socio" (il fallback di
+     * Today per nome vuoto) e la tessera senza dati, finche' non ha fatto
+     * logout e login. Il logout risolveva perche' riscriveva il record nel
+     * formato giusto.
+     *
+     * Il controllo e' su `id` e non su `name` di proposito: `id` e' cio' su
+     * cui si costruiscono il QR della tessera e ogni lookup, quindi vuoto vuol
+     * dire inservibile in senso proprio. Non e' un fallback difensivo su un
+     * campo che il backend riempie gia': e' il rifiuto di pubblicare qualcosa
+     * che non e' mai stato letto davvero.
+     */
+    private fun UserModel?.takeIfUsable(): UserModel? = this?.takeIf { it.id.isNotBlank() }
 
     /**
      * Strategy when /api/cs/me fails. Wipe is reserved for the single case
