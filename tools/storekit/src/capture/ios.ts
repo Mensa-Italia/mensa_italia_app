@@ -260,9 +260,56 @@ export async function prepareSimulator(
     String(config.statusBar.batteryPercent),
   ]);
 
-  // Anything that could raise a consent alert mid-capture.
-  for (const service of ["location-always", "photos", "camera", "calendar", "contacts"]) {
-    await run("xcrun", [...SIMCTL, "privacy", udid, "grant", service, config.app.bundleId]);
+}
+
+/**
+ * Anything that could raise a consent alert mid-capture.
+ *
+ * `simctl privacy` accepts only these service names: all, calendar,
+ * contacts-limited, contacts, location, location-always, photos-add, photos,
+ * media-library, microphone, motion, reminders, siri. `camera` was in this
+ * list and is not one of them, so that call had always failed silently.
+ */
+const PRIVACY_SERVICES = [
+  // `location` is when-in-use and `location-always` is a *different* service:
+  // granting the second does not imply the first. The app asks for
+  // when-in-use (`EventFiltersSheet.requestWhenInUseAuthorization()`), so
+  // without this entry the "Allow ... to use your location?" alert lands on
+  // top of whatever scene is being photographed. It reached the iPad 13"
+  // artwork exactly this way.
+  "location",
+  "location-always",
+  "photos",
+  "calendar",
+  "contacts",
+  "reminders",
+  "motion",
+  "microphone",
+];
+
+/**
+ * Must run *after* `installApp`: TCC keys its entries by bundle id, and a
+ * grant issued while the app is absent is not reliably kept once it lands.
+ */
+export async function grantPrivacyConsents(
+  udid: string,
+  bundleId: string,
+): Promise<void> {
+  for (const service of PRIVACY_SERVICES) {
+    const { code, stderr } = await run("xcrun", [
+      ...SIMCTL,
+      "privacy",
+      udid,
+      "grant",
+      service,
+      bundleId,
+    ]);
+    // Not fatal: a consent that stays ungranted costs one alert on one scene,
+    // not the run. But it must not be silent, or the next stray alert takes
+    // another round of screenshots to explain.
+    if (code !== 0) {
+      log.warn(`privacy grant ${service}: ${stderr.trim() || `exit ${code}`}`);
+    }
   }
 }
 
@@ -416,6 +463,7 @@ export async function captureIosDevice(
   await bootSimulator(udid);
   await prepareSimulator(udid, config);
   await installApp(udid, appPath);
+  await grantPrivacyConsents(udid, config.app.bundleId);
 
   for (const locale of locales) {
     await log.group(`locale ${locale}`, async () => {

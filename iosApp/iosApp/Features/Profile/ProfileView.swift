@@ -120,6 +120,12 @@ struct ProfileView: View {
                         }
                     }
                     .pickerStyle(.menu)
+                    // Il Picker disegna la propria label accanto al valore, e
+                    // qui la riga ha gia' il suo `Text`: senza questo si legge
+                    // "Tema Tema". `labelsHidden` nasconde solo la resa, la
+                    // label resta per VoiceOver — che e' il motivo per cui non
+                    // si passa una stringa vuota al Picker.
+                    .labelsHidden()
                 }
 
                 HStack {
