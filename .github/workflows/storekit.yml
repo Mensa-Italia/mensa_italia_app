@@ -123,7 +123,13 @@ jobs:
         working-directory: tools/storekit
         run: |
           set -euo pipefail
-          args=(--platform ios)
+          # Tempistiche piu' larghe dei default, che sono tarati su un Mac
+          # caldo. `captureWhenStable` scatta quando due frame consecutivi sono
+          # identici, e una splash e' perfettamente identica a se stessa: il
+          # solo argine e' `minDwellMs`, e 7s di default non bastano al primo
+          # avvio su un runner freddo — la scena `card` del 6.5" e' finita
+          # fotografata sulla splash proprio cosi'. Qui il tempo non costa.
+          args=(--platform ios --min-dwell-ms 15000 --max-wait-ms 90000 --warmup-ms 60000)
           if [ -n "${STOREKIT_THEME:-}" ]; then args+=(--theme "$STOREKIT_THEME"); fi
           if [ -n "${STOREKIT_DEVICES:-}" ]; then args+=(--devices "$STOREKIT_DEVICES"); fi
           if [ -n "${STOREKIT_LOCALES:-}" ]; then args+=(--locales "$STOREKIT_LOCALES"); fi
