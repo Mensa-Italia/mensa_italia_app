@@ -51,7 +51,10 @@ fun StampDetailSheet(
             )
         }
 
-    val title = record?.description_?.takeIf { it.isNotEmpty() } ?: stamp.stampId
+    // `description`, non `description_`: il trattino basso e' il nome che
+    // l'interop Swift da' al campo per non collidere con `NSObject.description`
+    // — in Kotlin non esiste.
+    val title = record?.description?.takeIf { it.isNotEmpty() } ?: stamp.stampId
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
