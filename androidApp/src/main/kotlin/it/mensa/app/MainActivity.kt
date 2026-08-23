@@ -1,5 +1,6 @@
 package it.mensa.app
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +20,8 @@ import androidx.lifecycle.lifecycleScope
 import it.mensa.app.navigation.MensaNavGraph
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.push.DeviceRegistrar
+import it.mensa.app.services.push.PendingPushTarget
+import it.mensa.app.services.push.PushDeepLinkRouter
 import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.ThemeManager
@@ -40,6 +43,12 @@ class MainActivity : ComponentActivity() {
         // `mensa_autologin_*` extras. Inert on non-debuggable builds.
         // Must run before setContent so RootViewModel sees it on first compose.
         LaunchHarness.configure(this, intent)
+
+        // Cold-launch da una push: il sistema apre questa Activity con il
+        // payload FCM negli extra. Il bersaglio si parcheggia in
+        // PendingPushTarget e lo drena MainAppShell quando il NavController
+        // esiste — qui non esiste ancora.
+        capturePushTarget(intent)
 
         // Edge-to-edge: Compose draws behind system bars
         enableEdgeToEdge()
@@ -111,11 +120,42 @@ class MainActivity : ComponentActivity() {
         audioPlayerController.unbind()
     }
 
-    override fun onNewIntent(intent: android.content.Intent) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent.data?.let { uri ->
-            if (uri.scheme == "mensa") {
-                // TODO: inject StripeService and call handleDeepLink(uri)
+        // Senza questo, `getIntent()` continuerebbe a restituire quello di
+        // partenza e un secondo tap non si vedrebbe.
+        setIntent(intent)
+        capturePushTarget(intent)
+    }
+
+    /**
+     * Legge il payload FCM dagli extra e lo mette in [PendingPushTarget].
+     *
+     * FCM consegna il `data` payload come extra di stringhe sull'Intent che
+     * apre l'app, sia quando la notifica l'ha disegnata il sistema (app in
+     * background) sia quando l'abbiamo disegnata noi in
+     * [it.mensa.app.services.push.MensaMessagingService]. Gli extra non-stringa
+     * (flag interni del sistema) escono null da `getString` e vengono scartati.
+     *
+     * Un payload che [PushDeepLinkRouter] non sa leggere non viene parcheggiato:
+     * meglio aprire l'app dov'era che sbatterla su una schermata a caso.
+     */
+    private fun capturePushTarget(intent: Intent?) {
+        // `runCatching` perche' questa gira in onCreate a ogni avvio, anche
+        // quando di push non ce n'e' nessuna: un Bundle malformato — o messo
+        // li' da un'app terza che apre la nostra Activity — non deve poter
+        // impedire l'apertura dell'app. `getExtras` puo' lanciare se il Bundle
+        // contiene una Parcelable che non sappiamo deserializzare.
+        runCatching {
+            val extras = intent?.extras ?: return@runCatching
+            val data = extras.keySet()
+                .mapNotNull { key -> extras.getString(key)?.let { key to it } }
+                .toMap()
+            if (data.isEmpty()) return@runCatching
+
+            val target = PushDeepLinkRouter.parse(data)
+            if (target !is PushDeepLinkRouter.NotificationTarget.Unknown) {
+                PendingPushTarget.set(target)
             }
         }
     }

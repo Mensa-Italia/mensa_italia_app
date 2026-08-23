@@ -2,13 +2,16 @@ name: pipeline
 
 # Pipeline unica del repo, secondo la convenzione dell'organizzazione
 # (Mensa-Italia/.github, PIPELINE.md). Cosa succede lo decide il ref, non il
-# nome del file:
+# nome del file. Quello che questo repo ha davvero acceso:
 #
-#   pull_request / push su branch  -> check     controlli base, niente pubblicazione
-#   push su main                   -> dev       base + immagine :dev
-#   tag bX.Y.Z                     -> staging   base + scansioni + immagine :staging + Play beta + TestFlight
-#   tag vX.Y.Z                     -> release   base + scansioni + store + Release firmata
-#   cron del lunedi                -> audit     solo scansioni complete
+#   pull_request verso main  -> check     detekt + segreti, niente pubblicazione
+#   tag bX.Y.Z               -> staging   controlli + scansioni + Play beta + TestFlight
+#   tag vX.Y.Z               -> release   tutto + Play production + App Store + Release firmata
+#   workflow_dispatch        -> il livello che scegli
+#
+# `dev` (push su main) e `audit` (cron) plan.yml li sa calcolare, ma qui i
+# trigger corrispondenti non ci sono: un push su main non fa partire niente.
+# Erano legati all'immagine Docker, che non si costruisce piu'.
 #
 # Il livello lo calcola plan.yml: qui non si ricalcola mai.
 #
@@ -36,8 +39,14 @@ on:
   pull_request:
     branches: [main]
   push:
-    # Solo beta. `v*` (release) resta fuori: pubblicherebbe anche :latest.
-    tags: ['b*']
+    # `b*` = beta (Play beta + TestFlight), `v*` = release (Play production +
+    # App Store review + Release firmata).
+    #
+    # `v*` era escluso perche' avrebbe pubblicato anche l'immagine `:latest`,
+    # collidendo con quella di mensa-hub. Quel motivo non esiste piu': la web
+    # app e i job immagine sono stati eliminati e questo repo non tocca piu'
+    # ghcr.
+    tags: ['b*', 'v*']
   workflow_dispatch:
     inputs:
       tier:

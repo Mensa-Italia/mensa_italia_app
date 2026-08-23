@@ -79,13 +79,13 @@ Un solo workflow, [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.
 
 | Trigger | Livello | Controlli | Pubblica |
 |---|---|---|---|
-| PR verso `main`, push su un branch di lavoro | `check` | base + segreti | niente |
-| Push su `main` | `dev` | base + segreti | niente |
+| PR verso `main` | `check` | detekt + segreti | niente |
 | Tag `bX.Y.Z` | `staging` | base + segreti + dipendenze + SBOM | Play `beta` + TestFlight gruppo `Test open` |
 | Tag `vX.Y.Z` | `release` | tutti | Play `production` + App Store review + Release firmata |
-| Cron del lunedì | `audit` | solo segreti, dipendenze, SBOM, CodeQL | niente |
 
-Da quando `webApp/` è stato eliminato la pipeline non costruisce più nessuna immagine Docker: `plan` viene chiamato senza input `image` e i job `image`, `image-release` e `notify` non esistono più. Restano solo gli artefatti mobili.
+Un push su `main` **non fa partire niente**: i livelli `dev` e `audit` esistono in `plan.yml` ma qui i trigger corrispondenti non ci sono, perché erano legati all'immagine Docker. Per far compilare Android e iOS su CI serve un tag.
+
+Da quando `webApp/` è stato eliminato la pipeline non costruisce più nessuna immagine: `plan` viene chiamato senza input `image` e i job `image`, `image-release` e `notify` non esistono più. Restano solo gli artefatti mobili.
 
 `workflow_dispatch` ha un input `tier` per forzare un livello a mano; il default `auto` si comporta come un push normale. Forzare `staging` o `release` richiede comunque di essere su un tag: senza tag non esiste una versione, e `plan.yml` si ferma con un errore invece di pubblicare qualcosa senza nome.
 

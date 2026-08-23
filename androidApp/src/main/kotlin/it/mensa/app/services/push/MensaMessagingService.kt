@@ -38,12 +38,10 @@ import kotlin.random.Random
  *    con l'app in primo piano e per quelli `data`-only; per gli altri, con
  *    l'app in background, ci pensa il sistema.
  *
- * Il tap apre l'app. Portare l'utente sulla schermata specifica non e' ancora
- * cablato su Android — [PushDeepLinkRouter] sa gia' interpretare il payload e
- * [it.mensa.app.navigation.DeepLinkHandler] sa gia' navigare, ma manca il pezzo
- * che tiene il target da parte fra il tap e la comparsa del NavController (su
- * iOS lo fa `PendingDeepLink`). Finche' non c'e', il payload viaggia negli
- * extra dell'Intent e nessuno lo legge.
+ * Il tap porta l'utente sulla schermata giusta: il payload viaggia negli extra
+ * dell'Intent, [it.mensa.app.MainActivity] lo parcheggia in
+ * [PendingPushTarget] e [it.mensa.app.ui.shell.MainAppShell] lo drena quando il
+ * NavController esiste. Vale sia ad app aperta sia da cold-launch.
  */
 class MensaMessagingService : FirebaseMessagingService() {
 

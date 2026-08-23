@@ -1,9 +1,16 @@
 package it.mensa.app.navigation
 
 import androidx.navigation.NavController
+import it.mensa.app.features.deals.DealsRoute
+import it.mensa.app.features.documents.DocumentsRoutes
+import it.mensa.app.features.events.EventRoutes
+import it.mensa.app.features.localoffices.LocalOfficesRoutes
 import it.mensa.app.features.notifications.AccountConfirmationController
 import it.mensa.app.features.notifications.NotificationTarget
 import it.mensa.app.features.notifications.NotificationsRoutes
+import it.mensa.app.features.quid.QuidRoute
+import it.mensa.app.features.receipts.ReceiptsRoutes
+import it.mensa.app.features.tickets.TicketsRoutes
 import it.mensa.app.services.push.PushDeepLinkRouter
 import org.koin.mp.KoinPlatform
 
@@ -18,27 +25,11 @@ import org.koin.mp.KoinPlatform
  *
  * Mirrors iOS NotificationsListView.destinationView(for:) routing logic.
  *
- * TODO (deep links):
- *   - documents/detail/{id} route when DocumentsNavGraph is wired
- *   - quid/issue/{categoryId} and quid/article/{postId} when QuidNavGraph is wired
- *   - receipts/list when ReceiptsNavGraph is wired
- *   - tickets/list when TicketsNavGraph is wired
+ * Le rotte arrivano dagli oggetti `*Routes` delle feature e non da stringhe
+ * scritte a mano: qui c'erano sia rotte duplicate a mano sia una lista di TODO
+ * che aspettavano nav graph ormai cablati da tempo.
  */
 object DeepLinkHandler {
-
-    // ─── Routes (pending nav graphs) ─────────────────────────────────
-
-    /** Builds an event detail route. */
-    private fun eventRoute(eventId: String) = "events/detail/$eventId"
-
-    /** Builds a deal detail route. */
-    private fun dealRoute(dealId: String) = "deals/detail/$dealId"
-
-    /** Builds a ticket detail route. */
-    private fun ticketRoute(ticketId: String) = "tickets/detail/$ticketId"
-
-    /** Builds a local office detail route. */
-    private fun localOfficeRoute(slug: String) = "local_offices/detail/$slug"
 
     // ─── Notification target routing ──────────────────────────────────────────
 
@@ -52,39 +43,54 @@ object DeepLinkHandler {
     ) {
         when (target) {
             is NotificationTarget.Event -> {
-                navController.navigate(eventRoute(target.eventId))
+                navController.navigate(EventRoutes.detail(target.eventId))
             }
             is NotificationTarget.Deal -> {
-                navController.navigate(dealRoute(target.dealId))
+                navController.navigate(DealsRoute.detail(target.dealId))
             }
             is NotificationTarget.SingleDocument -> {
-                navController.navigate("documents/detail/${target.documentId}")
+                navController.navigate(DocumentsRoutes.detail(target.documentId))
             }
             is NotificationTarget.MultipleDocuments -> {
-                navController.navigate("documents/list")
+                navController.navigate(DocumentsRoutes.LIST)
             }
             is NotificationTarget.TicketPurchase -> {
-                // TODO (deep links): navigate to tickets list
-                // navController.navigate("tickets/list")
+                navController.navigate(TicketsRoutes.LIST)
             }
             is NotificationTarget.PaymentUpdateStatus -> {
-                // TODO (deep links): navigate to receipts list
-                // navController.navigate("receipts/list")
+                navController.navigate(ReceiptsRoutes.LIST)
             }
             is NotificationTarget.Quid -> {
-                // TODO (deep links): navigate to quid/issue/{categoryId}
-                // navController.navigate("quid/issue/${target.categoryId}")
+                // Il nome del numero non sta nel payload: lo schermo lo mostra
+                // vuoto finche' non carica i suoi dati, che e' meglio di non
+                // aprirlo affatto.
+                val issueId = target.categoryId.toLongOrNull()
+                if (issueId != null) {
+                    navController.navigate(QuidRoute.issue(issueId, ""))
+                } else {
+                    navController.navigate(QuidRoute.ISSUES)
+                }
             }
             is NotificationTarget.QuidArticle -> {
-                // TODO (deep links): navigate to quid/article/{postId}
-                // navController.navigate("quid/article/${target.postId}")
+                val articleId = target.postId.toLongOrNull()
+                if (articleId != null) {
+                    navController.navigate(QuidRoute.article(articleId))
+                } else {
+                    navController.navigate(QuidRoute.ISSUES)
+                }
             }
             is NotificationTarget.QuidPdf -> {
-                // TODO (deep links): navigate to quid/pdf/{recordId}
-                // navController.navigate("quid/pdf/${target.recordId}")
+                // Volutamente la lista e non il PDF. La rotta PDF vuole un URL,
+                // il payload porta un record id, e risolverlo richiede di
+                // leggere `quid.observeIssues()` cercando `id == -recordId`
+                // (come fa `QuidPDFDeepLinkLoader` su iOS): e' una lettura
+                // asincrona, e questa funzione naviga in modo sincrono. La
+                // lista e' il posto giusto da cui l'utente arriva al PDF in un
+                // tap.
+                navController.navigate(QuidRoute.ISSUES)
             }
             is NotificationTarget.LocalOffice -> {
-                navController.navigate(localOfficeRoute(target.slug))
+                navController.navigate(LocalOfficesRoutes.detail(target.slug))
             }
             is NotificationTarget.AccountConfirmation -> {
                 // No navigation — surface the modal approval sheet instead.
@@ -104,72 +110,52 @@ object DeepLinkHandler {
     // ─── FCM push target routing ──────────────────────────────────────────────
 
     /**
-     * Route a [PushDeepLinkRouter.NotificationTarget] (parsed from FCM data payload).
-     * Called from MensaMessagingService when the app processes a foreground push.
+     * Porta l'utente dove punta una push che ha toccato.
+     *
+     * Chiamata da [it.mensa.app.ui.shell.MainAppShell] quando drena
+     * [it.mensa.app.services.push.PendingPushTarget]: e' li' che esiste un
+     * NavController, non dentro il servizio FCM.
+     *
+     * [openUrl] apre gli indirizzi esterni — il guscio passa l'`UriHandler` di
+     * Compose, che su Android finisce in una Chrome Custom Tab.
      */
     fun handlePushTarget(
         target: PushDeepLinkRouter.NotificationTarget,
         navController: NavController,
+        openUrl: (String) -> Unit,
     ) {
         when (target) {
             is PushDeepLinkRouter.NotificationTarget.Event -> {
-                navController.navigate(eventRoute(target.eventId))
+                navController.navigate(EventRoutes.detail(target.eventId))
             }
             is PushDeepLinkRouter.NotificationTarget.Deal -> {
-                navController.navigate(dealRoute(target.dealId))
+                navController.navigate(DealsRoute.detail(target.dealId))
             }
             is PushDeepLinkRouter.NotificationTarget.Document -> {
-                navController.navigate("documents/detail/${target.documentId}")
+                navController.navigate(DocumentsRoutes.detail(target.documentId))
             }
             is PushDeepLinkRouter.NotificationTarget.Ticket -> {
-                navController.navigate(ticketRoute(target.ticketId))
+                navController.navigate(TicketsRoutes.detail(target.ticketId))
             }
             is PushDeepLinkRouter.NotificationTarget.Quid -> {
-                // TODO (deep links): navigate to quid/article or quid screen
-                // target.transactionId?.let { navController.navigate("quid/article/$it") }
+                // `transactionId` qui e' l'id del numero, quando c'e'.
+                val issueId = target.transactionId?.toLongOrNull()
+                if (issueId != null) {
+                    navController.navigate(QuidRoute.issue(issueId, ""))
+                } else {
+                    navController.navigate(QuidRoute.ISSUES)
+                }
             }
             is PushDeepLinkRouter.NotificationTarget.LocalOffice -> {
-                navController.navigate(localOfficeRoute(target.officeId))
+                navController.navigate(LocalOfficesRoutes.detail(target.officeId))
             }
             is PushDeepLinkRouter.NotificationTarget.ExternalUrl -> {
-                // Open in Chrome Custom Tab — handled by caller (MensaMessagingService)
+                openUrl(target.url)
             }
             is PushDeepLinkRouter.NotificationTarget.Unknown -> {
-                // Navigate to notifications list as fallback
                 navController.navigate(NotificationsRoutes.LIST)
             }
         }
     }
 
-    // ─── Stripe redirect handling ─────────────────────────────────────────────
-
-    /**
-     * Handle Stripe redirect intents from the mensa:// deep link scheme.
-     *
-     * Called from MainActivity.onNewIntent when a Stripe payment redirect arrives.
-     * Stripe posts back to mensa://stripe/return?payment_intent=pi_xxx&... or
-     * mensa://stripe/cancel depending on payment outcome.
-     *
-     * @param path URI path, e.g. "/stripe/return" or "/stripe/cancel"
-     * @param navController active NavController
-     */
-    fun handleStripeRedirect(
-        path: String?,
-        navController: NavController,
-    ) {
-        when {
-            path?.startsWith("/stripe/return") == true -> {
-                // TODO (payments): navigate to payment success screen
-                // navController.navigate("payments/success")
-            }
-            path?.startsWith("/stripe/cancel") == true -> {
-                // TODO (payments): navigate to payment cancelled screen
-                // navController.navigate("payments/cancelled")
-            }
-            else -> {
-                // Unrecognized mensa:// deep link — navigate to Today as fallback
-                // navController.navigate(Route.Today.path)
-            }
-        }
-    }
 }

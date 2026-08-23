@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -83,6 +84,7 @@ import it.mensa.app.features.tickets.ticketsNavGraph
 import it.mensa.app.features.today.TodayScreen
 import it.mensa.app.navigation.toRoute
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.services.push.PendingPushTarget
 import it.mensa.app.services.push.PushPermissionRequester
 import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.tr
@@ -195,6 +197,26 @@ fun MainAppShell() {
     // Track current route for tab highlight + bottom bar visibility
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    // Tap su una push: MainActivity ha parcheggiato il bersaglio in
+    // PendingPushTarget perche' quando l'Intent arriva il NavController non
+    // esiste ancora. Si drena qui, ed e' il motivo per cui la condizione
+    // guarda `navBackStackEntry`: finche' e' null il grafo non e' impostato e
+    // navigare lancerebbe. `runCatching` perche' una rotta che non risolve non
+    // deve far chiudere l'app a chi ha solo toccato una notifica.
+    val pendingPush by PendingPushTarget.target.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
+    LaunchedEffect(pendingPush, navBackStackEntry != null) {
+        if (navBackStackEntry == null || pendingPush == null) return@LaunchedEffect
+        val target = PendingPushTarget.consume() ?: return@LaunchedEffect
+        runCatching {
+            DeepLinkHandler.handlePushTarget(
+                target = target,
+                navController = navController,
+                openUrl = uriHandler::openUri,
+            )
+        }
+    }
 
     // Profile uses its own nested NavController, so master only sees route="profile".
     // ProfileNavGraph signals via callback whether it's at its own root.
