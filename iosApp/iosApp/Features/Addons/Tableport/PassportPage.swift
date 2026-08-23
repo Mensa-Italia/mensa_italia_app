@@ -11,6 +11,15 @@ import Shared
 ///   • 6 stamps per page (3 rows × 2 cols).
 ///   • NO clipping anywhere — the flipping page is free to overflow the
 ///     passport silhouette during animation.
+/// Quanti timbri stanno in una pagina del passaporto.
+///
+/// Era un `private let` dentro `PassportInside`, quindi `StampImagePrefetcher`
+/// non aveva modo di saperlo: per questo scaldava tutta la collezione invece
+/// della sola pagina vicina.
+enum PassportLayout {
+    static let stampsPerPage = 6
+}
+
 struct PassportInside: View {
     let width: CGFloat
     let height: CGFloat
@@ -21,7 +30,7 @@ struct PassportInside: View {
     @Binding var currentPage: Int
     @Binding var totalPages: Int
 
-    private let stampsPerPage = 6
+    private let stampsPerPage = PassportLayout.stampsPerPage
 
     @State private var dragAngle: Double = 0   // -180...0 forward, 0...180 backward
     @State private var isDragging: Bool = false

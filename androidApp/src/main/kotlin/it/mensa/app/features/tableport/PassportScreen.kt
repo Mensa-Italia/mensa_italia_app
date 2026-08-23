@@ -49,31 +49,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
-import coil3.ImageLoader
 import it.mensa.app.features.tableport._components.PassportCover
 import it.mensa.app.features.tableport._components.PassportPage
 import it.mensa.app.features.tableport._components.PassportPalette
 import it.mensa.app.features.tableport._components.StampConfirmSheet
+import it.mensa.app.features.tableport._components.StampDetailSheet
 import it.mensa.app.features.tableport.util.StampImagePrefetcher
-import androidx.compose.ui.text.font.FontWeight
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
+import it.mensa.app.ui.components.mensaImageLoader
 import it.mensa.app.ui.theme.MensaMotion
+import it.mensa.shared.model.StampUserModel
 import org.koin.androidx.compose.koinViewModel
 
 private const val STAMPS_PER_PAGE = 6
-private const val TOTAL_STAMP_GOAL = 30
 
 /**
  * PassportScreen — Tableport hub in M3 Expressive Wave-2 style.
  *
- * Layout: brand-blue hero zone with kicker + counter + progress meter, then
- * a Parchment content surface hosting the passport book in a HorizontalPager,
- * with a page-indicator strip and an ExtendedFAB ("Scansiona QR") at the
- * bottom-end per M3 Expressive guidance.
+ * Layout: velluto scuro a tutta altezza — lo stesso fondo di
+ * `PassportView.swift` — con il libro del passaporto in un HorizontalPager,
+ * la striscia di indicatori e l'ExtendedFAB ("Scansiona QR") in basso.
  *
- * Hero discipline: this is the screen's one hero — the passport book itself,
- * elevated on a Parchment surface with a brand backdrop above.
+ * Niente contatore "N / 30" in testa: il totale era una costante scritta a
+ * mano, non un dato, e trasformava una collezione in una barra di
+ * completamento. iOS non l'ha mai avuto.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -86,8 +86,8 @@ fun PassportScreen(
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
-    val brandHero = Brush.verticalGradient(
-        listOf(colorScheme.primary, colorScheme.primaryContainer),
+    val velvet = Brush.verticalGradient(
+        listOf(PassportPalette.velvetTop, PassportPalette.velvetBottom),
     )
 
     // Receive QR scan result handed back via SavedStateHandle
@@ -105,14 +105,28 @@ fun PassportScreen(
 
     var isOpen by rememberSaveable { mutableStateOf(false) }
     var stampsRevealed by rememberSaveable { mutableStateOf(false) }
+    // Non `rememberSaveable`: StampUserModel non e' Parcelable, e riaprire il
+    // dettaglio dopo una rotazione non vale un wrapper.
+    var selectedStamp by remember { mutableStateOf<StampUserModel?>(null) }
 
     val stamps = uiState.stamps
     val pageCount = maxOf(1, (stamps.size + STAMPS_PER_PAGE - 1) / STAMPS_PER_PAGE)
     val pagerState = rememberPagerState(pageCount = { pageCount + 1 }) // +1 for cover
 
-    LaunchedEffect(stamps) {
+    LaunchedEffect(stamps, pagerState.currentPage) {
         if (stamps.isNotEmpty()) {
-            StampImagePrefetcher.warmAll(stamps, context, ImageLoader(context))
+            // `mensaImageLoader` e non `ImageLoader(context)`: quest'ultimo
+            // costruiva un loader nuovo a ogni effetto, con la propria memory
+            // cache, che nessuno legge — le immagini venivano scaldate in una
+            // cache diversa da quella da cui poi vengono disegnate.
+            StampImagePrefetcher.warmAround(
+                stamps = stamps,
+                // Pagina 0 e' la copertina: le pagine dei timbri partono da 1.
+                pageIndex = (pagerState.currentPage - 1).coerceAtLeast(0),
+                perPage = STAMPS_PER_PAGE,
+                context = context,
+                imageLoader = mensaImageLoader(context),
+            )
         }
     }
 
@@ -187,14 +201,15 @@ fun PassportScreen(
                 .fillMaxSize()
                 .background(colorScheme.background),
         ) {
-            // ── Background composition: brand hero on top, parchment below ──
-            // We paint hero in the upper portion of the screen so the
-            // passport book sits on a warm Parchment plate below.
+            // ── Velluto a tutta altezza, come su iOS ────────────────────────
+            // Prima qui c'era una fascia di brand alta 360dp fisse. Non aveva
+            // relazione con il contenuto: su schermi diversi il taglio fra blu
+            // e sfondo cadeva in un punto qualsiasi, e nella maggior parte dei
+            // casi in mezzo al passaporto, tranciandolo in due.
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(360.dp)
-                    .background(brandHero),
+                    .fillMaxSize()
+                    .background(velvet),
             )
 
             Column(
@@ -203,12 +218,6 @@ fun PassportScreen(
                     .padding(top = innerPadding.calculateTopPadding()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // ── Hero zone — kicker + counter + progress meter ───────────
-                HeroHeader(
-                    collected = stamps.size,
-                    total = TOTAL_STAMP_GOAL,
-                )
-
                 // ── Passport book — the one hero of the screen ──────────────
                 Box(
                     modifier = Modifier
@@ -243,7 +252,7 @@ fun PassportScreen(
                                 stampsRevealed = stampsRevealed,
                                 width = passportWidth,
                                 height = passportHeight,
-                                onTapStamp = {},
+                                onTapStamp = { selectedStamp = it },
                             )
                         }
                     }
@@ -259,6 +268,14 @@ fun PassportScreen(
                 Spacer(modifier = Modifier.height(96.dp)) // breathing room for FAB
             }
 
+            // ── Dettaglio del timbro ────────────────────────────────────────
+            selectedStamp?.let { stamp ->
+                StampDetailSheet(
+                    stamp = stamp,
+                    onDismiss = { selectedStamp = null },
+                )
+            }
+
             // ── Stamp confirmation sheet ────────────────────────────────────
             uiState.pendingVerification?.let { pending ->
                 StampConfirmSheet(
@@ -267,81 +284,6 @@ fun PassportScreen(
                     onDone = { vm.clearPendingVerification() },
                 )
             }
-        }
-    }
-}
-
-// ─── Hero header ─────────────────────────────────────────────────────────────
-
-@Composable
-private fun HeroHeader(collected: Int, total: Int) {
-    val progress = (collected.toFloat() / total.coerceAtLeast(1)).coerceIn(0f, 1f)
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = MensaMotion.springHero,
-        label = "passportProgress",
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 28.dp, vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = tr("tableport.collection_kicker", "RACCOLTA TIMBRI"),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.secondary,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Emphasized counter — one hero typography moment per screen
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = "$collected",
-                style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
-                color = Color.White,
-            )
-            Text(
-                text = " / $total",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                color = Color.White.copy(alpha = 0.70f),
-                modifier = Modifier.padding(bottom = 6.dp),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = tr("tableport.stamps_suffix", "timbri collezionati"),
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = 0.80f),
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        // Progress meter — cyan fill on white-translucent track
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .height(6.dp)
-                .clip(RoundedCornerShape(50))
-                .background(Color.White.copy(alpha = 0.18f)),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(animatedProgress)
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(MaterialTheme.colorScheme.secondary, Color.White),
-                        ),
-                    ),
-            )
         }
     }
 }

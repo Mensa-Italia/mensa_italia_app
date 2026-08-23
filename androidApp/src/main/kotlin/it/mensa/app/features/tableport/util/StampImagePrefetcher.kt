@@ -15,7 +15,33 @@ import it.mensa.shared.model.StampUserModel
  */
 object StampImagePrefetcher {
 
-    fun warmAll(stamps: List<StampUserModel>, context: Context, imageLoader: ImageLoader) {
+    /**
+     * Scalda solo la pagina attorno a [pageIndex], non tutta la collezione.
+     *
+     * `warmAll` accodava ogni timbro in una volta sola. Coil serve le
+     * richieste da un pool limitato, quindi le immagini della pagina che
+     * l'utente sta *guardando* finivano in coda dietro decine di prefetch di
+     * pagine che non aveva ancora aperto: il risultato e' proprio il
+     * caricamento in ritardo di quello che si vede.
+     *
+     * Una pagina avanti e una indietro bastano: il pager si sfoglia una
+     * pagina per volta.
+     */
+    fun warmAround(
+        stamps: List<StampUserModel>,
+        pageIndex: Int,
+        perPage: Int,
+        context: Context,
+        imageLoader: ImageLoader,
+    ) {
+        if (stamps.isEmpty() || perPage <= 0) return
+        val from = ((pageIndex - 1) * perPage).coerceAtLeast(0)
+        val to = ((pageIndex + 2) * perPage).coerceAtMost(stamps.size)
+        if (from >= to) return
+        warm(stamps.subList(from, to), context, imageLoader)
+    }
+
+    private fun warm(stamps: List<StampUserModel>, context: Context, imageLoader: ImageLoader) {
         stamps.forEach { su ->
             val record = su.stampRecord ?: return@forEach
             if (record.image.isEmpty()) return@forEach

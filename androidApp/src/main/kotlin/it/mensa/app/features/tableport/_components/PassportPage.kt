@@ -2,6 +2,7 @@ package it.mensa.app.features.tableport._components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -308,7 +309,13 @@ private fun StampGrid(
                         size = stampSize,
                         rotation = rotation,
                         showsCancel = showCancel,
-                        modifier = Modifier.scale(scaleAnim),
+                        // `onTapStamp` arrivava fin qui attraverso tre livelli
+                        // di composable e poi non veniva mai chiamato: il
+                        // dettaglio del timbro, che su iOS esiste da sempre, su
+                        // Android era irraggiungibile.
+                        modifier = Modifier
+                            .scale(scaleAnim)
+                            .clickable { onTapStamp(stamp) },
                     )
                 }
                 // Fill empty cells so the row remains aligned

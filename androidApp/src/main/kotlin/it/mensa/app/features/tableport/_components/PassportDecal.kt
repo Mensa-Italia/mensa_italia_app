@@ -49,6 +49,13 @@ object PassportPalette {
     // Stamp accents
     val stampInk    = Color(0xFF8A1F1F)  // cancel mark — postal red, desaturated
     val ringAccent  = Color(0xFF6AC9F0)  // collected-stamp inner ring (brand cyan)
+
+    // Velluto — il fondo su cui poggia il libro. Sono gli stessi due colori di
+    // `PassportView.swift`, convertiti da componenti 0-1 a esadecimale: prima
+    // Android dipingeva una fascia blu di brand alta 360dp e iOS un velluto
+    // quasi nero, quindi la stessa schermata sembrava due app diverse.
+    val velvetTop    = Color(0xFF0A0D1A)
+    val velvetBottom = Color(0xFF1A1F2E)
 }
 
 /**

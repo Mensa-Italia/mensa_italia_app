@@ -18,9 +18,23 @@ enum StampImagePrefetcher {
         return URLSession(configuration: cfg)
     }()
 
-    /// Warm every stamp image we know about. Cheap because already-cached
-    /// requests short-circuit at the URLCache layer.
-    static func warmAll(_ stamps: [StampUserModel]) {
+    /// Scalda solo la pagina attorno a `page`, non tutta la collezione.
+    ///
+    /// `warmAll` accodava una richiesta per ogni timbro. La sessione tiene 4
+    /// connessioni per host, quindi le immagini della pagina che l'utente sta
+    /// *guardando* finivano in fila dietro decine di prefetch di pagine mai
+    /// aperte: e' esattamente il caricamento in ritardo che si vede a schermo.
+    /// Una pagina avanti e una indietro bastano, il libro si sfoglia una
+    /// pagina per volta.
+    static func warmAround(_ stamps: [StampUserModel], page: Int, perPage: Int) {
+        guard !stamps.isEmpty, perPage > 0 else { return }
+        let from = max(0, (page - 1) * perPage)
+        let to = min(stamps.count, (page + 2) * perPage)
+        guard from < to else { return }
+        warm(Array(stamps[from..<to]))
+    }
+
+    private static func warm(_ stamps: [StampUserModel]) {
         queue.async {
             for s in stamps {
                 guard let url = url(for: s) else { continue }

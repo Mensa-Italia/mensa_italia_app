@@ -136,10 +136,21 @@ struct PassportView: View {
                 }
                 .frame(width: w, height: h)
                 // No outer clip: pages can fly past the passport silhouette
-                // during the flip. Shadows still applied to give physical
-                // weight on the velvet.
-                .shadow(color: .black.opacity(0.22), radius: 28, x: 0, y: 16)
-                .shadow(color: .black.opacity(0.14), radius: 6, x: 0, y: 3)
+                // during the flip.
+                //
+                // Per questo l'ombra sta su una sagoma dedicata *dietro* le
+                // pagine, e non sul contenuto. `.shadow` in SwiftUI traccia
+                // l'alpha di cio' a cui e' applicato: applicata qui sopra
+                // seguiva ogni lembo di pagina fuori dal profilo del libro e
+                // ne usciva una macchia scura, invece dell'ombra netta di un
+                // oggetto rettangolare appoggiato sul velluto.
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Color.black.opacity(0.55))
+                        .shadow(color: .black.opacity(0.45), radius: 22, x: 0, y: 14)
+                        .shadow(color: .black.opacity(0.28), radius: 4, x: 0, y: 2)
+                        .frame(width: w, height: h)
+                )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .scaleEffect(heroIn ? 1 : 0.92)
                 .offset(y: heroIn ? 0 : 60)
@@ -168,6 +179,15 @@ struct PassportView: View {
         .task {
             start()
             heroIn = true
+        }
+        .onChange(of: currentPage) { _, page in
+            // Il prefetch segue la pagina. Scaldare solo all'arrivo dei dati
+            // basterebbe se si scaldasse tutto, ma adesso si scalda una
+            // finestra: senza questo, sfogliando oltre la finestra iniziale le
+            // immagini tornerebbero a caricarsi solo quando sono gia' a schermo.
+            StampImagePrefetcher.warmAround(
+                stamps, page: page, perPage: PassportLayout.stampsPerPage
+            )
         }
         .onDisappear { stop() }
         .sheet(isPresented: $showScanner) {
@@ -199,7 +219,9 @@ struct PassportView: View {
                 Task { @MainActor in
                     let list = (value as? [StampUserModel]) ?? []
                     self.stamps = list
-                    StampImagePrefetcher.warmAll(list)
+                    StampImagePrefetcher.warmAround(
+                        list, page: currentPage, perPage: PassportLayout.stampsPerPage
+                    )
                 }
             },
             onError: { _ in }
