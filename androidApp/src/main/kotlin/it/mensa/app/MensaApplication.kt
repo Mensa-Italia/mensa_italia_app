@@ -23,6 +23,7 @@ import it.mensa.app.features.tableport.tableportModule
 import it.mensa.app.features.testassistant.testAssistantModule
 import it.mensa.app.features.tickets.ticketsModule
 import it.mensa.app.services.stripe.StripeService
+import it.mensa.shared.auth.FlutterCredentialMigration
 import it.mensa.shared.MensaSdk
 import it.mensa.shared.db.DriverFactory
 import it.mensa.shared.di.initializeMensaDatabase
@@ -80,6 +81,18 @@ class MensaApplication : Application() {
         runBlocking {
             val factory = KoinPlatform.getKoin().get<DriverFactory>()
             initializeMensaDatabase(factory)
+
+            // Prima che qualcuno chieda una sessione: `AuthRepository.init()`
+            // parte da RootViewModel, e legge le credenziali per decidere se
+            // rifare il login vero invece di ripiegare sulla sessione salvata.
+            // Se il recupero da Flutter arrivasse dopo, il primo avvio dopo
+            // l'aggiornamento userebbe ancora la strada debole.
+            runCatching {
+                FlutterCredentialMigration.run(
+                    context = this@MensaApplication,
+                    credentials = KoinPlatform.getKoin().get(),
+                )
+            }
         }
 
         // Fetch the Stripe publishable key and initialize the SDK in the
