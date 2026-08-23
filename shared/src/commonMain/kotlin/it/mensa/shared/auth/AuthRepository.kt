@@ -382,6 +382,30 @@ class AuthRepository(
         return user
     }
 
+    /**
+     * Adotta credenziali recuperate dallo storage della vecchia app Flutter.
+     *
+     * Flutter non persisteva la sessione — `PocketBase(getBaseUrl())` con
+     * authStore in memoria — e rifaceva il login vero a ogni apertura con email
+     * e password tenute in `FlutterSecureStorage`. Questa app le cerca altrove,
+     * quindi per chi arriva da li' erano sul dispositivo ma irraggiungibili:
+     * [reloginWithStoredCredentials] tornava null e l'avvio ripiegava sulla
+     * sessione salvata.
+     *
+     * La lettura la fa la piattaforma, perche' e' il posto in cui va fatta:
+     * `EncryptedSharedPreferences` su Android, Keychain su iOS. Qui si adotta
+     * soltanto, in un punto solo, con la stessa regola su entrambe.
+     *
+     * Torna true se le ha adottate — cioe' se il chiamante puo' cancellare
+     * l'originale. Torna false se ce n'erano gia' di nostre, che sono per
+     * definizione piu' recenti, o se non c'e' niente da adottare.
+     */
+    suspend fun adoptLegacyCredentials(email: String, password: String): Boolean {
+        if (email.isBlank() || password.isBlank()) return false
+        if (runCatching { credentials.read() }.getOrNull() != null) return false
+        return runCatching { credentials.save(email, password) }.isSuccess
+    }
+
     suspend fun logout() {
         AuthHolder.session = null
         tokenStore.clear()

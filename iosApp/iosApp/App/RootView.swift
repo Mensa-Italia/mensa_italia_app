@@ -36,6 +36,12 @@ final class RootViewModel {
         //    existing session and the DEBUG onboarding force-show should NOT
         //    trigger. (Fresh logins flip `sessionRestored` back to false
         //    implicitly because they happen after this initial check.)
+        // 1b. Prima di doInit, non dopo: e' doInit a decidere se rifare il
+        //     login vero o ripiegare sulla sessione salvata, e lo decide
+        //     leggendo le credenziali. Recuperate piu' tardi, il primo avvio
+        //     dopo l'aggiornamento userebbe ancora la strada debole.
+        await FlutterCredentialMigration.run()
+
         try? await koin.auth.doInit()
         sessionRestored = koin.auth.authState.value is AuthStateAuthenticated
 
