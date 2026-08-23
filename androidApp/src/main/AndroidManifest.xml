@@ -29,6 +29,15 @@
     <!-- Notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Advertising ID: l'app non ne fa uso e su Play Console e' dichiarato
+         cosi'. Qualunque dipendenza Google Play Services che lo mergia nel
+         manifest finale fa rifiutare l'upload ("This release includes the
+         AD_ID permission but your declaration ... says your app doesn't use
+         advertising ID"). E' successo accendendo Firebase: analytics adesso
+         non c'e' piu', questa riga e' la rete di sicurezza perche' il permesso
+         non rientri di nascosto da una transitiva. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+
     <!-- Vibration -->
     <uses-permission android:name="android.permission.VIBRATE" />
 

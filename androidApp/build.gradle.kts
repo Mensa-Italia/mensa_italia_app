@@ -159,11 +159,19 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.permissions)
 
-    // Firebase (BOM-driven)
+    // Firebase (BOM-driven). Solo Messaging: serve alle push e alla
+    // registrazione del device.
+    //
+    // `firebase-analytics-ktx` NON va rimessa senza prima aggiornare la
+    // dichiarazione su Play Console. Trascina play-services-measurement, che
+    // mergia `com.google.android.gms.permission.AD_ID` nel manifest finale, e
+    // l'upload viene rifiutato: "This release includes the AD_ID permission
+    // but your declaration on Play Console says your app doesn't use
+    // advertising ID" (run 32634413544). Nel codice non c'era comunque una
+    // riga che la usasse.
     val firebaseBom = platform(libs.firebase.bom)
     implementation(firebaseBom)
     implementation(libs.firebase.messaging.ktx)
-    implementation(libs.firebase.analytics.ktx)
 
     // Stripe
     implementation(libs.stripe.android)
