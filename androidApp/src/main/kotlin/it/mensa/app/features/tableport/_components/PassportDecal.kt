@@ -31,6 +31,26 @@ import it.mensa.app.ui.components.CachedAsyncImage
 // expression lives in the cyan inner-ring on stamps and the brand-blue hero
 // surrounding the book.
 
+/**
+ * Misure delle miniature richieste al server.
+ *
+ * Tutto il passaporto chiedeva `800x0`, anche la griglia, dove un timbro viene
+ * disegnato a ~73dp: a densita' 3x sono ~220px, quindi si scaricavano circa 13
+ * volte i pixel necessari, sei volte per pagina. E' il motivo per cui i timbri
+ * "ci mettono un occhio" anche con il prefetch a posto.
+ *
+ * GRID copre 4x sul telefono piu' denso senza esagerare; DETAIL resta grande
+ * perche' li' il timbro e' disegnato a 240dp.
+ *
+ * Devono restare identiche fra griglia e prefetcher: l'URL e' la chiave di
+ * cache, quindi scaldare una misura e disegnarne un'altra rende il prefetch
+ * lavoro sprecato.
+ */
+object StampThumb {
+    const val GRID = "320x0"
+    const val DETAIL = "800x0"
+}
+
 object PassportPalette {
     // Cover — fixed brand navy for the passport document identity.
     val coverDeep   = Color(0xFF071A3A)

@@ -338,7 +338,7 @@ private struct PassportStampDetailSheet: View {
     private var record: StampModel? { stamp.stampRecord }
     private var imageURL: URL? {
         guard let r = record, !r.image.isEmpty else { return nil }
-        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: "800x0")
+        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: PassportLayout.detailThumb)
     }
     private var title: String {
         if let d = record?.description_, !d.isEmpty { return d }

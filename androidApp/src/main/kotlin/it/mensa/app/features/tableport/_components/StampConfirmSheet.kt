@@ -321,7 +321,7 @@ private fun SealedStampPreview(stamp: StampModel) {
                 collection = "stamps",
                 recordId = stamp.id,
                 filename = stamp.image,
-                thumb = "800x0",
+                thumb = StampThumb.DETAIL,
             )
             CachedAsyncImage(
                 model = url,

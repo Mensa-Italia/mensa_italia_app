@@ -18,6 +18,18 @@ import Shared
 /// della sola pagina vicina.
 enum PassportLayout {
     static let stampsPerPage = 6
+
+    /// Miniature richieste al server.
+    ///
+    /// Tutto il passaporto chiedeva `800x0`, anche la griglia, dove un timbro
+    /// e' disegnato a ~73pt: a 3x sono ~220px, quindi si scaricavano circa 13
+    /// volte i pixel necessari, sei volte per pagina.
+    ///
+    /// `gridThumb` deve restare identico fra griglia e prefetcher: l'URL e' la
+    /// chiave di cache, e scaldare una misura per disegnarne un'altra rende il
+    /// prefetch lavoro sprecato.
+    static let gridThumb = "320x0"
+    static let detailThumb = "800x0"
 }
 
 struct PassportInside: View {
@@ -486,7 +498,7 @@ private struct SinglePassportPage: View {
 
     private func imageURL(for stamp: StampUserModel) -> URL? {
         guard let r = stamp.stampRecord, !r.image.isEmpty else { return nil }
-        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: "800x0")
+        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: PassportLayout.gridThumb)
     }
 }
 

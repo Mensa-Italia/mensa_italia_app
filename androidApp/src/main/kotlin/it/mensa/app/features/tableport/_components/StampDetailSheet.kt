@@ -47,7 +47,7 @@ fun StampDetailSheet(
                 collection = "stamp",
                 recordId = it.id,
                 filename = it.image,
-                thumb = "800x0",
+                thumb = StampThumb.DETAIL,
             )
         }
 

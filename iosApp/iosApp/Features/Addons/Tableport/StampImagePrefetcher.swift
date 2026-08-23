@@ -54,6 +54,6 @@ enum StampImagePrefetcher {
 
     private static func url(for stamp: StampUserModel) -> URL? {
         guard let r = stamp.stampRecord, !r.image.isEmpty else { return nil }
-        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: "800x0")
+        return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: PassportLayout.gridThumb)
     }
 }

@@ -3,6 +3,7 @@ package it.mensa.app.features.tableport.util
 import android.content.Context
 import coil3.ImageLoader
 import coil3.request.ImageRequest
+import it.mensa.app.features.tableport._components.StampThumb
 import it.mensa.app.support.FilesUrl
 import it.mensa.shared.model.StampUserModel
 
@@ -49,7 +50,7 @@ object StampImagePrefetcher {
                 collection = "stamp",
                 recordId = record.id,
                 filename = record.image,
-                thumb = "800x0",
+                thumb = StampThumb.GRID,
             )
             val request = ImageRequest.Builder(context)
                 .data(url)
