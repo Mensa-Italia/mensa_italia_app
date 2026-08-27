@@ -28,7 +28,27 @@ class FeatureFlags(
         val orgChart: Boolean = false,
         val localGroups: Boolean = false,
         val passkeys: Boolean = false,
+        val donationLinkOnIos: Boolean = false,
+        val donationLinkOnAndroid: Boolean = false,
+        val donationStripeLink: String = "",
     ) {
+        /**
+         * Link esterno da aprire al posto della pagina di donazione nativa,
+         * oppure null per usare quella nativa.
+         *
+         * Serve perche' Apple pretende l'iscrizione a un circuito per le
+         * donazioni in-app che l'associazione non ha: dove il flag e' acceso,
+         * la donazione esce dall'app invece di passare da Stripe dentro
+         * l'app.
+         *
+         * Il link vuoto vale come flag spento e non e' prudenza: un flag
+         * acceso senza link darebbe un pulsante che non apre niente, che e'
+         * peggio della pagina nativa. La regola sta qui e non nelle due UI
+         * perche' altrimenti andrebbe ricordata due volte.
+         */
+        val donationLinkIos: String? get() = donationStripeLink.takeIf { donationLinkOnIos && it.isNotBlank() }
+        val donationLinkAndroid: String? get() = donationStripeLink.takeIf { donationLinkOnAndroid && it.isNotBlank() }
+
         /**
          * True se i risultati di ricerca di [type] vanno mostrati.
          *
@@ -55,6 +75,11 @@ class FeatureFlags(
     val localGroupsEnabled: Boolean get() = _flags.value.localGroups
     val passkeysEnabled: Boolean get() = _flags.value.passkeys
 
+    /** Vedi [Flags.donationLinkIos]. */
+    val donationLinkIos: String? get() = _flags.value.donationLinkIos
+    /** Vedi [Flags.donationLinkAndroid]. */
+    val donationLinkAndroid: String? get() = _flags.value.donationLinkAndroid
+
     /** Vedi [Flags.allowsSearchType]. */
     fun allowsSearchType(type: String): Boolean = _flags.value.allowsSearchType(type)
 
@@ -77,6 +102,9 @@ class FeatureFlags(
                 orgChart = configs[KEY_ORG_CHART].toFlag(),
                 localGroups = configs[KEY_LOCAL_GROUPS].toFlag(),
                 passkeys = configs[KEY_PASSKEYS].toFlag(),
+                donationLinkOnIos = configs[KEY_DONATION_LINK_IOS].toFlag(),
+                donationLinkOnAndroid = configs[KEY_DONATION_LINK_ANDROID].toFlag(),
+                donationStripeLink = configs[KEY_DONATION_STRIPE_LINK]?.trim().orEmpty(),
             )
             _flags.value = fresh
             writeCached(fresh)
@@ -90,20 +118,34 @@ class FeatureFlags(
         val parts = raw.split(',')
         // Length check doubles as a version guard: a cache written by an older
         // build with fewer flags is discarded rather than read short.
-        if (parts.size != 4) return null
+        if (parts.size != 6) return null
         return Flags(
             publicArea = parts[0] == "1",
             orgChart = parts[1] == "1",
             localGroups = parts[2] == "1",
             passkeys = parts[3] == "1",
+            donationLinkOnIos = parts[4] == "1",
+            donationLinkOnAndroid = parts[5] == "1",
+            donationStripeLink = db.keyValueQueries
+                .selectById(CACHE_KEY_DONATION_LINK).awaitAsOneOrNull()?.value_.orEmpty(),
         )
     }
 
     private suspend fun writeCached(flags: Flags) {
-        val encoded = listOf(flags.publicArea, flags.orgChart, flags.localGroups, flags.passkeys)
-            .joinToString(",") { if (it) "1" else "0" }
+        val encoded = listOf(
+            flags.publicArea,
+            flags.orgChart,
+            flags.localGroups,
+            flags.passkeys,
+            flags.donationLinkOnIos,
+            flags.donationLinkOnAndroid,
+        ).joinToString(",") { if (it) "1" else "0" }
         try {
             db.keyValueQueries.insertOrReplace(key = CACHE_KEY, value_ = encoded)
+            db.keyValueQueries.insertOrReplace(
+                key = CACHE_KEY_DONATION_LINK,
+                value_ = flags.donationStripeLink,
+            )
         } catch (_: Throwable) {
             // Cache write is best-effort; the in-memory value is already set.
         }
@@ -121,6 +163,12 @@ class FeatureFlags(
         const val KEY_ORG_CHART = "org_chart_enabled"
         const val KEY_LOCAL_GROUPS = "local_groups_enabled"
         const val KEY_PASSKEYS = "enable_passkeys"
+        const val KEY_DONATION_LINK_IOS = "donation_link_on_ios"
+        const val KEY_DONATION_LINK_ANDROID = "donation_link_on_android"
+        const val KEY_DONATION_STRIPE_LINK = "donation_stripe_link"
         const val CACHE_KEY = "config.feature_flags"
+        // Il link sta per conto suo e non nella lista separata da virgole:
+        // un URL puo' contenerne una, e la spezzerebbe in due campi.
+        const val CACHE_KEY_DONATION_LINK = "config.donation_stripe_link"
     }
 }

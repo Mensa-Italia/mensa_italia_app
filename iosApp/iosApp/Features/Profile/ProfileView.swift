@@ -66,12 +66,28 @@ struct ProfileView: View {
 
             // MARK: Donation
             Section(tr("app.profile.section_donation", fallback: "Donazione")) { // i18n
-                NavigationLink {
-                    MakeDonationView()
-                } label: {
-                    ProfileRowLabel(icon: "heart.fill",
-                                    title: tr("views.make_donation.title", fallback: "Fai una donazione"),
-                                    iconColor: .pink)
+                // Con `donation_link_on_ios` acceso la donazione esce
+                // dall'app invece di passare dalla pagina Stripe interna:
+                // Apple pretende l'iscrizione a un circuito per le donazioni
+                // in-app che l'associazione non ha. Il link e'
+                // `donation_stripe_link`; se e' vuoto il flag non conta e si
+                // resta sulla pagina nativa, altrimenti la riga non aprirebbe
+                // niente.
+                if let donationLink = koin.featureFlags.donationLinkIos,
+                   let url = URL(string: donationLink) {
+                    Link(destination: url) {
+                        ProfileRowLabel(icon: "heart.fill",
+                                        title: tr("views.make_donation.title", fallback: "Fai una donazione"),
+                                        iconColor: .pink)
+                    }
+                } else {
+                    NavigationLink {
+                        MakeDonationView()
+                    } label: {
+                        ProfileRowLabel(icon: "heart.fill",
+                                        title: tr("views.make_donation.title", fallback: "Fai una donazione"),
+                                        iconColor: .pink)
+                    }
                 }
                 NavigationLink {
                     CalendarLinkerView()

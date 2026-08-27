@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -80,6 +81,7 @@ fun ProfileScreen(
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    val uriHandler = LocalUriHandler.current
     val appVersion = remember(context) {
         runCatching {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -153,7 +155,17 @@ fun ProfileScreen(
                         ProfileRow(
                             icon = Icons.Outlined.Favorite,
                             title = tr("views.make_donation.title", fallback = "Fai una donazione"),
-                            onClick = { onNavigate(ProfileRoute.MakeDonation) },
+                            // Con `donation_link_on_android` acceso la donazione
+                            // esce dall'app invece di passare dalla pagina
+                            // Stripe interna. Il link e' `donation_stripe_link`;
+                            // se e' vuoto il flag non conta e si resta sulla
+                            // pagina nativa, altrimenti il pulsante non aprirebbe
+                            // niente.
+                            onClick = {
+                                val link = koinAccess().featureFlags.donationLinkAndroid
+                                if (link != null) uriHandler.openUri(link)
+                                else onNavigate(ProfileRoute.MakeDonation)
+                            },
                         )
                         ProfileRow(
                             icon = Icons.Outlined.CalendarMonth,
