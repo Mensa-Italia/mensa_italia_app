@@ -38,6 +38,12 @@ actual class DriverFactory {
             deleteDbFile()
             driver = NativeSqliteDriver(MensaDatabase.Schema.synchronous(), DB_NAME)
         }
+        // Dopo l'apertura, non prima: il file lo crea NativeSqliteDriver, e
+        // `NSURLIsExcludedFromBackupKey` si puo' scrivere solo su qualcosa che
+        // esiste gia'. Idempotente, quindi rifarlo a ogni avvio va bene — ed e'
+        // necessario, perche' un `-wal` ricreato da SQLite riparte senza
+        // attributi estesi. Vedi [excludeDatabaseFromBackup].
+        excludeDatabaseFromBackup(DB_NAME)
         return driver
     }
 

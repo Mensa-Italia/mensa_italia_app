@@ -406,9 +406,17 @@ class AuthRepository(
         return runCatching { credentials.save(email, password) }.isSuccess
     }
 
+    /**
+     * `tokenStore.clear()` era l'unico passo senza `runCatching`, e su iOS il
+     * Keychain sa lanciare per conto suo (vedi il commento di [init] sul
+     * simulator senza code signing). Se lanciava qui, credenziali e database
+     * restavano intatti: l'utente vedeva la schermata di accesso con la
+     * password ancora su disco e la cache dei soci al suo posto. Ora ogni passo
+     * e' isolato e l'uscita avviene comunque.
+     */
     suspend fun logout() {
         AuthHolder.session = null
-        tokenStore.clear()
+        runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
         _authState.value = AuthState.Anonymous

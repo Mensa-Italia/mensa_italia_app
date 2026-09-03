@@ -41,11 +41,16 @@ enum StampImagePrefetcher {
                 let key = url.absoluteString
                 if inflight.contains(key) { continue }
                 inflight.insert(key)
-                var req = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+                // Stesso header delle immagini a schermo: senza, il prefetch
+                // arriverebbe anonimo e scalderebbe la cache per una strada
+                // diversa da quella che poi userà la view. Vedi `MensaAuth`.
+                var req = MensaAuth.request(url: url, cachePolicy: .returnCacheDataElseLoad)
                 req.timeoutInterval = 20
                 let task = session.dataTask(with: req) { _, _, _ in
                     queue.async { inflight.remove(key) }
                 }
+                // Il 307 verso S3 non deve portarsi dietro l'Authorization.
+                task.delegate = MensaRedirectAuthStripper.shared
                 task.priority = URLSessionTask.lowPriority
                 task.resume()
             }

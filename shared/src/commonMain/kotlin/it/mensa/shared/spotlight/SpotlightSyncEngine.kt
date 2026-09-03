@@ -4,12 +4,9 @@ import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
-import it.mensa.shared.api.SkipAuthAttribute
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.RegSociModel
 import it.mensa.shared.repository.RegSociRepository
@@ -206,11 +203,16 @@ class SpotlightSyncEngine(
     private suspend fun downloadImage(m: RegSociModel): ByteArray? {
         if (m.image.isEmpty() || m.image.contains(LEGACY_AVATAR)) return null
         val url = "$baseUrl/api/files/members_registry/${m.id}/${m.image}?thumb=$THUMB_PARAM"
+        // Autenticata come ogni altra richiesta. Prima si toglieva
+        // esplicitamente l'Authorization, quando `/api/files` era comunque
+        // pubblico e mandarlo non serviva. Ora l'header e' cio' che decide se
+        // il server produce il link firmato verso S3, quindi toglierlo vuol dire
+        // rinunciarci — e il giorno in cui gli allegati verranno chiusi del
+        // tutto, questa sarebbe la prima chiamata a rompersi in silenzio: il
+        // `runCatching` qui sotto inghiotte l'errore e i soci finiscono
+        // nell'indice Spotlight senza foto, senza una riga di log.
         return runCatching {
-            val resp: HttpResponse = httpClient.get(url) {
-                attributes.put(SkipAuthAttribute, true)
-                header(HttpHeaders.Authorization, null)
-            }
+            val resp: HttpResponse = httpClient.get(url)
             if (resp.status == HttpStatusCode.OK || resp.status.isSuccess()) resp.body<ByteArray>() else null
         }.getOrNull()
     }

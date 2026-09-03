@@ -186,13 +186,21 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         // CachedURLResponse risultante viene scritta sotto la chiave canonica
         // così tutti i futuri lookup (con qualunque URL reale che condivide
         // filename+thumb) hittano la stessa entry.
-        let fetchRequest = URLRequest(
+        // Con l'header il backend risponde 307 verso un link S3 firmato; senza,
+        // serve il file da solo. In entrambi i casi l'immagine arriva, ma la
+        // prima strada e' quella per cui il backend e' configurato. Il
+        // `delegate` toglie l'Authorization quando il redirect cambia host,
+        // cosi' il token non finisce nei log di S3. Vedi `MensaAuth`.
+        let fetchRequest = MensaAuth.request(
             url: url,
             cachePolicy: .reloadIgnoringLocalCacheData,
             timeoutInterval: 30
         )
         do {
-            let (data, response) = try await imageURLSession.data(for: fetchRequest)
+            let (data, response) = try await imageURLSession.data(
+                for: fetchRequest,
+                delegate: MensaRedirectAuthStripper.shared
+            )
             guard let http = response as? HTTPURLResponse else { return }
             if http.statusCode != 200 {
                 Log.app.error("CachedAsyncImage non-200 \(http.statusCode) for \(url.absoluteString)")

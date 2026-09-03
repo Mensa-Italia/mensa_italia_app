@@ -10,6 +10,10 @@ struct MensaApp: App {
 
     init() {
         GothamFont.register()
+        // Prima di qualunque cosa tocchi la sessione: porta le voci del
+        // Keychain gia' presenti a `ThisDeviceOnly`, cioe' fuori dai backup
+        // del dispositivo. Vedi `KeychainHardening`.
+        KeychainHardening.harden()
         CachedImageCacheConfig.configureShared()
         CrashLogger_appleKt.installCrashLogger()
         MensaSdk.shared.doInitKoinIos()

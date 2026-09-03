@@ -3,6 +3,7 @@ package it.mensa.shared.di
 import it.mensa.shared.api.AuthRefresherHolder
 import it.mensa.shared.api.HttpClientFactory
 import it.mensa.shared.api.endpoints.AuthApi
+import it.mensa.shared.api.endpoints.FileLinkApi
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
@@ -14,6 +15,7 @@ import org.koin.dsl.module
 val sharedModule = module {
     single { HttpClientFactory(get<ITokenStore>()).create() }
     single { AuthApi(get()) }
+    single { FileLinkApi(get()) }
     single { OidcDiscoveryCache(get()) }
     single {
         TokenRefresher(get(), get(), get()).also {
