@@ -58,6 +58,12 @@ final class RootViewModel {
         // 3. Subscribe to authState Flow
         let authFlow = koin.auth.authState as Kotlinx_coroutines_coreFlow
         authSub = subscribeFlow(authFlow) { [weak self] (_: AuthState) in
+            // Un accesso appena fatto ha scritto voci nuove nel Keychain, e le
+            // voci nuove nascono con l'accessibilita' di default — dentro i
+            // backup. Qui e' l'unico punto attraversato da tutti i modi di
+            // entrare (password, passkey, relogin all'avvio), quindi e' qui
+            // che si ripassa. Vedi `KeychainHardening`.
+            KeychainHardening.harden()
             Task { @MainActor [weak self] in
                 await self?.evaluatePhase()
             }

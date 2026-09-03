@@ -43,8 +43,13 @@ object AuthRefresherHolder {
 /** True when [host] belongs to the Mensa backend (svc/auth/…). The Bearer
  *  token must NEVER be attached to third-party hosts (e.g. the Tolgee CDN):
  *  it leaks the user's session and some origins reject foreign Authorization
- *  headers outright (BunnyCDN → Azure returns 403). */
-private fun isMensaHost(host: String): Boolean =
+ *  headers outright (BunnyCDN → Azure returns 403).
+ *
+ *  Pubblica perche' la stessa regola serve fuori da Ktor: le immagini le
+ *  scarica Coil su Android e una URLSession su iOS, e anche loro devono
+ *  mandare il Bearer al backend e a nessun altro. Una regola sola, in un
+ *  posto solo. */
+fun isMensaHost(host: String): Boolean =
     host == "mensa.it" || host.endsWith(".mensa.it")
 
 val AuthPlugin = createClientPlugin("MensaAuthPlugin") {
