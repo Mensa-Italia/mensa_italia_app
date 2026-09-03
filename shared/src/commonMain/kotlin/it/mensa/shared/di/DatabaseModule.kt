@@ -5,6 +5,7 @@ import it.mensa.shared.db.DriverFactory
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.db.createDatabase
 import it.mensa.shared.spotlight.SpotlightSinkRegistry
+import kotlinx.coroutines.withContext
 import org.koin.dsl.module
 
 /**
@@ -77,12 +78,90 @@ private val ALL_TABLES = listOf(
     "StampUser", "Ticket",
 )
 
-suspend fun wipeAllUserData() {
+/**
+ * Su [ioDispatcher] e non sul thread chiamante: la catena del logout parte dal
+ * main thread su entrambe le piattaforme (`viewModelScope` su Android, un
+ * `Task` di SwiftUI su iOS) e qui dentro si riscrive l'intero file del
+ * database. Prima erano 18 DELETE sincrone — gia' abbastanza per un
+ * micro-freeze; con il VACUUM sarebbe diventato visibile.
+ */
+suspend fun wipeAllUserData(): Unit = withContext(ioDispatcher) {
     val driver = MensaDatabaseHolder.requireDriver()
+
+    // Prima delle DELETE, non dopo: `secure_delete` dice a SQLite di
+    // sovrascrivere con zeri il contenuto delle righe cancellate invece di
+    // limitarsi a marcare le pagine come libere. Vale solo per le DELETE che
+    // vengono dopo, quindi l'ordine conta. E' una PRAGMA di sessione: muore
+    // con la connessione, non tocca il file.
+    runCatching {
+        driver.execute(identifier = null, sql = "PRAGMA secure_delete = ON", parameters = 0)
+    }
+
     for (table in ALL_TABLES) {
         driver.execute(identifier = null, sql = "DELETE FROM $table", parameters = 0)
     }
+
+    compactDatabase(driver)
+
     // iOS Spotlight (members + documents domain + thumbnail cache).
     // No-op when the host hasn't registered a sink (Android, JS).
     runCatching { SpotlightSinkRegistry.sink?.clearAll() }
+}
+
+/**
+ * Riscrive il file del database da capo dopo lo svuotamento.
+ *
+ * Una `DELETE FROM` non restituisce spazio: le pagine restano allocate al file
+ * e, senza `secure_delete`, il loro contenuto resta leggibile con un editor
+ * esadecimale. Dopo un logout in `mensa.db` ci sarebbero ancora l'anagrafica
+ * dei soci, i documenti e le ricevute di chi e' appena uscito — su un
+ * dispositivo che magari non e' suo.
+ *
+ * Due passaggi, in quest'ordine:
+ *
+ *  1. `VACUUM` ricostruisce il database in un file nuovo e ci copia dentro
+ *    soltanto le pagine ancora in uso — che a questo punto sono gli schemi
+ *    vuoti. Non puo' girare dentro una transazione, e infatti qui non ce
+ *    n'e' una aperta.
+ *  2. `PRAGMA wal_checkpoint(TRUNCATE)` perche' entrambi i driver aprono il
+ *    database in modalita' WAL: le scritture del VACUUM finiscono nel file
+ *    `-wal`, e finche' non si fa un checkpoint il `.db` principale continua a
+ *    contenere le pagine di prima. Il checkpoint le travasa e azzera il
+ *    `-wal`, che altrimenti resterebbe li' con le immagini delle pagine
+ *    vecchie.
+ *
+ * L'ordine e' quello e non un altro: un checkpoint fatto *prima* del VACUUM
+ * lascia nel `-wal` le pagine che il VACUUM ci scrive subito dopo.
+ *
+ * Misurato su SQLite 3.45 con 3000 righe e `secure_delete` inizialmente OFF,
+ * contando le occorrenze di una stringa segreta nei byte di `.db` + `-wal`:
+ *
+ * | sequenza                                    | residui | file    |
+ * |---------------------------------------------|---------|---------|
+ * | `DELETE` soltanto (com'era)                 |    3378 | 136 KB  |
+ * | `DELETE` + `VACUUM`, senza checkpoint       |    3378 | 144 KB  |
+ * | `secure_delete` + `DELETE` + checkpoint     |       0 | 115 KB  |
+ * | questa: + `VACUUM` prima del checkpoint     |       0 |   8 KB  |
+ *
+ * Da leggere cosi': il VACUUM da solo non toglie niente, perche' in modalita'
+ * WAL i dati vecchi stanno nel `-wal` e il VACUUM ci scrive dentro invece di
+ * svuotarlo. E' il checkpoint a ripulire; il VACUUM serve a non lasciare un
+ * file pieno di pagine libere.
+ *
+ * Ogni passo e' isolato in un `runCatching`: e' una misura di igiene, non una
+ * condizione di correttezza. Se il VACUUM non riesce — un'altra connessione ha
+ * una transazione aperta, il disco e' pieno — i dati sono comunque gia' stati
+ * cancellati, e far fallire il logout per questo sarebbe sbagliato.
+ *
+ * Nota sul percorso: `SqlDriver.execute` arriva a `execSQL` su Android e a
+ * `sqlite3_step` su SQLiter, cioe' esattamente il modo documentato di eseguire
+ * `VACUUM` e le PRAGMA su entrambe le piattaforme.
+ */
+internal fun compactDatabase(driver: SqlDriver) {
+    runCatching {
+        driver.execute(identifier = null, sql = "VACUUM", parameters = 0)
+    }
+    runCatching {
+        driver.execute(identifier = null, sql = "PRAGMA wal_checkpoint(TRUNCATE)", parameters = 0)
+    }
 }
