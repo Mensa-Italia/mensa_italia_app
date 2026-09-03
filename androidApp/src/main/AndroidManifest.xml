@@ -46,14 +46,32 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
+    <!-- Backup: niente di questa app esce dal dispositivo.
+
+         `mensa.db` e' una copia locale dei dati dei soci (anagrafica,
+         documenti, ricevute, timbri) e le preferenze cifrate contengono il
+         refresh token: su un dispositivo nuovo l'app rifa' il login e
+         riscarica tutto, quindi un backup non aggiunge niente e allarga solo
+         la superficie.
+
+         Servono tutti e tre gli attributi:
+          - `allowBackup=false` spegne Auto Backup, il backup key/value e
+            `adb backup`;
+          - `dataExtractionRules` (API 31+) e' l'unico modo per fermare anche
+            il trasferimento diretto fra dispositivi (D2D), che
+            `allowBackup=false` da solo NON blocca;
+          - `fullBackupContent` copre le API 23..30, dove
+            `dataExtractionRules` non esiste ancora. -->
     <application
         android:name=".MensaApplication"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.MensaApp"
-        android:allowBackup="true"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         tools:targetApi="35">
 
         <activity

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Regole di Auto Backup per Android 6..11 (API 23..30), dove
+  `dataExtractionRules` non esiste ancora.
+
+  Serve solo come rete di sicurezza: con `android:allowBackup="false"` nel
+  manifest questo file non viene nemmeno letto. Sta qui perche' se un giorno
+  qualcuno riaccende `allowBackup`, il default e' "backuppa tutto" e i dati dei
+  soci finirebbero su Drive senza che nessuno se ne accorga. Con queste regole
+  il default diventa "non backuppare niente".
+
+  In `full-backup-content` l'attributo `path` e' obbligatorio: `.` vuol dire
+  l'intero dominio.
+-->
+<full-backup-content>
+    <exclude domain="root" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>

@@ -13,14 +13,24 @@ import org.koin.dsl.module
 
 /**
  * Apple auth-storage uses the Keychain via `multiplatform-settings`'
- * `KeychainSettings`. Default accessibility class is
- * `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`:
+ * `KeychainSettings`.
  *
- *  - readable after the first device unlock following a cold boot
- *    (background BGTask refresh still works);
- *  - `ThisDeviceOnly`: an iCloud backup restore on a different device
- *    cannot lift the session;
- *  - excluded from iCloud Keychain sync.
+ * ATTENZIONE all'accessibilita': `KeychainSettings(service = ...)` costruisce le
+ * sue query con `kSecClass` e `kSecAttrService` soltanto — `kSecAttrAccessible`
+ * non lo passa mai. Le voci nascono quindi con il default del Keychain,
+ * `kSecAttrAccessibleWhenUnlocked`, che **finisce nei backup cifrati** del
+ * dispositivo e si ripristina su un telefono diverso. Qui dentro c'e' il
+ * refresh token e, via [CredentialStore], la password del socio.
+ *
+ * A portarle a `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` — leggibili
+ * dopo il primo sblocco, cosi' il refresh da BGTask continua a funzionare, ma
+ * fuori da ogni backup e dalla sincronizzazione iCloud — ci pensa
+ * `KeychainHardening` lato Swift, con una `SecItemUpdate` fuori banda.
+ *
+ * Non si passa `kSecAttrAccessible` al costruttore di proposito: quegli
+ * attributi finiscono anche nelle query di lettura, le voci gia' scritte non
+ * verrebbero piu' trovate e ogni utente si ritroverebbe disconnesso dopo
+ * l'aggiornamento. Il dettaglio sta nel commento di `KeychainHardening.swift`.
  *
  * TODO(watchOS sharing): for the watchOS companion app to read the same token
  * we need `kSecAttrAccessGroup` set on Keychain entries (and the matching

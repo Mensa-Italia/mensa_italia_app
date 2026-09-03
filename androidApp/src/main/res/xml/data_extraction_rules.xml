@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Regole di estrazione dati per Android 12+ (API 31+).
+
+  Niente di questa app esce dal dispositivo. Il database locale (`mensa.db`)
+  e' una copia di cio' che sta sul server e contiene dati personali dei soci —
+  anagrafica, documenti, ricevute, timbri. Le preferenze cifrate contengono il
+  refresh token e le credenziali. Nessuna delle due cose ha motivo di finire
+  in un backup: al primo avvio su un dispositivo nuovo l'app rifa' il login e
+  riscarica tutto.
+
+  Perche' non basta `android:allowBackup="false"`: da Android 12 quel flag
+  spegne il backup su cloud ma **non** il trasferimento diretto fra dispositivi
+  (D2D). Le due sezioni qui sotto chiudono entrambe le strade.
+
+  L'esclusione e' per dominio intero, uno per uno: `root` copre solo la home
+  della app, mentre `database`, `sharedpref`, `file` ed `external` sono domini
+  distinti e non ereditano l'esclusione di `root`. I domini `device_*` sono le
+  controparti su archiviazione protetta dalle credenziali (direct boot).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+        <exclude domain="device_root" />
+        <exclude domain="device_file" />
+        <exclude domain="device_database" />
+        <exclude domain="device_sharedpref" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+        <exclude domain="device_root" />
+        <exclude domain="device_file" />
+        <exclude domain="device_database" />
+        <exclude domain="device_sharedpref" />
+    </device-transfer>
+</data-extraction-rules>
