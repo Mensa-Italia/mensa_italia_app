@@ -1,5 +1,7 @@
 import Foundation
 import Shared
+import SwiftUI
+import UIKit
 
 /// Autenticazione per le richieste che non passano dal client Ktor condiviso.
 ///
@@ -33,6 +35,46 @@ enum MensaAuth {
         var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: timeoutInterval)
         authorize(&request)
         return request
+    }
+
+    /// Scarica un file del backend in un file temporaneo e ne ritorna il path.
+    ///
+    /// Serve a tutto cio' che non puo' mandare un header per conto suo:
+    /// `PDFDocument(url:)` di PDFKit si fa la rete da solo e non accetta header,
+    /// e un `ShareLink` su un URL remoto consegna a chi lo riceve un link che
+    /// senza autenticazione risponde 404. Scaricando qui, con l'header, si
+    /// ottengono entrambe le cose: i byte da dare a PDFKit e un file vero da
+    /// condividere.
+    ///
+    /// Il file finisce in `tmp/mensa-files/`, che iOS non mette nei backup e
+    /// svuota per conto suo. Il nome e' quello dell'URL cosi' il foglio di
+    /// condivisione e l'anteprima mostrano un titolo sensato.
+    ///
+    /// Torna nil su qualunque errore: chi chiama mostra il suo stato di errore.
+    static func downloadToTemporaryFile(from url: URL) async -> URL? {
+        let urlRequest = request(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60)
+        do {
+            let (data, response) = try await URLSession.shared.data(
+                for: urlRequest,
+                delegate: MensaRedirectAuthStripper.shared
+            )
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                Log.net.error("download file: HTTP \(code) per \(url.absoluteString)")
+                return nil
+            }
+            let dir = FileManager.default.temporaryDirectory
+                .appendingPathComponent("mensa-files", isDirectory: true)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let name = url.lastPathComponent.isEmpty ? "documento" : url.lastPathComponent
+            let dest = dir.appendingPathComponent(name)
+            try? FileManager.default.removeItem(at: dest)
+            try data.write(to: dest, options: .atomic)
+            return dest
+        } catch {
+            Log.net.error("download file fallito: \(error.localizedDescription)")
+            return nil
+        }
     }
 
     /// Aggiunge l'header a una richiesta gia' costruita.
@@ -72,4 +114,28 @@ final class MensaRedirectAuthStripper: NSObject, URLSessionTaskDelegate, @unchec
         sanitized.setValue(nil, forHTTPHeaderField: "Authorization")
         completionHandler(sanitized)
     }
+}
+
+/// Un file scaricato, pronto per il foglio di condivisione.
+///
+/// `Identifiable` perche' `.sheet(item:)` lo richiede: un `URL` da solo non lo e'.
+struct SharedFile: Identifiable {
+    let url: URL
+    var id: String { url.absoluteString }
+}
+
+/// Foglio di condivisione di sistema per un file gia' su disco.
+///
+/// `ShareLink` copre il caso in cui il contenuto si conosce quando si compone
+/// la view. Qui il file esiste solo dopo un download autenticato, quindi la
+/// condivisione va presentata quando quel download e' finito — e per
+/// presentarla a comando serve `UIActivityViewController`.
+struct ShareFileSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }

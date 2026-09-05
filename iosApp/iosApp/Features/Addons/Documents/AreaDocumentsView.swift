@@ -45,6 +45,10 @@ final class DocumentsListViewModel {
 
 struct AreaDocumentsView: View {
     @State private var vm = DocumentsListViewModel()
+    /// Il documento scaricato che sta per essere condiviso. Vedi la swipe
+    /// action piu' sotto: il file va scaricato prima, con l'header.
+    @State private var sharing: SharedFile?
+    @State private var preparingShare = false
 
     private let dateFmt: DateFormatter = {
         let f = DateFormatter()
@@ -66,6 +70,16 @@ struct AreaDocumentsView: View {
             .toolbar { filterToolbarItem }
             .refreshable { await vm.refresh() }
             .task { await vm.load() }
+            .sheet(item: $sharing) { file in
+                ShareFileSheet(url: file.url)
+            }
+            .overlay {
+                if preparingShare {
+                    ProgressView()
+                        .padding(24)
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                }
+            }
     }
 
     /// Filtro sempre in toolbar — le categorie specifiche si popolano dal
@@ -96,6 +110,17 @@ struct AreaDocumentsView: View {
         }
     }
 
+    /// Scarica il documento con l'header e apre il foglio di condivisione sul
+    /// file, non sull'URL.
+    private func share(_ url: URL) async {
+        await MainActor.run { preparingShare = true }
+        let file = await MensaAuth.downloadToTemporaryFile(from: url)
+        await MainActor.run {
+            preparingShare = false
+            if let file { sharing = SharedFile(url: file) }
+        }
+    }
+
     /// PDF diretto quando il file c'e', altrimenti il risolutore per id.
     @ViewBuilder
     private func documentDestination(for d: DocumentModel) -> some View {
@@ -121,12 +146,19 @@ struct AreaDocumentsView: View {
                     )
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    // Si scarica prima e si condivide il file. Un
+                    // `/api/files/...` passato a qualcun altro risponde 404:
+                    // il backend serve gli allegati solo a chi si autentica, e
+                    // chi riceve il link non ha la nostra sessione. Era uno
+                    // `ShareLink` sull'URL nudo.
                     if let url = Files.url(
                         collection: "documents",
                         recordId: d.id,
                         filename: d.file
                     ) {
-                        ShareLink(item: url) {
+                        Button {
+                            Task { await share(url) }
+                        } label: {
                             Label(
                                 tr("common.share", fallback: "Condividi"),
                                 systemImage: "square.and.arrow.up"
