@@ -1,6 +1,7 @@
 package it.mensa.app.features.tableport
 
 import androidx.lifecycle.ViewModel
+import it.mensa.shared.tableport.StampQRParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,17 +18,17 @@ class QrScannerViewModel : ViewModel() {
     val uiState: StateFlow<QrScannerUiState> = _uiState.asStateFlow()
 
     /**
-     * Parse a raw QR string in format `stampId:::verificationCode`.
-     * Returns a [ScanResult] or null if the format does not match.
+     * Legge il contenuto del QR e ne ricava id e codice.
+     *
+     * Delega a [StampQRParser], che e' lo stesso parser usato da iOS. Qui c'era
+     * una seconda copia della stessa logica, scritta a mano: le due si sono
+     * divise il destino, e il QR con l'URL intero le rompeva entrambe allo
+     * stesso modo senza che si potesse correggerle in un posto solo.
      */
     fun parseQr(raw: String): ScanResult? {
-        val parts = raw.split(":::")
-        if (parts.size < 2) return null
-        val id = parts[0].trim()
-        val code = parts[1].trim()
-        if (id.isEmpty() || code.isEmpty()) return null
+        val payload = StampQRParser.parse(raw) ?: return null
         _uiState.update { it.copy(scanning = false, lastScanned = raw) }
-        return ScanResult(id, code)
+        return ScanResult(payload.stampId, payload.verificationCode)
     }
 
     /** Re-enable scanning after a dismiss so the user can try again. */
