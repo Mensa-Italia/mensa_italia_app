@@ -4,6 +4,9 @@ import PDFKit
 struct PDFViewerView: View {
     let url: URL
     @State private var document: PDFDocument?
+    /// Il PDF scaricato su disco. Serve a due cose: darlo a PDFKit e passarlo
+    /// al foglio di condivisione al posto dell'URL remoto.
+    @State private var localFile: URL?
     @State private var loading = true
 
     var body: some View {
@@ -24,20 +27,32 @@ struct PDFViewerView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: url) {
-                    Image(systemName: "square.and.arrow.up")
+                // Si condivide il file, non l'URL. Un `/api/files/...` passato
+                // a qualcun altro risponde 404: il backend serve gli allegati
+                // solo a chi si autentica, e chi riceve il link non ha la
+                // nostra sessione. Il bottone compare quando il file c'e'.
+                if let localFile {
+                    ShareLink(item: localFile) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                 }
             }
         }
         .task { await load() }
     }
 
+    /// Scarica il PDF con l'header e poi lo apre da disco.
+    ///
+    /// `PDFDocument(url:)` su un URL remoto se la fa la rete da solo, dentro
+    /// PDFKit, e non c'e' modo di infilarci un header: da quando il backend
+    /// serve gli allegati solo a richieste autenticate, quella strada prende un
+    /// 404 e torna nil — cioe' "Impossibile aprire il PDF" su ogni documento.
     private func load() async {
         loading = true
-        let loaded = await Task.detached(priority: .userInitiated) {
-            PDFDocument(url: url)
-        }.value
+        let file = await MensaAuth.downloadToTemporaryFile(from: url)
+        let loaded = file.flatMap { PDFDocument(url: $0) }
         await MainActor.run {
+            self.localFile = file
             self.document = loaded
             self.loading = false
         }
