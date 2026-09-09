@@ -2,6 +2,8 @@ package it.mensa.app.features.locations
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -48,11 +50,11 @@ fun NavGraphBuilder.locationsNavGraph(navController: NavController) {
             )
         }
 
-        composable(LocationRoutes.MAP) {
-            val vm = navController.newLocationViewModel()
+        composable(LocationRoutes.MAP) { entry ->
+            val graphEntry = entry.rememberGraphEntry(navController)
+            val vm = koinViewModel<NewLocationViewModel>(viewModelStoreOwner = graphEntry)
             LaunchedEffect(vm) {
-                navController.getBackStackEntry(LocationRoutes.GRAPH)
-                    .savedStateHandle
+                graphEntry.savedStateHandle
                     .get<String>(LocationRoutes.ARG_CURRENT_LOCATION_ID)
                     ?.let(vm::startFrom)
             }
@@ -63,9 +65,9 @@ fun NavGraphBuilder.locationsNavGraph(navController: NavController) {
             )
         }
 
-        composable(LocationRoutes.DETAILS) {
+        composable(LocationRoutes.DETAILS) { entry ->
             NameLocationScreen(
-                vm = navController.newLocationViewModel(),
+                vm = koinViewModel(viewModelStoreOwner = entry.rememberGraphEntry(navController)),
                 onSaved = { loc -> navController.finishLocationPicker(loc) },
                 onBack = { navController.popBackStack() },
             )
@@ -85,10 +87,24 @@ fun NavController.navigateToLocationPicker(currentLocationId: String? = null) {
     }
 }
 
-/** Il draft, preso dall'entry del graph cosi' e' lo stesso su MAP e DETAILS. */
+/**
+ * L'entry del graph, che ospita il draft ([NewLocationViewModel]) condiviso fra
+ * MAP e DETAILS.
+ *
+ * Risolta una volta sola e tenuta da [remember], con la pagina corrente come
+ * chiave. Chiudere il picker fa il pop del graph, che esce dal back stack
+ * all'istante, mentre la pagina resta composta per tutta l'animazione di uscita
+ * e in quel frattempo si ricompone almeno una volta: cercare li' di nuovo la
+ * rotta del graph e' un [IllegalArgumentException], ed e' la chiusura dell'app
+ * che si vedeva toccando "Salva posizione".
+ *
+ * L'oggetto invece resta valido: finche' la pagina figlia sta uscendo, il graph
+ * e' "in transizione" e Navigation non lo distrugge ne' svuota il suo
+ * ViewModelStore. E' solo la ricerca per rotta a non essere piu' possibile.
+ */
 @Composable
-private fun NavController.newLocationViewModel(): NewLocationViewModel =
-    koinViewModel(viewModelStoreOwner = getBackStackEntry(LocationRoutes.GRAPH))
+private fun NavBackStackEntry.rememberGraphEntry(navController: NavController): NavBackStackEntry =
+    remember(this) { navController.getBackStackEntry(LocationRoutes.GRAPH) }
 
 /** Chiude il flusso e consegna la posizione scelta a chi l'ha aperto. */
 private fun NavController.finishLocationPicker(location: LocationModel) {
