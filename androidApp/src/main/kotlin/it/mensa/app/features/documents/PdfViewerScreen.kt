@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,8 +151,11 @@ fun PdfViewerScreen(
 private fun PdfPageList(pages: List<PdfPageSize>, vm: PdfViewerViewModel) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var scale by remember { mutableFloatStateOf(MIN_SCALE) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
+    // `rememberSaveable`: ruotando il telefono si rimisura tutto, e perdere
+    // l'ingrandimento proprio mentre si gira lo schermo per leggere meglio e'
+    // il contrario di quel che serve. Su iOS la scala si conserva allo stesso modo.
+    var scale by rememberSaveable { mutableFloatStateOf(MIN_SCALE) }
+    var offsetX by rememberSaveable { mutableFloatStateOf(0f) }
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val baseWidth: Dp = maxWidth
@@ -174,6 +178,13 @@ private fun PdfPageList(pages: List<PdfPageSize>, vm: PdfViewerViewModel) {
 
         fun panBy(dx: Float) {
             offsetX = (offsetX + dx).coerceIn(-maxPan(scale), 0f)
+        }
+
+        // Dopo una rotazione la finestra e' larga diversamente, quindi lo
+        // spostamento ripescato puo' cadere fuori dai nuovi bordi: si rimette
+        // dentro, altrimenti la pagina resta spostata di lato senza motivo.
+        LaunchedEffect(viewportWidthPx, scale) {
+            offsetX = offsetX.coerceIn(-maxPan(scale), 0f)
         }
 
         LazyColumn(
