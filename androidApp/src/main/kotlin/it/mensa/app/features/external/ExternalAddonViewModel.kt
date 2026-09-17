@@ -64,8 +64,12 @@ class ExternalAddonViewModel(private val addonId: String) : ViewModel() {
          * query parameters, preserving any pre-existing query params on base.
          */
         fun buildUrl(base: String, params: Map<String, String>): String? {
+            // Il `base` dell'addon arriva dal backend e puo' essere senza
+            // schema: la WebView caricherebbe un indirizzo relativo e
+            // resterebbe bianca, senza dire perche'.
+            val normalized = it.mensa.shared.net.ExternalUrl.normalize(base) ?: return null
             return try {
-                val uri = android.net.Uri.parse(base)
+                val uri = android.net.Uri.parse(normalized)
                 val builder = uri.buildUpon()
                 for ((k, v) in params) {
                     if (k.isNotEmpty()) builder.appendQueryParameter(k, v)

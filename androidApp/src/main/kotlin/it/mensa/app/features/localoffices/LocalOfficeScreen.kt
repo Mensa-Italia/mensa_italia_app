@@ -1,7 +1,5 @@
 package it.mensa.app.features.localoffices
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +65,7 @@ import it.mensa.app.features.localoffices._components.LinkEditorMode
 import it.mensa.app.features.localoffices._components.LocalOfficeLinkEditorSheet
 import it.mensa.app.features.localoffices._components.LocalOfficeTestDateEditorSheet
 import it.mensa.app.features.localoffices._components.TestDateEditorMode
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.AppFormat
@@ -224,7 +223,7 @@ fun LocalOfficeScreen(
                         LinktreeGroup(
                             linktree = state.linktree,
                             onLinkClick = { url ->
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                ExternalLinks.open(context, url)
                             },
                         )
                     }

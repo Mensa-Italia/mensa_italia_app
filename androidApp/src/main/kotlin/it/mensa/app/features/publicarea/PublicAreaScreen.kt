@@ -1,7 +1,5 @@
 package it.mensa.app.features.publicarea
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -61,6 +59,7 @@ import it.mensa.app.features.podcasts.PodcastsListScreen
 import it.mensa.app.features.quid.QuidArticleScreen
 import it.mensa.app.features.quid.QuidIssueScreen
 import it.mensa.app.features.quid.QuidIssuesScreen
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.root.MensaLogoMark
 import it.mensa.shared.model.LocalOfficeAssistantModel
@@ -332,11 +331,7 @@ private fun PublicLanding(
                     icon = Icons.Outlined.PersonAdd,
                     title = tr("public.area.register_test", fallback = "Iscriviti per fare il test"),
                     trailingIcon = Icons.AutoMirrored.Outlined.OpenInNew,
-                    onClick = {
-                        runCatching {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(REGISTER_TEST_URL)))
-                        }
-                    },
+                    onClick = { ExternalLinks.open(context, REGISTER_TEST_URL) },
                 )
             }
             SectionFooter(

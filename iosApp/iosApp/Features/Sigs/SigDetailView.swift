@@ -328,7 +328,9 @@ struct SigDetailView: View {
     /// so joining IS opening the external link.
     @ViewBuilder
     private func actions(_ sig: SigModel) -> some View {
-        if !sig.link.isEmpty, let url = URL(string: sig.link) {
+        // `sig.link` arriva dal backend e puo' essere senza schema
+        // (es. `www.…`): normalizzato qui, altrimenti il bottone non apre niente.
+        if let url = ExternalLink.url(sig.link) {
             Link(destination: url) {
                 HStack(spacing: 10) {
                     Image(systemName: sig.groupType.contains("facebook")

@@ -1,7 +1,5 @@
 package it.mensa.app.features.tickets
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
@@ -52,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.QrCodeView
 import it.mensa.app.support.AppFormat
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
@@ -208,9 +207,9 @@ private fun TicketContent(
 
         // Link to event CTA
         val link = ticket.link
-        if (!link.isNullOrBlank()) {
+        if (ExternalLinks.canOpen(link)) {
             Button(
-                onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link))) } },
+                onClick = { ExternalLinks.open(context, link) },
                 modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
             ) {
                 Icon(Icons.Outlined.ArrowOutward, null, modifier = Modifier.size(18.dp))

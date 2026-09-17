@@ -51,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,6 +61,7 @@ import it.mensa.app.features.profile._components.ProfileRow
 import it.mensa.app.features.profile._components.ProfileSectionGroup
 import it.mensa.app.features.profile._components.ProfileSectionTone
 import it.mensa.app.features.profile._components.ProfileToggleRow
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
@@ -81,7 +81,6 @@ fun ProfileScreen(
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val uriHandler = LocalUriHandler.current
     val appVersion = remember(context) {
         runCatching {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -158,12 +157,12 @@ fun ProfileScreen(
                             // Con `donation_link_on_android` acceso la donazione
                             // esce dall'app invece di passare dalla pagina
                             // Stripe interna. Il link e' `donation_stripe_link`;
-                            // se e' vuoto il flag non conta e si resta sulla
-                            // pagina nativa, altrimenti il pulsante non aprirebbe
-                            // niente.
+                            // se non e' apribile il flag non conta e si resta
+                            // sulla pagina nativa, altrimenti il pulsante non
+                            // aprirebbe niente.
                             onClick = {
                                 val link = koinAccess().featureFlags.donationLinkAndroid
-                                if (link != null) uriHandler.openUri(link)
+                                if (ExternalLinks.canOpen(link)) ExternalLinks.open(context, link)
                                 else onNavigate(ProfileRoute.MakeDonation)
                             },
                         )

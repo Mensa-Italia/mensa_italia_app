@@ -1,7 +1,5 @@
 package it.mensa.app.features.localoffices
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.localoffices._components.LinkEditorMode
 import it.mensa.app.features.localoffices._components.LocalOfficeLinkEditorSheet
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
@@ -165,11 +164,10 @@ fun LocalOfficeLinktreeScreen(
                                 LinktreeLinkButton(
                                     link = link,
                                     canEdit = canEdit,
-                                    onClick = {
-                                        if (link.url.isNotEmpty()) {
-                                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link.url)))
-                                        }
-                                    },
+                                    // `open` da sola: se l'indirizzo non porta da
+                                    // nessuna parte lo dice con un avviso, invece di
+                                    // lasciare una riga che non reagisce al tocco.
+                                    onClick = { ExternalLinks.open(context, link.url) },
                                     onEdit = { editingLink = link },
                                     onDelete = { deletingLink = link },
                                 )
@@ -186,11 +184,7 @@ fun LocalOfficeLinktreeScreen(
                                 LinktreeLinkButton(
                                     link = child,
                                     canEdit = canEdit,
-                                    onClick = {
-                                        if (child.url.isNotEmpty()) {
-                                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(child.url)))
-                                        }
-                                    },
+                                    onClick = { ExternalLinks.open(context, child.url) },
                                     onEdit = { editingLink = child },
                                     onDelete = { deletingLink = child },
                                 )

@@ -1,8 +1,6 @@
 package it.mensa.app.features.quid
 
 import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +32,7 @@ import it.mensa.app.features.quid._components.buildAudioTrack
 import it.mensa.app.features.quid._components.quidTrackId
 import it.mensa.app.features.quid.util.QuidDateParser
 import it.mensa.app.services.audio.AudioPlayerController
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
@@ -193,16 +192,9 @@ fun QuidArticleScreen(
                         }
 
                         // CTA — open on site
-                        if (article.link.isNotEmpty()) {
+                        if (ExternalLinks.canOpen(article.link)) {
                             OutlinedButton(
-                                onClick = {
-                                    try {
-                                        val uri = Uri.parse(article.link)
-                                        CustomTabsIntent.Builder().build().launchUrl(context, uri)
-                                    } catch (_: Exception) {
-                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(article.link)))
-                                    }
-                                },
+                                onClick = { ExternalLinks.open(context, article.link) },
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Icon(

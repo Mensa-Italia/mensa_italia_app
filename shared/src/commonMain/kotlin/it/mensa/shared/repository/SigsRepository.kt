@@ -7,6 +7,7 @@ import it.mensa.shared.api.FilePart
 import it.mensa.shared.api.endpoints.SigsApi
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.SigModel
+import it.mensa.shared.net.ExternalUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -86,7 +87,9 @@ class SigsRepository(
     private fun baseFields(draft: SigDraft): Map<String, Any?> {
         val map = linkedMapOf<String, Any?>(
             "name" to draft.name,
-            "link" to draft.link,
+            // Stesso motivo dei deal: l'editor salva quel che viene digitato,
+            // e un link senza schema poi non lo apre nessuna delle due app.
+            "link" to (ExternalUrl.normalize(draft.link) ?: draft.link),
             "group_type" to draft.groupType,
         )
         if (draft.description.isNotBlank()) map["description"] = draft.description

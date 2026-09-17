@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.root.MensaLogoMark
 
@@ -195,13 +196,7 @@ fun ChiSiamoScreen(onBack: () -> Unit) {
                         icon = Icons.Outlined.Mail,
                         title = tr("public.chi_siamo.contact.email.title", fallback = "Scrivici una mail"),
                         subtitle = "info@mensa.it",
-                        onClick = {
-                            runCatching {
-                                context.startActivity(
-                                    Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:info@mensa.it")),
-                                )
-                            }
-                        },
+                        onClick = { ExternalLinks.sendEmail(context, "info@mensa.it") },
                     )
                     CSRowDivider()
                     ContactRow(

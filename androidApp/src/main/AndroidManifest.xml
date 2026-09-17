@@ -22,6 +22,48 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Visibilita' dei pacchetti (Android 11+).
+         Da API 30 un'app vede solo le app che dichiara qui: senza questo blocco
+         `queryIntentActivities` e `resolveActivity` rispondono "nessuno" anche
+         quando un browser, un client di posta o un'app calendario ci sono
+         eccome. `startActivity` continuerebbe a funzionare per i link web, ma
+         il codice che usa `resolveActivity` come controllo preventivo si
+         convince che non ci sia niente e non fa partire l'azione: e' il motivo
+         per cui "Aggiungi al calendario" non faceva nulla su Android recenti.
+         Le Custom Tabs hanno bisogno della stessa visibilita' per trovare il
+         browser che le supporta. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.INSERT" />
+            <data android:mimeType="vnd.android.cursor.dir/event" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/pdf" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+
     <!-- Calendar -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />

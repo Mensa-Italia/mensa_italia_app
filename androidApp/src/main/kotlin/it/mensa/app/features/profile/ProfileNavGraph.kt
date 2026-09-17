@@ -13,8 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import android.content.Intent
-import android.net.Uri
 import it.mensa.app.features.profile.sub.CalendarLinkerScreen
 import it.mensa.app.features.profile.sub.CreditsScreen
 import it.mensa.app.features.profile.sub.DevicesScreen
@@ -24,6 +22,7 @@ import it.mensa.app.features.profile.sub.OrgChartScreen
 import it.mensa.app.features.profile.sub.PasskeysScreen
 import it.mensa.app.features.profile.sub.PaymentMethodsScreen
 import it.mensa.app.features.profile.sub.RenewMembershipScreen
+import it.mensa.app.support.ExternalLinks
 
 sealed class ProfileRoute(val route: String) {
     object Main : ProfileRoute("profile_main")
@@ -115,14 +114,14 @@ fun ProfileNavGraph(
         composable(ProfileRoute.PrivacyPolicy.route) {
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mensa.it/privacy")))
+                ExternalLinks.open(context, "https://www.mensa.it/privacy")
                 navController.popBackStack()
             }
         }
         composable(ProfileRoute.Terms.route) {
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mensa.it/privacy-policy/")))
+                ExternalLinks.open(context, "https://www.mensa.it/privacy-policy/")
                 navController.popBackStack()
             }
         }

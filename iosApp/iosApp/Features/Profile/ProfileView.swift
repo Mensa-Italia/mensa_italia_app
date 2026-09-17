@@ -73,8 +73,7 @@ struct ProfileView: View {
                 // `donation_stripe_link`; se e' vuoto il flag non conta e si
                 // resta sulla pagina nativa, altrimenti la riga non aprirebbe
                 // niente.
-                if let donationLink = koin.featureFlags.donationLinkIos,
-                   let url = URL(string: donationLink) {
+                if let url = ExternalLink.url(koin.featureFlags.donationLinkIos) {
                     Link(destination: url) {
                         ProfileRowLabel(icon: "heart.fill",
                                         title: tr("views.make_donation.title", fallback: "Fai una donazione"),
@@ -155,12 +154,12 @@ struct ProfileView: View {
             Section(tr("app.profile.section_info", fallback: "Info")) { // i18n
                 ProfileRow(icon: "info.circle", title: tr("app.profile.version", fallback: "Versione"), value: appVersion) // i18n
 
-                Button(action: { openURL("https://www.mensa.it/privacy") }) {
+                Button(action: { ExternalLink.open("https://www.mensa.it/privacy") }) {
                     ProfileRow(icon: "lock.shield", title: tr("views.settings.tile.privacypolicy.title", fallback: "Privacy Policy"), action: {}) // i18n
                 }
                 .buttonStyle(.plain)
 
-                Button(action: { openURL("https://www.mensa.it/privacy-policy/") }) {
+                Button(action: { ExternalLink.open("https://www.mensa.it/privacy-policy/") }) {
                     ProfileRow(icon: "doc.text", title: tr("app.profile.terms", fallback: "Termini di utilizzo"), action: {}) // i18n
                 }
                 .buttonStyle(.plain)
@@ -281,13 +280,6 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24)
-    }
-
-    // MARK: - Helpers
-
-    private func openURL(_ urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url)
     }
 }
 

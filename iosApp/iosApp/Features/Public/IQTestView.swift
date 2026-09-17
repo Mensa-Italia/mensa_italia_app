@@ -160,7 +160,7 @@ struct IQTestView: View {
                         "iqtest.disclaimer.privacy",
                         fallback: "Le tue risposte vengono inviate direttamente a Mensa Norge, che calcola e restituisce il risultato. Mensa Italia non vede, non conserva e non elabora i dati del test."
                     ))
-                    if let url = URL(string: "https://test.mensa.no/Home/Test/it") {
+                    if let url = ExternalLink.url("https://test.mensa.no/Home/Test/it") {
                         Link(
                             tr(
                                 "iqtest.disclaimer.open_original",

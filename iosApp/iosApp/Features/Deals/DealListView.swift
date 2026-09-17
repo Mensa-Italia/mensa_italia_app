@@ -100,7 +100,7 @@ struct DealListView: View {
                         value: appeared
                     )
                     .contextMenu {
-                        if let link = deal.link, !link.isEmpty, let url = URL(string: link) {
+                        if let url = ExternalLink.url(deal.link) {
                             Link(destination: url) {
                                 Label(
                                     tr("app.open_link", fallback: "Apri link"),

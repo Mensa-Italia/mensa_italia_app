@@ -55,7 +55,11 @@ final class ExternalAddonViewModel {
     /// append every (name, value) pair returned by the server as a query
     /// parameter, preserving any params already present on `base`.
     static func buildURL(base: String, accessData: AddonAccessData) -> URL? {
-        guard var comps = URLComponents(string: base) else { return nil }
+        // Il `base` dell'addon arriva dal backend e puo' essere senza schema.
+        // `URLComponents(string:)` accetta anche un indirizzo relativo, quindi
+        // qui non fallisce niente: la WKWebView si limita a restare bianca.
+        guard let absolute = ExternalLink.browsable(base),
+              var comps = URLComponents(url: absolute, resolvingAgainstBaseURL: false) else { return nil }
         var items: [URLQueryItem] = comps.queryItems ?? []
         // `accessData.params` bridges to `NSDictionary` from Kotlin's
         // `Map<String, String>`. Cast defensively — if bridging produces

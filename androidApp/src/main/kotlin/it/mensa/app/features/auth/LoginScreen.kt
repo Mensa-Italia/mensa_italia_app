@@ -1,7 +1,5 @@
 package it.mensa.app.features.auth
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -60,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.app.ui.root.LogoVariant
@@ -339,8 +338,10 @@ fun LoginScreen(
             // ── Forgot password ───────────────────────────────────────────────
             TextButton(
                 onClick = {
-                    val uri = Uri.parse("https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734")
-                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
+                    ExternalLinks.open(
+                        context,
+                        "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734",
+                    )
                 },
             ) {
                 Text(
@@ -365,13 +366,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 TextButton(
-                    onClick = {
-                        runCatching {
-                            context.startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mensa.it")),
-                            )
-                        }
-                    },
+                    onClick = { ExternalLinks.open(context, "https://www.mensa.it") },
                 ) {
                     Text(
                         text = tr("app.login.discover", "Scopri Mensa"),

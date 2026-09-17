@@ -323,9 +323,7 @@ struct LocalOfficeLinktreeView: View {
     @ViewBuilder
     private func readOnlyLinktreeRow(_ row: LocalOfficeLinktreeRowModel) -> some View {
         Button {
-            if let url = URL(string: row.url) {
-                UIApplication.shared.open(url)
-            }
+            ExternalLink.open(row.url)
         } label: {
             HStack(spacing: 12) {
                 iconView(row.icon)

@@ -1,8 +1,6 @@
 package it.mensa.app.features.receipts
 
 import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
@@ -55,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.AppFormat
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.features.receipts.amountFormatted
 import it.mensa.app.features.receipts.fallback
@@ -85,10 +84,7 @@ fun ReceiptDetailScreen(
     // Open Chrome Custom Tab when PDF URL is ready
     LaunchedEffect(uiState.pdfUrl) {
         val urlStr = uiState.pdfUrl ?: return@LaunchedEffect
-        val uri = Uri.parse(urlStr)
-        val customTab = CustomTabsIntent.Builder().setShowTitle(true).build()
-        runCatching { customTab.launchUrl(context, uri) }
-            .onFailure { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) } }
+        ExternalLinks.open(context, urlStr)
         vm.onPdfUrlConsumed()
     }
 

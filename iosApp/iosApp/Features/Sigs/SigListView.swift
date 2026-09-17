@@ -204,7 +204,9 @@ struct SigListView: View {
                     .buttonStyle(.plain)
                     .modifier(StaggerAppear(index: idx))
                     .contextMenu {
-                        if !sig.link.isEmpty, let url = URL(string: sig.link) {
+                        // Stesso link della detail: normalizzato, cosi' la voce
+                        // "Apri link" non compare per un indirizzo non apribile.
+                        if let url = ExternalLink.url(sig.link) {
                             Link(destination: url) {
                                 Label(tr("app.open_link", fallback: "Apri link"), systemImage: "safari")
                             }

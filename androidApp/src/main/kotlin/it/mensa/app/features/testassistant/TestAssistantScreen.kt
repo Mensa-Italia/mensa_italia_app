@@ -1,8 +1,5 @@
 package it.mensa.app.features.testassistant
 
-import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.*
 import it.mensa.app.ui.theme.*
@@ -62,16 +60,7 @@ fun TestAssistantScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                onOpenPlatform = {
-                    runCatching {
-                        CustomTabsIntent.Builder().build()
-                            .launchUrl(context, Uri.parse(vm.platformUrl))
-                    }.onFailure {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse(vm.platformUrl)),
-                        )
-                    }
-                },
+                onOpenPlatform = { ExternalLinks.open(context, vm.platformUrl) },
             )
         } else {
             UnauthorizedState(

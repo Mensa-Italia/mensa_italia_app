@@ -83,7 +83,7 @@ struct QuidArticleView: View {
             // Share the original WordPress URL out. The Liquid Glass capsule keeps
             // it readable against any hero background; we only show it once the
             // article is loaded so the share sheet never opens on an empty target.
-            if let article, let url = URL(string: article.link) {
+            if let article, let url = ExternalLink.url(article.link) {
                 ToolbarItem(placement: .topBarTrailing) {
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
@@ -153,9 +153,9 @@ struct QuidArticleView: View {
                     }
 
                     // Escape-hatch — quieter bordered style fits the editorial palette.
-                    if let url = URL(string: article.link) {
+                    if ExternalLink.canOpen(article.link) {
                         Button {
-                            UIApplication.shared.open(url)
+                            ExternalLink.open(article.link)
                         } label: {
                             Label(
                                 tr("addons.quid.open_on_site", fallback: "Apri sul sito"),

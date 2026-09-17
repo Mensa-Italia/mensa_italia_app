@@ -10,6 +10,7 @@ import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.DealModel
 import it.mensa.shared.model.DealsContactModel
 import it.mensa.shared.model.LocationModel
+import it.mensa.shared.net.ExternalUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -157,7 +158,12 @@ class DealsRepository(
         details = details,
         who = who,
         howToGet = howToGet,
-        link = link,
+        // Lo schema si mette qui, che e' l'unico punto da cui passano sia
+        // l'editor iOS sia quello Android: e' cosi' che nel database sono
+        // finiti link come `www.bonavitaly.com`, che poi le app non sapevano
+        // aprire. Se non se ne ricava un indirizzo si tiene quel che l'utente
+        // ha scritto, che buttarglielo via sarebbe peggio.
+        link = ExternalUrl.normalize(link) ?: link,
         vatNumber = vatNumber,
         position = positionId,
         isActive = true,

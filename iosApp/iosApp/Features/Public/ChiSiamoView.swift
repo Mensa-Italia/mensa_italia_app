@@ -117,7 +117,8 @@ struct ChiSiamoView: View {
             }
 
             Section(tr("public.chi_siamo.section.contacts", fallback: "Contatti")) {
-                Link(destination: URL(string: "mailto:info@mensa.it")!) {
+                if let mail = ExternalLink.mailto("info@mensa.it") {
+                Link(destination: mail) {
                     Label {
                         VStack(alignment: .leading) {
                             Text(tr("public.chi_siamo.contact.email.title", fallback: "Scrivici una mail"))
@@ -129,7 +130,10 @@ struct ChiSiamoView: View {
                         }
                     } icon: { Image(systemName: "envelope") }
                 }
-                Link(destination: URL(string: "maps://?address=Viale+Lunigiana+7+20125+Milano")!) {
+                }
+                // `maps:` non e' http: passa da `url`, non da `browsable`.
+                if let maps = ExternalLink.url("maps://?address=Viale+Lunigiana+7+20125+Milano") {
+                Link(destination: maps) {
                     Label {
                         VStack(alignment: .leading) {
                             Text(tr("public.chi_siamo.contact.address.title", fallback: "Sede nazionale, Milano"))
@@ -140,6 +144,7 @@ struct ChiSiamoView: View {
                                 .foregroundStyle(.secondary)
                         }
                     } icon: { Image(systemName: "mappin.and.ellipse") }
+                }
                 }
             }
         }

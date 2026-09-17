@@ -26,7 +26,9 @@ final class ReceiptDetailViewModel {
         defer { downloadingPDF = false }
         do {
             let urlString = try await koin.receipts.getReceiptUrl(id: id)
-            if let url = URL(string: urlString) {
+            // Finisce in SFSafariViewController, che accetta solo http/https:
+            // con qualunque altra cosa violerebbe la sua precondizione.
+            if let url = ExternalLink.browsable(urlString) {
                 self.pdfURL = url
             }
         } catch {

@@ -12,6 +12,7 @@ import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.EventScheduleModel
 import it.mensa.shared.model.LocationModel
+import it.mensa.shared.net.ExternalUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -191,7 +192,8 @@ class EventsRepository(
         val map = linkedMapOf<String, Any?>(
             "name" to draft.name,
             "description" to draft.description,
-            "info_link" to draft.infoLink,
+            // Stesso motivo dei deal: senza schema il bottone "Sito" non apre nulla.
+            "info_link" to (ExternalUrl.normalize(draft.infoLink) ?: draft.infoLink),
             "when_start" to draft.whenStart.toString(),
             "when_end" to draft.whenEnd.toString(),
             "is_national" to draft.isNational,

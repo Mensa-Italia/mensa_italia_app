@@ -93,7 +93,7 @@ struct TicketDetailView: View {
                 .padding(16)
                 .compatGlass(cornerRadius: 16)
 
-                if let link = t.link, let url = URL(string: link) {
+                if let url = ExternalLink.url(t.link) {
                     Link(destination: url) {
                         Label(tr("tickets.go_event", fallback: "Vai all'evento"), systemImage: "arrow.up.right.square")
                             .font(.headline)

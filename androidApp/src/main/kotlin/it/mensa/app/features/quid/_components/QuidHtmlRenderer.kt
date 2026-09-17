@@ -1,11 +1,9 @@
 package it.mensa.app.features.quid._components
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import it.mensa.app.support.ExternalLinks
 
 /**
  * QuidHtmlRenderer — WebView wrapper in AndroidView.
@@ -66,16 +65,10 @@ fun QuidHtmlRenderer(
                         view: WebView,
                         request: WebResourceRequest,
                     ): Boolean {
-                        val uri = request.url ?: return false
-                        try {
-                            CustomTabsIntent.Builder()
-                                .build()
-                                .launchUrl(context, uri)
-                        } catch (_: Exception) {
-                            context.startActivity(
-                                android.content.Intent(android.content.Intent.ACTION_VIEW, uri),
-                            )
-                        }
+                        val url = request.url?.toString() ?: return false
+                        // true anche quando l'helper fallisce: se restituissimo false
+                        // il link si aprirebbe dentro la WebView dell'articolo.
+                        ExternalLinks.open(context, url)
                         return true
                     }
                 }

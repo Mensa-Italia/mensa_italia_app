@@ -28,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -86,6 +86,7 @@ import it.mensa.app.navigation.toRoute
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.push.PendingPushTarget
 import it.mensa.app.services.push.PushPermissionRequester
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaNavItem
@@ -205,7 +206,7 @@ fun MainAppShell() {
     // navigare lancerebbe. `runCatching` perche' una rotta che non risolve non
     // deve far chiudere l'app a chi ha solo toccato una notifica.
     val pendingPush by PendingPushTarget.target.collectAsStateWithLifecycle()
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     LaunchedEffect(pendingPush, navBackStackEntry != null) {
         if (navBackStackEntry == null || pendingPush == null) return@LaunchedEffect
         val target = PendingPushTarget.consume() ?: return@LaunchedEffect
@@ -213,7 +214,9 @@ fun MainAppShell() {
             DeepLinkHandler.handlePushTarget(
                 target = target,
                 navController = navController,
-                openUrl = uriHandler::openUri,
+                // Non l'`UriHandler` di Compose: su un indirizzo che non risolve
+                // lancia, e l'indirizzo qui arriva dal payload della push.
+                openUrl = { url -> ExternalLinks.open(context, url) },
             )
         }
     }

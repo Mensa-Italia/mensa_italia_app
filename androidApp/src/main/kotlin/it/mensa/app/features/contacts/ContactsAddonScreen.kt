@@ -1,7 +1,5 @@
 package it.mensa.app.features.contacts
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +17,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.*
 import it.mensa.app.ui.theme.*
@@ -109,12 +108,8 @@ fun ContactsAddonScreen(
                                 items(group.members, key = { "member_${group.id}_${it.userId}" }) { member ->
                                     ContactRow(
                                         member = member,
-                                        onCall = { phone ->
-                                            context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone")))
-                                        },
-                                        onEmail = { email ->
-                                            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$email")))
-                                        },
+                                        onCall = { phone -> ExternalLinks.dial(context, phone) },
+                                        onEmail = { email -> ExternalLinks.sendEmail(context, email) },
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 }

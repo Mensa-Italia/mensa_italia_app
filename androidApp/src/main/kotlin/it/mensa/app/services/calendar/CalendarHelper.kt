@@ -55,11 +55,17 @@ class CalendarHelper(private val context: Context) {
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        return if (intent.resolveActivity(context.packageManager) != null) {
+        // Si prova e basta, invece di chiedere prima a `resolveActivity`.
+        // Da Android 11 quella domanda risponde "nessuno" per ogni app non
+        // dichiarata in <queries>, anche quando il calendario e' installato:
+        // il gate diceva di no e "Aggiungi al calendario" non faceva niente.
+        // Il <queries> nel manifest adesso c'e', ma il tentativo diretto e'
+        // comunque piu' solido, che l'unica risposta che conta e' se parte.
+        return try {
             context.startActivity(intent)
             true
-        } else {
-            Logger.w("Calendar", "openIntent", "No calendar app found")
+        } catch (e: Exception) {
+            Logger.w("Calendar", "openIntent", "Nessuna app calendario: ${e.message}")
             false
         }
     }

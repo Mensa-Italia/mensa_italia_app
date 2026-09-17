@@ -34,10 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
@@ -55,7 +56,7 @@ fun RenewMembershipScreen(
     val user = uiState.user
     val isExpired = vm.isExpired(user)
     val locale = rememberAppLocale()
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -141,7 +142,7 @@ fun RenewMembershipScreen(
 
             // ── Renew CTA ────────────────────────────────────────────────────
             Button(
-                onClick = { uriHandler.openUri(RENEW_URL) },
+                onClick = { ExternalLinks.open(context, RENEW_URL) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 56.dp),

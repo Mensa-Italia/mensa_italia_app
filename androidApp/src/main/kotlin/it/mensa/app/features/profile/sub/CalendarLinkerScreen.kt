@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import org.koin.androidx.compose.koinViewModel
@@ -138,11 +138,7 @@ fun CalendarLinkerScreen(
                     if (link != null) {
                         // ── Add to Calendar Button ─────────────────────────
                         Button(
-                            onClick = {
-                                val uri = Uri.parse(vm.webcalUrl(link))
-                                val intent = Intent(Intent.ACTION_VIEW, uri)
-                                context.startActivity(intent)
-                            },
+                            onClick = { ExternalLinks.open(context, vm.webcalUrl(link)) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .defaultMinSize(minHeight = 56.dp),

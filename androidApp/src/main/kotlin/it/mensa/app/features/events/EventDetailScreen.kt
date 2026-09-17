@@ -74,6 +74,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import it.mensa.app.features.events.util.EventDateFormatter
 import it.mensa.app.services.calendar.CalendarHelper
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
@@ -253,13 +254,10 @@ fun EventDetailScreen(
                             Text(tr("events.cta.calendar", fallback = "Aggiungi al calendario"))
                         }
 
-                        if (event.bookingLink.isNotBlank()) {
+                        if (ExternalLinks.canOpen(event.bookingLink)) {
                             Spacer(Modifier.height(10.dp))
                             OutlinedButton(
-                                onClick = {
-                                    val uri = Uri.parse(if (event.bookingLink.startsWith("http")) event.bookingLink else "https://${event.bookingLink}")
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, uri))
-                                },
+                                onClick = { ExternalLinks.open(context, event.bookingLink) },
                                 modifier = Modifier.fillMaxWidth(),
                             ) { Text(tr("events.cta.book", fallback = "Prenota")) }
                         }
@@ -291,7 +289,7 @@ fun EventDetailScreen(
 
                         // Contatti
                         val hasMail = event.contact.contains("@")
-                        val hasLink = event.infoLink.isNotBlank()
+                        val hasLink = ExternalLinks.canOpen(event.infoLink)
                         if (hasMail || hasLink) {
                             Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(tr("events.section.contacts", fallback = "Contatti"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
@@ -300,15 +298,12 @@ fun EventDetailScreen(
                                 Column(Modifier.padding(16.dp)) {
                                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         if (hasMail) {
-                                            OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${event.contact}"))) }) {
+                                            OutlinedButton(onClick = { ExternalLinks.sendEmail(context, event.contact) }) {
                                                 Icon(Icons.Outlined.Email, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.email", fallback = "Email"))
                                             }
                                         }
                                         if (hasLink) {
-                                            OutlinedButton(onClick = {
-                                                val url = if (event.infoLink.startsWith("http")) event.infoLink else "https://${event.infoLink}"
-                                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                            }) {
+                                            OutlinedButton(onClick = { ExternalLinks.open(context, event.infoLink) }) {
                                                 Icon(Icons.Outlined.Language, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.site", fallback = "Sito"))
                                             }
                                         }

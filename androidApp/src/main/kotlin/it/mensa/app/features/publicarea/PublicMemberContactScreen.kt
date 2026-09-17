@@ -1,7 +1,5 @@
 package it.mensa.app.features.publicarea
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,10 +41,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
-import java.net.URLEncoder
 
 /**
  * Pre-login mini-detail for a local-office admin / assistant. Mirrors
@@ -141,11 +139,7 @@ fun PublicMemberContactScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val subject = URLEncoder.encode(mailSubject, "UTF-8")
-                                    val uri = Uri.parse("mailto:$email?subject=$subject")
-                                    runCatching {
-                                        context.startActivity(Intent(Intent.ACTION_SENDTO, uri))
-                                    }
+                                    ExternalLinks.sendEmail(context, email, mailSubject)
                                 }
                                 .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically,

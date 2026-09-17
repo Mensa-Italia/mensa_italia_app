@@ -311,7 +311,7 @@ struct DealDetailView: View {
     @ViewBuilder
     private func actionsBlock(_ deal: DealModel) -> some View {
         VStack(spacing: 12) {
-            if let link = deal.link, !link.isEmpty, let url = URL(string: link) {
+            if let url = ExternalLink.url(deal.link) {
                 Link(destination: url) {
                     HStack(spacing: 8) {
                         Image(systemName: "safari")
@@ -487,16 +487,15 @@ private struct ContactRow: View {
                 }
 
                 HStack(spacing: 10) {
-                    if !contact.email.isEmpty,
-                       let url = URL(string: "mailto:\(contact.email)") {
+                    if let url = ExternalLink.mailto(contact.email) {
                         Link(destination: url) {
                             Label(contact.email, systemImage: "envelope.fill")
                                 .font(.caption)
                                 .labelStyle(.titleAndIcon)
                         }
                     }
-                    if let phone = contact.phoneNumber, !phone.isEmpty,
-                       let url = URL(string: "tel:\(phone.replacingOccurrences(of: " ", with: ""))") {
+                    if let phone = contact.phoneNumber,
+                       let url = ExternalLink.tel(phone) {
                         Link(destination: url) {
                             Label(phone, systemImage: "phone.fill")
                                 .font(.caption)

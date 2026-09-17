@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
@@ -80,6 +78,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
@@ -371,16 +370,9 @@ private fun DealDetailContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Open link
-            deal.link?.takeIf { it.isNotEmpty() }?.let { link ->
+            deal.link?.takeIf { ExternalLinks.canOpen(it) }?.let { link ->
                 Button(
-                    onClick = {
-                        try {
-                            val uri = Uri.parse(link)
-                            CustomTabsIntent.Builder().build().launchUrl(context, uri)
-                        } catch (_: Exception) {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-                        }
-                    },
+                    onClick = { ExternalLinks.open(context, link) },
                     modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
                 ) {
                     Icon(Icons.Outlined.OpenInBrowser, null, modifier = Modifier.size(18.dp))
@@ -571,9 +563,7 @@ private fun ContactRow(contact: DealsContactModel) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (contact.email.isNotEmpty()) {
                     TextButton(
-                        onClick = {
-                            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${contact.email}")))
-                        },
+                        onClick = { ExternalLinks.sendEmail(context, contact.email) },
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
                     ) {
                         Text(contact.email, style = MaterialTheme.typography.labelSmall)
@@ -581,9 +571,7 @@ private fun ContactRow(contact: DealsContactModel) {
                 }
                 contact.phoneNumber?.takeIf { it.isNotEmpty() }?.let { phone ->
                     TextButton(
-                        onClick = {
-                            context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${phone.replace(" ", "")}")))
-                        },
+                        onClick = { ExternalLinks.dial(context, phone) },
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
                     ) {
                         Text(phone, style = MaterialTheme.typography.labelSmall)

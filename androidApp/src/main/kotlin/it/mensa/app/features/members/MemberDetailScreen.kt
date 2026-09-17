@@ -1,7 +1,5 @@
 package it.mensa.app.features.members
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -59,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.members._components.MemberAvatar
 import it.mensa.app.features.members._components.MemberHeroAvatar
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
@@ -114,15 +113,9 @@ fun MemberDetailScreen(
                     MemberDetailContent(
                         member = member,
                         vm = vm,
-                        onOpenUrl = { url ->
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        },
-                        onDial = { phone ->
-                            context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone")))
-                        },
-                        onEmail = { email ->
-                            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$email")))
-                        },
+                        onOpenUrl = { url -> ExternalLinks.open(context, url) },
+                        onDial = { phone -> ExternalLinks.dial(context, phone) },
+                        onEmail = { email -> ExternalLinks.sendEmail(context, email) },
                     )
                 }
                 state.error != null -> {
@@ -289,7 +282,13 @@ private fun MemberDetailContent(
                     rows = contactRows,
                     onRowClick = { _, value ->
                         when {
-                            value.startsWith("http") -> onOpenUrl(value)
+                            // `isWebLink` e non `canOpen`: quest'ultimo dice di si'
+                            // anche a una mail nuda, che normalizza in `mailto:`, e
+                            // si mangerebbe il ramo del browser. Al contrario, un
+                            // indirizzo web che contiene una chiocciola non deve
+                            // finire nel compositore di posta: per questo il web
+                            // resta la prima domanda, come era prima.
+                            ExternalLinks.isWebLink(value) -> onOpenUrl(value)
                             value.contains("@") -> onEmail(value)
                             value.matches(Regex("[0-9 +()\\-]+")) -> onDial(value)
                         }

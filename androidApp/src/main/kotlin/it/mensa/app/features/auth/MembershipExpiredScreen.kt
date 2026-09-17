@@ -38,11 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.AppFormat
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
@@ -66,7 +67,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun MembershipExpiredScreen() {
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val locale = rememberAppLocale()
     val scope = rememberCoroutineScope()
     val auth = remember { koinAccess().auth }
@@ -173,7 +174,7 @@ fun MembershipExpiredScreen() {
 
             PrimaryButton(
                 text = tr("app.renew.cta_now", fallback = "Rinnova ora"),
-                onClick = { uriHandler.openUri(Membership.RENEWAL_URL) },
+                onClick = { ExternalLinks.open(context, Membership.RENEWAL_URL) },
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Outlined.OpenInBrowser,
             )

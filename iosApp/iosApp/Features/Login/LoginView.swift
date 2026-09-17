@@ -69,10 +69,12 @@ struct LoginView: View {
                 } footer: {
                     HStack {
                         Spacer()
-                        Link(
-                            tr("views.signin.form.button.recover_password.text", fallback: "Password dimenticata?"),
-                            destination: URL(string: "https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734")!
-                        )
+                        if let url = ExternalLink.url("https://www.cloud32.it/Associazioni/utenti/password/reset?codass=170734") {
+                            Link(
+                                tr("views.signin.form.button.recover_password.text", fallback: "Password dimenticata?"),
+                                destination: url
+                            )
+                        }
                     }
                 }
 
@@ -185,10 +187,12 @@ struct LoginView: View {
                     HStack(spacing: 4) {
                         Text(tr("app.login.no_member", fallback: "Non sei socio?"))
                             .foregroundStyle(.secondary)
-                        Link(
-                            tr("app.login.discover", fallback: "Scopri Mensa"),
-                            destination: URL(string: "https://www.mensa.it")!
-                        )
+                        if let url = ExternalLink.url("https://www.mensa.it") {
+                            Link(
+                                tr("app.login.discover", fallback: "Scopri Mensa"),
+                                destination: url
+                            )
+                        }
                     }
                     .font(.footnote)
                     .frame(maxWidth: .infinity, alignment: .center)

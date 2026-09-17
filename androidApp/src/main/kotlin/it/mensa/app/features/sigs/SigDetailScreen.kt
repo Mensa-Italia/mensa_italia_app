@@ -1,7 +1,5 @@
 package it.mensa.app.features.sigs
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -53,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
@@ -102,9 +101,7 @@ fun SigDetailScreen(
                 state.sig != null -> {
                     SigDetailContent(
                         sig = state.sig!!,
-                        onJoin = { url ->
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        },
+                        onJoin = { url -> ExternalLinks.open(context, url) },
                     )
                 }
                 state.error != null -> {
@@ -338,7 +335,7 @@ private fun SigDetailContent(
                 },
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (sig.link.isNotBlank()) {
+            if (ExternalLinks.canOpen(sig.link)) {
                 val isFacebook = sig.groupType.contains("facebook", ignoreCase = true)
                 Button(
                     onClick = { onJoin(sig.link) },

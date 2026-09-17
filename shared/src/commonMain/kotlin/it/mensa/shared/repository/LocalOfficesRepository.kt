@@ -10,6 +10,7 @@ import it.mensa.shared.model.LocalOfficeModel
 import it.mensa.shared.model.LocalOfficeTestDateModel
 import it.mensa.shared.model.LocalOfficeTestDateRecord
 import it.mensa.shared.model.SigModel
+import it.mensa.shared.net.ExternalUrl
 import kotlinx.serialization.json.JsonObject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -182,7 +183,13 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         officeId: String,
         record: LocalOfficeLinkRecord,
     ): LocalOfficeLinkRecord {
-        val created = api.createLink(record.copy(localOffice = officeId))
+        // Lo schema si mette qui: l'editor del linktree salva quel che viene
+        // digitato, e "www.sedelocale.it" senza `https://` non lo apre nessuno.
+        val normalized = record.copy(
+            localOffice = officeId,
+            url = ExternalUrl.normalize(record.url) ?: record.url,
+        )
+        val created = api.createLink(normalized)
         refreshLinktreeByOffice(officeId)
         return created
     }
@@ -295,7 +302,9 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
             kind?.let { put("kind", kotlinx.serialization.json.JsonPrimitive(it)) }
             parent?.let { put("parent", kotlinx.serialization.json.JsonPrimitive(it)) }
             title?.let { put("title", kotlinx.serialization.json.JsonPrimitive(it)) }
-            url?.let { put("url", kotlinx.serialization.json.JsonPrimitive(it)) }
+            url?.let {
+                put("url", kotlinx.serialization.json.JsonPrimitive(ExternalUrl.normalize(it) ?: it))
+            }
             icon?.let { put("icon", kotlinx.serialization.json.JsonPrimitive(it)) }
             sortOrder?.let { put("sort_order", kotlinx.serialization.json.JsonPrimitive(it)) }
             active?.let { put("active", kotlinx.serialization.json.JsonPrimitive(it)) }

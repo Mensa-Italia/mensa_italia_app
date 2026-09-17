@@ -142,10 +142,10 @@ struct PublicMemberContactView: View {
     }
 
     private var mailtoURL: URL? {
-        guard !email.isEmpty else { return nil }
-        let subject = tr("public.member.mail_subject", fallback: "Informazioni sul test Mensa")
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        return URL(string: "mailto:\(email)?subject=\(subject)")
+        ExternalLink.mailto(
+            email,
+            subject: tr("public.member.mail_subject", fallback: "Informazioni sul test Mensa")
+        )
     }
 
     private func initials(from name: String) -> String {

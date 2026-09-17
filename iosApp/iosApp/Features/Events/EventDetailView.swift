@@ -113,7 +113,9 @@ struct EventDetailView: View {
             }
         }
         .sheet(isPresented: $showBooking) {
-            if let link = vm.event?.bookingLink, let url = URL(string: link) {
+            // `browsable` e non `url`: SafariView e' un SFSafariViewController,
+            // che accetta solo http/https e su tutto il resto cade.
+            if let url = ExternalLink.browsable(vm.event?.bookingLink) {
                 SafariView(url: url).ignoresSafeArea()
             }
         }
@@ -296,9 +298,18 @@ struct EventDetailView: View {
                 await addToCalendar(event)
             }
 
-            if !event.bookingLink.isEmpty {
+            // Il bottone compare per qualunque link apribile, non solo per il
+            // web: capita che la prenotazione sia una mail o un telefono, e
+            // chiedere `browsable` qui faceva sparire il bottone in quei casi.
+            if ExternalLink.canOpen(event.bookingLink) {
                 Button {
-                    showBooking = true
+                    // Il foglio e' un SFSafariViewController e vuole http/https;
+                    // `mailto:` e `tel:` li deve prendere il sistema.
+                    if ExternalLink.browsable(event.bookingLink) != nil {
+                        showBooking = true
+                    } else {
+                        ExternalLink.open(event.bookingLink)
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "ticket")
@@ -548,14 +559,15 @@ struct EventDetailView: View {
         // Accept either a plain email or an explicit mailto:.
         let mail = raw.hasPrefix("mailto:") ? String(raw.dropFirst("mailto:".count)) : raw
         guard mail.contains("@"), mail.contains(".") else { return nil }
-        return URL(string: "mailto:\(mail)")
+        return ExternalLink.mailto(mail)
     }
 
     private func infoSiteURL(_ raw: String) -> URL? {
-        guard !raw.isEmpty else { return nil }
-        let normalized = raw.hasPrefix("http") ? raw : "https://\(raw)"
-        guard let url = URL(string: normalized), url.host != nil else { return nil }
-        return url
+        // Lo schema mancante e l'host inesistente li gestisce l'helper, con la
+        // stessa regola di Android. `browsable` e non `url`: questo bottone si
+        // chiama "Sito", e una mail nuda nel campo info_link diventerebbe un
+        // `mailto:` che apre il compositore di posta sotto quell'etichetta.
+        ExternalLink.browsable(raw)
     }
 }
 

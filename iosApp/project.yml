@@ -48,6 +48,16 @@ targets:
         NSCalendarsFullAccessUsageDescription: "Mensa Italia chiede accesso al tuo calendario per aggiungere eventi che ti interessano."
         NSCameraUsageDescription: "Mensa Italia usa la fotocamera per scansionare i QR dei francobolli Tableport."
         NSLocationWhenInUseUsageDescription: "Mensa Italia usa la tua posizione per mostrarti eventi vicini sulla mappa."
+        # Schemi che l'app puo' interrogare con `canOpenURL`. Da iOS 9 quella
+        # chiamata risponde `false` per qualunque schema non elencato qui, anche
+        # quando l'app che lo gestisce e' installata: il bottone "Apri in Mappe"
+        # del dettaglio evento restava spento proprio per questo.
+        LSApplicationQueriesSchemes:
+          - maps
+          - comgooglemaps
+          - webcal
+          - tel
+          - mailto
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
             CFBundleURLName: it.mensa.app.stripe

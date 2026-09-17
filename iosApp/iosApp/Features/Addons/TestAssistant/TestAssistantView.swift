@@ -4,7 +4,9 @@ import Shared
 struct TestAssistantView: View {
     @State private var openURL = false
 
-    private let platformURL = URL(string: "https://www.cloud32.it/Associazioni/utenti/testelab")!
+    /// Resta una stringa: l'apertura passa da `ExternalLink`, che normalizza e
+    /// non porta giu' l'app se un domani la costante viene ritoccata male.
+    private let platformURL = "https://www.cloud32.it/Associazioni/utenti/testelab"
 
     /// Powers session-stable: lettura sincrona dall'auth — cambia solo a
     /// login/logout, in entrambi i casi la view viene smontata da RootView.
@@ -90,7 +92,7 @@ struct TestAssistantView: View {
         })
         .onChange(of: openURL) { _, newValue in
             if newValue {
-                UIApplication.shared.open(platformURL)
+                ExternalLink.open(platformURL)
                 openURL = false
             }
         }
