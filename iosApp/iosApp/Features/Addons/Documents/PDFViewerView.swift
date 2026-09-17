@@ -123,6 +123,15 @@ private struct PDFKitRepresentedView: UIViewRepresentable {
         private var userScale: CGFloat?
         /// L'ultimo valore scritto da noi, per non scambiarlo per un gesto.
         private var lastApplied: CGFloat?
+        /// La registrazione al centro notifiche, da togliere quando si esce.
+        private var observer: NSObjectProtocol?
+
+        deinit {
+            // `addObserver(forName:object:queue:using:)` restituisce un token e
+            // il blocco resta registrato finche' non lo si rimuove: senza
+            // questo, ogni documento aperto ne lasciava uno per sempre.
+            if let observer { NotificationCenter.default.removeObserver(observer) }
+        }
 
         func reset() {
             didFit = false
@@ -131,7 +140,8 @@ private struct PDFKitRepresentedView: UIViewRepresentable {
         }
 
         func observe(_ view: PDFView) {
-            NotificationCenter.default.addObserver(
+            if let observer { NotificationCenter.default.removeObserver(observer) }
+            observer = NotificationCenter.default.addObserver(
                 forName: .PDFViewScaleChanged,
                 object: view,
                 queue: .main

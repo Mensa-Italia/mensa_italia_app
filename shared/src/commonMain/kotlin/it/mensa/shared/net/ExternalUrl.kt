@@ -145,6 +145,11 @@ object ExternalUrl {
         val authority = if (authorityEnd < 0) afterScheme else afterScheme.substring(0, authorityEnd)
         val rest = if (authorityEnd < 0) "" else afterScheme.substring(authorityEnd)
 
+        // Uno spazio prima della barra vuol dire che non era un indirizzo:
+        // `Nome <info@mensa.it>` altrimenti passerebbe, perche' guardando solo
+        // la parte dopo la chiocciola si legge un host che sembra buono.
+        if (authority.any { it.isWhitespace() || it == ' ' }) return null
+
         // Via le credenziali `utente:password@` prima di guardare l'host.
         val hostPort = authority.substringAfterLast('@')
         val host = if (hostPort.startsWith("[")) {

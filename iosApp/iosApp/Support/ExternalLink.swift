@@ -49,9 +49,17 @@ enum ExternalLink {
     }
 
     /// `mailto:` costruito a modo, con l'oggetto codificato.
+    ///
+    /// L'indirizzo passa dalla stessa regola di `shared`. Senza quel
+    /// controllo `URLComponents` non fallisce mai — percent-codifica e basta —
+    /// e un campo compilato a mano con "chiedere in sede" diventerebbe
+    /// `mailto:chiedere%20in%20sede`, cioe' esattamente il bottone morto che
+    /// questo helper doveva far sparire.
     static func mailto(_ email: String?, subject: String? = nil) -> URL? {
-        let address = (email ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !address.isEmpty else { return nil }
+        var address = (email ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if address.hasPrefix("mailto:") { address = String(address.dropFirst("mailto:".count)) }
+        guard !address.isEmpty,
+              ExternalUrl.shared.normalize(raw: address) == "mailto:\(address)" else { return nil }
         var components = URLComponents()
         components.scheme = "mailto"
         components.path = address

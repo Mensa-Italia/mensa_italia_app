@@ -64,10 +64,14 @@ enum MensaAuth {
                 for: urlRequest,
                 delegate: MensaRedirectAuthStripper.shared
             )
+            // Il file temporaneo e' nostro da qui in poi: `defer` copre tutte le
+            // uscite, compreso un throw di `createDirectory` o `moveItem`, che
+            // dal `catch` non sarebbe piu' raggiungibile. Dopo uno spostamento
+            // riuscito la rimozione fallisce senza conseguenze.
+            defer { try? FileManager.default.removeItem(at: temporary) }
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                 let code = (response as? HTTPURLResponse)?.statusCode ?? -1
                 Log.net.error("download file: HTTP \(code) per \(url.absoluteString)")
-                try? FileManager.default.removeItem(at: temporary)
                 return nil
             }
             let dir = FileManager.default.temporaryDirectory

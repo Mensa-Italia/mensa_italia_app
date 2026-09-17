@@ -115,6 +115,9 @@ class ExternalUrlTest {
     fun `uno spazio nell'host annulla il link`() {
         assertNull(ExternalUrl.normalize("www.mensa .it"))
         assertNull(ExternalUrl.normalize("due parole"))
+        // Guardando solo la parte dopo la chiocciola si leggerebbe "mensa.it>",
+        // che sembra un host buono: va scartata tutta l'autorita'.
+        assertNull(ExternalUrl.normalize("Nome Cognome <info@mensa.it>"))
     }
 
     @Test

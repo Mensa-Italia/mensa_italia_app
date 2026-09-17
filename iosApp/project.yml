@@ -52,12 +52,12 @@ targets:
         # chiamata risponde `false` per qualunque schema non elencato qui, anche
         # quando l'app che lo gestisce e' installata: il bottone "Apri in Mappe"
         # del dettaglio evento restava spento proprio per questo.
+        # Solo `maps`: e' l'unico schema che l'app interroga davvero, nel
+        # dettaglio evento. `tel:` e `mailto:` iOS li consente senza
+        # dichiararli, e chiedere capacita' che non si usano e' una domanda in
+        # piu' a cui rispondere in revisione.
         LSApplicationQueriesSchemes:
           - maps
-          - comgooglemaps
-          - webcal
-          - tel
-          - mailto
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
             CFBundleURLName: it.mensa.app.stripe

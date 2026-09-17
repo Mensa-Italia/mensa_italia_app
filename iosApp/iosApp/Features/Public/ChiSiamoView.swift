@@ -118,33 +118,33 @@ struct ChiSiamoView: View {
 
             Section(tr("public.chi_siamo.section.contacts", fallback: "Contatti")) {
                 if let mail = ExternalLink.mailto("info@mensa.it") {
-                Link(destination: mail) {
-                    Label {
-                        VStack(alignment: .leading) {
-                            Text(tr("public.chi_siamo.contact.email.title", fallback: "Scrivici una mail"))
-                                .font(.body)
-                            // Indirizzo email — non tradotto.
-                            Text("info@mensa.it")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-                    } icon: { Image(systemName: "envelope") }
-                }
+                    Link(destination: mail) {
+                        Label {
+                            VStack(alignment: .leading) {
+                                Text(tr("public.chi_siamo.contact.email.title", fallback: "Scrivici una mail"))
+                                    .font(.body)
+                                // Indirizzo email — non tradotto.
+                                Text("info@mensa.it")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } icon: { Image(systemName: "envelope") }
+                    }
                 }
                 // `maps:` non e' http: passa da `url`, non da `browsable`.
                 if let maps = ExternalLink.url("maps://?address=Viale+Lunigiana+7+20125+Milano") {
-                Link(destination: maps) {
-                    Label {
-                        VStack(alignment: .leading) {
-                            Text(tr("public.chi_siamo.contact.address.title", fallback: "Sede nazionale, Milano"))
-                                .font(.body)
-                            // Indirizzo fisico — non tradotto.
-                            Text("Viale Lunigiana 7")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-                    } icon: { Image(systemName: "mappin.and.ellipse") }
-                }
+                    Link(destination: maps) {
+                        Label {
+                            VStack(alignment: .leading) {
+                                Text(tr("public.chi_siamo.contact.address.title", fallback: "Sede nazionale, Milano"))
+                                    .font(.body)
+                                // Indirizzo fisico — non tradotto.
+                                Text("Viale Lunigiana 7")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } icon: { Image(systemName: "mappin.and.ellipse") }
+                    }
                 }
             }
         }
