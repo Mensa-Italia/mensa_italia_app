@@ -59,22 +59,116 @@ struct PDFViewerView: View {
     }
 }
 
+/// La `PDFView` di PDFKit: pinch, trascinamento e doppio tap li fa gia' lei.
+///
+/// L'unica cosa che qui andava sistemata e' la durata dello zoom. `autoScales`
+/// vuol dire "riadatta la scala ogni volta che cambi misura": lasciato acceso
+/// per sempre, ogni rimisurazione della view — ruotare il telefono, lo Split
+/// View su iPad, la barra di navigazione che passa da grande a compatta —
+/// ricalcolava la scala di riempimento e cancellava l'ingrandimento scelto da
+/// chi stava leggendo un comma in corpo otto.
+///
+/// Quindi: `autoScales` acceso per il primo layout, che e' quello che fa
+/// entrare la pagina nello schermo, e poi spento. Da li' in avanti la scala e'
+/// dell'utente, e alle rimisurazioni successive la riportiamo noi.
 private struct PDFKitRepresentedView: UIViewRepresentable {
     let document: PDFDocument
 
-    func makeUIView(context: Context) -> PDFView {
-        let v = PDFView()
+    /// Una `PDFView` che avvisa quando cambia misura.
+    ///
+    /// Non basta agganciarsi a `updateUIView`: SwiftUI lo chiama quando
+    /// rivaluta il body, e su iPad la rotazione non cambia la size class,
+    /// quindi puo' non arrivare affatto. Con `autoScales` spento nessuno
+    /// rifarebbe il conto e la pagina resterebbe alla scala di prima, storta.
+    /// `layoutSubviews` invece scatta sempre, perche' e' il layout vero.
+    final class BoundsAwarePDFView: PDFView {
+        var onResize: ((BoundsAwarePDFView) -> Void)?
+        private var lastSize: CGSize = .zero
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            guard bounds.size != lastSize else { return }
+            lastSize = bounds.size
+            onResize?(self)
+        }
+    }
+
+    func makeUIView(context: Context) -> BoundsAwarePDFView {
+        let v = BoundsAwarePDFView()
         v.autoScales = true
         v.displayMode = .singlePageContinuous
         v.displayDirection = .vertical
         v.usePageViewController(false)
         v.document = document
+        context.coordinator.observe(v)
+        v.onResize = { [coordinator = context.coordinator] view in
+            coordinator.applyScale(to: view)
+        }
         return v
     }
 
-    func updateUIView(_ uiView: PDFView, context: Context) {
+    func updateUIView(_ uiView: BoundsAwarePDFView, context: Context) {
         if uiView.document != document {
             uiView.document = document
+            context.coordinator.reset()
+        }
+        context.coordinator.applyScale(to: uiView)
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator {
+        private var didFit = false
+        /// La scala scelta col pizzico, `nil` finche' l'utente non zooma.
+        private var userScale: CGFloat?
+        /// L'ultimo valore scritto da noi, per non scambiarlo per un gesto.
+        private var lastApplied: CGFloat?
+
+        func reset() {
+            didFit = false
+            userScale = nil
+            lastApplied = nil
+        }
+
+        func observe(_ view: PDFView) {
+            NotificationCenter.default.addObserver(
+                forName: .PDFViewScaleChanged,
+                object: view,
+                queue: .main
+            ) { [weak self, weak view] _ in
+                guard let self, let view, self.didFit else { return }
+                let current = view.scaleFactor
+                // Anche le nostre assegnazioni fanno scattare questa notifica:
+                // se le registrassimo come zoom dell'utente, la scala di
+                // riempimento di ieri diventerebbe il "volere dell'utente" di oggi.
+                if let lastApplied = self.lastApplied, abs(current - lastApplied) < 0.0001 { return }
+                self.userScale = current
+            }
+        }
+
+        /// Primo layout utile: si congela il fit. Dai successivi in poi si
+        /// rimette la scala dell'utente, che altrimenti PDFKit sovrascriverebbe.
+        func applyScale(to view: PDFView) {
+            guard view.bounds.width > 0, view.document != nil else { return }
+            let fit = view.scaleFactorForSizeToFit
+            guard fit > 0 else { return }
+
+            // La scala di riempimento cambia con i bounds, quindi i limiti vanno
+            // rifatti ogni volta: dopo una rotazione il minimo di prima non
+            // farebbe piu' entrare la pagina nello schermo.
+            view.minScaleFactor = fit
+            view.maxScaleFactor = fit * 8
+
+            // Chi non ha mai zoomato continua a vedere la pagina intera a ogni
+            // rimisurazione, esattamente come faceva `autoScales`.
+            let target = userScale.map { max(fit, $0) } ?? fit
+            lastApplied = target
+
+            if !didFit {
+                didFit = true
+                view.autoScales = false
+            }
+            view.scaleFactor = target
         }
     }
 }

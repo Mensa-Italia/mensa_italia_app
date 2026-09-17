@@ -65,14 +65,26 @@ private struct QLPreview: UIViewControllerRepresentable {
         return c
     }
 
+    /// Ricarica solo se il file e' davvero cambiato.
+    ///
+    /// Prima qui c'era un `reloadData()` secco. SwiftUI chiama
+    /// `updateUIViewController` non solo quando cambia `file`, ma a ogni
+    /// rivalutazione di un antenato o dell'ambiente — la rotazione basta —
+    /// e `reloadData()` ricostruisce l'anteprima da capo: si tornava a pagina
+    /// uno alla scala di partenza, buttando via lo zoom di chi stava leggendo.
+    ///
+    /// Il confronto sta nel Coordinator perche' e' l'unica cosa che sopravvive
+    /// alla ricreazione della struct.
     func updateUIViewController(_ uiViewController: QLPreviewController, context: Context) {
+        guard context.coordinator.file != file else { return }
+        context.coordinator.file = file
         uiViewController.reloadData()
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(file: file) }
 
     final class Coordinator: NSObject, QLPreviewControllerDataSource {
-        let file: URL
+        var file: URL
         init(file: URL) { self.file = file }
         func numberOfPreviewItems(in controller: QLPreviewController) -> Int { 1 }
         func previewController(_ controller: QLPreviewController,

@@ -1,7 +1,6 @@
 package it.mensa.app.features.quid
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import org.koin.androidx.compose.koinViewModel
@@ -58,24 +62,38 @@ fun QuidPdfScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // When file is ready, launch the system PDF viewer immediately
-    state.localFile?.let { file ->
-        val uri = androidx.core.content.FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            file,
-        )
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/pdf")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        // Only open once (avoid re-triggering on recomposition)
-        try {
-            context.startActivity(intent)
-        } catch (_: Exception) {
-            // Fallback: open in browser
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl)))
-        }
+    // Quando il file c'e', si apre il visore PDF di sistema.
+    //
+    // Dentro un `LaunchedEffect` con una guardia, non nel corpo del composable.
+    // Il commento diceva "solo una volta", ma non c'era niente a garantirlo: il
+    // corpo di un composable rigira a ogni ricomposizione — cambio di tema,
+    // insets, animazione di navigazione, riemissione del flow al ritorno in
+    // primo piano — e a ogni giro rilanciava l'intent. Chi tornava indietro dal
+    // visore ci veniva rispedito dentro subito, senza poter uscire.
+    //
+    // Anche `getUriForFile` sta dentro la protezione: se il FileProvider non e'
+    // configurato lancia, e prima quella eccezione era fuori dal try.
+    val localFile = state.localFile
+    var alreadyOpened by rememberSaveable(localFile?.absolutePath) { mutableStateOf(false) }
+    LaunchedEffect(localFile?.absolutePath) {
+        val file = localFile ?: return@LaunchedEffect
+        if (alreadyOpened) return@LaunchedEffect
+        alreadyOpened = true
+        val opened = runCatching {
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file,
+            )
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/pdf")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                },
+            )
+        }.isSuccess
+        // Nessun visore PDF installato: si ripiega sul browser.
+        if (!opened) ExternalLinks.open(context, pdfUrl)
     }
 
     Scaffold(
@@ -138,11 +156,7 @@ fun QuidPdfScreen(
                             textAlign = TextAlign.Center,
                         )
                         // Fallback: open in browser
-                        Button(onClick = {
-                            try {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl)))
-                            } catch (_: Exception) { }
-                        }) {
+                        Button(onClick = { ExternalLinks.open(context, pdfUrl) }) {
                             Text(tr("addons.quid.open_on_site", fallback = "Apri nel browser"))
                         }
                     }

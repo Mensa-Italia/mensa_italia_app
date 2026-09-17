@@ -54,13 +54,20 @@ enum MensaAuth {
     static func downloadToTemporaryFile(from url: URL) async -> URL? {
         let urlRequest = request(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60)
         do {
-            let (data, response) = try await URLSession.shared.data(
+            // `download` invece di `data`: scrive direttamente su disco mentre
+            // scarica. Con `data` l'intero PDF passava prima per la memoria, e
+            // un verbale scansionato di qualche decina di MB era un picco che su
+            // un iPhone vecchio non c'era motivo di chiedere. Il delegato resta
+            // lo stesso, quindi l'Authorization continua a cadere sui redirect
+            // verso host che non sono nostri.
+            let (temporary, response) = try await URLSession.shared.download(
                 for: urlRequest,
                 delegate: MensaRedirectAuthStripper.shared
             )
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                 let code = (response as? HTTPURLResponse)?.statusCode ?? -1
                 Log.net.error("download file: HTTP \(code) per \(url.absoluteString)")
+                try? FileManager.default.removeItem(at: temporary)
                 return nil
             }
             let dir = FileManager.default.temporaryDirectory
@@ -69,7 +76,7 @@ enum MensaAuth {
             let name = url.lastPathComponent.isEmpty ? "documento" : url.lastPathComponent
             let dest = dir.appendingPathComponent(name)
             try? FileManager.default.removeItem(at: dest)
-            try data.write(to: dest, options: .atomic)
+            try FileManager.default.moveItem(at: temporary, to: dest)
             return dest
         } catch {
             Log.net.error("download file fallito: \(error.localizedDescription)")
