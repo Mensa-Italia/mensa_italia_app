@@ -6,6 +6,28 @@
 # non nell'IPA.
 
 [[IgnoredVulns]]
+id = "GHSA-7pqw-9j4j-h8q3"
+# Advisory gemella di GHSA-jmr9-qjv8-65gv qui sotto: stesso pacchetto, stesso
+# meccanismo, stessa assenza di rimedio. Pubblicata dopo, quindi il filtro
+# esistente non la copriva e la scansione ha chiuso i cancelli di pubblicazione
+# del tag v22.2.12 — build Android e iOS verdi, `play` e `publish` saltati.
+#
+# Il controllo di contenimento guarda solo la cartella padre di ogni voce
+# dell'archivio e mai l'ultimo pezzo del percorso: con due voci duplicate — un
+# symlink che punta fuori, poi un file normale — si scrive fuori dalla cartella
+# di destinazione. Serve che sia l'attaccante a fornire lo zip.
+#
+# Vale quel che vale per l'altra: l'unico zip che storekit estrae e' l'archivio
+# del browser preso dalla CDN di Google, e storekit gira sul Mac di chi
+# pubblica senza entrare in nessun artefatto. Non c'e' versione corretta da
+# prendere: l'advisory copre tutto fino alla 2.0.1, che e' l'ultima pubblicata,
+# e a monte esiste solo una PR aperta.
+#
+# Stessa data di revisione dell'altra, cosi' si guardano insieme.
+ignoreUntil = 2027-02-28
+reason = "extract-zip: nessuna versione corretta esiste; transitiva di puppeteer-core (devDependency), estrae solo l'archivio del browser dalla CDN di Google, e storekit non entra in nessun artefatto pubblicato."
+
+[[IgnoredVulns]]
 id = "GHSA-jmr9-qjv8-65gv"
 # `extract-zip` non ha una versione corretta: l'advisory copre ogni release
 # fino alla 2.0.1 compresa, che e' l'ultima pubblicata ("0 vulnerabilities can
