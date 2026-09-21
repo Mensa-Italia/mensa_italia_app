@@ -26,7 +26,12 @@ import java.io.FileOutputStream
 
 /** Le proporzioni di una pagina, in punti PDF: bastano a dare l'altezza alla lista. */
 data class PdfPageSize(val width: Int, val height: Int) {
-    val aspectRatio: Float get() = if (height == 0) 1f else width.toFloat() / height.toFloat()
+    // Guardia su entrambi i lati: con width a zero il rapporto sarebbe 0f, e
+    // `pageWidth / 0f` da' Dp.Infinity, che arrotondata in pixel diventa
+    // Int.MAX_VALUE e fa saltare la creazione dei Constraints — la schermata
+    // crasherebbe invece di mostrare l'errore.
+    val aspectRatio: Float get() =
+        if (width <= 0 || height <= 0) 1f else width.toFloat() / height.toFloat()
 }
 
 sealed class PdfViewerState {
