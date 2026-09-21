@@ -21,7 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -293,9 +294,18 @@ private fun PdfPageItem(
                 bitmap = bmp.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
+                // `requiredWidth` e non `width`: `width` rispetta i vincoli che
+                // arrivano dal genitore, e il genitore e' largo quanto la
+                // finestra. Zoomando, la larghezza chiesta veniva riportata a
+                // quella della finestra mentre l'altezza restava quella
+                // ingrandita, e `FillBounds` allungava la pagina per riempire
+                // una casella troppo alta: il testo si deformava. `required`
+                // esce dai vincoli, quel che sporge lo taglia il `clipToBounds`
+                // del genitore, ed e' anche cio' che rende visibile lo
+                // spostamento laterale — prima l'immagine non sporgeva mai.
                 modifier = Modifier
-                    .width(pageWidth)
-                    .height(pageHeight)
+                    .requiredWidth(pageWidth)
+                    .requiredHeight(pageHeight)
                     .graphicsLayer { translationX = offsetX },
             )
         } else {
