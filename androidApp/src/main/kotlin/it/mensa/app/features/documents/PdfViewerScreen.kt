@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -304,6 +305,24 @@ private fun PdfPageItem(
                 // del genitore, ed e' anche cio' che rende visibile lo
                 // spostamento laterale — prima l'immagine non sporgeva mai.
                 modifier = Modifier
+                    // `wrapContentWidth(Start, unbounded = true)` prima di
+                    // `requiredWidth`, e non e' un dettaglio: quando un figlio
+                    // non entra nei vincoli, i modificatori `required` lo
+                    // CENTRANO nello spazio disponibile. Lo spostamento qui
+                    // sotto e' invece calcolato assumendo il foglio ancorato a
+                    // sinistra, e con la sporgenza divisa a meta' sui due lati
+                    // la parte sinistra della pagina — l'inizio delle righe —
+                    // non si riusciva piu' a raggiungere, mentre dall'altra
+                    // parte si finiva oltre il bordo destro sul bianco.
+                    // Cosi' il foglio parte da sinistra e sporge tutto a
+                    // destra, come l'intervallo di `offsetX` presume.
+                    //
+                    // In piu' questo nodo riporta la larghezza rientrata nei
+                    // vincoli, quindi la casella resta larga quanto la finestra
+                    // e il `clipToBounds` del contenitore taglia davvero: senza,
+                    // il Box cresceva fino alla pagina ingrandita e a tagliare
+                    // restava solo la lista.
+                    .wrapContentWidth(Alignment.Start, unbounded = true)
                     .requiredWidth(pageWidth)
                     .requiredHeight(pageHeight)
                     .graphicsLayer { translationX = offsetX },
