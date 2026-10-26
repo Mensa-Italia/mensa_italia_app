@@ -68,7 +68,7 @@ struct AreaDocumentsView: View {
                 prompt: tr("addons.documents.search_placeholder", fallback: "Cerca un documento…")
             )
             .toolbar { filterToolbarItem }
-            .refreshable { await vm.refresh() }
+            .refreshableOnReconnect { await vm.refresh() }
             .task { await vm.load() }
             .sheet(item: $sharing) { file in
                 ShareFileSheet(url: file.url)

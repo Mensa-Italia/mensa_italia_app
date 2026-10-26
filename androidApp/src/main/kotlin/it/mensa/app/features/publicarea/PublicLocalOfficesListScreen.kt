@@ -51,6 +51,7 @@ import it.mensa.app.ui.theme.BackdropDark
 import it.mensa.app.ui.theme.MensaBlue
 import it.mensa.shared.model.LocalOfficeModel
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * Pre-login variant of LocalOfficesListScreen. Uses [PublicLocalOfficesListViewModel]
@@ -67,6 +68,7 @@ fun PublicLocalOfficesListScreen(
     val state by vm.uiState.collectAsStateWithLifecycle()
     val filtered = remember(state) { vm.filtered(state) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    RefreshOnReconnect { vm.refresh() }
 
     MensaScaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),

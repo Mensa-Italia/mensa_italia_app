@@ -50,7 +50,7 @@ struct QuidIssuesView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
         .overlay {
             if issues.isEmpty {
                 if refreshing {

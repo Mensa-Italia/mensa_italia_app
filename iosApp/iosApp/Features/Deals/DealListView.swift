@@ -114,7 +114,7 @@ struct DealListView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .refreshable { await vm.refresh() }
+        .refreshableOnReconnect { await vm.refresh() }
     }
 
     /// Il filtro è SEMPRE in toolbar — i settori specifici si popolano dal

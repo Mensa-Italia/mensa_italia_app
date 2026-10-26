@@ -250,7 +250,7 @@ struct EventListView: View {
             }
             .padding(.top, 4)
         }
-        .refreshable { await vm.refresh() }
+        .refreshableOnReconnect { await vm.refresh() }
     }
 
     private func sectionHeader(_ title: String, count: Int) -> some View {

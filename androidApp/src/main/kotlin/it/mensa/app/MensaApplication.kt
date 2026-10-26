@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.mp.KoinPlatform
+import it.mensa.app.support.NetworkWatcher
 
 class MensaApplication : Application() {
 
@@ -94,6 +95,9 @@ class MensaApplication : Application() {
                 )
             }
         }
+
+        // Dopo il database: `Connectivity` lo legge per l'ultimo contatto.
+        NetworkWatcher.start(this, KoinPlatform.getKoin().get())
 
         // Fetch the Stripe publishable key and initialize the SDK in the
         // background. Both addPaymentMethod() and donation flows call

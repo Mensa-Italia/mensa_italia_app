@@ -34,6 +34,7 @@ import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.Podcast
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,6 +120,7 @@ fun PodcastsListScreen(
             }
 
             else -> {
+                RefreshOnReconnect(vm::refresh)
                 PullToRefreshBox(
                     isRefreshing = uiState.loading,
                     onRefresh = vm::refresh,

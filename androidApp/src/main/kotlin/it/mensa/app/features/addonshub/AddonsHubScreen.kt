@@ -24,6 +24,7 @@ import it.mensa.app.ui.components.*
 import it.mensa.app.ui.theme.*
 import it.mensa.shared.model.AddonModel
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * AddonsHubScreen — grid of addons available to the current user.
@@ -70,6 +71,7 @@ fun AddonsHubScreen(
             )
         },
     ) { innerPadding ->
+        RefreshOnReconnect(vm::refresh)
         PullToRefreshBox(
             isRefreshing = uiState.loading,
             onRefresh = vm::refresh,

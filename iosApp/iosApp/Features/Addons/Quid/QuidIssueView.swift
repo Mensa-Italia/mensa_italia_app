@@ -69,7 +69,7 @@ struct QuidIssueView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
         .overlay {
             if articles.isEmpty {
                 if refreshing {

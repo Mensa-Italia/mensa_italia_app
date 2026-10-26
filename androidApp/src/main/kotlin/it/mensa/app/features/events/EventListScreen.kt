@@ -58,6 +58,7 @@ import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * EventListScreen — M3 Expressive restyled.
@@ -139,6 +140,7 @@ fun EventListScreen(
         snackbarHostState = snackbarHostState,
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
+            RefreshOnReconnect { vm.refresh() }
             PullToRefreshBox(
                 isRefreshing = state.refreshing,
                 onRefresh = { vm.refresh() },

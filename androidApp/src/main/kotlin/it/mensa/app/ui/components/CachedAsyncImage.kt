@@ -1,12 +1,18 @@
 package it.mensa.app.ui.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -14,6 +20,9 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import it.mensa.app.support.MensaAuthInterceptor
+import it.mensa.app.support.koinAccess
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -48,11 +57,26 @@ fun CachedAsyncImage(
     // Per gli URL PocketBase `/api/files/...` deriviamo una chiave di cache
     // canonica `filename + thumb`, indipendente dal recordId del path. Vedi
     // kdoc di [canonicalCacheKey].
-    val request = remember(model, context) {
+    // Fallita (offline), l'immagine riparte da sola quando il server torna a
+    // rispondere: `retry` entra nella richiesta, e una richiesta diversa Coil
+    // la ricarica. Vedi `Connectivity.reconnects`.
+    var failed by remember(model) { mutableStateOf(false) }
+    var retry by remember(model) { mutableIntStateOf(0) }
+    if (failed) {
+        val connectivity = remember { koinAccess().connectivity }
+        LaunchedEffect(connectivity) {
+            connectivity.reconnects.drop(1).first()
+            failed = false
+            retry++
+        }
+    }
+
+    val request = remember(model, context, retry) {
         when (model) {
             is String -> ImageRequest.Builder(context)
                 .data(model)
                 .apply { canonicalCacheKey(model)?.let { memoryCacheKey(it); diskCacheKey(it) } }
+                .apply { if (retry > 0) memoryCacheKeyExtra("retry", retry.toString()) }
                 .build()
             else -> model
         }
@@ -64,7 +88,10 @@ fun CachedAsyncImage(
         imageLoader = imageLoader,
         contentScale = contentScale,
         modifier = modifier,
-        onState = onState,
+        onState = { state ->
+            if (state is AsyncImagePainter.State.Error) failed = true
+            onState?.invoke(state)
+        },
     )
 }
 

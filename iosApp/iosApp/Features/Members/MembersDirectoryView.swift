@@ -164,7 +164,7 @@ struct MembersDirectoryView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .refreshable { await vm.refresh() }
+                .refreshableOnReconnect { await vm.refresh() }
 
                 if sectioned.count > 1 {
                     AlphabetIndex(

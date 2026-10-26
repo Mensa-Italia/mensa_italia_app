@@ -271,7 +271,7 @@ struct LocalOfficeView: View {
             }
         }
         .ignoresSafeArea(.container, edges: .top)
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
     }
 
     // MARK: - Hero

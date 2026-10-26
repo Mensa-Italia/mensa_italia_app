@@ -29,6 +29,7 @@ import it.mensa.shared.model.DocumentModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.DateFormat
 import java.util.*
+import it.mensa.app.support.RefreshOnReconnect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,6 +149,7 @@ fun AreaDocumentsScreen(
                         )
                     }
                     else -> {
+                        RefreshOnReconnect(vm::refresh)
                         PullToRefreshBox(
                             isRefreshing = uiState.loading,
                             onRefresh = vm::refresh,

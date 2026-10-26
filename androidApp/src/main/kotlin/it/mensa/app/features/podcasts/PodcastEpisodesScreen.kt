@@ -65,6 +65,7 @@ import it.mensa.shared.model.PodcastEpisode
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import it.mensa.app.support.RefreshOnReconnect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -156,6 +157,7 @@ fun PodcastEpisodesScreen(
             }
 
             else -> {
+                RefreshOnReconnect(vm::refresh)
                 PullToRefreshBox(
                     isRefreshing = uiState.loading,
                     onRefresh = vm::refresh,

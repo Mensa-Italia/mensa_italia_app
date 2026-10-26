@@ -292,6 +292,9 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     let onLoad: ((CGSize) -> Void)?
 
     @State private var loaded: UIImage?
+    /// Sale quando la connessione torna e l'immagine non era arrivata: fa
+    /// ripartire `load()` (vedi `ReconnectSignal`).
+    @State private var retry = 0
 
     init(
         url: URL?,
@@ -332,7 +335,15 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                     .transition(.opacity)
             }
         }
-        .task(id: url) { await load() }
+        .task(id: LoadKey(url: url, retry: retry)) { await load() }
+        .onChange(of: ReconnectSignal.shared.count) { _, _ in
+            if loaded == nil { retry += 1 }
+        }
+    }
+
+    private struct LoadKey: Equatable {
+        let url: URL?
+        let retry: Int
     }
 
     private func load() async {

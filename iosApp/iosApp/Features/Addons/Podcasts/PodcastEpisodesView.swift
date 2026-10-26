@@ -70,7 +70,7 @@ struct PodcastEpisodesView: View {
             }
         }
         .listStyle(.plain)
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
         .overlay {
             if episodes.isEmpty {
                 if refreshing {

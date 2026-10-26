@@ -41,6 +41,7 @@ import it.mensa.app.ui.theme.EasingEmphasizedDecelerate
 import it.mensa.app.ui.theme.MensaMotion
 import it.mensa.shared.model.SigModel
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * L'etichetta di un `group_type`.
@@ -162,6 +163,7 @@ fun SigListScreen(
                         var appeared by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) { appeared = true }
 
+                        RefreshOnReconnect { vm.refresh() }
                         PullToRefreshBox(
                             isRefreshing = state.loading,
                             onRefresh = { vm.refresh() },

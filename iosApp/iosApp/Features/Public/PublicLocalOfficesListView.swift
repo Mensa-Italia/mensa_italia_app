@@ -54,7 +54,7 @@ struct PublicLocalOfficesListView: View {
                 ContentUnavailableView.search(text: query)
             }
         }
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
         .navigationTitle(tr("public.local_offices.title", fallback: "Gruppi locali"))
         .navigationBarTitleDisplayMode(.large)
         .searchable(

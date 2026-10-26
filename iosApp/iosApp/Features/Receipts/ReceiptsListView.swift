@@ -40,7 +40,7 @@ struct ReceiptsListView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                 }
-                .refreshable { await vm.refresh() }
+                .refreshableOnReconnect { await vm.refresh() }
             }
         }
         .navigationTitle(tr("receipts.title", fallback: "Le mie ricevute"))

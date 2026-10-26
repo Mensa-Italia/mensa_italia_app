@@ -50,6 +50,7 @@ import it.mensa.app.features.today._components.NotificationsPreview
 import it.mensa.app.features.today._components.OfflineBanner
 import it.mensa.app.features.today._components.SectionLabel
 import it.mensa.app.support.FilesUrl
+import it.mensa.app.support.RefreshOnReconnect
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
 import it.mensa.app.ui.components.LoadingDots
@@ -99,6 +100,7 @@ fun TodayScreen(
     val refreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
+    RefreshOnReconnect { viewModel.refresh() }
 
     MensaScaffold(
         modifier = modifier,

@@ -52,6 +52,7 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.model.QuidArticle
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import it.mensa.app.support.RefreshOnReconnect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +85,7 @@ fun QuidIssueScreen(
             )
         },
     ) { innerPadding ->
+        RefreshOnReconnect { viewModel.refresh() }
         PullToRefreshBox(
             isRefreshing = state.refreshing,
             onRefresh = { viewModel.refresh() },

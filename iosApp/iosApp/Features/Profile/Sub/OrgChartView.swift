@@ -61,7 +61,7 @@ struct OrgChartView: View {
                     appeared = true
                 }
             }
-            .refreshable { await vm.load() }
+            .refreshableOnReconnect { await vm.load() }
     }
 
     // MARK: - Content

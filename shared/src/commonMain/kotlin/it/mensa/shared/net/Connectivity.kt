@@ -118,12 +118,43 @@ class Connectivity(
         combine(reachable, lastContact, ticks) { r, last, _ -> gate(r, last, Clock.System.now()) }
             .stateIn(scope, SharingStarted.Eagerly, OnlineGate.OPEN)
 
+    /**
+     * Quante volte il server e' tornato a rispondere dopo essere stato
+     * irraggiungibile. Le UI lo osservano per ricaricare da sole quello che
+     * offline non era arrivato (liste, immagini), invece di chiedere
+     * all'utente di uscire e rientrare nella pagina.
+     */
+    private val _reconnects = MutableStateFlow(0)
+    val reconnects: StateFlow<Int> = _reconnects.asStateFlow()
+
     init {
         scope.launch {
             readStored()?.let(ServerReachability::restore)
             persistContacts()
         }
         scope.launch { probeWhileOffline() }
+        scope.launch {
+            var previous: Boolean? = null
+            reachable.collect { r ->
+                if (previous == false && r == true) _reconnects.value += 1
+                previous = r
+            }
+        }
+    }
+
+    /**
+     * Il sistema dice che la rete e' cambiata (NWPathMonitor su iOS,
+     * ConnectivityManager su Android). Senza rete il server non si raggiunge:
+     * lo si segna subito, senza aspettare che una richiesta fallisca. Con la
+     * rete tornata lo si interroga subito, invece di aspettare il prossimo
+     * controllo di [probeWhileOffline] (fino a [PROBE_MS]).
+     */
+    fun onNetworkChange(available: Boolean) {
+        if (!available) {
+            ServerReachability.onUnreachable()
+            return
+        }
+        if (reachable.value != true) scope.launch { probeNow() }
     }
 
     /** Chiede al server se c'e'. Per il tasto "Riprova"; true se ha risposto. */

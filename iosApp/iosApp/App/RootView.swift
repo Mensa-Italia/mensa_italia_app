@@ -80,6 +80,9 @@ final class RootViewModel {
                 await self?.evaluatePhase()
             }
         } onError: { _ in }
+        // Da qui il database c'e': parte l'osservazione della rete, che
+        // ricarica pagine e immagini quando la connessione torna.
+        _ = ConnectivityStore.shared
 
         // 4b. E quando cambia il verdetto sulla tessera (arriva il server).
         let gateFlow = koin.auth.membershipGate as Kotlinx_coroutines_coreFlow

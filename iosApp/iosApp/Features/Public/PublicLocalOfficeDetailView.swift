@@ -91,7 +91,7 @@ struct PublicLocalOfficeDetailView: View {
             }
         }
         .ignoresSafeArea(.container, edges: .top)
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
     }
 
     // MARK: - Section wrapper (stesso del privato)

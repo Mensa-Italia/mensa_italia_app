@@ -45,7 +45,7 @@ struct AddonsHubView: View {
             .padding(.bottom, 24)
             .padding(.top, 8)
         }
-        .refreshable { await refresh() }
+        .refreshableOnReconnect { await refresh() }
         .overlay {
             if visibleAddons.isEmpty && !refreshing {
                 ContentUnavailableView(

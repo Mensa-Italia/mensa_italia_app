@@ -46,6 +46,7 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * TicketsListScreen — M3 Expressive restyled.
@@ -109,6 +110,7 @@ fun TicketsListScreen(
             }
 
             else -> {
+                RefreshOnReconnect(vm::refresh)
                 PullToRefreshBox(
                     isRefreshing = uiState.loading,
                     onRefresh = vm::refresh,

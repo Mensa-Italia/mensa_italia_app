@@ -38,6 +38,7 @@ import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import androidx.compose.material3.LargeTopAppBar
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * ReceiptsListScreen — M3 Expressive restyled.
@@ -82,6 +83,7 @@ fun ReceiptsListScreen(
             }
 
             else -> {
+                RefreshOnReconnect(vm::refresh)
                 PullToRefreshBox(
                     isRefreshing = uiState.loading,
                     onRefresh = vm::refresh,

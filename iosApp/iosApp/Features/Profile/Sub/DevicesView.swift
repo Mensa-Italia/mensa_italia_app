@@ -57,7 +57,7 @@ struct DevicesView: View {
                 ProgressView().controlSize(.large)
             }
         }
-        .refreshable { await vm.refresh() }
+        .refreshableOnReconnect { await vm.refresh() }
         .task {
             await vm.load()
             withAnimation { appeared = true }

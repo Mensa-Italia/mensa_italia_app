@@ -448,7 +448,7 @@ struct TodayView: View {
         // Side by side, a column clips to its own width by default, which
         // cut the cards' shadows at the hinge; let them spill over.
         .scrollClipDisabled()
-        .refreshable { await vm.refresh() }
+        .refreshableOnReconnect { await vm.refresh() }
     }
 
     private struct FoldLayout {

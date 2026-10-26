@@ -258,7 +258,7 @@ struct SigListView: View {
             .padding(.bottom, 12)
             .animation(.spring(response: 0.45, dampingFraction: 0.88), value: filter)
         }
-        .refreshable { await vm.refresh() }
+        .refreshableOnReconnect { await vm.refresh() }
         .overlay {
             if vm.loading && vm.sigs.isEmpty {
                 LoadingDots()

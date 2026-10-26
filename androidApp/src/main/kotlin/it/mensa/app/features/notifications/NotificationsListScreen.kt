@@ -61,6 +61,7 @@ import it.mensa.shared.model.NotificationModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * NotificationsListScreen — M3 Expressive restyled.
@@ -128,6 +129,7 @@ fun NotificationsListScreen(
             )
         },
     ) { innerPadding ->
+        RefreshOnReconnect { vm.refresh() }
         PullToRefreshBox(
             isRefreshing = uiState.refreshing,
             onRefresh = { vm.refresh() },

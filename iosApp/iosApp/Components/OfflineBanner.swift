@@ -1,4 +1,5 @@
 import SwiftUI
+import Network
 import Shared
 
 /// Lo stato della connessione col server, per SwiftUI. Specchio di
@@ -13,9 +14,19 @@ final class ConnectivityStore {
     private(set) var lastContact: Date?
 
     @ObservationIgnored private var subs: [Closeable] = []
+    @ObservationIgnored private let pathMonitor = NWPathMonitor()
 
     private init() {
         let connectivity = koin.connectivity
+        subs.append(subscribeFlow(connectivity.reconnects as Kotlinx_coroutines_coreFlow) { (value: KotlinInt) in
+            Task { @MainActor in ReconnectSignal.shared.count = value.intValue }
+        })
+        // La rete del telefono, dal sistema: tornata, si chiede subito al
+        // server invece di aspettare il controllo periodico di `Connectivity`.
+        pathMonitor.pathUpdateHandler = { path in
+            connectivity.onNetworkChange(available: path.status == .satisfied)
+        }
+        pathMonitor.start(queue: DispatchQueue(label: "it.mensa.app.network-path"))
         subs.append(subscribeOptionalFlow(connectivity.reachable as Kotlinx_coroutines_coreFlow) { [weak self] (value: KotlinBoolean?) in
             Task { @MainActor in self?.reachable = value?.boolValue }
         })
@@ -35,6 +46,28 @@ final class ConnectivityStore {
         f.locale = Locale(identifier: LocaleManager.shared.activeTag)
         f.setLocalizedDateFormatFromTemplate("ddMMMyyyyHHmm")
         return f.string(from: lastContact)
+    }
+}
+
+/// Quante volte il server e' tornato a rispondere dopo un periodo offline
+/// (`Connectivity.reconnects` in :shared). Tenuto fuori da `ConnectivityStore`
+/// perche' lo leggono anche le immagini, che possono comparire prima che Koin
+/// abbia il database: questo non tocca Koin, lo aggiorna `ConnectivityStore`.
+@MainActor @Observable
+final class ReconnectSignal {
+    static let shared = ReconnectSignal()
+    var count = 0
+    private init() {}
+}
+
+extension View {
+    /// `.refreshable`, e la stessa azione quando la connessione torna: la
+    /// pagina aperta offline si aggiorna da sola, senza uscire e rientrare.
+    func refreshableOnReconnect(_ action: @escaping @Sendable () async -> Void) -> some View {
+        refreshable(action: action)
+            .onChange(of: ReconnectSignal.shared.count) { _, _ in
+                Task { await action() }
+            }
     }
 }
 

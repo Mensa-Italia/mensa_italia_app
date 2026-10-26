@@ -51,6 +51,7 @@ import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
 import org.koin.androidx.compose.koinViewModel
+import it.mensa.app.support.RefreshOnReconnect
 
 /**
  * DealListScreen — M3 Expressive restyled.
@@ -152,6 +153,7 @@ fun DealListScreen(
     ) { innerPadding ->
         val pullRefreshState = rememberPullToRefreshState()
 
+        RefreshOnReconnect { viewModel.refresh() }
         PullToRefreshBox(
             isRefreshing = state.refreshing,
             onRefresh = { viewModel.refresh() },

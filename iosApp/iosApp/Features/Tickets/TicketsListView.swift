@@ -42,7 +42,7 @@ struct TicketsListView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                 }
-                .refreshable { await vm.refresh() }
+                .refreshableOnReconnect { await vm.refresh() }
             }
         }
         .navigationTitle(tr("tickets.title", fallback: "I miei ticket"))

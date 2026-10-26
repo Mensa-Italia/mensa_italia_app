@@ -213,7 +213,7 @@ struct NotificationsListView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .refreshable { await vm.refresh() }
+                .refreshableOnReconnect { await vm.refresh() }
             }
         }
         .navigationTitle(tr("notifications.title", fallback: "Notifiche"))

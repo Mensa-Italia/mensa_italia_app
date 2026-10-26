@@ -38,7 +38,7 @@ struct PublicEventsView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .refreshable { await loadEvents() }
+                .refreshableOnReconnect { await loadEvents() }
             }
         }
         .navigationTitle(tr("public.events.title", fallback: "Eventi pubblici"))
