@@ -70,7 +70,8 @@ struct MensaApp: App {
 ///   1. `initializeMensaDatabase(DriverFactory())` — fills the SQLDelight
 ///      lazy holder that every repository depends on. Must complete BEFORE
 ///      any koin accessor is touched.
-///   2. `StripeService.bootstrap()` — fetches the Stripe publishable key.
+///   2. `StripeService.bootstrap()` — fetches the Stripe publishable key,
+///      in the background (not awaited).
 /// Until step 1 is done we show a `LoadingDots` splash; on error we surface
 /// it as a `ContentUnavailableView` so the user can see why the app stalled
 /// instead of getting a black screen.
@@ -96,7 +97,11 @@ struct BootstrapGate<Content: View>: View {
         .task {
             do {
                 try await DatabaseModuleKt.initializeMensaDatabase(factory: DriverFactory())
-                try? await StripeService.bootstrap()
+                // In sottofondo: la chiave Stripe arriva da `configs`, cioe'
+                // dalla rete, e l'avvio la aspettava per pagamenti che si
+                // aprono molto piu' tardi. Ogni flusso di `StripeService` la
+                // richiede comunque da se' prima di usarla.
+                Task { try? await StripeService.bootstrap() }
                 ready = true
                 // DB ora pronto: sblocca Spotlight refresh + schedula BGTask.
                 // Vedi `SpotlightRefreshCoordinator.markBootstrapped()`.

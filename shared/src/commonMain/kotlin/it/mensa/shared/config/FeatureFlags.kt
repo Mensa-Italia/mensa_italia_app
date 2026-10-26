@@ -3,6 +3,10 @@ package it.mensa.shared.config
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import it.mensa.shared.api.endpoints.SettingsApi
 import it.mensa.shared.db.MensaDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,17 +88,33 @@ class FeatureFlags(
     fun allowsSearchType(type: String): Boolean = _flags.value.allowsSearchType(type)
 
     /**
-     * Restores the cached values, then refreshes from the backend. Safe to call
-     * on every launch and after login; never throws — a failure leaves whatever
-     * was already loaded in place.
+     * Safe to call on every launch and after login; never throws — a failure
+     * leaves whatever was already loaded in place.
+     *
+     * I valori salvati subito; quelli del server in sottofondo, quando la
+     * cache c'e'. Prima l'avvio aspettava sempre `configs` dalla rete. Senza
+     * cache (primo avvio) si aspetta: i default spegnerebbero sezioni che il
+     * server tiene accese.
      */
-    @Suppress("TooGenericExceptionCaught")
     suspend fun bootstrap() {
-        try {
-            readCached()?.let { _flags.value = it }
+        val cached = try {
+            readCached()
         } catch (_: Throwable) {
             // Cache miss or unreadable DB — the network pass below still runs.
+            null
         }
+        if (cached != null) {
+            _flags.value = cached
+            backgroundScope.launch { refreshFromNetwork() }
+        } else {
+            refreshFromNetwork()
+        }
+    }
+
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun refreshFromNetwork() {
         try {
             val configs = settings.configs()
             val fresh = Flags(

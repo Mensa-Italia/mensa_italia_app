@@ -8,7 +8,6 @@ import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
 import it.mensa.shared.auth.Membership
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -117,12 +116,12 @@ class RootViewModel(
         // Record whether this was an existing session (affects onboarding gate)
         sessionRestored = auth.authState.value is AuthState.Authenticated
 
-        // 3. Pre-warm Today DB cache — non-blocking, fire and forget
+        // 3. Pre-warm Today DB cache — fire and forget. Nel viewModelScope e
+        //    non in un `coroutineScope { launch { } }`: quello aspetta i figli,
+        //    quindi l'avvio restava fermo finche' gli eventi non erano scaricati.
         if (sessionRestored) {
-            coroutineScope {
-                launch {
-                    runCatching { events.refresh() }
-                }
+            viewModelScope.launch {
+                runCatching { events.refresh() }
             }
         }
 

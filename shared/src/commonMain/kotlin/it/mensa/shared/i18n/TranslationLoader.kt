@@ -7,7 +7,11 @@ import io.ktor.client.request.get
 import it.mensa.shared.api.SkipAuthAttribute
 import it.mensa.shared.api.endpoints.SettingsApi
 import it.mensa.shared.db.MensaDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,11 +66,15 @@ class TranslationLoader(
             }
             var restoredLocale: String? = null
             var restoredJson: String? = null
+            // La lingua giusta dalla cache: in quel caso il catalogo nuovo si
+            // scarica dopo, senza far aspettare l'avvio (vedi sotto).
+            var restoredPreferred = false
             for (cand in candidates) {
                 val payload = try { readKey("i18n.payload.$cand") } catch (_: Throwable) { null }
                 if (payload != null) {
                     restoredLocale = cand
                     restoredJson = payload
+                    restoredPreferred = true
                     break
                 }
             }
@@ -83,27 +91,16 @@ class TranslationLoader(
                 }
             }
 
-            // 2. Refresh path: fetch configs, resolve locale, fetch translations
-            runCatching {
-                val configs = settings.configs()
-                val urlTemplate = configs["i18n_flat_url"].orEmpty()
-                val languages = configs["languages"]
-                    ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-                    ?: listOf("it")
-                val baseLocale = configs["base_language"] ?: "it"
-
-                _availableLocales.value = languages
-
-                val resolved = resolveLocale(preferred, languages, baseLocale)
-                val url = urlTemplate.replace("{locale}", resolved)
-
-                val payload: String = fetchPayload(url)
-                val strings = parse(payload)
-
-                try { writeKey("i18n.locale", resolved) } catch (_: Throwable) {}
-                try { writeKey("i18n.base", baseLocale) } catch (_: Throwable) {}
-                try { writeKey("i18n.payload.$resolved", payload) } catch (_: Throwable) {}
-                _ready.value = Ready(resolved, baseLocale, strings)
+            // 2. Refresh path. Con la lingua giusta gia' in cache gira in
+            //    sottofondo: l'avvio aspettava configs, catalogo e fino a 8 s
+            //    di tentativi sul CDN per stringhe che aveva gia'. Senza cache,
+            //    o con una lingua diversa, si aspetta: meglio dell'app che
+            //    cambia lingua sotto gli occhi.
+            val gen = ++generation
+            if (restoredPreferred && _ready.value != null) {
+                backgroundScope.launch { runCatching { refreshFromNetwork(preferred, gen) } }
+            } else {
+                runCatching { refreshFromNetwork(preferred, gen) }
             }
         } catch (_: Throwable) {
             // Swallow — i18n must never crash the host.
@@ -112,6 +109,34 @@ class TranslationLoader(
         if (_ready.value == null) {
             _ready.value = Ready(preferred, "it", emptyMap())
         }
+    }
+
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    /** Cresce a ogni [bootstrap]: un download partito per la lingua di prima non la rimette. */
+    private var generation = 0
+
+    private suspend fun refreshFromNetwork(preferred: String, gen: Int) {
+        val configs = settings.configs()
+        val urlTemplate = configs["i18n_flat_url"].orEmpty()
+        val languages = configs["languages"]
+            ?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ?: listOf("it")
+        val baseLocale = configs["base_language"] ?: "it"
+
+        _availableLocales.value = languages
+
+        val resolved = resolveLocale(preferred, languages, baseLocale)
+        val url = urlTemplate.replace("{locale}", resolved)
+
+        val payload: String = fetchPayload(url)
+        val strings = parse(payload)
+
+        try { writeKey("i18n.locale", resolved) } catch (_: Throwable) {}
+        try { writeKey("i18n.base", baseLocale) } catch (_: Throwable) {}
+        try { writeKey("i18n.payload.$resolved", payload) } catch (_: Throwable) {}
+        if (gen != generation) return
+        _ready.value = Ready(resolved, baseLocale, strings)
     }
 
     /**

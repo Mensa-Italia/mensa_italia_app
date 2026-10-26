@@ -15,6 +15,11 @@ import it.mensa.shared.di.wipeAllUserData
 import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +46,10 @@ class AuthRepository(
     val currentUser: StateFlow<UserModel?> = _currentUser.asStateFlow()
 
     private val _lastLoginMethod = MutableStateFlow<LoginMethod?>(null)
+
+    /** Dove gira la verifica col server di un avvio dalla cache (vedi [init]). */
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private var revalidation: Job? = null
 
     /**
      * Come l'utente e' entrato *in questa esecuzione dell'app*, o null se la
@@ -172,6 +181,44 @@ class AuthRepository(
     }
 
     private suspend fun initImpl() {
+        // Avvio dalla cache. Con una sessione e un socio salvati l'app parte
+        // subito con quelli, e tutto il resto (liste, tessera, timbri) e' gia'
+        // nel database: la verifica col server — il login vero, che passa da
+        // cloud32 e puo' metterci secondi, il refresh del token, `/me` — gira
+        // dopo, in sottofondo, e aggiorna lo stato quando risponde. Se il
+        // server dice che la sessione non vale piu', si esce come prima.
+        // Senza cache (primo avvio dopo il login) si aspetta come sempre.
+        val stored = readStoredSession()
+        val cached = readCachedUser()
+        if (stored != null && cached != null) {
+            AuthHolder.session = stored
+            _authState.value = AuthState.Authenticated(stored.accessToken)
+            _currentUser.value = DemoIdentity.redact(cached)
+            revalidation = backgroundScope.launch {
+                try {
+                    revalidate()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (t: Throwable) {
+                    // Offline o server giu': resta la cache, come gia' faceva
+                    // l'avvio senza rete.
+                    println("MENSA_AUTH_REVALIDATE_FAILED: ${t::class.simpleName}: ${t.message}")
+                }
+            }
+            return
+        }
+        revalidate()
+    }
+
+    private suspend fun readCachedUser(): UserModel? {
+        val cachedJson = runCatching {
+            db.keyValueQueries.selectById(KEY_CURRENT_USER).awaitAsOneOrNull()?.value_
+        }.getOrNull() ?: return null
+        return runCatching { json.decodeFromString<UserModel>(cachedJson) }.getOrNull().takeIfUsable()
+    }
+
+    /** Lo stato di autenticazione deciso dal server. Vedi [initImpl]. */
+    private suspend fun revalidate() {
         // Login vero a ogni avvio, quando le credenziali ci sono. E' la
         // richiesta esplicita: la sessione ripristinata da disco piu' un
         // `/api/cs/me` non bastava a far arrivare la scadenza tessera
@@ -385,6 +432,8 @@ class AuthRepository(
     }
 
     suspend fun login(email: String, password: String): Result<UserModel> = runCatching {
+        // Un login esplicito vince sulla verifica di un avvio dalla cache.
+        revalidation?.cancel()
         adoptTokens(
             tokens = api.loginWithZitadel(email, password),
             method = LoginMethod.PASSWORD,
@@ -466,6 +515,9 @@ class AuthRepository(
      * e' isolato e l'uscita avviene comunque.
      */
     suspend fun logout() {
+        // Senza questo, un relogin dell'avvio ancora in volo rientrerebbe
+        // subito dopo l'uscita.
+        revalidation?.cancel()
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }
