@@ -13,6 +13,13 @@ data class RegisterDeviceBody(
     val language: String = "",
 )
 
+/** I due campi che la delete rule di `users_devices` chiede a chi non e' il proprietario. */
+@Serializable
+data class DeleteDeviceByTokenBody(
+    val id: String,
+    val firebase_id: String,
+)
+
 @Serializable
 data class UpdateDeviceLanguageBody(
     val language: String,
@@ -51,4 +58,22 @@ class DevicesApi(private val pb: PocketBaseClient) {
     @Throws(Exception::class)
     suspend fun findByFirebaseId(firebaseId: String): PbListResponse<DeviceModel> =
         pb.list("users_devices", filter = "firebase_id='$firebaseId'")
+
+    /**
+     * Tutte le righe con questo token, di qualunque utente. La list rule le
+     * mostra a chi passa il token come `?firebase_id=` (chi ha il token e'
+     * su quel telefono); il solo filter vedrebbe solo le righe proprie.
+     */
+    @Throws(Exception::class)
+    suspend fun findAnyUserByFirebaseId(firebaseId: String): PbListResponse<DeviceModel> =
+        pb.list(
+            "users_devices",
+            filter = "firebase_id='$firebaseId'",
+            query = mapOf("firebase_id" to firebaseId),
+        )
+
+    /** Cancella una riga di un altro utente: la delete rule vuole id e token nel body. */
+    @Throws(Exception::class)
+    suspend fun deleteByToken(id: String, firebaseId: String) =
+        pb.deleteWithBody("users_devices", id, DeleteDeviceByTokenBody(id = id, firebase_id = firebaseId))
 }

@@ -101,6 +101,10 @@ class DevicesRepository(
             value_ = firebaseToken,
         )
 
+        // Chi era entrato prima su questo telefono non deve piu' ricevere qui.
+        // Best effort: se fallisce, la registrazione va avanti lo stesso.
+        runCatching { evictOtherUsers(userId, firebaseToken) }
+
         val existing = runCatching { api.findByFirebaseId(firebaseToken).items }
             .getOrElse { return null }
             .firstOrNull { it.user == userId }
@@ -111,6 +115,40 @@ class DevicesRepository(
         }
 
         return runCatching { register(userId, firebaseToken, deviceName, language) }.getOrNull()
+    }
+
+    /**
+     * Toglie dal server la riga di questo dispositivo per [userId]. Si chiama
+     * al logout, finche' la sessione e' ancora valida.
+     *
+     * Prima il logout non la toccava. La riga restava, e chi entrava dopo sullo
+     * stesso telefono si aggiungeva con lo stesso token: l'indice unico e' su
+     * `(user, firebase_id)`, quindi lo permette. Il server manda a ogni utente
+     * su ogni suo device, e cosi' il telefono riceveva ogni notifica due volte,
+     * una per account.
+     *
+     * Best effort: offline il logout non aspetta. In quel caso la riga la
+     * toglie [evictOtherUsers] al login seguente.
+     */
+    @Throws(Exception::class)
+    suspend fun unregisterCurrent(userId: String) {
+        val token = currentFirebaseId() ?: return
+        api.findByFirebaseId(token).items
+            .filter { it.user == userId && it.firebaseId == token }
+            .forEach { api.delete(it.id) }
+    }
+
+    /**
+     * Cancella le righe di altri utenti con il token di questo telefono: chi
+     * e' uscito offline, o da una versione che al logout non le toglieva.
+     * Il token e' di un'installazione sola, quindi quelle righe puntano qui e
+     * non possono essere di un altro telefono. La vecchia app Flutter faceva
+     * lo stesso (`removeSimilarDevice`).
+     */
+    private suspend fun evictOtherUsers(userId: String, token: String) {
+        api.findAnyUserByFirebaseId(token).items
+            .filter { it.user != userId && it.firebaseId == token }
+            .forEach { api.deleteByToken(it.id, token) }
     }
 
     @Throws(Exception::class)

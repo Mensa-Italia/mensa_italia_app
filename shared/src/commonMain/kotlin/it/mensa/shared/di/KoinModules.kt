@@ -9,6 +9,7 @@ import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
 import it.mensa.shared.auth.oidc.TokenRefresher
+import it.mensa.shared.repository.DevicesRepository
 import it.mensa.shared.spotlight.SpotlightSyncEngine
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -29,7 +30,12 @@ val sharedModule = module {
             AuthRefresherHolder.refresher = it
         }
     }
-    single { AuthRepository(get(), get(), get(), get(), get(), get(), get()) }
+    single {
+        val scope = this
+        AuthRepository(get(), get(), get(), get(), get(), get(), get(),
+            unregisterDevice = { userId -> scope.getOrNull<DevicesRepository>()?.unregisterCurrent(userId) },
+        )
+    }
     single { SpotlightSyncEngine(regSoci = get(), httpClient = get(), db = get()) }
 }
 

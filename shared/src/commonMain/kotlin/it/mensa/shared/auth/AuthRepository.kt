@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,6 +38,8 @@ private const val KEY_CURRENT_USER = "auth.current_user"
 private const val KEY_CURRENT_USER_SYNCED_AT = "auth.current_user.synced_at"
 private const val MEMBERSHIP_CHECK_MAX_WAIT_MS = 8_000L
 private const val EXPIRES_SAFETY_MARGIN_SECONDS = 30L
+/** Quanto il logout aspetta la cancellazione del device prima di uscire comunque. */
+private const val LOGOUT_DEVICE_TIMEOUT_MS = 4_000L
 
 class AuthRepository(
     private val api: AuthApi,
@@ -46,6 +49,12 @@ class AuthRepository(
     private val discovery: OidcDiscoveryCache,
     private val tokenRefresher: TokenRefresher,
     private val credentials: ICredentialStore,
+    /**
+     * Toglie dal server la riga di questo telefono per l'utente che esce
+     * (`DevicesRepository.unregisterCurrent`). Passata come funzione e non
+     * come repository perche' i device stanno in un altro modulo Koin.
+     */
+    private val unregisterDevice: suspend (userId: String) -> Unit = {},
 ) {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unknown)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -582,6 +591,11 @@ class AuthRepository(
         // Senza questo, un relogin dell'avvio ancora in volo rientrerebbe
         // subito dopo l'uscita.
         revalidation?.cancel()
+        // Prima di buttare la sessione: per cancellare la riga serve ancora
+        // l'autenticazione. Senza rete non si aspetta oltre il limite.
+        _currentUser.value?.id?.takeIf { it.isNotBlank() }?.let { userId ->
+            runCatching { withTimeoutOrNull(LOGOUT_DEVICE_TIMEOUT_MS) { unregisterDevice(userId) } }
+        }
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }

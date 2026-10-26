@@ -10,8 +10,10 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import io.ktor.client.request.headers
 
@@ -43,13 +45,16 @@ class PocketBaseClient(@PublishedApi internal val client: HttpClient) {
         perPage: Int = 50,
         filter: String? = null,
         sort: String? = null,
-        expand: String? = null
+        expand: String? = null,
+        /** Parametri in piu', letti dalle API rule come `@request.query.<nome>`. */
+        query: Map<String, String> = emptyMap(),
     ): PbListResponse<T> = client.get("/api/collections/$collection/records") {
         parameter("page", page)
         parameter("perPage", perPage)
         filter?.let { parameter("filter", it) }
         sort?.let { parameter("sort", it) }
         expand?.let { parameter("expand", it) }
+        query.forEach { (k, v) -> parameter(k, v) }
     }.body()
 
     suspend inline fun <reified T> getOne(
@@ -73,6 +78,14 @@ class PocketBaseClient(@PublishedApi internal val client: HttpClient) {
     @Throws(Exception::class)
     suspend fun delete(collection: String, id: String) {
         client.delete("/api/collections/$collection/records/$id")
+    }
+
+    /** DELETE con un body, per le API rule che lo leggono come `@request.body.<campo>`. */
+    suspend inline fun <reified B> deleteWithBody(collection: String, id: String, body: B) {
+        client.delete("/api/collections/$collection/records/$id") {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
     }
 
     @PublishedApi
