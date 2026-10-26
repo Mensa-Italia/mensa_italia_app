@@ -1,6 +1,6 @@
 package it.mensa.app.ui.root
 
-import it.mensa.app.ui.components.ChangelogOnLaunch
+import it.mensa.app.ui.components.LaunchNotices
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -108,8 +108,9 @@ fun RootScreen(
                 // dopo un accesso con password. Agganciata qui e non alla login
                 // per non sovrapporsi all'onboarding.
                 PasskeyEnrollmentPrompt()
-                // "Novità" una volta per versione, a chi ha aggiornato.
-                ChangelogOnLaunch()
+                // Il messaggio degli sviluppatori, se ce n'e' uno non letto,
+                // poi "Novità" una volta per versione.
+                LaunchNotices()
             }
             is RootPhase.Public -> PublicAreaScreen(
                 onLogin = { vm.exitPublic() },

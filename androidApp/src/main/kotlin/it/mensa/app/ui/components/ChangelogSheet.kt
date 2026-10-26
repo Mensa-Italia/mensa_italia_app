@@ -46,22 +46,52 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * "Novità" sopra la Home, una volta per versione. Le regole stanno in
- * `Changelog` (:shared); qui solo la presentazione. Mirrors iOS
- * `ChangelogSheet`.
+ * Le schede dell'apertura sopra la Home, una alla volta: prima il messaggio
+ * degli sviluppatori (`DeveloperMessage.pending`), poi "Novità" una volta per
+ * versione (`Changelog.shouldShow`). Mirrors iOS `launchNotices()`.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChangelogOnLaunch() {
-    val changelog = remember { koinAccess().changelog }
-    var show by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+fun LaunchNotices() {
+    val koin = remember { koinAccess() }
+    var developerMessage by remember { mutableStateOf<String?>(null) }
+    var changelogTurn by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         // Un attimo dopo la Home, cosi' la scheda sale sopra qualcosa di gia'
         // disegnato invece che durante la transizione.
         delay(600)
+        developerMessage = runCatching { koin.developerMessage.pending() }.getOrNull()
+        if (developerMessage == null) changelogTurn = true
+    }
+
+    val message = developerMessage
+    if (message != null) {
+        DeveloperMessageSheet(message = message) {
+            scope.launch { runCatching { koin.developerMessage.markSeen(message) } }
+            developerMessage = null
+            // Il changelog dopo, a scheda chiusa: due insieme non salgono.
+            changelogTurn = true
+        }
+    } else if (changelogTurn) {
+        ChangelogOnLaunch()
+    }
+}
+
+/**
+ * "Novità" sopra la Home, una volta per versione. Le regole stanno in
+ * `Changelog` (:shared); qui solo la presentazione. Mirrors iOS
+ * `ChangelogSheet`.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChangelogOnLaunch() {
+    val changelog = remember { koinAccess().changelog }
+    var show by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
         show = runCatching { changelog.shouldShow() }.getOrDefault(false)
     }
 

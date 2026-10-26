@@ -297,8 +297,9 @@ struct RootView: View {
                         // e solo dopo un accesso con password. Agganciata qui e
                         // non alla LoginView per non sovrapporsi all'onboarding.
                         .passkeyEnrollmentPrompt()
-                        // "Novità" una volta per versione, a chi ha aggiornato.
-                        .changelogOnLaunch()
+                        // Il messaggio degli sviluppatori, se ce n'è uno non
+                        // letto, poi "Novità" una volta per versione.
+                        .launchNotices()
                 }
             }
         }

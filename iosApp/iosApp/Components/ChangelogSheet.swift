@@ -72,10 +72,19 @@ struct ChangelogSheet: View {
     }
 }
 
-/// Apre il changelog sopra la Home quando `Changelog.shouldShow` lo chiede,
-/// e lo segna come visto alla chiusura.
-private struct ChangelogOnLaunchModifier: ViewModifier {
-    @State private var presented = false
+/// Le schede dell'apertura sopra la Home, una alla volta: prima il messaggio
+/// degli sviluppatori (`DeveloperMessage.pending`), poi il changelog
+/// (`Changelog.shouldShow`). Ognuna si segna come vista alla chiusura.
+private struct LaunchNoticesModifier: ViewModifier {
+    /// Con `sheet(item:)` il testo viaggia con la presentazione: con
+    /// `isPresented` la scheda leggeva il valore di prima ed era vuota.
+    private struct PendingMessage: Identifiable {
+        let text: String
+        var id: String { text }
+    }
+
+    @State private var developerMessage: PendingMessage?
+    @State private var showChangelog = false
 
     func body(content: Content) -> some View {
         content
@@ -83,18 +92,35 @@ private struct ChangelogOnLaunchModifier: ViewModifier {
                 // Un attimo dopo la Home, così la scheda sale sopra
                 // qualcosa di già disegnato invece che durante la transizione.
                 try? await Task.sleep(nanoseconds: 600_000_000)
-                if (try? await koin.changelog.shouldShow())?.boolValue == true {
-                    presented = true
+                if let message = try? await koin.developerMessage.pending() {
+                    developerMessage = PendingMessage(text: message)
+                } else {
+                    await presentChangelogIfNeeded()
                 }
             }
-            .sheet(isPresented: $presented, onDismiss: { koin.changelog.markSeen() }) {
+            .sheet(item: $developerMessage, onDismiss: {
+                // Il changelog dopo, a scheda chiusa: due insieme non salgono.
+                Task { await presentChangelogIfNeeded() }
+            }) { pending in
+                DeveloperMessageSheet(message: pending.text) {
+                    Task { try? await koin.developerMessage.markSeen(message: pending.text) }
+                    developerMessage = nil
+                }
+            }
+            .sheet(isPresented: $showChangelog, onDismiss: { koin.changelog.markSeen() }) {
                 ChangelogSheet(items: koin.changelog.items) {
-                    presented = false
+                    showChangelog = false
                 }
             }
+    }
+
+    private func presentChangelogIfNeeded() async {
+        if (try? await koin.changelog.shouldShow())?.boolValue == true {
+            showChangelog = true
+        }
     }
 }
 
 extension View {
-    func changelogOnLaunch() -> some View { modifier(ChangelogOnLaunchModifier()) }
+    func launchNotices() -> some View { modifier(LaunchNoticesModifier()) }
 }

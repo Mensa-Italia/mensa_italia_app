@@ -28,6 +28,9 @@ androidx-credentials = "1.5.0"
 
 # Coil
 coil = "3.0.4"
+# 0.33 e' l'ultima per Compose 1.7: dalla 0.34 chiama API di Compose 1.8
+# (TextAutoSize) e l'app si chiude appena disegna il testo.
+markdown-renderer = "0.33.0"
 
 # Media3 / ExoPlayer
 media3 = "1.4.1"
@@ -132,6 +135,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
+markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdown-renderer" }
 
 # Compose extras (BOM-driven)
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }

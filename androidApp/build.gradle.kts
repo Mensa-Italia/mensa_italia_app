@@ -143,6 +143,8 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    // Markdown del messaggio degli sviluppatori (`DeveloperMessageSheet`).
+    implementation(libs.markdown.renderer.m3)
 
     // Media3
     implementation(libs.androidx.media3.exoplayer)

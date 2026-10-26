@@ -15,6 +15,11 @@ packages:
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
     from: 11.0.0
+  # Markdown del messaggio degli sviluppatori (`DeveloperMessageSheet`).
+  # Textual, il suo successore, chiede iOS 18.
+  MarkdownUI:
+    url: https://github.com/gonzalezreal/swift-markdown-ui
+    from: 2.4.1
 
 targets:
   iosApp:
@@ -138,3 +143,5 @@ targets:
         product: StripeApplePay
       - package: Firebase
         product: FirebaseMessaging
+      - package: MarkdownUI
+        product: MarkdownUI

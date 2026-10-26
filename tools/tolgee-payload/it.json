@@ -1048,5 +1048,8 @@
   "today.birthdays.one": "{name} compie gli anni oggi",
   "today.birthdays.many": "{count} soci compiono gli anni oggi",
   "today.birthdays.cta": "Fagli gli auguri",
-  "today.birthdays.age": "Compie {age} anni"
+  "today.birthdays.age": "Compie {age} anni",
+  "developer_message.title": "Un messaggio dagli sviluppatori",
+  "developer_message.scroll_hint": "Scorri fino in fondo per continuare",
+  "developer_message.continue": "Avanti"
 }
