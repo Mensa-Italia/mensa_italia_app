@@ -3,6 +3,9 @@ package it.mensa.shared.config
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import it.mensa.shared.api.endpoints.SettingsApi
 import it.mensa.shared.db.MensaDatabase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Un messaggio degli sviluppatori ai soci, in markdown, dalla chiave
@@ -43,6 +46,35 @@ class DeveloperMessage internal constructor(
             }
             .getOrElse { read(KEY_LATEST) }
         return pendingOf(message, lastSeen())
+    }
+
+    /**
+     * Toccata una notifica `developer_message`: la scheda va mostrata, anche
+     * se il messaggio e' gia' stato letto. E' uno stato e non un evento
+     * perche' la notifica puo' aprire l'app da chiusa, prima che la scheda
+     * esista: la richiesta aspetta finche' qualcuno non la prende con
+     * [consumeShowRequest].
+     */
+    private val _showRequested = MutableStateFlow(false)
+    val showRequested: StateFlow<Boolean> = _showRequested.asStateFlow()
+
+    fun requestShow() {
+        _showRequested.value = true
+    }
+
+    fun consumeShowRequest() {
+        _showRequested.value = false
+    }
+
+    /**
+     * Il messaggio di adesso, letto o no: quello da rimostrare al tocco della
+     * notifica. Null se la chiave e' vuota. Dal server, o dall'ultimo
+     * arrivato se offline.
+     */
+    @Throws(Exception::class)
+    suspend fun current(): String? {
+        val message = runCatching { settings.settings()[KEY] }.getOrElse { read(KEY_LATEST) }
+        return message?.trim()?.takeIf { it.isNotEmpty() }
     }
 
     /** Letto fino in fondo: non ricompare finche' il testo non cambia. */

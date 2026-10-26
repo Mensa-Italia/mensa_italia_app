@@ -35,6 +35,7 @@ struct NotificationDetailView: View {
         case .localOffice:        return tr("notifications.go_local_office", fallback: "Apri gruppo locale")
         case .accountConfirmation: return tr("notifications.go_account_confirmation", fallback: "Conferma identità")
         case .member:              return tr("notifications.go_member", fallback: "Apri socio")
+        case .developerMessage:    return tr("notifications.go_developer_message", fallback: "Leggi il messaggio")
         }
     }
 
@@ -59,6 +60,7 @@ struct NotificationDetailView: View {
                 onDismiss: { target = nil }
             )
         case .member(let id):         MemberDetailView(memberId: id)
+        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
     }
 
@@ -91,7 +93,7 @@ struct NotificationDetailView: View {
 
                 if let t = notificationTarget(from: notification) {
                     Button {
-                        target = t
+                        if !t.openInPlace() { target = t }
                     } label: {
                         Label(ctaLabel(for: t), systemImage: "arrow.right.circle.fill")
                             .font(.headline)

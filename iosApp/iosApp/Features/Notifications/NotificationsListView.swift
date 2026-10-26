@@ -22,6 +22,8 @@ enum NotificationTarget: Hashable {
     case quidArticle(String)
     case quidPdf(String)
     case localOffice(String)
+    /// Il messaggio degli sviluppatori: nessuna pagina, rimostra la scheda.
+    case developerMessage
     case accountConfirmation(exAppId: String, callbackUrl: String, notificationId: String?)
     /// Spotlight-only target: tap on a CoreSpotlight result for a member.
     /// Not produced by `NotificationRouter` (no `type=member` push exists);
@@ -41,6 +43,7 @@ enum NotificationTarget: Hashable {
         case let t as NotificationTargetQuidArticle:     self = .quidArticle(t.postId)
         case let t as NotificationTargetQuidPdf:         self = .quidPdf(t.recordId)
         case let t as NotificationTargetLocalOffice:     self = .localOffice(t.slug)
+        case is NotificationTargetDeveloperMessage:      self = .developerMessage
         case let t as NotificationTargetAccountConfirmation:
             self = .accountConfirmation(
                 exAppId: t.exAppId,
@@ -89,22 +92,33 @@ func notificationSystemIcon(for notification: NotificationModel) -> String {
     return NotificationRouter.shared.systemIconName(type: type)
 }
 
-// MARK: - Title / body rendering helpers
-
-/// Builds the localized title using Tolgee key `<tr>.title` with named params.
-/// Mirrors Flutter: `notification.title.tr(namedArgs: notification.trNamedParams)`
-/// where `title = "$tr.title"`.
-func notificationTitle(_ n: NotificationModel) -> String {
-    guard !n.tr.isEmpty else { return tr("notifications.fallback.title", fallback: "Notifica") }
-    let key = "\(n.tr).title"
-    return tr(key, fallback: key, n.trNamedParams)
+extension NotificationTarget {
+    /// Le destinazioni che non sono una pagina: le apre qui e torna true,
+    /// cosi' chi naviga non deve conoscerle. Oggi solo il messaggio degli
+    /// sviluppatori, che rimostra la scheda anche se gia' letto (vedi
+    /// `launchNotices()`).
+    @MainActor
+    func openInPlace() -> Bool {
+        if case .developerMessage = self {
+            koin.developerMessage.requestShow()
+            return true
+        }
+        return false
+    }
 }
 
-/// Builds the localized body using Tolgee key `<tr>.body` with named params.
+// MARK: - Title / body rendering helpers
+
+/// Titolo della notifica: dalla chiave `tr` nella lingua dell'app, oppure dal
+/// titolo salvato dal server se `tr` e' vuoto o non tradotto. La regola sta in
+/// `NotificationText` (:shared), uguale su Android.
+func notificationTitle(_ n: NotificationModel) -> String {
+    NotificationText.shared.title(n: n, i18n: koin.i18n)
+}
+
+/// Testo della notifica, con la stessa regola del titolo.
 func notificationBody(_ n: NotificationModel) -> String {
-    guard !n.tr.isEmpty else { return "" }
-    let key = "\(n.tr).body"
-    return tr(key, fallback: key, n.trNamedParams)
+    NotificationText.shared.body(n: n, i18n: koin.i18n)
 }
 
 // MARK: - Routing
@@ -286,6 +300,7 @@ struct NotificationsListView: View {
                 onDismiss: { route = nil }
             )
         case .member(let id):         MemberDetailView(memberId: id)
+        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
     }
 
@@ -297,7 +312,7 @@ struct NotificationsListView: View {
         //    the referenced object. For unsupported / missing-data notifications,
         //    surface an inline alert instead of opening a detail screen.
         if let target = notificationTarget(from: n) {
-            route = .target(target)
+            if !target.openInPlace() { route = .target(target) }
         } else {
             unsupportedAlert = true
         }

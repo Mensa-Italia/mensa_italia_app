@@ -9,6 +9,8 @@ import kotlinx.serialization.json.JsonObject
 internal fun Notification.toModel(json: Json): NotificationModel = NotificationModel(
     id = id,
     tr = tr,
+    title = title,
+    description = description,
     trNamedParams = trNamedParamsJson.let {
         runCatching {
             @Suppress("UNCHECKED_CAST")

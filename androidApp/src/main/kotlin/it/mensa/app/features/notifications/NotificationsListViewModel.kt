@@ -39,6 +39,8 @@ sealed class NotificationTarget {
     data class QuidPdf(val recordId: String) : NotificationTarget()
     /** Opens a local office by slug. */
     data class LocalOffice(val slug: String) : NotificationTarget()
+    /** Il messaggio degli sviluppatori: non apre una pagina, rimostra la scheda. */
+    object DeveloperMessage : NotificationTarget()
     /**
      * Third-party data-access approval prompt. Carries the `ex_apps` record id
      * and the callback URL the caller expects a `{"accepted": bool}` POST on.
@@ -169,6 +171,7 @@ fun notificationTarget(dict: Map<String, String>): NotificationTarget? {
         "quid_article" -> str("post_id")?.let { NotificationTarget.QuidArticle(it) }
         "quid_pdf" -> str("record_id")?.let { NotificationTarget.QuidPdf(it) }
         "local_office" -> str("slug")?.let { NotificationTarget.LocalOffice(it) }
+        "developer_message" -> NotificationTarget.DeveloperMessage
         "account_confirmation" -> {
             val appId = str("keyAppId")
             val url = str("url")

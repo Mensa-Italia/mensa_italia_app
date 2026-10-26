@@ -254,6 +254,7 @@ struct MainTabView: View {
         case .localOffice(let slug):  LocalOfficeBySlugLoader(slug: slug)
         case .accountConfirmation:    EmptyView() // handled directly in .sheet
         case .member(let id):         MemberDetailView(memberId: id)
+        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
     }
 }
@@ -302,6 +303,7 @@ extension NotificationTarget: Identifiable {
         case .localOffice(let slug):  return "localOffice:\(slug)"
         case .accountConfirmation(let appId, _, _): return "accountConfirmation:\(appId)"
         case .member(let id):         return "member:\(id)"
+        case .developerMessage:       return "developerMessage"
         }
     }
 }

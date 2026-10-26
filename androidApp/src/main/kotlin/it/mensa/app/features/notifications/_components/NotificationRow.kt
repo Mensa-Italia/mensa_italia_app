@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.LocalOffer
+import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.LocationCity
 import androidx.compose.material.icons.outlined.Newspaper
 import androidx.compose.material.icons.outlined.Notifications
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import it.mensa.app.features.notifications.notificationDataMap
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.NotificationModel
+import it.mensa.shared.notifications.NotificationText
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -54,23 +56,21 @@ fun notificationIcon(n: NotificationModel): ImageVector {
         "quid" -> Icons.Outlined.Newspaper
         "quid_article" -> Icons.AutoMirrored.Outlined.Article
         "local_office" -> Icons.Outlined.LocationCity
+        "developer_message" -> Icons.Outlined.Campaign
         else -> Icons.Outlined.Notifications
     }
 }
 
 // ─── Title / body helpers ─────────────────────────────────────────────────────
 
-fun notificationTitleText(n: NotificationModel): String {
-    if (n.tr.isEmpty()) return "Notifica"
-    val key = "${n.tr}.title"
-    return koinAccess().i18n.t(key, key, n.trNamedParams)
-}
+/**
+ * Titolo e testo: dalla chiave `tr` nella lingua dell'app, oppure da quelli
+ * salvati dal server se `tr` e' vuoto o non tradotto. La regola sta in
+ * `NotificationText` (:shared), uguale su iOS.
+ */
+fun notificationTitleText(n: NotificationModel): String = NotificationText.title(n, koinAccess().i18n)
 
-fun notificationBodyText(n: NotificationModel): String {
-    if (n.tr.isEmpty()) return ""
-    val key = "${n.tr}.body"
-    return koinAccess().i18n.t(key, "", n.trNamedParams)
-}
+fun notificationBodyText(n: NotificationModel): String = NotificationText.body(n, koinAccess().i18n)
 
 // ─── Relative time helper ─────────────────────────────────────────────────────
 

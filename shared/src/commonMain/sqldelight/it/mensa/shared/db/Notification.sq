@@ -5,7 +5,11 @@ CREATE TABLE Notification (
     dataJson TEXT,
     seen INTEGER,
     createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL
+    updatedAt INTEGER NOT NULL,
+    -- Titolo e testo gia' tradotti dal server: si usano quando `tr` e' vuoto
+    -- (es. `developer_message`). Aggiunti con la migrazione 1.sqm.
+    title TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX notification_seen ON Notification(seen);
@@ -17,8 +21,8 @@ selectById:
 SELECT * FROM Notification WHERE id = ?;
 
 insertOrReplace:
-INSERT OR REPLACE INTO Notification(id, tr, trNamedParamsJson, dataJson, seen, createdAt, updatedAt)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Notification(id, tr, trNamedParamsJson, dataJson, seen, createdAt, updatedAt, title, description)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteById:
 DELETE FROM Notification WHERE id = ?;

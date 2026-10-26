@@ -48,18 +48,7 @@ class NotificationsRepository(
         db.transaction {
             db.notificationQueries.deleteAll()
             items.forEach { n ->
-                db.notificationQueries.insertOrReplace(
-                    id = n.id,
-                    tr = n.tr,
-                    trNamedParamsJson = json.encodeToString(
-                        kotlinx.serialization.serializer<Map<String, String>>(),
-                        n.trNamedParams
-                    ),
-                    dataJson = n.data?.let { json.encodeToString(kotlinx.serialization.json.JsonObject.serializer(), it) },
-                    seen = n.seen?.toEpochMilliseconds(),
-                    createdAt = n.created.toEpochMilliseconds(),
-                    updatedAt = Clock.System.now().toEpochMilliseconds(),
-                )
+                write(n)
             }
         }
     }
@@ -70,18 +59,7 @@ class NotificationsRepository(
     @Throws(Exception::class)
     suspend fun markSeen(id: String) {
         val updated = api.see(id)
-        db.notificationQueries.insertOrReplace(
-            id = updated.id,
-            tr = updated.tr,
-            trNamedParamsJson = json.encodeToString(
-                kotlinx.serialization.serializer<Map<String, String>>(),
-                updated.trNamedParams
-            ),
-            dataJson = updated.data?.let { json.encodeToString(kotlinx.serialization.json.JsonObject.serializer(), it) },
-            seen = updated.seen?.toEpochMilliseconds(),
-            createdAt = updated.created.toEpochMilliseconds(),
-            updatedAt = Clock.System.now().toEpochMilliseconds(),
-        )
+        write(updated)
     }
 
     /**
@@ -106,20 +84,7 @@ class NotificationsRepository(
                     semaphore.withPermit {
                         runCatching {
                             val updated = api.see(id)
-                            db.notificationQueries.insertOrReplace(
-                                id = updated.id,
-                                tr = updated.tr,
-                                trNamedParamsJson = json.encodeToString(
-                                    kotlinx.serialization.serializer<Map<String, String>>(),
-                                    updated.trNamedParams
-                                ),
-                                dataJson = updated.data?.let {
-                                    json.encodeToString(JsonObject.serializer(), it)
-                                },
-                                seen = updated.seen?.toEpochMilliseconds(),
-                                createdAt = updated.created.toEpochMilliseconds(),
-                                updatedAt = Clock.System.now().toEpochMilliseconds(),
-                            )
+                            write(updated)
                         }
                     }
                 }
@@ -134,6 +99,24 @@ class NotificationsRepository(
     suspend fun removeOne(id: String) {
         api.delete(id)
         db.notificationQueries.deleteById(id)
+    }
+
+    /** L'unica scrittura di una notifica nella cache locale. */
+    private suspend fun write(n: NotificationModel) {
+        db.notificationQueries.insertOrReplace(
+            id = n.id,
+            tr = n.tr,
+            trNamedParamsJson = json.encodeToString(
+                kotlinx.serialization.serializer<Map<String, String>>(),
+                n.trNamedParams
+            ),
+            dataJson = n.data?.let { json.encodeToString(JsonObject.serializer(), it) },
+            seen = n.seen?.toEpochMilliseconds(),
+            createdAt = n.created.toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
+            title = n.title,
+            description = n.description,
+        )
     }
 
     /**
@@ -152,20 +135,7 @@ class NotificationsRepository(
                                 NotificationModel.serializer(),
                                 msg.record
                             )
-                            db.notificationQueries.insertOrReplace(
-                                id = notif.id,
-                                tr = notif.tr,
-                                trNamedParamsJson = json.encodeToString(
-                                    kotlinx.serialization.serializer<Map<String, String>>(),
-                                    notif.trNamedParams
-                                ),
-                                dataJson = notif.data?.let {
-                                    json.encodeToString(JsonObject.serializer(), it)
-                                },
-                                seen = notif.seen?.toEpochMilliseconds(),
-                                createdAt = notif.created.toEpochMilliseconds(),
-                                updatedAt = Clock.System.now().toEpochMilliseconds(),
-                            )
+                            write(notif)
                         }
                     }
                     "delete" -> {

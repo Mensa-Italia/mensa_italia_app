@@ -169,4 +169,5 @@ private fun ctaLabel(target: NotificationTarget): String = when (target) {
     is NotificationTarget.QuidPdf -> tr("notifications.go_quid_pdf", fallback = "Apri PDF Quid")
     is NotificationTarget.LocalOffice -> tr("notifications.go_local_office", fallback = "Apri gruppo locale")
     is NotificationTarget.AccountConfirmation -> tr("notifications.go_account_confirmation", fallback = "Conferma identità")
+    is NotificationTarget.DeveloperMessage -> tr("notifications.go_developer_message", fallback = "Leggi il messaggio")
 }

@@ -44,6 +44,7 @@ import androidx.compose.material3.Card
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.shared.model.NotificationModel
+import it.mensa.shared.notifications.NotificationText
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -219,30 +220,12 @@ private fun NotificationRow(
 // ─── i18n resolution ─────────────────────────────────────────────────────────
 
 /**
- * Resolves the raw notification tr key to a human-readable string.
- *
- * NotificationModel.tr comes from the backend as an i18n key
- * (e.g. "push_notification.new_document_available").
- * When the Tolgee catalog is missing the key, we fall back to a humanized
- * version of the key's last segment.
+ * Lo stesso titolo della lista notifiche ([NotificationText] in :shared).
+ * Prima qui la chiave grezza diventava "New online event" mentre la lista
+ * diceva "Nuovo evento ONLINE!", e con `tr` vuoto restava "Notifica".
  */
-private fun NotificationModel.resolveTitle(i18n: it.mensa.shared.i18n.I18n): String {
-    val raw = tr.trim()
-    if (raw.isBlank()) return "Notifica"
-
-    // Check if it looks like an i18n key (dots, underscores, no spaces)
-    val looksLikeKey = !raw.contains(' ') && (raw.contains('.') || raw.contains('_'))
-
-    return if (looksLikeKey) {
-        val humanFallback = raw
-            .substringAfterLast('.')
-            .replace('_', ' ')
-            .replaceFirstChar { it.uppercase() }
-        i18n.t(raw, humanFallback, emptyMap())
-    } else {
-        raw
-    }
-}
+private fun NotificationModel.resolveTitle(i18n: it.mensa.shared.i18n.I18n): String =
+    NotificationText.title(this, i18n)
 
 private fun NotificationModel.iconForKind(): ImageVector {
     val key = tr.lowercase()

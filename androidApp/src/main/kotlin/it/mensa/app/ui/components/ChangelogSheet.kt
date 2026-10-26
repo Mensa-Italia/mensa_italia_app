@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.shared.changelog.ChangelogItem
@@ -75,6 +76,16 @@ fun LaunchNotices() {
                 runCatching { koin.developerMessage.pending() }.getOrNull()?.let { developerMessage = it }
             }
         }
+    }
+
+    // Toccata una notifica `developer_message`: si rimostra il messaggio di
+    // adesso, anche se gia' letto. La richiesta resta finche' non la si
+    // prende, cosi' funziona anche se la notifica ha aperto l'app da chiusa.
+    val showRequested by koin.developerMessage.showRequested.collectAsStateWithLifecycle()
+    LaunchedEffect(showRequested) {
+        if (!showRequested) return@LaunchedEffect
+        koin.developerMessage.consumeShowRequest()
+        runCatching { koin.developerMessage.current() }.getOrNull()?.let { developerMessage = it }
     }
 
     val message = developerMessage

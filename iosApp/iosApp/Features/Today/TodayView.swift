@@ -118,6 +118,7 @@ struct TodayView: View {
                     onDismiss: { notificationRoute = nil }
                 )
             case .member(let id):         MemberDetailView(memberId: id)
+            case .developerMessage:       EmptyView() // aperto da `openInPlace()`
             }
         }
     }
@@ -429,7 +430,7 @@ struct TodayView: View {
 
     private func handleNotificationTap(_ n: NotificationModel) {
         Task { try? await koin.notifications.markSeen(id: n.id) }
-        if let target = notificationTarget(from: n) {
+        if let target = notificationTarget(from: n), !target.openInPlace() {
             notificationRoute = target
         }
     }

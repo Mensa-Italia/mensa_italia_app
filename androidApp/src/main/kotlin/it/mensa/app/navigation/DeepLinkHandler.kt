@@ -15,6 +15,7 @@ import it.mensa.app.features.tickets.TicketsRoutes
 import it.mensa.app.services.push.PushDeepLinkRouter
 import it.mensa.shared.notifications.AppLink
 import org.koin.mp.KoinPlatform
+import it.mensa.app.support.koinAccess
 
 /**
  * DeepLinkHandler — utility for routing typed notification targets to nav destinations.
@@ -93,6 +94,11 @@ object DeepLinkHandler {
             }
             is NotificationTarget.LocalOffice -> {
                 navController.navigate(LocalOfficesRoutes.detail(target.slug))
+            }
+            is NotificationTarget.DeveloperMessage -> {
+                // Nessuna pagina: la scheda del messaggio sale sopra a quello
+                // che c'e' (vedi `LaunchNotices`), anche se gia' letto.
+                runCatching { koinAccess().developerMessage.requestShow() }
             }
             is NotificationTarget.AccountConfirmation -> {
                 // No navigation — surface the modal approval sheet instead.

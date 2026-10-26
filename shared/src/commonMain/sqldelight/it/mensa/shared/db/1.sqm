@@ -1,0 +1,6 @@
+-- Versione 1 -> 2: titolo e testo delle notifiche come li salva il server.
+-- Prima migrazione dello schema: i dati gia' salvati restano (su iOS uno
+-- schema diverso senza migrazione cancellava tutto il database, su Android
+-- falliva la prima query).
+ALTER TABLE Notification ADD COLUMN title TEXT NOT NULL DEFAULT '';
+ALTER TABLE Notification ADD COLUMN description TEXT NOT NULL DEFAULT '';

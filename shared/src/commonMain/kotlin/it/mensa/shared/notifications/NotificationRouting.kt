@@ -30,6 +30,9 @@ data class NotificationTargetQuidPdf(val recordId: String) : NotificationTarget(
 /** Opens the linktree-style page of a local office. Payload carries the slug. */
 data class NotificationTargetLocalOffice(val slug: String) : NotificationTarget()
 
+/** Il messaggio degli sviluppatori: non apre una pagina, rimostra la scheda. */
+object NotificationTargetDeveloperMessage : NotificationTarget()
+
 /**
  * Third-party data-access approval prompt. Payload carries the `ex_apps`
  * record id and the callback URL the host expects a `{"accepted": bool}`
@@ -77,6 +80,7 @@ object NotificationRouter {
             "quid_article" -> str("post_id")?.let { NotificationTargetQuidArticle(it) }
             "quid_pdf" -> str("record_id")?.let { NotificationTargetQuidPdf(it) }
             "local_office" -> str("slug")?.let { NotificationTargetLocalOffice(it) }
+            "developer_message" -> NotificationTargetDeveloperMessage
             "account_confirmation" -> {
                 val appId = str("keyAppId")
                 val url = str("url")
@@ -107,6 +111,7 @@ object NotificationRouter {
         "quid" -> "newspaper"
         "quid_article" -> "doc.richtext"
         "local_office" -> "building.2"
+        "developer_message" -> "megaphone"
         else -> "bell"
     }
 }

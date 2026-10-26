@@ -86,6 +86,7 @@ private struct LaunchNoticesModifier: ViewModifier {
     @State private var developerMessage: PendingMessage?
     @State private var showChangelog = false
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showRequestSub: Closeable?
 
     func body(content: Content) -> some View {
         content
@@ -99,6 +100,25 @@ private struct LaunchNoticesModifier: ViewModifier {
                     await presentChangelogIfNeeded()
                 }
             }
+            // Toccata una notifica `developer_message`: si rimostra il
+            // messaggio di adesso, anche se gia' letto. La richiesta resta in
+            // :shared finche' non la si prende, quindi vale anche quando la
+            // notifica ha aperto l'app da chiusa.
+            .onAppear {
+                showRequestSub?.close()
+                let flow = koin.developerMessage.showRequested as Kotlinx_coroutines_coreFlow
+                showRequestSub = subscribeFlow(flow) { (requested: KotlinBoolean) in
+                    guard requested.boolValue else { return }
+                    Task { @MainActor in
+                        koin.developerMessage.consumeShowRequest()
+                        showChangelog = false
+                        if let message = try? await koin.developerMessage.current() {
+                            developerMessage = PendingMessage(text: message)
+                        }
+                    }
+                }
+            }
+            .onDisappear { showRequestSub?.close() }
             // Anche al ritorno in primo piano: un messaggio cambiato mentre
             // l'app era aperta si vede subito, senza chiuderla del tutto.
             .onChange(of: scenePhase) { _, phase in

@@ -108,6 +108,9 @@ actual class DriverFactory {
             "Event" to "isPublic",
             "RegSoci" to "dataHash",
             "RegSoci" to "imageHash",
+            // Aggiunta con la migrazione 1.sqm: se non c'e', la migrazione
+            // non e' passata e si ricrea il database invece di cadere.
+            "Notification" to "title",
         )
     }
 }
