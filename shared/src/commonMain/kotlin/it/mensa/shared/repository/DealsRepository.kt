@@ -34,33 +34,46 @@ class DealsRepository(
         db.transaction {
             db.dealQueries.deleteAll()
             items.forEach { d ->
-                db.dealQueries.insertOrReplace(
-                    id = d.id,
-                    name = d.name,
-                    commercialSector = d.commercialSector,
-                    positionJson = d.position?.let {
-                        json.encodeToString(LocationModel.serializer(), it)
-                    },
-                    isLocal = if (d.isLocal) 1L else 0L,
-                    details = d.details,
-                    who = d.who,
-                    starting = d.starting?.toEpochMilliseconds(),
-                    ending = d.ending?.toEpochMilliseconds(),
-                    howToGet = d.howToGet,
-                    link = d.link,
-                    owner = d.owner,
-                    attachment = d.attachment,
-                    isActive = if (d.isActive) 1L else 0L,
-                    vatNumber = d.vatNumber,
-                    updatedAt = Clock.System.now().toEpochMilliseconds()
-                )
+                insertRow(d)
             }
         }
     }
 
+    /**
+     * Dal database se c'e', altrimenti dal server: la notifica di una
+     * convenzione nuova arriva prima che la lista l'abbia scaricata, e il
+     * dettaglio restava vuoto. Null se manca anche sul server o non c'e' rete.
+     */
     suspend fun getById(id: String): DealModel? {
-        val row = db.dealQueries.selectById(id).awaitAsOneOrNull() ?: return null
-        return row.toModel(json)
+        db.dealQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
+        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
+        // si decodifica comunque in un modello vuoto, con tutti i default.
+        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        insertRow(remote)
+        return remote
+    }
+
+    private suspend fun insertRow(d: DealModel) {
+        db.dealQueries.insertOrReplace(
+            id = d.id,
+            name = d.name,
+            commercialSector = d.commercialSector,
+            positionJson = d.position?.let {
+                json.encodeToString(LocationModel.serializer(), it)
+            },
+            isLocal = if (d.isLocal) 1L else 0L,
+            details = d.details,
+            who = d.who,
+            starting = d.starting?.toEpochMilliseconds(),
+            ending = d.ending?.toEpochMilliseconds(),
+            howToGet = d.howToGet,
+            link = d.link,
+            owner = d.owner,
+            attachment = d.attachment,
+            isActive = if (d.isActive) 1L else 0L,
+            vatNumber = d.vatNumber,
+            updatedAt = Clock.System.now().toEpochMilliseconds()
+        )
     }
 
     /**

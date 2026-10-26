@@ -149,6 +149,8 @@ dependencies {
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.common)
+    // Audio dei podcast scaricato con il nostro OkHttp, per il Bearer (MensaAuthInterceptor).
+    implementation(libs.androidx.media3.datasource.okhttp)
 
     // Maps
     implementation(libs.maps.compose)

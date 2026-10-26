@@ -43,6 +43,7 @@ sealed class ProfileRoute(val route: String) {
 fun ProfileNavGraph(
     navController: NavHostController = rememberNavController(),
     onSearchTap: () -> Unit = {},
+    onReceiptsClick: () -> Unit = {},
     onAtRootChange: (Boolean) -> Unit = {},
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -82,6 +83,7 @@ fun ProfileNavGraph(
             ProfileScreen(
                 onNavigate = { route -> navController.navigate(route.route) },
                 onSearchTap = onSearchTap,
+                onReceiptsClick = onReceiptsClick,
             )
         }
         composable(ProfileRoute.LanguagePicker.route) {

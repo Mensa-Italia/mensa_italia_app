@@ -134,9 +134,18 @@ class EventsRepository(
 
     suspend fun fetchPublicEvents(): List<EventModel> = api.listPublic()
 
+    /**
+     * Dal database se c'e', altrimenti dal server: la notifica di un evento
+     * nuovo (o un link condiviso) puo' arrivare prima che la lista l'abbia
+     * scaricato. Null se manca anche sul server o non c'e' rete.
+     */
     suspend fun getById(id: String): EventModel? {
-        val row = db.eventQueries.selectById(id).awaitAsOneOrNull() ?: return null
-        return row.toModel(json)
+        db.eventQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
+        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
+        // si decodifica comunque in un modello vuoto, con tutti i default.
+        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        upsertRow(remote)
+        return remote
     }
 
     /** Create an event with optional image cover and nested schedules. */

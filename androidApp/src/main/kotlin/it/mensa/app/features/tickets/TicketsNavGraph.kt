@@ -59,6 +59,7 @@ fun NavGraphBuilder.ticketsNavGraph(navController: NavController) {
             onNavigateToDetail = { ticketId ->
                 navController.navigate(TicketsRoutes.detail(ticketId))
             },
+            onBack = { navController.popBackStack() },
         )
     }
 

@@ -47,7 +47,10 @@ import it.mensa.app.ui.components.CachedAsyncImage
  * lavoro sprecato.
  */
 object StampThumb {
-    const val GRID = "320x0"
+    // Una misura dichiarata sul campo `stamp.image` (0x50, 0x250, 0x500):
+    // PocketBase ignora le altre e manda l'originale 1024×1024, ~850 KB a
+    // timbro. Con `320x0` sfogliare voleva dire riscaricarli. Come iOS.
+    const val GRID = "0x500"
     const val DETAIL = "800x0"
 }
 

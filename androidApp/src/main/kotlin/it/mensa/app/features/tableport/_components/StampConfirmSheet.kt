@@ -318,7 +318,7 @@ private fun SealedStampPreview(stamp: StampModel) {
         // Stamp image clipped to a rounded square
         if (stamp.image.isNotEmpty()) {
             val url = FilesUrl.build(
-                collection = "stamps",
+                collection = "stamp", // al singolare: con "stamps" il file era un 404
                 recordId = stamp.id,
                 filename = stamp.image,
                 thumb = StampThumb.DETAIL,

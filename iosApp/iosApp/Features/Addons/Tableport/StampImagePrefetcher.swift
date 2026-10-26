@@ -1,59 +1,45 @@
 import Foundation
 import Shared
 
-/// Warms `URLCache.shared` with stamp PNGs so the next page's images are
-/// already on disk by the time the user flips to it.
+/// Loads the stamps of the pages around the open one ahead of time, so a
+/// page turned to already has them (in memory, decoded) and one turned back
+/// to still does.
 ///
-/// Strategy: fire one URLSession data task per image, low priority,
-/// rate-limited so we don't saturate the network. Each request reuses
-/// `URLCache.shared` (configured at app boot in `CachedImageCacheConfig`).
+/// Through `MensaImageLoader`, the same path the stamps on screen take: it
+/// used to warm `URLCache.shared`, which no view reads, so nothing prefetched
+/// was ever found.
 enum StampImagePrefetcher {
-    private static let queue = DispatchQueue(label: "mensa.stamp.prefetch", qos: .utility)
-    private static var inflight: Set<String> = []
-    private static let session: URLSession = {
-        let cfg = URLSessionConfiguration.default
-        cfg.requestCachePolicy = .returnCacheDataElseLoad
-        cfg.urlCache = URLCache.shared
-        cfg.httpMaximumConnectionsPerHost = 4
-        return URLSession(configuration: cfg)
-    }()
-
     /// Scalda solo la pagina attorno a `page`, non tutta la collezione.
     ///
-    /// `warmAll` accodava una richiesta per ogni timbro. La sessione tiene 4
-    /// connessioni per host, quindi le immagini della pagina che l'utente sta
+    /// `warmAll` accodava una richiesta per ogni timbro. Le connessioni per
+    /// host sono poche, quindi le immagini della pagina che l'utente sta
     /// *guardando* finivano in fila dietro decine di prefetch di pagine mai
     /// aperte: e' esattamente il caricamento in ritardo che si vede a schermo.
     /// Una pagina avanti e una indietro bastano, il libro si sfoglia una
     /// pagina per volta.
-    static func warmAround(_ stamps: [StampUserModel], page: Int, perPage: Int) {
+    ///
+    /// `ahead`: pages warmed past the open one. A continuous scroll covers
+    /// several pages in one fling, so it asks for more than a book does.
+    static func warmAround(_ stamps: [StampUserModel], page: Int, perPage: Int, ahead: Int = 1) {
         guard !stamps.isEmpty, perPage > 0 else { return }
         let from = max(0, (page - 1) * perPage)
-        let to = min(stamps.count, (page + 2) * perPage)
+        let to = min(stamps.count, (page + 1 + ahead) * perPage)
         guard from < to else { return }
         warm(Array(stamps[from..<to]))
     }
 
+    /// Tutta la collezione su disco, in sottofondo e tre alla volta (vedi
+    /// `MensaImageLoader.warmDisk`): sfogliando, il timbro nuovo arriva dal
+    /// disco in un frame invece che dalla rete. Parte dalla Home, prima che
+    /// il passaporto si apra, e di nuovo all'apertura per i timbri appena
+    /// arrivati; quello che e' gia' su disco non si riscarica.
+    static func warmCollection(_ stamps: [StampUserModel]) {
+        MensaImageLoader.warmDisk(stamps.compactMap(url(for:)))
+    }
+
     private static func warm(_ stamps: [StampUserModel]) {
-        queue.async {
-            for s in stamps {
-                guard let url = url(for: s) else { continue }
-                let key = url.absoluteString
-                if inflight.contains(key) { continue }
-                inflight.insert(key)
-                // Stesso header delle immagini a schermo: senza, il prefetch
-                // arriverebbe anonimo e scalderebbe la cache per una strada
-                // diversa da quella che poi userà la view. Vedi `MensaAuth`.
-                var req = MensaAuth.request(url: url, cachePolicy: .returnCacheDataElseLoad)
-                req.timeoutInterval = 20
-                let task = session.dataTask(with: req) { _, _, _ in
-                    queue.async { inflight.remove(key) }
-                }
-                // Il 307 verso S3 non deve portarsi dietro l'Authorization.
-                task.delegate = MensaRedirectAuthStripper.shared
-                task.priority = URLSessionTask.lowPriority
-                task.resume()
-            }
+        for stamp in stamps {
+            if let url = url(for: stamp) { MensaImageLoader.prefetch(url) }
         }
     }
 

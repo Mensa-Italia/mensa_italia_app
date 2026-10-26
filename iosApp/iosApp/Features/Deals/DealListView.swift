@@ -48,9 +48,8 @@ struct DealListView: View {
                         Button {
                             showAdd = true
                         } label: {
-                            Image(systemName: "plus.circle.fill")
+                            Label(tr("addons.deals.add", fallback: "Aggiungi deal"), systemImage: "plus.circle.fill")
                         }
-                        .accessibilityLabel(tr("addons.deals.add", fallback: "Aggiungi deal"))
                     }
                 }
             }
@@ -132,13 +131,12 @@ struct DealListView: View {
                     }
                 }
             } label: {
-                Image(systemName: vm.selectedSector == nil
-                      ? "line.3.horizontal.decrease.circle"
-                      : "line.3.horizontal.decrease.circle.fill")
-                    .accessibilityLabel(Text(tr(
-                        "app.deals.filter.label",
-                        fallback: "Filtra per settore"
-                    )))
+                Label(
+                    tr("app.deals.filter.label", fallback: "Filtra per settore"),
+                    systemImage: vm.selectedSector == nil
+                        ? "line.3.horizontal.decrease.circle"
+                        : "line.3.horizontal.decrease.circle.fill"
+                )
             }
             .tint(AppTheme.Colors.brandTintAdaptive)
         }

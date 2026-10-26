@@ -43,6 +43,8 @@ import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -56,6 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TicketsListScreen(
     onNavigateToDetail: (String) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val vm: TicketsListViewModel = koinViewModel()
@@ -78,6 +81,13 @@ fun TicketsListScreen(
         topBar = {
             LargeTopAppBar(
                 title = { Text(tr("tickets.title", fallback = "I miei ticket")) },
+                // Si apre dalla Home (e dalle notifiche), non e' piu' un tab:
+                // senza freccia l'unica uscita era il gesto di sistema.
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = tr("app.back", fallback = "Indietro"))
+                    }
+                },
                 scrollBehavior = scrollBehavior,
             )
         },

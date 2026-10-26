@@ -71,7 +71,9 @@ object NotificationRouter {
             "multiple_documents" -> NotificationTargetMultipleDocuments
             "ticket_purchase" -> NotificationTargetTicketPurchase
             "payment_update_status" -> NotificationTargetPaymentUpdateStatus
-            "quid" -> str("category_id")?.let { NotificationTargetQuid(it) }
+            // `quid_id` e' quello che manda davvero il cron del backend
+            // (`crons/quidnotify`); `category_id` resta per le notifiche vecchie.
+            "quid" -> (str("category_id") ?: str("quid_id"))?.let { NotificationTargetQuid(it) }
             "quid_article" -> str("post_id")?.let { NotificationTargetQuidArticle(it) }
             "quid_pdf" -> str("record_id")?.let { NotificationTargetQuidPdf(it) }
             "local_office" -> str("slug")?.let { NotificationTargetLocalOffice(it) }

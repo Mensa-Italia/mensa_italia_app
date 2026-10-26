@@ -51,7 +51,7 @@ fun NavGraphBuilder.locationsNavGraph(navController: NavController) {
         }
 
         composable(LocationRoutes.MAP) { entry ->
-            val graphEntry = entry.rememberGraphEntry(navController)
+            val graphEntry = entry.rememberGraphEntry(navController) ?: return@composable
             val vm = koinViewModel<NewLocationViewModel>(viewModelStoreOwner = graphEntry)
             LaunchedEffect(vm) {
                 graphEntry.savedStateHandle
@@ -66,8 +66,9 @@ fun NavGraphBuilder.locationsNavGraph(navController: NavController) {
         }
 
         composable(LocationRoutes.DETAILS) { entry ->
+            val graphEntry = entry.rememberGraphEntry(navController) ?: return@composable
             NameLocationScreen(
-                vm = koinViewModel(viewModelStoreOwner = entry.rememberGraphEntry(navController)),
+                vm = koinViewModel(viewModelStoreOwner = graphEntry),
                 onSaved = { loc -> navController.finishLocationPicker(loc) },
                 onBack = { navController.popBackStack() },
             )
@@ -82,10 +83,23 @@ fun NavGraphBuilder.locationsNavGraph(navController: NavController) {
 fun NavController.navigateToLocationPicker(currentLocationId: String? = null) {
     navigate(LocationRoutes.GRAPH)
     if (currentLocationId != null) {
-        getBackStackEntry(LocationRoutes.GRAPH)
-            .savedStateHandle[LocationRoutes.ARG_CURRENT_LOCATION_ID] = currentLocationId
+        graphEntryOrNull()?.savedStateHandle?.set(LocationRoutes.ARG_CURRENT_LOCATION_ID, currentLocationId)
     }
 }
+
+/**
+ * L'entry del graph se e' sul back stack, null altrimenti.
+ *
+ * Mai [NavController.getBackStackEntry]: lancia [IllegalArgumentException]
+ * quando la rotta non c'e', e questo flusso e' pieno di momenti in cui il
+ * graph e' appena uscito dal back stack mentre una sua pagina e' ancora a
+ * schermo. "No destination with route locations/picker is on the
+ * NavController's back stack" e' arrivato dalle segnalazioni anche dopo la
+ * prima correzione; con la ricerca che non lancia quella classe di crash
+ * non esiste piu', qualunque sia il percorso che ci arriva.
+ */
+private fun NavController.graphEntryOrNull(): NavBackStackEntry? =
+    currentBackStack.value.lastOrNull { it.destination.route == LocationRoutes.GRAPH }
 
 /**
  * L'entry del graph, che ospita il draft ([NewLocationViewModel]) condiviso fra
@@ -101,10 +115,14 @@ fun NavController.navigateToLocationPicker(currentLocationId: String? = null) {
  * L'oggetto invece resta valido: finche' la pagina figlia sta uscendo, il graph
  * e' "in transizione" e Navigation non lo distrugge ne' svuota il suo
  * ViewModelStore. E' solo la ricerca per rotta a non essere piu' possibile.
+ *
+ * Null se la pagina viene composta per la prima volta quando il graph se n'e'
+ * gia' andato: la pagina sta uscendo e non disegna niente, invece di chiudere
+ * l'app.
  */
 @Composable
-private fun NavBackStackEntry.rememberGraphEntry(navController: NavController): NavBackStackEntry =
-    remember(this) { navController.getBackStackEntry(LocationRoutes.GRAPH) }
+private fun NavBackStackEntry.rememberGraphEntry(navController: NavController): NavBackStackEntry? =
+    remember(this) { navController.graphEntryOrNull() }
 
 /** Chiude il flusso e consegna la posizione scelta a chi l'ha aperto. */
 private fun NavController.finishLocationPicker(location: LocationModel) {

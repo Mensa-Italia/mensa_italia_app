@@ -50,6 +50,13 @@ struct MensaApp: App {
             // ("member:<id>" / "document:<id>"). Lo stashamo in
             // PendingDeepLink (stessa pipeline delle push) così MainTabView
             // lo drena e apre la sheet di dettaglio.
+            // Link universali `https://svc.mensa.it/links/…` (QR dei
+            // francobolli, eventi condivisi). Con il ciclo di vita SwiftUI
+            // arrivano qui, come gli URL scheme. Stessa pipeline delle push:
+            // `MainTabView` li drena quando c'è, anche dopo login o rinnovo.
+            .onOpenURL { url in
+                PendingDeepLink.shared.open(url: url)
+            }
             .onContinueUserActivity(CSSearchableItemActionType) { activity in
                 guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
                       let target = SpotlightIndexer.target(forIdentifier: id) else { return }

@@ -138,7 +138,7 @@ struct SigDetailView: View {
                         }
                         .disabled(vm.sig == nil)
                     } label: {
-                        Image(systemName: "ellipsis.circle")
+                        Label(tr("app.more_actions", fallback: "Altre azioni"), systemImage: "ellipsis.circle")
                     }
                     .disabled(vm.deleting)
                 }

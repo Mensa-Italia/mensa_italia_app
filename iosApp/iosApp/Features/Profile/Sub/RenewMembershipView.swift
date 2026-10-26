@@ -46,16 +46,6 @@ struct RenewMembershipView: View {
         }
         .navigationTitle(tr("app.renew.title", fallback: "Tessera"))
         .navigationBarTitleDisplayMode(.large)
-        .background(
-            LinearGradient(
-                colors: [
-                    AppTheme.Colors.brandPrimary.opacity(0.06),
-                    Color(.systemBackground)
-                ],
-                startPoint: .top, endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        )
         .task {
             await vm.load()
             withAnimation { appeared = true }
@@ -108,7 +98,7 @@ struct RenewMembershipView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(
-            Color(.secondarySystemBackground),
+            Color(.secondarySystemGroupedBackground),
             in: RoundedRectangle(cornerRadius: AppTheme.Radius.card)
         )
     }

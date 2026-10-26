@@ -4,6 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
 import it.mensa.shared.api.endpoints.AuthApi
+import it.mensa.shared.api.endpoints.InvalidCredentialsException
 import it.mensa.shared.auth.oidc.JwtDecoder
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
 import it.mensa.shared.auth.oidc.OidcSession
@@ -13,6 +14,7 @@ import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.di.wipeAllUserData
 import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.model.UserModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,6 +92,55 @@ class AuthRepository(
      */
     suspend fun reloadUser(): UserModel? =
         reloginWithStoredCredentials() ?: refreshCurrentUser()
+
+    /**
+     * Il tasto "Ho rinnovato" del muro del rinnovo.
+     *
+     * La scadenza sul record la riscrive il backend solo durante un login con
+     * password (`/auth-with-zitadel` legge l'area soci di cloud32 e aggiorna
+     * `expire_membership`). `/api/cs/me` e il login con passkey restituiscono
+     * quello che c'e' gia' a database. Chi e' entrato con la passkey, o ha
+     * cambiato password sul portale, restava quindi chiuso fuori per sempre:
+     * rinnovava, il portale diceva "in regola", e qui risultava la data vecchia
+     * a ogni tentativo.
+     *
+     * [MembershipRecheck.NEEDS_PASSWORD] distingue proprio quel caso: il dato
+     * e' quello del database, non quello del portale, e per rileggerlo serve
+     * la password ([recheckMembershipWithPassword]).
+     */
+    suspend fun recheckMembership(): MembershipRecheck {
+        val relogged = reloginWithStoredCredentials()
+        val user = relogged ?: refreshCurrentUser() ?: return MembershipRecheck.UNREACHABLE
+        return when {
+            !Membership.isExpired(user) -> MembershipRecheck.RENEWED
+            relogged == null -> MembershipRecheck.NEEDS_PASSWORD
+            else -> MembershipRecheck.STILL_EXPIRED
+        }
+    }
+
+    /**
+     * Come [recheckMembership], con la password dell'area soci scritta adesso:
+     * e' un login vero, quindi la scadenza arriva da cloud32. La password
+     * viene salvata come in ogni login, cosi' il prossimo controllo non la
+     * richiede.
+     */
+    suspend fun recheckMembershipWithPassword(password: String): MembershipRecheck {
+        val email = runCatching { credentials.read()?.email }.getOrNull()
+            ?: db.keyValueQueries.selectById(KEY_CURRENT_USER).awaitAsOneOrNull()?.value_
+                ?.let { runCatching { json.decodeFromString<UserModel>(it).email }.getOrNull() }
+                ?.takeIf { it.isNotBlank() }
+            ?: return MembershipRecheck.UNREACHABLE
+        val user = try {
+            login(email, password).getOrThrow()
+        } catch (_: InvalidCredentialsException) {
+            return MembershipRecheck.WRONG_PASSWORD
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Throwable) {
+            return MembershipRecheck.UNREACHABLE
+        }
+        return if (Membership.isExpired(user)) MembershipRecheck.STILL_EXPIRED else MembershipRecheck.RENEWED
+    }
 
     init {
         tokenRefresher.onSessionLost = {
@@ -474,6 +525,20 @@ sealed interface AuthState {
     data object Unknown : AuthState
     data object Anonymous : AuthState
     data class Authenticated(val token: String) : AuthState
+}
+
+/** Esito di [AuthRepository.recheckMembership]. */
+enum class MembershipRecheck {
+    /** La tessera risulta attiva: il muro si toglie da solo. */
+    RENEWED,
+    /** Riletta dal portale, ed e' ancora scaduta. */
+    STILL_EXPIRED,
+    /** Scaduta secondo il database, che il portale non ha riletto: serve la password. */
+    NEEDS_PASSWORD,
+    /** La password scritta non e' stata accettata. */
+    WRONG_PASSWORD,
+    /** Server non raggiunto. */
+    UNREACHABLE,
 }
 
 /** Come e' avvenuto l'accesso corrente. Vedi [AuthRepository.lastLoginMethod]. */

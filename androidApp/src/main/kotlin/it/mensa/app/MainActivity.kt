@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import it.mensa.app.navigation.MensaNavGraph
+import it.mensa.app.navigation.PendingAppLink
 import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.push.DeviceRegistrar
 import it.mensa.app.services.push.PendingPushTarget
@@ -27,6 +28,7 @@ import it.mensa.app.support.koinAccess
 import it.mensa.app.support.ThemeManager
 import it.mensa.app.support.ThemeMode
 import it.mensa.app.ui.theme.MensaTheme
+import it.mensa.shared.notifications.AppLinkParser
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -49,6 +51,7 @@ class MainActivity : ComponentActivity() {
         // PendingPushTarget e lo drena MainAppShell quando il NavController
         // esiste — qui non esiste ancora.
         capturePushTarget(intent)
+        captureAppLink(intent)
 
         // Edge-to-edge: Compose draws behind system bars
         enableEdgeToEdge()
@@ -141,6 +144,18 @@ class MainActivity : ComponentActivity() {
         // partenza e un secondo tap non si vedrebbe.
         setIntent(intent)
         capturePushTarget(intent)
+        captureAppLink(intent)
+    }
+
+    /**
+     * Un link `https://svc.mensa.it/links/...` (QR di un francobollo, evento
+     * condiviso) che ha aperto l'app. Si parcheggia in [PendingAppLink] per la
+     * stessa ragione delle push: il NavController qui non c'e' ancora.
+     */
+    private fun captureAppLink(intent: Intent?) {
+        if (intent?.action != Intent.ACTION_VIEW) return
+        val url = intent.dataString ?: return
+        AppLinkParser.parse(url)?.let(PendingAppLink::set)
     }
 
     /**

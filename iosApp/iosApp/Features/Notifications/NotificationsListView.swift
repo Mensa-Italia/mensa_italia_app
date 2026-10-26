@@ -241,8 +241,7 @@ struct NotificationsListView: View {
                         )
                     }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .accessibilityLabel(tr("notifications.actions.more", fallback: "Altre azioni"))
+                    Label(tr("notifications.actions.more", fallback: "Altre azioni"), systemImage: "ellipsis.circle")
                 }
             }
         }

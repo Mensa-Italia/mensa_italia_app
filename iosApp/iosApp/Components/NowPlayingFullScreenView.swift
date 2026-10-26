@@ -15,359 +15,316 @@ private func playLightHaptic() {
 
 // MARK: - Root View
 
+/// Full-screen now playing, Apple Music's way: the artwork's colours fill the
+/// screen, the artwork sits big above (or, with room to spare, beside) the
+/// controls, and the transport is bare glyphs on that colour. No close
+/// button: the grabber, or pulling the page down, puts it away.
+///
+/// With width to spare (iPhone Duo unfolded, landscape) artwork and controls
+/// take one side each, split at the hinge when there is one so neither
+/// crosses it.
 struct NowPlayingFullScreenView: View {
-    @ObservedObject var audioService: AudioPlayerService = .shared
+    /// Coarse state only. The service republishes the position 10 times a
+    /// second: observed here, the whole page — its menus included — was
+    /// rebuilt under the finger, and a menu item tapped while its menu was
+    /// being replaced did nothing. The position lives in `NowPlayingProgress`.
+    @StateObject private var observer = MiniPlayerObserver()
+    private let audioService = AudioPlayerService.shared
     @Environment(\.openURL) private var openURL
     @State private var showingQueue = false
 
     var body: some View {
-        Group {
-            if let track = audioService.currentTrack {
-                content(for: track)
-                    // Backdrop dietro al content. `ignoresSafeArea` lo
-                    // estende ai bordi della sheet (che è già sotto la
-                    // status bar grazie al detent .large).
-                    .background(backdrop(for: track).ignoresSafeArea())
-            } else {
-                ProgressView()
-                    .tint(.white)
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-
-    /// Background "blurred artwork" che si estende dietro status bar e home
-    /// indicator. Il sheet di sistema disegna i propri angoli arrotondati
-    /// (`presentationCornerRadius`) sopra quest'area: i pixel dietro la status
-    /// bar quindi appaiono ai bordi superiori della card.
-    @ViewBuilder
-    private func backdrop(for track: AudioTrack) -> some View {
         ZStack {
-            Color.black
-            BlurredArtworkBackdrop(url: track.artworkURL, trackId: track.id)
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.0),
-                    Color.black.opacity(0.35),
-                    Color.black.opacity(0.75)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        }
-    }
-
-    @ViewBuilder
-    private func content(for track: AudioTrack) -> some View {
-        GeometryReader { geo in
-            // Apple Music usa ~55-60% dell'altezza per l'artwork. Cappiamo
-            // alla width-meno-padding per evitare overflow su iPad portrait.
-            let artworkSide = min(geo.size.width - 48, geo.size.height * 0.5)
-            VStack(spacing: 0) {
-                // Grabber
-                Capsule()
-                    .fill(Color.white.opacity(0.4))
-                    .frame(width: 36, height: 5)
-                    .padding(.top, 8)
-                    .padding(.bottom, 8)
-
-                // Top bar
-                topBar(for: track)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
-
-                Spacer(minLength: 8)
-
-                // Artwork prende il suo aspect ratio naturale, vincolato a
-                // un quadrato max così che gli album quadrati riempiano il
-                // box e gli artwork landscape (podcast) restino al loro ratio
-                // senza letterbox visibile.
-                artwork(for: track)
-                    .frame(maxWidth: artworkSide, maxHeight: artworkSide)
-
-                Spacer(minLength: 8)
-
-                // Title block
-                titleBlock(for: track)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
-
-                // Scrubber
-                CustomAudioScrubber(
-                    duration: max(track.duration, 0.01),
-                    currentTime: audioService.currentTime,
-                    onSeek: { newTime in
-                        audioService.seek(to: newTime)
+            if let track = observer.currentTrack {
+                NowPlayingBackdrop(url: track.artworkURL, trackId: track.id)
+                GeometryReader { geo in
+                    if geo.size.width > geo.size.height && geo.size.width >= 640 {
+                        wideLayout(track: track, geo: geo)
+                    } else {
+                        compactLayout(track: track, geo: geo)
                     }
-                )
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Posizione di riproduzione")
-                .accessibilityValue(timestampAccessibility(current: audioService.currentTime, total: track.duration))
-                .padding(.top, 12)
-
-                // Timestamps
-                timestamps(track: track)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 4)
-                    .padding(.bottom, 12)
-
-                // Transport
-                transportControls()
-                    .padding(.horizontal, 32)
-                    .padding(.bottom, 20)
-
-                // Secondary
-                secondaryActions()
-                    .padding(.horizontal, 48)
-                    .padding(.bottom, 16)
+                }
+                .overlay(alignment: .top) { grabber }
+            } else {
+                Color.black.ignoresSafeArea()
             }
-            .frame(width: geo.size.width, height: geo.size.height)
         }
+        .foregroundStyle(.white)
+        .preferredColorScheme(.dark)
         .sheet(isPresented: $showingQueue) {
             QueueListSheet()
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
-                .presentationBackground(.ultraThinMaterial)
         }
     }
 
-    @ViewBuilder
-    private func topBar(for track: AudioTrack) -> some View {
-        HStack {
-            Button {
-                audioService.dismissFullPlayer()
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(Color.white.opacity(0.08)))
-            }
-            .accessibilityLabel("Chiudi")
+    // MARK: Layouts
 
-            Spacer()
+    private func compactLayout(track: AudioTrack, geo: GeometryProxy) -> some View {
+        let side = min(geo.size.width - 56, geo.size.height * 0.48)
+        return VStack(spacing: 0) {
+            Spacer(minLength: 28)
+            artwork(for: track)
+                .frame(maxWidth: side, maxHeight: side)
+            Spacer(minLength: 20)
+            controls(for: track)
+        }
+        .padding(.horizontal, 28)
+        .padding(.bottom, 8)
+        .frame(width: geo.size.width, height: geo.size.height)
+    }
 
-            VStack(spacing: 2) {
-                Text("In riproduzione da")
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
-                Text(track.subtitle)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.9))
-                    .lineLimit(1)
-            }
+    private func wideLayout(track: AudioTrack, geo: GeometryProxy) -> some View {
+        let hinge = geo.verticalHinge
+        let leftWidth = hinge?.minX ?? geo.size.width / 2
+        let rightWidth = geo.size.width - (hinge?.maxX ?? geo.size.width / 2)
+        let side = min(leftWidth - 64, geo.size.height - 64)
+        return HStack(spacing: 0) {
+            artwork(for: track)
+                .frame(maxWidth: side, maxHeight: side)
+                .frame(width: leftWidth, height: geo.size.height)
+            Spacer(minLength: 0)
+            controls(for: track)
+                .frame(maxWidth: 440)
+                .padding(.horizontal, 32)
+                .frame(width: rightWidth, height: geo.size.height)
+        }
+    }
 
-            Spacer()
+    // MARK: Pieces
 
-            Menu {
-                if let link = track.originDeepLink, let url = URL(string: link) {
-                    Button {
-                        openURL(url)
-                    } label: {
-                        Label("Apri sorgente", systemImage: "arrow.up.right.square")
-                    }
-                }
-                Button(role: .destructive) {
-                    audioService.stop()
-                } label: {
-                    Label("Interrompi riproduzione", systemImage: "stop.fill")
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(Color.white.opacity(0.08)))
-            }
-            .accessibilityLabel("Altre opzioni")
+    /// Tapping it puts the page away too, so dismissing never depends on the
+    /// drag alone.
+    private var grabber: some View {
+        Button {
+            audioService.dismissFullPlayer()
+        } label: {
+            Capsule()
+                .fill(.white.opacity(0.4))
+                .frame(width: 36, height: 5)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 20)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(tr("audio.player.dismiss", fallback: "Chiudi player")))
+    }
+
+    private func controls(for track: AudioTrack) -> some View {
+        VStack(spacing: 0) {
+            titleRow(for: track)
+                .padding(.bottom, 22)
+            NowPlayingProgress(duration: track.duration)
+            transportControls()
+                .padding(.vertical, 26)
+            volumeRow()
+            bottomRow()
+                .padding(.top, 22)
         }
     }
 
     @ViewBuilder
     private func artwork(for track: AudioTrack) -> some View {
-        // Placeholder = `Color.clear`: `CachedAsyncImage` lo renderizza in
-        // ZStack DIETRO l'immagine (vedi `Support/CachedAsyncImage.swift`),
-        // un fill colorato qui significherebbe "quadrato visibile dietro
-        // l'artwork landscape" — non vogliamo.
+        // Placeholder `Color.clear`: `CachedAsyncImage` draws it behind the
+        // image, and a coloured one would show around a landscape cover.
         Group {
             if let url = track.artworkURL {
                 CachedAsyncImage(url: url) { image in
                     image
                         .resizable()
                         .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .shadow(color: .black.opacity(0.45), radius: 30, x: 0, y: 14)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 } placeholder: {
                     Color.clear
                 }
             } else {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(AppTheme.brandGradient)
                     .aspectRatio(1, contentMode: .fit)
-                    .shadow(color: .black.opacity(0.45), radius: 30, x: 0, y: 14)
             }
         }
-        .scaleEffect(audioService.isPlaying ? 1.0 : 0.92)
-        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: audioService.isPlaying)
+        .shadow(color: .black.opacity(0.35), radius: 28, x: 0, y: 14)
+        // Music shrinks the artwork while paused.
+        .scaleEffect(observer.isPlaying ? 1.0 : 0.86)
+        .animation(.spring(response: 0.5, dampingFraction: 0.72), value: observer.isPlaying)
     }
 
-    @ViewBuilder
-    private func titleBlock(for track: AudioTrack) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(track.title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.white)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
-            Text(track.subtitle)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+    private func titleRow(for track: AudioTrack) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(track.title)
+                    .font(.title3.weight(.semibold))
+                    .lineLimit(2)
+                Text(track.subtitle)
+                    .font(.body)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Menu {
+                if let link = track.originDeepLink, let url = URL(string: link) {
+                    Button {
+                        audioService.dismissFullPlayer()
+                        openURL(url)
+                    } label: {
+                        Label(tr("audio.player.open_source", fallback: "Vai all'episodio"), systemImage: "arrow.up.right.square")
+                    }
+                }
+                Button {
+                    showingQueue = true
+                } label: {
+                    Label(tr("audio.player.queue", fallback: "Coda di riproduzione"), systemImage: "list.bullet")
+                }
+                Button(role: .destructive) {
+                    audioService.stop()
+                } label: {
+                    Label(tr("audio.player.stop", fallback: "Interrompi riproduzione"), systemImage: "stop.fill")
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 16, weight: .bold))
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(.white.opacity(0.15)))
+                    .contentShape(Circle())
+            }
+            .accessibilityLabel(Text(tr("app.more_actions", fallback: "Altre azioni")))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    @ViewBuilder
-    private func timestamps(track: AudioTrack) -> some View {
-        HStack {
-            Text(formatTime(audioService.currentTime))
-            Spacer()
-            Text("-" + formatTime(max(0, track.duration - audioService.currentTime)))
+    private func transportControls() -> some View {
+        let hasQueue = observer.queueCount > 1
+        return HStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if hasQueue {
+                transportButton("backward.fill", size: 30, label: tr("audio.player.previous_track", fallback: "Traccia precedente")) {
+                    audioService.skipToPrevious()
+                }
+            } else {
+                transportButton("gobackward.15", size: 30, label: tr("audio.player.skip_backward", fallback: "Indietro 15 secondi")) {
+                    audioService.skipBackward(15)
+                }
+            }
+            Spacer(minLength: 0)
+            transportButton(
+                observer.isPlaying ? "pause.fill" : "play.fill",
+                size: 46,
+                label: observer.isPlaying
+                    ? tr("audio.player.pause", fallback: "Pausa")
+                    : tr("audio.player.play", fallback: "Riproduci")
+            ) {
+                audioService.toggle()
+            }
+            .contentTransition(.symbolEffect(.replace))
+            Spacer(minLength: 0)
+            if hasQueue {
+                transportButton("forward.fill", size: 30, label: tr("audio.player.next_track", fallback: "Traccia successiva"), enabled: observer.hasNext) {
+                    audioService.skipToNext()
+                }
+            } else {
+                transportButton("goforward.15", size: 30, label: tr("audio.player.skip_forward", fallback: "Avanti 15 secondi")) {
+                    audioService.skipForward(15)
+                }
+            }
+            Spacer(minLength: 0)
         }
-        .font(.caption.monospacedDigit().weight(.medium))
+    }
+
+    private func transportButton(
+        _ systemName: String,
+        size: CGFloat,
+        label: String,
+        enabled: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button {
+            playLightHaptic()
+            action()
+        } label: {
+            Image(systemName: systemName)
+                .font(.system(size: size, weight: .regular))
+                .frame(width: 72, height: 72)
+                .contentShape(Circle())
+        }
+        .buttonStyle(NowPlayingButtonStyle())
+        .opacity(enabled ? 1 : 0.35)
+        .disabled(!enabled)
+        .accessibilityLabel(Text(label))
+    }
+
+    private func volumeRow() -> some View {
+        // `MPVolumeView`: the only way to drive the system volume from an
+        // app (`AVAudioSession.outputVolume` is read-only).
+        HStack(spacing: 12) {
+            Image(systemName: "speaker.fill")
+            SystemVolumeSlider()
+                .frame(height: 30)
+            Image(systemName: "speaker.wave.3.fill")
+        }
+        .font(.caption)
         .foregroundStyle(.white.opacity(0.6))
     }
 
-    @ViewBuilder
-    private func transportControls() -> some View {
+    /// Music's bottom row: an action left, AirPlay in the middle, the queue
+    /// right. For spoken audio the left one is the playback speed.
+    private func bottomRow() -> some View {
         HStack {
-            if audioService.queue.count > 1 {
-                Button {
-                    playLightHaptic()
-                    audioService.skipToPrevious()
+            Menu {
+                Picker(selection: Binding(
+                    get: { observer.playbackRate },
+                    set: { audioService.setPlaybackRate($0) }
+                )) {
+                    ForEach(AudioPlayerService.playbackRates, id: \.self) { rate in
+                        Text(Self.rateLabel(rate)).tag(rate)
+                    }
                 } label: {
-                    Image(systemName: "backward.fill")
-                        .font(.system(size: 28, weight: .regular))
-                        .foregroundStyle(.white.opacity(audioService.hasPrevious ? 1.0 : 0.3))
+                    Text(tr("audio.player.speed", fallback: "Velocità"))
                 }
-                .disabled(!audioService.hasPrevious)
-                .accessibilityLabel("Traccia precedente")
-            } else {
-                Button {
-                    playLightHaptic()
-                    audioService.skipBackward(15)
-                } label: {
-                    Image(systemName: "gobackward.15")
-                        .font(.system(size: 28, weight: .regular))
-                        .foregroundStyle(.white)
-                }
-                .accessibilityLabel("Indietro di 15 secondi")
+            } label: {
+                Text(Self.rateLabel(observer.playbackRate))
+                    .font(.subheadline.weight(.semibold).monospacedDigit())
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
+            .accessibilityLabel(Text(tr("audio.player.speed", fallback: "Velocità")))
+
+            Spacer()
+
+            AirPlayPickerView(tint: UIColor.white.withAlphaComponent(0.7))
+                .frame(width: 44, height: 44)
+                .accessibilityLabel(Text(tr("audio.player.output", fallback: "Output audio")))
 
             Spacer()
 
             Button {
-                playLightHaptic()
-                audioService.toggle()
+                showingQueue = true
             } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 72, height: 72)
-                    Image(systemName: audioService.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: 32, weight: .black))
-                        .foregroundStyle(.black)
-                        .offset(x: audioService.isPlaying ? 0 : 2)
-                }
+                Image(systemName: "list.bullet")
+                    .font(.system(size: 20, weight: .regular))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
-            .accessibilityLabel(audioService.isPlaying ? "Pausa" : "Riproduci")
-
-            Spacer()
-
-            if audioService.queue.count > 1 {
-                Button {
-                    playLightHaptic()
-                    audioService.skipToNext()
-                } label: {
-                    Image(systemName: "forward.fill")
-                        .font(.system(size: 28, weight: .regular))
-                        .foregroundStyle(.white.opacity(audioService.hasNext ? 1.0 : 0.3))
-                }
-                .disabled(!audioService.hasNext)
-                .accessibilityLabel("Traccia successiva")
-            } else {
-                Button {
-                    playLightHaptic()
-                    audioService.skipForward(15)
-                } label: {
-                    Image(systemName: "goforward.15")
-                        .font(.system(size: 28, weight: .regular))
-                        .foregroundStyle(.white)
-                }
-                .accessibilityLabel("Avanti di 15 secondi")
-            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(tr("audio.player.queue", fallback: "Coda di riproduzione")))
         }
+        .foregroundStyle(.white.opacity(0.7))
     }
 
-    @ViewBuilder
-    private func secondaryActions() -> some View {
-        VStack(spacing: 18) {
-            // Volume slider di sistema. Wrappiamo `MPVolumeView` perché:
-            //  - è l'UNICO modo per pilotare il volume di sistema da app
-            //    (AVAudioSession.outputVolume è read-only);
-            //  - sopra a un widget Apple-Music-like che NON funzionasse
-            //    sarebbe peggio del non averlo.
-            // I due speaker glyph laterali sono solo affordance visuale,
-            // l'interazione vive nello slider centrale.
-            HStack(spacing: 12) {
-                Image(systemName: "speaker.fill")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
-                SystemVolumeSlider()
-                    .frame(height: 30)
-                Image(systemName: "speaker.wave.3.fill")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
-            }
-
-            // Azioni: AirPlay (sistema), Queue (sempre tappabile — apre
-            // la lista anche con un solo elemento per coerenza UX).
-            HStack {
-                AirPlayPickerView()
-                    .frame(width: 40, height: 40)
-                    .accessibilityLabel("Output audio")
-
-                Spacer()
-
-                Button {
-                    showingQueue = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "list.bullet")
-                            .font(.system(size: 20, weight: .regular))
-                        if audioService.queue.count > 1 {
-                            Text("\(audioService.queue.count)")
-                                .font(.caption.weight(.semibold))
-                        }
-                    }
-                    .foregroundStyle(.white.opacity(0.85))
-                    .frame(minWidth: 40, minHeight: 40)
-                }
-                .accessibilityLabel("Coda di riproduzione")
-            }
-        }
+    private static func rateLabel(_ rate: Float) -> String {
+        rate.formatted(.number.precision(.fractionLength(0...2))) + "×"
     }
+}
 
-    private func formatTime(_ t: TimeInterval) -> String {
-        guard t.isFinite, t >= 0 else { return "0:00" }
-        let total = Int(t)
-        let m = total / 60
-        let s = total % 60
-        return String(format: "%d:%02d", m, s)
-    }
-
-    private func timestampAccessibility(current: TimeInterval, total: TimeInterval) -> String {
-        "\(formatTime(current)) di \(formatTime(total))"
+/// Music's transport feedback: a soft disc behind the glyph while pressed.
+private struct NowPlayingButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                Circle()
+                    .fill(.white.opacity(configuration.isPressed ? 0.15 : 0))
+            )
+            .scaleEffect(configuration.isPressed ? 0.9 : 1)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
 
@@ -453,31 +410,43 @@ private struct QueueListSheet: View {
     }
 }
 
-// MARK: - Blurred Backdrop
+// MARK: - Backdrop
 
-private struct BlurredArtworkBackdrop: View {
+/// The artwork's own colours across the whole screen, like Music: the image
+/// blurred past recognition and saturated, darkened just enough for white
+/// text to read on any cover.
+private struct NowPlayingBackdrop: View {
     let url: URL?
     let trackId: String
 
     var body: some View {
-        ZStack {
-            if let url {
-                CachedAsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    AppTheme.brandGradient
+        Color.black
+            .overlay {
+                Group {
+                    if let url {
+                        CachedAsyncImage(url: url) { image in
+                            image.resizable().scaledToFill()
+                        } placeholder: {
+                            AppTheme.brandGradient
+                        }
+                    } else {
+                        AppTheme.brandGradient
+                    }
                 }
-            } else {
-                AppTheme.brandGradient
+                .blur(radius: 70)
+                .saturation(1.6)
+                .scaleEffect(1.5)
             }
-        }
-        .blur(radius: 60)
-        .scaleEffect(1.3)
-        .opacity(0.55)
-        .ignoresSafeArea()
-        .animation(.easeInOut(duration: 0.6), value: trackId)
+            .overlay {
+                LinearGradient(
+                    colors: [.black.opacity(0.15), .black.opacity(0.45)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+            .clipped()
+            .ignoresSafeArea()
+            .animation(.easeInOut(duration: 0.6), value: trackId)
     }
 }
 
@@ -514,11 +483,14 @@ private struct SystemVolumeSlider: UIViewRepresentable {
 
 /// `AVRoutePickerView` wrappato: apre il system route picker (AirPlay,
 /// Bluetooth, output disponibili) al tap. Sostituisce l'icona statica
-/// `airplayaudio` che non aveva action collegata.
-private struct AirPlayPickerView: UIViewRepresentable {
+/// `airplayaudio` che non aveva action collegata. Lo usa anche il mini-player
+/// largo, con il colore del testo invece del bianco su copertina.
+struct AirPlayPickerView: UIViewRepresentable {
+    var tint: UIColor = UIColor.white.withAlphaComponent(0.85)
+
     func makeUIView(context: Context) -> AVRoutePickerView {
         let view = AVRoutePickerView()
-        view.tintColor = UIColor.white.withAlphaComponent(0.85)
+        view.tintColor = tint
         view.activeTintColor = UIColor.systemBlue
         view.prioritizesVideoDevices = false
         return view
@@ -527,78 +499,149 @@ private struct AirPlayPickerView: UIViewRepresentable {
     func updateUIView(_ uiView: AVRoutePickerView, context: Context) {}
 }
 
-// MARK: - Custom Audio Scrubber
+// MARK: - Scrubber
 
-private struct CustomAudioScrubber: View {
+/// The only part of the page that follows the position, so its 10 Hz
+/// updates redraw this row and nothing else.
+private struct NowPlayingProgress: View {
+    let duration: TimeInterval
+    @ObservedObject private var service: AudioPlayerService = .shared
+
+    var body: some View {
+        NowPlayingScrubber(
+            duration: max(duration, 0.01),
+            currentTime: service.currentTime,
+            onSeek: { service.seek(to: $0) }
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(tr("audio.player.position", fallback: "Posizione di riproduzione")))
+        .accessibilityValue(
+            NowPlayingScrubber.format(service.currentTime) + " / " + NowPlayingScrubber.format(duration)
+        )
+    }
+}
+
+/// Music's progress bar: a thin rounded track with no thumb, thickening while
+/// dragged, elapsed and remaining time underneath.
+private struct NowPlayingScrubber: View {
     let duration: TimeInterval
     let currentTime: TimeInterval
     let onSeek: (TimeInterval) -> Void
 
-    @State private var isScrubbing: Bool = false
+    @State private var isScrubbing = false
     @State private var scrubValue: TimeInterval = 0
-    @State private var didHaptic: Bool = false
-
-    private let thumbRadius: CGFloat = 7
 
     private var displayedValue: TimeInterval {
         isScrubbing ? scrubValue : currentTime
     }
 
     var body: some View {
-        GeometryReader { geo in
-            let W = geo.size.width
-            let R = thumbRadius
-            let trackHeight: CGFloat = isScrubbing ? 8 : 4
-            let safeDuration = max(duration, 0.01)
-            let pct = min(max(displayedValue / safeDuration, 0), 1)
-            let cx = R + (W - 2 * R) * CGFloat(pct)
-            let midY = geo.size.height / 2
-
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: max(0, W - 2 * R), height: trackHeight)
-                    .position(x: W / 2, y: midY)
-
-                Capsule()
-                    .fill(Color.white)
-                    .frame(width: max(0, cx - R), height: trackHeight)
-                    .position(x: R + max(0, cx - R) / 2, y: midY)
-
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 2 * R, height: 2 * R)
-                    .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 1)
-                    .scaleEffect(isScrubbing ? 1.4 : 1.0)
-                    .position(x: cx, y: midY)
+        VStack(spacing: 8) {
+            GeometryReader { geo in
+                let width = geo.size.width
+                let fraction = min(max(displayedValue / duration, 0), 1)
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(.white.opacity(0.22))
+                    Capsule()
+                        .fill(.white.opacity(isScrubbing ? 1 : 0.75))
+                        .frame(width: width * fraction)
+                }
+                .frame(height: isScrubbing ? 12 : 7)
+                .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isScrubbing)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            if !isScrubbing {
+                                isScrubbing = true
+                                playLightHaptic()
+                            }
+                            let p = min(max(value.location.x / max(width, 1), 0), 1)
+                            scrubValue = Double(p) * duration
+                        }
+                        .onEnded { _ in
+                            onSeek(scrubValue)
+                            isScrubbing = false
+                        }
+                )
             }
-            .frame(width: W, height: geo.size.height)
-            .contentShape(Rectangle())
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isScrubbing)
-            .animation(isScrubbing ? nil : .linear(duration: 0.1), value: currentTime)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        if !isScrubbing {
-                            isScrubbing = true
-                        }
-                        if !didHaptic {
-                            playLightHaptic()
-                            didHaptic = true
-                        }
-                        let x = min(max(value.location.x, R), W - R)
-                        let p = (x - R) / max(W - 2 * R, 1)
-                        scrubValue = Double(p) * safeDuration
-                    }
-                    .onEnded { _ in
-                        let final = scrubValue
-                        onSeek(final)
-                        isScrubbing = false
-                        didHaptic = false
-                    }
-            )
+            .frame(height: 24)
+
+            HStack {
+                Text(Self.format(displayedValue))
+                Spacer()
+                Text("-" + Self.format(max(0, duration - displayedValue)))
+            }
+            .font(.caption.monospacedDigit().weight(.medium))
+            .foregroundStyle(.white.opacity(isScrubbing ? 0.9 : 0.55))
         }
-        .frame(height: 36)
-        .padding(.horizontal, 24)
+    }
+
+    static func format(_ t: TimeInterval) -> String {
+        guard t.isFinite, t >= 0 else { return "0:00" }
+        let total = Int(t)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
+    }
+}
+
+// MARK: - Presentation
+
+/// Presents the now-playing page from the shell, zooming out of the
+/// mini-player (iOS 18+) the way Music opens from its bar. The zoom also
+/// brings the interactive pull-down to dismiss. Before iOS 18 it stays a
+/// large sheet.
+struct NowPlayingPresentation: ViewModifier {
+    @Binding var isPresented: Bool
+    let namespace: Namespace.ID
+
+    static let sourceID = "now-playing"
+
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content
+                .fullScreenCover(isPresented: $isPresented) {
+                    NowPlayingFullScreenView()
+                        .navigationTransition(.zoom(sourceID: Self.sourceID, in: namespace))
+                }
+                .environment(\.nowPlayingNamespace, namespace)
+        } else {
+            content
+                .sheet(isPresented: $isPresented) {
+                    NowPlayingFullScreenView()
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.hidden)
+                        .presentationBackground(Color.black)
+                }
+        }
+    }
+}
+
+private struct NowPlayingNamespaceKey: EnvironmentKey {
+    static let defaultValue: Namespace.ID? = nil
+}
+
+extension EnvironmentValues {
+    /// Where the mini-player marks itself as the zoom source of the
+    /// now-playing page (`NowPlayingPresentation`).
+    var nowPlayingNamespace: Namespace.ID? {
+        get { self[NowPlayingNamespaceKey.self] }
+        set { self[NowPlayingNamespaceKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// Marks the mini-player as the view the now-playing page zooms out of.
+    @ViewBuilder
+    func nowPlayingTransitionSource(_ namespace: Namespace.ID?) -> some View {
+        if #available(iOS 18.0, *), let namespace {
+            matchedTransitionSource(id: NowPlayingPresentation.sourceID, in: namespace)
+        } else {
+            self
+        }
     }
 }

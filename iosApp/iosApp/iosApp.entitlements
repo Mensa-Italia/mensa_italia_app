@@ -17,9 +17,14 @@
 	     contenere questo bundle sotto "webcredentials" (MensaCore/main/utilities/aasa.go;
 	     su auth.mensa.it ci arriva via una route Traefik dedicata). In sviluppo,
 	     prima che il file sia pubblicato, si usa il suffisso "?mode=developer" con
-	     Associated Domains Development attivo sul device. -->
+	     Associated Domains Development attivo sul device.
+	     applinks:svc.mensa.it apre nell'app i link /links/stamp/… (QR dei
+	     francobolli) e /links/event/…: l'AASA di svc.mensa.it li dichiara già
+	     sotto "applinks". La vecchia app Flutter aveva questa voce; quella
+	     nativa l'aveva persa. -->
 	<key>com.apple.developer.associated-domains</key>
 	<array>
+		<string>applinks:svc.mensa.it</string>
 		<string>webcredentials:auth.mensa.it</string>
 		<string>webcredentials:svc.mensa.it</string>
 	</array>

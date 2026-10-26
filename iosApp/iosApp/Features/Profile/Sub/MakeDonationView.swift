@@ -59,16 +59,6 @@ struct MakeDonationView: View {
         }
         .navigationTitle(tr("views.make_donation.title", fallback: "Donazione"))
         .navigationBarTitleDisplayMode(.inline)
-        .background(
-            LinearGradient(
-                colors: [
-                    AppTheme.Colors.brandPrimary.opacity(0.05),
-                    Color(.systemBackground)
-                ],
-                startPoint: .top, endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        )
         .task {
             await vm.load()
             withAnimation { appeared = true }
@@ -138,7 +128,7 @@ struct MakeDonationView: View {
                             .background(
                                 vm.amount == value && !vm.usingCustom
                                 ? AppTheme.Colors.brandPrimary
-                                : Color(.secondarySystemBackground),
+                                : Color(.secondarySystemGroupedBackground),
                                 in: RoundedRectangle(cornerRadius: 14)
                             )
                             .foregroundStyle(
@@ -166,7 +156,7 @@ struct MakeDonationView: View {
             .onChange(of: vm.customAmountText) { _, _ in vm.applyCustom() }
         }
         .padding(14)
-        .background(Color(.secondarySystemBackground),
+        .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 14))
     }
 
@@ -181,7 +171,7 @@ struct MakeDonationView: View {
                     .foregroundStyle(.secondary)
                     .padding(14)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.secondarySystemBackground),
+                    .background(Color(.secondarySystemGroupedBackground),
                                 in: RoundedRectangle(cornerRadius: 14))
             } else {
                 Picker(selection: $vm.selectedMethodId) {
@@ -194,7 +184,7 @@ struct MakeDonationView: View {
                 .pickerStyle(.menu)
                 .padding(14)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemBackground),
+                .background(Color(.secondarySystemGroupedBackground),
                             in: RoundedRectangle(cornerRadius: 14))
             }
         }

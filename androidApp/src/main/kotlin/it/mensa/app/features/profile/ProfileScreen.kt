@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.AutoAwesome
@@ -76,6 +77,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     onNavigate: (ProfileRoute) -> Unit = {},
     onSearchTap: () -> Unit = {},
+    /** Receipts are a root drill route, outside this nested graph. */
+    onReceiptsClick: () -> Unit = {},
     vm: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -107,7 +110,7 @@ fun ProfileScreen(
                 ProfileHeader(user = uiState.user)
             }
 
-            // Account: Membership, Pagamenti, Dispositivi
+            // Account: Membership, Pagamenti, Ricevute, Dispositivi
             item(key = "section_account") {
                 Spacer(Modifier.height(16.dp))
                 AnimatedSection(visible = sectionsVisible, indexDelay = 0) {
@@ -125,6 +128,11 @@ fun ProfileScreen(
                             icon = Icons.Outlined.CreditCard,
                             title = tr("app.profile.payments", fallback = "Pagamenti"),
                             onClick = { onNavigate(ProfileRoute.PaymentMethods) },
+                        )
+                        ProfileRow(
+                            icon = Icons.Outlined.Receipt,
+                            title = tr("card.nav_receipts", fallback = "Le mie ricevute"),
+                            onClick = onReceiptsClick,
                         )
                         ProfileRow(
                             icon = Icons.Outlined.Devices,

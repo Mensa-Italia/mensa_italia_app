@@ -12,14 +12,13 @@ import it.mensa.app.features.notifications.NotificationsRoutes
 import it.mensa.app.features.podcasts.PodcastsRoutes
 import it.mensa.app.features.quid.QuidRoute
 import it.mensa.app.features.sigs.SigsRoutes
-import it.mensa.app.features.tableport.TableportRoutes
 import it.mensa.app.features.testassistant.TestAssistantRoutes
 
 /**
  * DiscoverCategoryRoutes — maps each [DiscoverCategory] to its navigation route.
  *
  * Returns null for categories that navigate to tabs rather than drill destinations
- * (e.g. Card → navigate to Card tab, handled upstream).
+ * (e.g. OrgChart → ProfileNavGraph sub-screen, handled upstream).
  */
 fun DiscoverCategory.toRoute(): String? = when (this) {
     DiscoverCategory.Events        -> EventRoutes.LIST
@@ -29,14 +28,12 @@ fun DiscoverCategory.toRoute(): String? = when (this) {
     DiscoverCategory.LocalOffices  -> LocalOfficesRoutes.LIST
     DiscoverCategory.Documents     -> DocumentsRoutes.LIST
     DiscoverCategory.Notifications -> NotificationsRoutes.LIST
-    DiscoverCategory.Tableport     -> TableportRoutes.PASSPORT
     DiscoverCategory.Quid          -> QuidRoute.ISSUES
     DiscoverCategory.Podcasts      -> PodcastsRoutes.LIST
     DiscoverCategory.TestAssistant -> TestAssistantRoutes.DASHBOARD
     DiscoverCategory.AddonsHub     -> AddonsHubRoutes.HUB
     DiscoverCategory.Contacts      -> ContactsRoutes.LIST
     // Categories navigated via tab switch (handled at call site)
-    DiscoverCategory.Card          -> null  // → navigate to Card tab
     DiscoverCategory.OrgChart      -> null  // → ProfileNavGraph sub-screen (no master route)
     DiscoverCategory.RegSoci       -> MembersRoutes.DIRECTORY
     DiscoverCategory.External      -> null  // requires addonId — resolved at call site

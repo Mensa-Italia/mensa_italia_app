@@ -88,6 +88,43 @@ enum MensaAuth {
         }
     }
 
+    /// L'URL da dare a chi si fa la rete da solo e non accetta header, come
+    /// `AVPlayer`: il link S3 firmato verso cui il backend rimanda una
+    /// richiesta autenticata.
+    ///
+    /// Per l'audio scaricare tutto prima di suonare (come per i PDF) vorrebbe
+    /// dire aspettare l'intero episodio; con il link firmato `AVPlayer` fa
+    /// streaming e range request da solo, senza token. Il redirect si legge e
+    /// non si segue (`MensaRedirectCapture`), quindi il corpo del file non
+    /// viene scaricato due volte e l'Authorization non arriva mai a S3.
+    ///
+    /// Un URL che non e' nostro torna com'e'. Se il backend risponde 200 invece
+    /// di rimandare, il file si scarica con l'header e si usa la copia locale.
+    static func playableURL(for url: URL) async -> URL? {
+        guard isMensaHost(url.host) else { return url }
+        let urlRequest = request(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        do {
+            let (_, response) = try await URLSession.shared.data(
+                for: urlRequest,
+                delegate: MensaRedirectCapture.shared
+            )
+            guard let http = response as? HTTPURLResponse else { return nil }
+            switch http.statusCode {
+            case 300...399:
+                guard let location = http.value(forHTTPHeaderField: "Location") else { return nil }
+                return URL(string: location, relativeTo: url)?.absoluteURL
+            case 200:
+                return await downloadToTemporaryFile(from: url)
+            default:
+                Log.net.error("file firmato: HTTP \(http.statusCode) per \(url.absoluteString)")
+                return nil
+            }
+        } catch {
+            Log.net.error("file firmato fallito: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     /// Aggiunge l'header a una richiesta gia' costruita.
     static func authorize(_ request: inout URLRequest) {
         guard isMensaHost(request.url?.host) else { return }
@@ -124,6 +161,22 @@ final class MensaRedirectAuthStripper: NSObject, URLSessionTaskDelegate, @unchec
         var sanitized = request
         sanitized.setValue(nil, forHTTPHeaderField: "Authorization")
         completionHandler(sanitized)
+    }
+}
+
+/// Non segue i redirect: la risposta che arriva al chiamante e' il 3xx stesso,
+/// con il link nel `Location`. Vedi `MensaAuth.playableURL(for:)`.
+final class MensaRedirectCapture: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    static let shared = MensaRedirectCapture()
+
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        completionHandler: @escaping (URLRequest?) -> Void
+    ) {
+        completionHandler(nil)
     }
 }
 

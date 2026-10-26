@@ -94,7 +94,7 @@ struct ScheduleListSheet: View {
                     Button {
                         addingNew = true
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Label(tr("events.schedule.add", fallback: "Aggiungi orario"), systemImage: "plus.circle.fill")
                     }
                 }
             }

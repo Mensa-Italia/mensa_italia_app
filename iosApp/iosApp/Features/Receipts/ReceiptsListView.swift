@@ -13,16 +13,6 @@ struct ReceiptsListView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color(.systemBackground),
-                    AppTheme.Colors.brandPrimary.opacity(0.04),
-                    Color(.systemBackground)
-                ],
-                startPoint: .top, endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
             if vm.loading && vm.receipts.isEmpty {
                 ProgressView().scaleEffect(1.3)
             } else if vm.receipts.isEmpty {

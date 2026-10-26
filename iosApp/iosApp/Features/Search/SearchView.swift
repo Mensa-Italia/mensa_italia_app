@@ -28,6 +28,25 @@ struct SearchView: View {
     /// sul titolo del gruppo selezionato.
     private struct OrgGroupRoute: Hashable { let groupTitle: String }
 
+    /// Every result the search can open. One list selection of this type
+    /// drives the detail column beside the results (and the push when the
+    /// split view is collapsed); value links of mixed route types left the
+    /// detail stale when picking a second result.
+    private enum SearchResult: Hashable {
+        case member(RegSociRoute)
+        case event(EventRoute)
+        case deal(DealRoute)
+        case document(DocumentRoute)
+        case sig(SigRoute)
+        case orgGroup(OrgGroupRoute)
+        case quidIssue(QuidIssueRoute)
+        case quidArticle(QuidArticleRoute)
+        case quidPDF(QuidPDFDeepLinkRoute)
+        case localOffice(LocalOfficeSlugRoute)
+    }
+
+    @State private var selection: SearchResult?
+
     private struct FilterChip: Identifiable, Hashable {
         let id: String  // "all" | type key
         let label: String
@@ -60,8 +79,49 @@ struct SearchView: View {
     }
 
     var body: some View {
+        NavigationSplitView {
+            results
+        } detail: {
+            // One stack per result, so picking another result drops whatever
+            // was pushed inside the previous one.
+            NavigationStack {
+                if let selection {
+                    destination(for: selection)
+                } else {
+                    ContentUnavailableView(
+                        tr("app.search.detail_empty.title", fallback: "Nessun risultato aperto"), // i18n
+                        systemImage: "magnifyingglass",
+                        description: Text(tr(
+                            "app.search.detail_empty.message",
+                            fallback: "Scegli un risultato per vederlo qui." // i18n
+                        ))
+                    )
+                }
+            }
+            .id(selection)
+        }
+    }
+
+    @ViewBuilder
+    private func destination(for result: SearchResult) -> some View {
+        switch result {
+        case .member(let route):      MemberDetailView(memberId: route.id)
+        case .event(let route):       EventDetailView(eventId: route.id)
+        case .deal(let route):        DealDetailView(dealId: route.id)
+        case .document(let route):    DocumentDetailView(documentId: route.id)
+        case .sig(let route):         SigDetailView(sigId: route.id)
+        case .orgGroup(let route):    OrgChartView(initialSearchText: route.groupTitle)
+        case .quidIssue(let route):   QuidIssueView(issueId: route.issueId, issueName: route.issueName)
+        case .quidArticle(let route): QuidArticleView(articleId: route.articleId)
+        case .quidPDF(let route):     QuidPDFDeepLinkLoader(recordId: route.recordId)
+        case .localOffice(let route): LocalOfficeBySlugLoader(slug: route.slug)
+        }
+    }
+
+    private var results: some View {
         rootContent
             .navigationTitle(tr("app.search.title", fallback: "Cerca")) // i18n
+            .toolbar(removing: .sidebarToggle)
             .searchable(
                 text: Binding(
                     get: { vm.query },
@@ -70,46 +130,8 @@ struct SearchView: View {
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: tr("app.search.placeholder", fallback: "Cerca persone, eventi, deal…") // i18n
             )
-            .toolbar {
-                if vm.selectedType != nil {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(tr("app.search.filter.clear", fallback: "Tutti")) { // i18n
-                            vm.pickType(nil)
-                        }
-                        .tint(AppTheme.Colors.brandTintAdaptive)
-                    }
-                }
-            }
-            .navigationDestination(for: RegSociRoute.self) { route in
-                MemberDetailView(memberId: route.id)
-            }
-            .navigationDestination(for: EventRoute.self) { route in
-                EventDetailView(eventId: route.id)
-            }
-            .navigationDestination(for: DealRoute.self) { route in
-                DealDetailView(dealId: route.id)
-            }
-            .navigationDestination(for: DocumentRoute.self) { route in
-                DocumentDetailView(documentId: route.id)
-            }
-            .navigationDestination(for: SigRoute.self) { route in
-                SigDetailView(sigId: route.id)
-            }
-            .navigationDestination(for: OrgGroupRoute.self) { route in
-                OrgChartView(initialSearchText: route.groupTitle)
-            }
-            .navigationDestination(for: QuidIssueRoute.self) { route in
-                QuidIssueView(issueId: route.issueId, issueName: route.issueName)
-            }
-            .navigationDestination(for: QuidArticleRoute.self) { route in
-                QuidArticleView(articleId: route.articleId)
-            }
-            .navigationDestination(for: QuidPDFDeepLinkRoute.self) { route in
-                QuidPDFDeepLinkLoader(recordId: route.recordId)
-            }
-            .navigationDestination(for: LocalOfficeSlugRoute.self) { route in
-                LocalOfficeBySlugLoader(slug: route.slug)
-            }
+            .modifier(KeepToolbarWhileSearching())
+            .toolbar { filterToolbarItem }
             .task {
                 // start() is idempotent — subscriptions live for the lifetime of
                 // the view's @State `vm`. We intentionally do NOT call stop() on
@@ -129,48 +151,50 @@ struct SearchView: View {
     // MARK: - Root content switch
 
     @ViewBuilder private var rootContent: some View {
-        // Chip bar lives OUTSIDE the List so it can scroll edge-to-edge,
-        // ignoring the `.insetGrouped` section margins. The phase content
-        // sits below it and keeps its native list inset styling.
-        VStack(spacing: 0) {
-            chipBar
-                .padding(.bottom, 4)
-            switch vm.phase {
-            case .idle:
-                idleList
-            case .loading:
-                loadingList
-            case .results(let sections) where sections.isEmpty:
-                emptyResultsView
-            case .results(let sections):
-                resultsList(sections)
-            case .error(let msg):
-                errorView(message: msg)
-            }
+        switch vm.phase {
+        case .idle:
+            idleList
+        case .loading:
+            loadingList
+        case .results(let sections) where sections.isEmpty:
+            emptyResultsView
+        case .results(let sections):
+            resultsList(sections)
+        case .error(let msg):
+            errorView(message: msg)
         }
     }
 
-    // MARK: - Edge-to-edge chip bar
+    // MARK: - Type filter
 
-    private var chipBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(filterChips) { chip in
-                    let isSelected = (vm.selectedType ?? "all") == (chip.key ?? "all")
-                    Button {
-                        vm.pickType(chip.key)
-                    } label: {
+    /// Result-type filter as a toolbar menu, the same pattern as the
+    /// Documents category filter: the glyph fills while a type is picked.
+    /// A Label rather than a bare Image, so the item keeps a title when the
+    /// system moves it into iPhone Duo's vertical bar or its overflow menu.
+    @ToolbarContentBuilder private var filterToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Picker(
+                    selection: Binding(
+                        get: { vm.selectedType },
+                        set: { vm.pickType($0) }
+                    ),
+                    label: EmptyView()
+                ) {
+                    ForEach(filterChips) { chip in
                         Label(chip.label, systemImage: chip.systemImage)
-                            .labelStyle(.titleAndIcon)
-                            .font(.subheadline.weight(.medium))
+                            .tag(chip.key)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(isSelected ? AppTheme.Colors.brandTintAdaptive : .secondary)
-                    .controlSize(.regular)
                 }
+            } label: {
+                Label(
+                    tr("app.search.filter.title", fallback: "Filtra risultati"), // i18n
+                    systemImage: vm.selectedType == nil
+                        ? "line.3.horizontal.decrease.circle"
+                        : "line.3.horizontal.decrease.circle.fill"
+                )
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
+            .tint(AppTheme.Colors.brandTintAdaptive)
         }
     }
 
@@ -382,7 +406,7 @@ struct SearchView: View {
 
     @ViewBuilder
     private func resultsList(_ sections: [SearchViewModel.HydratedSection]) -> some View {
-        List {
+        List(selection: $selection) {
             ForEach(sections) { section in
                 if section.type == "user" {
                     peopleSection(section)
@@ -716,7 +740,7 @@ struct SearchView: View {
             // affiliations (segretario / cosegretario / assistente al test
             // pulled from the dedicated search hit types), are surfaced as
             // small chips inside the row.
-            NavigationLink(value: RegSociRoute(id: member.id)) {
+            NavigationLink(value: SearchResult.member(RegSociRoute(id: member.id))) {
                 PersonSearchResultRow(
                     member: member, role: role, group: group,
                     localOfficeAffiliations: affiliations
@@ -730,7 +754,7 @@ struct SearchView: View {
             // no detectable label, so List doesn't render an accessory.
             ZStack {
                 EventRowCard(event: event)
-                NavigationLink(value: EventRoute(id: event.id)) {
+                NavigationLink(value: SearchResult.event(EventRoute(id: event.id))) {
                     EmptyView()
                 }
                 .opacity(0)
@@ -746,17 +770,17 @@ struct SearchView: View {
             // row works cleanly inside the search `List`, while the full
             // `DealCardView` (with `.glassEffect`) is reserved for `DealListView`
             // (which lives in a `LazyVStack`, where the card hit-tests fine).
-            NavigationLink(value: DealRoute(id: deal.id)) {
+            NavigationLink(value: SearchResult.deal(DealRoute(id: deal.id))) {
                 DealSearchResultRow(deal: deal)
             }
 
         case .sig(let sig):
-            NavigationLink(value: SigRoute(id: sig.id)) {
+            NavigationLink(value: SearchResult.sig(SigRoute(id: sig.id))) {
                 SigSearchResultRow(sig: sig)
             }
 
         case .document(let doc):
-            NavigationLink(value: DocumentRoute(id: doc.id)) {
+            NavigationLink(value: SearchResult.document(DocumentRoute(id: doc.id))) {
                 DocumentRow(doc: doc, dateString: documentDateString(doc))
             }
 
@@ -769,12 +793,12 @@ struct SearchView: View {
             ZStack {
                 QuidIssueCard(issue: issue)
                 if issue.pdfUrl != nil {
-                    NavigationLink(value: QuidPDFDeepLinkRoute(recordId: -issue.id)) {
+                    NavigationLink(value: SearchResult.quidPDF(QuidPDFDeepLinkRoute(recordId: -issue.id))) {
                         EmptyView()
                     }
                     .opacity(0)
                 } else {
-                    NavigationLink(value: QuidIssueRoute(issueId: issue.id, issueName: issue.name)) {
+                    NavigationLink(value: SearchResult.quidIssue(QuidIssueRoute(issueId: issue.id, issueName: issue.name))) {
                         EmptyView()
                     }
                     .opacity(0)
@@ -788,7 +812,7 @@ struct SearchView: View {
             // Riusa la card dell'articolo (la stessa della lista del numero).
             ZStack {
                 QuidArticleCard(article: article)
-                NavigationLink(value: QuidArticleRoute(articleId: article.id)) {
+                NavigationLink(value: SearchResult.quidArticle(QuidArticleRoute(articleId: article.id))) {
                     EmptyView()
                 }
                 .opacity(0)
@@ -800,7 +824,7 @@ struct SearchView: View {
         case .linktreeLink(let slug, let linkTitle, let linkSubtitle, let imageURL, _):
             // Lean row — un link del linktree di un gruppo locale. Tap apre la
             // pagina del gruppo (`LocalOfficeView`). Layout compatto in stile
-            NavigationLink(value: LocalOfficeSlugRoute(slug: slug)) {
+            NavigationLink(value: SearchResult.localOffice(LocalOfficeSlugRoute(slug: slug))) {
                 LinktreeLinkSearchResultRow(
                     title: linkTitle,
                     subtitle: linkSubtitle,
@@ -813,14 +837,14 @@ struct SearchView: View {
             // gruppo (la search bar interna farà il resto). HIG-style row:
             // leading capsule con icona "building.2.fill" in brand tint,
             // titolo localizzato, sottotitolo con conta membri.
-            NavigationLink(value: OrgGroupRoute(groupTitle: group.title)) {
+            NavigationLink(value: SearchResult.orgGroup(OrgGroupRoute(groupTitle: group.title))) {
                 OrgGroupSearchResultRow(group: group)
             }
 
         case .orgRole(let role, let groupTitle, _, let member):
             // Tap → scheda socio: la carica è "chi" prima ancora che "ruolo",
             // e la scheda socio è la destination naturale (e già esistente).
-            NavigationLink(value: RegSociRoute(id: member.userId)) {
+            NavigationLink(value: SearchResult.member(RegSociRoute(id: member.userId))) {
                 OrgRoleSearchResultRow(role: role, groupTitle: groupTitle, member: member)
             }
 
@@ -832,7 +856,7 @@ struct SearchView: View {
             // all'arrivo della prossima emissione mostriamo una versione
             // light tappabile con i campi forniti dal backend.
             if type == "user" {
-                NavigationLink(value: RegSociRoute(id: hit.id)) {
+                NavigationLink(value: SearchResult.member(RegSociRoute(id: hit.id))) {
                     LeanPersonSearchResultRow(
                         id: hit.id,
                         name: hit.leanTitle,
@@ -889,6 +913,19 @@ struct SearchView: View {
         f.locale = Locale(identifier: "it_IT")
         f.dateStyle = .medium
         return f.string(from: Date(timeIntervalSince1970: Double(doc.created.epochSeconds)))
+    }
+}
+
+/// The Search tab activates its field on selection, so search is presented
+/// from the start. By default that hides the bar holding the title and the
+/// filter menu, which beside a detail column leaves no way to filter.
+private struct KeepToolbarWhileSearching: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 17.1, *) {
+            content.searchPresentationToolbarBehavior(.avoidHidingContent)
+        } else {
+            content
+        }
     }
 }
 
@@ -1181,7 +1218,5 @@ struct LinktreeLinkSearchResultRow: View {
 }
 
 #Preview {
-    NavigationStack {
-        SearchView()
-    }
+    SearchView()
 }

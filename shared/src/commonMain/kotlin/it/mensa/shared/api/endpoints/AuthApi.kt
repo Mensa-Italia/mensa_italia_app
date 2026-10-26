@@ -8,6 +8,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import it.mensa.shared.api.SkipAuthAttribute
 import it.mensa.shared.auth.oidc.OidcTokenResponse
@@ -20,8 +21,8 @@ class AuthApi(private val client: HttpClient) {
      * No Authorization header on the request: a stale Bearer would either
      * be ignored or, worse, cause a 401 from the auth proxy.
      */
-    suspend fun loginWithZitadel(email: String, password: String): OidcTokenResponse =
-        client.post("/api/cs/auth-with-zitadel") {
+    suspend fun loginWithZitadel(email: String, password: String): OidcTokenResponse {
+        val response = client.post("/api/cs/auth-with-zitadel") {
             attributes.put(SkipAuthAttribute, true)
             header(HttpHeaders.Authorization, null)
             setBody(
@@ -32,7 +33,13 @@ class AuthApi(private val client: HttpClient) {
                     }
                 )
             )
-        }.body()
+        }
+        // Il client non usa `expectSuccess`: senza questo controllo il JSON
+        // d'errore del 401 veniva letto come una risposta di token vuota, e
+        // chi sbagliava password si vedeva "Empty access_token…".
+        if (response.status == HttpStatusCode.Unauthorized) throw InvalidCredentialsException()
+        return response.body()
+    }
 
     /**
      * `GET /api/cs/me` — returns the current [UserModel] for the bearer
@@ -42,3 +49,6 @@ class AuthApi(private val client: HttpClient) {
      */
     suspend fun me(): UserModel = client.get("/api/cs/me").body()
 }
+
+/** `/auth-with-zitadel` ha rifiutato email e password (401). */
+class InvalidCredentialsException : Exception("Email o password non corrette")

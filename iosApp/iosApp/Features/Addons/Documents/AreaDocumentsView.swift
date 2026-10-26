@@ -98,13 +98,12 @@ struct AreaDocumentsView: View {
                     }
                 }
             } label: {
-                Image(systemName: vm.selectedCategory == nil
-                      ? "line.3.horizontal.decrease.circle"
-                      : "line.3.horizontal.decrease.circle.fill")
-                    .accessibilityLabel(Text(tr(
-                        "addons.documents.filter",
-                        fallback: "Filtra per categoria"
-                    )))
+                Label(
+                    tr("addons.documents.filter", fallback: "Filtra per categoria"),
+                    systemImage: vm.selectedCategory == nil
+                        ? "line.3.horizontal.decrease.circle"
+                        : "line.3.horizontal.decrease.circle.fill"
+                )
             }
             .tint(AppTheme.Colors.brandTintAdaptive)
         }

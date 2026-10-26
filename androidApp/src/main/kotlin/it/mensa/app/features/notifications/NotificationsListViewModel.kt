@@ -145,8 +145,15 @@ fun notificationDataMap(n: NotificationModel): Map<String, String>? {
  * Parses a [NotificationModel] into a [NotificationTarget].
  * Mirrors iOS notificationTarget(from:).
  */
-fun notificationTarget(n: NotificationModel): NotificationTarget? {
-    val dict = notificationDataMap(n) ?: return null
+fun notificationTarget(n: NotificationModel): NotificationTarget? =
+    notificationDataMap(n)?.let(::notificationTarget)
+
+/**
+ * Lo stesso, dal `data` di una push: il backend manda gli stessi campi
+ * (`type`, `event_id`, `document_id`…) sia nella push sia nella notifica
+ * salvata. Vedi [it.mensa.app.services.push.PushDeepLinkRouter].
+ */
+fun notificationTarget(dict: Map<String, String>): NotificationTarget? {
     fun str(key: String): String? = dict[key]?.takeIf { it.isNotEmpty() && it != "null" }
     return when (dict["type"] ?: "") {
         "event" -> str("event_id")?.let { NotificationTarget.Event(it) }
@@ -155,7 +162,8 @@ fun notificationTarget(n: NotificationModel): NotificationTarget? {
         "multiple_documents" -> NotificationTarget.MultipleDocuments
         "ticket_purchase" -> NotificationTarget.TicketPurchase
         "payment_update_status" -> NotificationTarget.PaymentUpdateStatus
-        "quid" -> str("category_id")?.let { NotificationTarget.Quid(it) }
+        // `quid_id` e' quello che manda davvero il cron del backend.
+        "quid" -> (str("category_id") ?: str("quid_id"))?.let { NotificationTarget.Quid(it) }
         "quid_article" -> str("post_id")?.let { NotificationTarget.QuidArticle(it) }
         "quid_pdf" -> str("record_id")?.let { NotificationTarget.QuidPdf(it) }
         "local_office" -> str("slug")?.let { NotificationTarget.LocalOffice(it) }

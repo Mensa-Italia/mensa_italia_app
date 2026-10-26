@@ -53,8 +53,34 @@ class DocumentsRepository(
 
     suspend fun firstSnapshot(): List<DocumentModel> = observeAll().first()
 
-    suspend fun getById(id: String): DocumentModel? =
-        db.documentQueries.selectById(id).awaitAsOneOrNull()?.toModel()
+    /**
+     * Il documento, dal database se c'e', altrimenti dal server.
+     *
+     * Leggeva solo il database, che si riempie quando si apre la lista. La
+     * notifica di un documento nuovo arriva prima che la lista lo abbia mai
+     * scaricato, quindi toccarla dava "Documento non disponibile"; aprirlo
+     * prima dalla lista lo metteva in database e da li' in poi la notifica
+     * funzionava. Lo hanno notato i soci. Null solo se manca anche sul server
+     * o la rete non risponde.
+     */
+    suspend fun getById(id: String): DocumentModel? {
+        db.documentQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel() }
+        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
+        // si decodifica comunque in un modello vuoto, con tutti i default.
+        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        db.documentQueries.insertOrReplace(
+            id = remote.id,
+            name = remote.name,
+            description = remote.description,
+            file_ = remote.file,
+            uploadedBy = remote.uploadedBy,
+            category = remote.category,
+            elaborated = remote.elaborated,
+            created = remote.created.toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
+        )
+        return remote
+    }
 
     /**
      * Loads the AI-elaborated summary for a document, caching it locally.

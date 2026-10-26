@@ -33,7 +33,7 @@ struct PDFViewerView: View {
                 // nostra sessione. Il bottone compare quando il file c'e'.
                 if let localFile {
                     ShareLink(item: localFile) {
-                        Image(systemName: "square.and.arrow.up")
+                        Label(tr("app.share", fallback: "Condividi"), systemImage: "square.and.arrow.up")
                     }
                 }
             }

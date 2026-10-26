@@ -51,7 +51,7 @@ struct DealDetailView: View {
             // until vm.deal loads, mirroring EventDetailView.
             ToolbarItem(placement: .topBarTrailing) {
                 ShareLink(item: shareText(vm.deal)) {
-                    Image(systemName: "square.and.arrow.up")
+                    Label(tr("app.share", fallback: "Condividi"), systemImage: "square.and.arrow.up")
                 }
                 .disabled(vm.deal == nil)
             }
@@ -80,7 +80,7 @@ struct DealDetailView: View {
                         }
                         .disabled(vm.deal == nil)
                     } label: {
-                        Image(systemName: "ellipsis.circle")
+                        Label(tr("app.more_actions", fallback: "Altre azioni"), systemImage: "ellipsis.circle")
                     }
                     .disabled(vm.deleting)
                 }

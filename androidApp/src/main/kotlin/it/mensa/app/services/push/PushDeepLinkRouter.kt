@@ -32,6 +32,14 @@ object PushDeepLinkRouter {
         /** Generic URL (fallback — open in Chrome Custom Tab) */
         data class ExternalUrl(val url: String) : NotificationTarget()
 
+        /**
+         * Una push nel formato che il backend manda davvero, instradata come
+         * la stessa notifica toccata dalla lista.
+         */
+        data class InApp(
+            val target: it.mensa.app.features.notifications.NotificationTarget,
+        ) : NotificationTarget()
+
         /** Unknown or unparsable payload */
         object Unknown : NotificationTarget()
     }
@@ -57,6 +65,15 @@ object PushDeepLinkRouter {
      * @param data FCM `RemoteMessage.data` map
      */
     fun parse(data: Map<String, String>): NotificationTarget {
+        // Prima il formato del backend: `type` = "single_document" con
+        // `document_id`, "event" con `event_id`, "deal" con `deal_id`… Questo
+        // router cercava "document" e un `id` generico, che il backend non
+        // manda: toccare la push di un documento, di un evento o di una
+        // convenzione apriva l'app senza portare da nessuna parte. Lo stesso
+        // parser della lista notifiche, cosi' i due non si separano piu'.
+        it.mensa.app.features.notifications.notificationTarget(data)?.let {
+            return NotificationTarget.InApp(it)
+        }
         val type = data[KEY_TYPE] ?: return NotificationTarget.Unknown
         val id = data[KEY_ID]
         return when (type) {

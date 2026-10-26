@@ -350,9 +350,9 @@ private fun EmptyStampSlot(size: Dp) {
     }
 }
 
-private data class Seed(val angle: Double, val dx: Double, val dy: Double)
+internal data class Seed(val angle: Double, val dx: Double, val dy: Double)
 
-private fun deterministicSeed(id: String): Seed {
+internal fun deterministicSeed(id: String): Seed {
     var h: ULong = 1469598103934665603UL
     for (b in id.encodeToByteArray()) {
         h = h xor b.toULong()

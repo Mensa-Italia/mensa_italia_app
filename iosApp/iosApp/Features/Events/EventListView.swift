@@ -128,19 +128,31 @@ struct EventListView: View {
                 prompt: Text(tr("events.search.placeholder", fallback: "Cerca eventi"))
             )
             .toolbar {
+                // Labels, not bare images: iPhone Duo's vertical bar moves
+                // what doesn't fit into its overflow menu, which shows
+                // titles. Without one an item came out blank there, and
+                // stayed blank once back in the bar.
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         showFilters = true
                     } label: {
-                        Image(systemName: filterState.isEmpty
-                              ? "line.3.horizontal.decrease.circle"
-                              : "line.3.horizontal.decrease.circle.fill")
+                        Label(
+                            tr("events.filter.button", fallback: "Filtri"),
+                            systemImage: filterState.isEmpty
+                                ? "line.3.horizontal.decrease.circle"
+                                : "line.3.horizontal.decrease.circle.fill"
+                        )
                     }
-                    .accessibilityLabel(tr("events.filter.button", fallback: "Filtri"))
-                    Button { showMap = true } label: { Image(systemName: "map") }
-                    Button { showCalendar = true } label: { Image(systemName: "calendar") }
+                    Button { showMap = true } label: {
+                        Label(tr("events.map.title", fallback: "Mappa eventi"), systemImage: "map")
+                    }
+                    Button { showCalendar = true } label: {
+                        Label(tr("events.calendar.title", fallback: "Calendario eventi"), systemImage: "calendar")
+                    }
                     if canAddEvent {
-                        Button { showAdd = true } label: { Image(systemName: "plus") }
+                        Button { showAdd = true } label: {
+                            Label(tr("events.add.title", fallback: "Nuovo evento"), systemImage: "plus")
+                        }
                     }
                 }
             }

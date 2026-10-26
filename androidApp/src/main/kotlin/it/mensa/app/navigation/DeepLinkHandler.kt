@@ -10,8 +10,10 @@ import it.mensa.app.features.notifications.NotificationTarget
 import it.mensa.app.features.notifications.NotificationsRoutes
 import it.mensa.app.features.quid.QuidRoute
 import it.mensa.app.features.receipts.ReceiptsRoutes
+import it.mensa.app.features.tableport.TableportRoutes
 import it.mensa.app.features.tickets.TicketsRoutes
 import it.mensa.app.services.push.PushDeepLinkRouter
+import it.mensa.shared.notifications.AppLink
 import org.koin.mp.KoinPlatform
 
 /**
@@ -119,6 +121,24 @@ object DeepLinkHandler {
      * [openUrl] apre gli indirizzi esterni — il guscio passa l'`UriHandler` di
      * Compose, che su Android finisce in una Chrome Custom Tab.
      */
+    /**
+     * Apre un link `svc.mensa.it/links/...`. Il francobollo passa dal
+     * passaporto con lo stesso canale del lettore QR (`qr_stamp_id` /
+     * `qr_code` sul SavedStateHandle), cosi' la conferma e' quella di sempre.
+     */
+    fun handleAppLink(link: AppLink, navController: NavController) {
+        when (link) {
+            is AppLink.Event -> navController.navigate(EventRoutes.detail(link.eventId))
+            is AppLink.Stamp -> {
+                navController.navigate(TableportRoutes.PASSPORT)
+                navController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("qr_stamp_id", link.payload.stampId)
+                    set("qr_code", link.payload.verificationCode)
+                }
+            }
+        }
+    }
+
     fun handlePushTarget(
         target: PushDeepLinkRouter.NotificationTarget,
         navController: NavController,
@@ -151,6 +171,9 @@ object DeepLinkHandler {
             }
             is PushDeepLinkRouter.NotificationTarget.ExternalUrl -> {
                 openUrl(target.url)
+            }
+            is PushDeepLinkRouter.NotificationTarget.InApp -> {
+                handleNotificationTarget(target.target, navController)
             }
             is PushDeepLinkRouter.NotificationTarget.Unknown -> {
                 navController.navigate(NotificationsRoutes.LIST)

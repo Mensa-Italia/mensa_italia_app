@@ -1,8 +1,29 @@
 import SwiftUI
 import Shared
 
+/// Sections of the profile that open a page of their own. Rows that act in
+/// place (theme, notifications, external links, logout) are not routes.
+enum ProfileRoute: Hashable {
+    case membership
+    case payments
+    case receipts
+    case devices
+    case passkeys
+    case donation
+    case calendar
+    case orgChart
+    case language
+    case credits
+}
+
 /// Settings/profile screen — stock iOS list style with account, app preferences and logout.
+/// Compact width (iPhone, iPhone Duo folded) pushes each section; regular
+/// width (iPhone Duo unfolded, iPad) keeps the list as a sidebar with the
+/// chosen section beside it, like Settings. Owns its own navigation
+/// container, so don't wrap it in a NavigationStack.
 struct ProfileView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var selection: ProfileRoute?
     @State private var vm = ProfileViewModel()
     @State private var showLogoutConfirm = false
 
@@ -26,7 +47,79 @@ struct ProfileView: View {
     }
 
     var body: some View {
-        List {
+        NavigationSplitView {
+            sidebar
+        } detail: {
+            // One stack per section, so switching section drops whatever was
+            // pushed inside the previous one.
+            NavigationStack {
+                if let selection {
+                    destination(for: selection)
+                }
+            }
+            .id(selection)
+        }
+        .onChange(of: horizontalSizeClass, initial: true) { _, sizeClass in
+            // Side by side, open on the first section like Settings does.
+            // Collapsed that would push it straight away, so only with room.
+            if sizeClass == .regular, selection == nil {
+                selection = .membership
+            }
+            // Collapsing (iPhone Duo turned upright) would push that default
+            // section over the index: back to the index instead.
+            if sizeClass == .compact, selection == .membership {
+                selection = nil
+            }
+        }
+        .preferredColorScheme(vm.selectedTheme.colorScheme)
+        .task { await vm.load() }
+        // Apple convention for destructive account actions (cf. iOS Settings
+        // "Esci dal mio Apple ID"): a centered modal `.alert`, not an action
+        // sheet. Removes the "dialog appears at the top" anchoring quirk that
+        // `.confirmationDialog` exhibits when attached to a wide Form.
+        .alert(
+            tr("app.profile.logout_confirm_title", fallback: "Vuoi uscire dall'account?"), // i18n
+            isPresented: $showLogoutConfirm
+        ) {
+            Button(tr("views.make_donation.cancel", fallback: "Annulla"), role: .cancel) {} // i18n
+            Button(tr("views.settings.tile.logout.title", fallback: "Esci"), role: .destructive) { // i18n
+                Task { await vm.logout() }
+            }
+        } message: {
+            Text(tr("app.profile.logout_confirm_message", fallback: "Dovrai accedere di nuovo per usare l'app.")) // i18n
+        }
+        .alert(tr("app.error.title", fallback: "Errore"), isPresented: .init( // i18n
+            get: { vm.errorMessage != nil },
+            set: { if !$0 { vm.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { vm.errorMessage = nil }
+        } message: {
+            Text(vm.errorMessage ?? "")
+        }
+    }
+
+    private func destination(for route: ProfileRoute) -> some View {
+        sectionPage(for: route).indexPageBackground()
+    }
+
+    @ViewBuilder
+    private func sectionPage(for route: ProfileRoute) -> some View {
+        switch route {
+        case .membership: RenewMembershipView()
+        case .payments:   PaymentMethodsView()
+        case .receipts:   ReceiptsListView()
+        case .devices:    DevicesView()
+        case .passkeys:   PasskeysView()
+        case .donation:   MakeDonationView()
+        case .calendar:   CalendarLinkerView()
+        case .orgChart:   OrgChartView()
+        case .language:   LanguagePickerView()
+        case .credits:    CreditsView()
+        }
+    }
+
+    private var sidebar: some View {
+        List(selection: $selection) {
             // MARK: Header
             Section {
                 profileHeader
@@ -36,28 +129,24 @@ struct ProfileView: View {
 
             // MARK: Account
             Section(tr("app.profile.section_account", fallback: "Account")) { // i18n
-                NavigationLink {
-                    RenewMembershipView()
-                } label: {
+                NavigationLink(value: ProfileRoute.membership) {
                     ProfileRowLabel(icon: "creditcard",
                                     title: tr("app.profile.membership", fallback: "Iscrizione"))
                 }
-                NavigationLink {
-                    PaymentMethodsView()
-                } label: {
+                NavigationLink(value: ProfileRoute.payments) {
                     ProfileRowLabel(icon: "banknote",
                                     title: tr("app.profile.payments", fallback: "Pagamenti"))
                 }
-                NavigationLink {
-                    DevicesView()
-                } label: {
+                NavigationLink(value: ProfileRoute.receipts) {
+                    ProfileRowLabel(icon: "doc.text",
+                                    title: tr("card.my_receipts", fallback: "Le mie ricevute"))
+                }
+                NavigationLink(value: ProfileRoute.devices) {
                     ProfileRowLabel(icon: "iphone",
                                     title: tr("views.devices.title", fallback: "Dispositivi"))
                 }
                 if koin.featureFlags.passkeysEnabled {
-                    NavigationLink {
-                        PasskeysView()
-                    } label: {
+                    NavigationLink(value: ProfileRoute.passkeys) {
                         ProfileRowLabel(icon: "person.badge.key",
                                         title: tr("views.passkeys.title", fallback: "Passkey"))
                     }
@@ -80,17 +169,13 @@ struct ProfileView: View {
                                         iconColor: .pink)
                     }
                 } else {
-                    NavigationLink {
-                        MakeDonationView()
-                    } label: {
+                    NavigationLink(value: ProfileRoute.donation) {
                         ProfileRowLabel(icon: "heart.fill",
                                         title: tr("views.make_donation.title", fallback: "Fai una donazione"),
                                         iconColor: .pink)
                     }
                 }
-                NavigationLink {
-                    CalendarLinkerView()
-                } label: {
+                NavigationLink(value: ProfileRoute.calendar) {
                     ProfileRowLabel(icon: "calendar.badge.plus",
                                     title: tr("app.calendar_link.title", fallback: "Calendario"))
                 }
@@ -102,9 +187,7 @@ struct ProfileView: View {
             // resterebbe un header vuoto.
             if koin.featureFlags.orgChartEnabled {
             Section(tr("app.profile.section_association", fallback: "Associazione")) {
-                NavigationLink {
-                    OrgChartView()
-                } label: {
+                NavigationLink(value: ProfileRoute.orgChart) {
                     ProfileRowLabel(icon: "person.2.badge.gearshape",
                                     title: tr("app.org_chart.title", fallback: "Organigramma"))
                 }
@@ -113,9 +196,7 @@ struct ProfileView: View {
 
             // MARK: App settings
             Section(tr("app.profile.section_app", fallback: "App")) { // i18n
-                NavigationLink {
-                    LanguagePickerView()
-                } label: {
+                NavigationLink(value: ProfileRoute.language) {
                     ProfileRow(
                         icon: "globe",
                         title: tr("app.profile.language", fallback: "Lingua"), // i18n
@@ -164,9 +245,7 @@ struct ProfileView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    CreditsView()
-                } label: {
+                NavigationLink(value: ProfileRoute.credits) {
                     ProfileRowLabel(icon: "sparkles",
                                     title: tr("app.profile.credits", fallback: "Crediti")) // i18n
                 }
@@ -206,34 +285,15 @@ struct ProfileView: View {
                 }
             }
         }
+        .indexListStyle(sidebar: horizontalSizeClass == .regular)
         .navigationTitle(tr("app.profile.title", fallback: "Profilo")) // i18n
-        .navigationBarTitleDisplayMode(.large)
+        // Large on its own (iPhone, iPhone Duo folded). As a sidebar the
+        // large title sat under an empty bar row, far from the top: let the
+        // system put it inline there, as Explore's does.
+        .navigationBarTitleDisplayMode(horizontalSizeClass == .regular ? .automatic : .large)
         .cleanNavBar()
-        .preferredColorScheme(vm.selectedTheme.colorScheme)
-        .task { await vm.load() }
-        // Apple convention for destructive account actions (cf. iOS Settings
-        // "Esci dal mio Apple ID"): a centered modal `.alert`, not an action
-        // sheet. Removes the "dialog appears at the top" anchoring quirk that
-        // `.confirmationDialog` exhibits when attached to a wide Form.
-        .alert(
-            tr("app.profile.logout_confirm_title", fallback: "Vuoi uscire dall'account?"), // i18n
-            isPresented: $showLogoutConfirm
-        ) {
-            Button(tr("views.make_donation.cancel", fallback: "Annulla"), role: .cancel) {} // i18n
-            Button(tr("views.settings.tile.logout.title", fallback: "Esci"), role: .destructive) { // i18n
-                Task { await vm.logout() }
-            }
-        } message: {
-            Text(tr("app.profile.logout_confirm_message", fallback: "Dovrai accedere di nuovo per usare l'app.")) // i18n
-        }
-        .alert(tr("app.error.title", fallback: "Errore"), isPresented: .init( // i18n
-            get: { vm.errorMessage != nil },
-            set: { if !$0 { vm.errorMessage = nil } }
-        )) {
-            Button("OK", role: .cancel) { vm.errorMessage = nil }
-        } message: {
-            Text(vm.errorMessage ?? "")
-        }
+        // Like Settings, the index stays put beside the detail.
+        .toolbar(removing: .sidebarToggle)
     }
 
     // MARK: - Profile Header
@@ -301,7 +361,5 @@ struct ProfileRowLabel: View {
 }
 
 #Preview {
-    NavigationStack {
-        ProfileView()
-    }
+    ProfileView()
 }

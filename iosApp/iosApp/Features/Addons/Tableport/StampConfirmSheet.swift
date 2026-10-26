@@ -49,7 +49,7 @@ struct StampConfirmSheet: View {
                 VStack(spacing: 18) {
                     if !stamp.image.isEmpty,
                        let url = Files.url(
-                            collection: "stamps",
+                            collection: "stamp", // al singolare: con "stamps" il file era un 404
                             recordId: stamp.id,
                             filename: stamp.image,
                             thumb: PassportLayout.detailThumb

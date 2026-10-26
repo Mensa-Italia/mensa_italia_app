@@ -92,7 +92,7 @@ struct EventDetailView: View {
             // snap del pulsante.
             ToolbarItem(placement: .topBarTrailing) {
                 ShareLink(item: shareText(vm.event)) {
-                    Image(systemName: "square.and.arrow.up")
+                    Label(tr("app.share", fallback: "Condividi"), systemImage: "square.and.arrow.up")
                 }
             }
             // Edit visibile dal primo frame se l'utente ha power events/super.
@@ -100,7 +100,9 @@ struct EventDetailView: View {
             // appena `vm.event` arriva (necessario per matchare l'ownerId).
             ToolbarItem(placement: .topBarTrailing) {
                 if canEditEvent {
-                    Button { showEdit = true } label: { Image(systemName: "pencil") }
+                    Button { showEdit = true } label: {
+                        Label(tr("app.edit", fallback: "Modifica"), systemImage: "pencil")
+                    }
                         .disabled(vm.event == nil)
                 }
             }
@@ -130,95 +132,139 @@ struct EventDetailView: View {
 
     // MARK: - Body
 
-    @ViewBuilder
-    private func eventDetail(_ event: EventModel) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                heroHeader(event)
-                    .padding(.bottom, 4)
+    /// Narrower than this the page is one column, as on a phone.
+    private let twoColumnMinWidth: CGFloat = 720
 
-                VStack(alignment: .leading, spacing: 16) {
-                    // Title
-                    Text(event.name)
-                        .font(.largeTitle.bold())
+    /// Sections that read as text rather than as the event's card: beside
+    /// it when there's room, below it otherwise.
+    private enum SideSection: Hashable { case description, contacts, schedule }
 
-                    // Dates / location
-                    infoStack(event)
-
-                    // CTAs
-                    actionStack(event)
-
-                    if !event.description_.isEmpty {
-                        Divider()
-                        Text(tr("events.detail.description", fallback: "Descrizione"))
-                            .font(.headline)
-                        Text(autolinkedDescription(event.description_))
-                            .font(.body)
-                            .foregroundStyle(.primary)
-                            .tint(AppTheme.Colors.brandTintAdaptive)
-                    }
-
-                    if hasContactInfo(event) {
-                        Divider()
-                        contactsSection(event)
-                    }
-
-                    if !vm.schedules.isEmpty {
-                        Divider()
-                        Text(tr("events.detail.schedule", fallback: "Programma"))
-                            .font(.headline)
-                        scheduleStack
-                    }
-
-                    if let pos = event.position {
-                        Divider()
-                        Text(tr("events.detail.location", fallback: "Dove"))
-                            .font(.headline)
-                        embeddedMap(pos: pos, name: event.name)
-                    }
-                }
-                .padding(.horizontal)
-
-                Color.clear.frame(height: 32)
-            }
-        }
-        .ignoresSafeArea(edges: .top)
+    private func sideSections(_ event: EventModel) -> [SideSection] {
+        var sections: [SideSection] = []
+        if !event.description_.isEmpty { sections.append(.description) }
+        if hasContactInfo(event) { sections.append(.contacts) }
+        if !vm.schedules.isEmpty { sections.append(.schedule) }
+        return sections
     }
 
-    // MARK: - Hero w/ parallax
-
+    /// One column on a phone; on a wide screen (an unfolded iPhone Duo with
+    /// nothing beside the event, an iPad) the card — poster, dates, actions,
+    /// map — on the left and the text on the right, each scrolling on its
+    /// own. Full width, the poster alone filled the screen.
     @ViewBuilder
-    private func heroHeader(_ event: EventModel) -> some View {
-        let url = imageURL(for: event)
+    private func eventDetail(_ event: EventModel) -> some View {
+        let side = sideSections(event)
         GeometryReader { geo in
-            let minY = geo.frame(in: .global).minY
-            let stretch = max(0, minY)
-            ZStack(alignment: .bottom) {
-                Group {
-                    if let url {
-                        CachedAsyncImage(url: url) { img in
-                            img.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            gradientPlaceholder
+            if geo.size.width >= twoColumnMinWidth, !side.isEmpty {
+                // On a foldable the columns meet at the hinge, else halfway.
+                let hinge = geo.verticalHinge
+                let leftWidth = hinge?.minX ?? geo.size.width / 2
+                let gap = hinge?.width ?? 0
+                // Each column clips to its own width by default, which cut
+                // the poster's shadow at the hinge; let shadows spill over.
+                HStack(alignment: .top, spacing: 0) {
+                    ScrollView {
+                        mainColumn(event)
+                    }
+                    .scrollClipDisabled()
+                    .frame(width: leftWidth)
+                    Color.clear.frame(width: gap)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionList(side, event: event, dividerFirst: false)
                         }
-                    } else {
-                        gradientPlaceholder
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .padding(.bottom, 32)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .scrollClipDisabled()
+                }
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        mainColumn(event, includesMap: false)
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionList(side, event: event, dividerFirst: true)
+                            mapSection(event)
+                        }
+                        .padding(.horizontal)
+                        Color.clear.frame(height: 16)
                     }
                 }
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-                .clipped()
-
-                LinearGradient(
-                    colors: [Color.black.opacity(0.0), Color.black.opacity(0.45)],
-                    startPoint: .top, endPoint: .bottom
-                )
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
             }
-            .frame(width: geo.size.width, height: geo.size.height + stretch)
-            .clipped()
-            .offset(y: -stretch)
         }
-        .frame(height: 320)
+    }
+
+    /// Poster, title, dates, actions and (unless left for the end of a single
+    /// column) the map.
+    private func mainColumn(_ event: EventModel, includesMap: Bool = true) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            heroHeader(event)
+
+            VStack(alignment: .leading, spacing: 16) {
+                // Title
+                Text(event.name)
+                    .font(.largeTitle.bold())
+
+                // Dates / location
+                infoStack(event)
+
+                // CTAs
+                actionStack(event)
+
+                if includesMap {
+                    mapSection(event)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, includesMap ? 32 : 0)
+        }
+    }
+
+    @ViewBuilder
+    private func sectionList(_ sections: [SideSection], event: EventModel, dividerFirst: Bool) -> some View {
+        ForEach(Array(sections.enumerated()), id: \.element) { index, section in
+            if dividerFirst || index > 0 {
+                Divider()
+            }
+            switch section {
+            case .description:
+                Text(tr("events.detail.description", fallback: "Descrizione"))
+                    .font(.headline)
+                Text(autolinkedDescription(event.description_))
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .tint(AppTheme.Colors.brandTintAdaptive)
+            case .contacts:
+                contactsSection(event)
+            case .schedule:
+                Text(tr("events.detail.schedule", fallback: "Programma"))
+                    .font(.headline)
+                scheduleStack
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func mapSection(_ event: EventModel) -> some View {
+        if let pos = event.position {
+            Divider()
+            Text(tr("events.detail.location", fallback: "Dove"))
+                .font(.headline)
+            embeddedMap(pos: pos, name: event.name)
+        }
+    }
+
+    // MARK: - Hero card
+
+    /// The poster as a Liquid Glass card (see `GlassCoverCard`).
+    private func heroHeader(_ event: EventModel) -> some View {
+        GlassCoverCard(url: imageURL(for: event)) {
+            gradientPlaceholder
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
 
     private var gradientPlaceholder: some View {

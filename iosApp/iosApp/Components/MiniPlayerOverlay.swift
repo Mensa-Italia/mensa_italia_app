@@ -3,7 +3,7 @@ import Combine
 
 /// Modifier che sovrappone il `MiniAudioPlayer` a una view qualsiasi quando
 /// `AudioPlayerService.shared` ha una traccia attiva, e gestisce anche la
-/// presentazione del full-screen player via sheet.
+/// presentazione del full-screen player (`NowPlayingPresentation`).
 ///
 /// Usato in due posti:
 ///  - `MainTabView`: shell autenticata. Il player flotta sopra la floating
@@ -23,6 +23,7 @@ struct MiniPlayerOverlay: ViewModifier {
 
     @State private var hasAudioTrack: Bool = false
     @State private var isPresentingFullPlayer: Bool = false
+    @Namespace private var nowPlayingNamespace
 
     func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
@@ -36,13 +37,10 @@ struct MiniPlayerOverlay: ViewModifier {
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.86), value: hasAudioTrack)
-        .sheet(isPresented: $isPresentingFullPlayer) {
-            NowPlayingFullScreenView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(Color.black)
-                .presentationCornerRadius(28)
-        }
+        .modifier(NowPlayingPresentation(
+            isPresented: $isPresentingFullPlayer,
+            namespace: nowPlayingNamespace
+        ))
         .onReceive(
             AudioPlayerService.shared.$currentTrack
                 .map { $0 != nil }

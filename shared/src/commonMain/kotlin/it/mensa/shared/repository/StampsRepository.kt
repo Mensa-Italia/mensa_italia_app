@@ -12,6 +12,7 @@ import it.mensa.shared.model.StampUserExpand
 import it.mensa.shared.model.StampUserModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -29,6 +30,12 @@ class StampsRepository(
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
+
+    /**
+     * I timbri gia' in database, una volta sola. Per chi deve solo scaldarne
+     * le immagini (la Home) senza tenere aperto un flow.
+     */
+    suspend fun current(): List<StampUserModel> = observeAll().first()
 
     /** Refresh the user's `stamp_users` records (expand=stamp). */
     suspend fun refresh(filter: String? = null, @Suppress("UNUSED_PARAMETER") sort: String = "-created") {

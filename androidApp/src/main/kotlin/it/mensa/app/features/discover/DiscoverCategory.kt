@@ -2,7 +2,6 @@ package it.mensa.app.features.discover
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountTree
-import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.Description
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Podcasts
-import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.material.icons.outlined.Store
@@ -79,11 +77,6 @@ enum class DiscoverCategory(
     ),
 
     // ── Sezione 3: Strumenti ─────────────────────────────────────────────────
-    Tableport(
-        labelKey = "discover.category.tableport",
-        labelFallback = "Tableport",
-        icon = Icons.Outlined.QrCodeScanner,
-    ),
     Contacts(
         labelKey = "discover.category.contacts",
         labelFallback = "Contatti",
@@ -110,11 +103,6 @@ enum class DiscoverCategory(
         labelKey = "reg_soci.title",
         labelFallback = "Reg. Soci",
         icon = Icons.Outlined.Person,
-    ),
-    Card(
-        labelKey = "app.tab.card",
-        labelFallback = "Tessera",
-        icon = Icons.Outlined.Badge,
     ),
     External(
         labelKey = "app.discover.external",
@@ -154,7 +142,6 @@ val discoverSections: List<DiscoverSection> = listOf(
         kickerKey = "discover.kicker.addons",
         kickerFallback = "ADDON",
         categories = listOf(
-            DiscoverCategory.Tableport,
             DiscoverCategory.Quid,
             DiscoverCategory.Podcasts,
             DiscoverCategory.AddonsHub,

@@ -1,8 +1,7 @@
 package it.mensa.app.features.tableport
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -12,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,7 +34,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import it.mensa.app.features.tableport._components.PassportCoverLining
+import it.mensa.app.features.tableport._components.PassportCoverTurn
+import it.mensa.app.features.tableport._components.EntryScanButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -52,14 +56,17 @@ import androidx.navigation.NavBackStackEntry
 import it.mensa.app.features.tableport._components.PassportCover
 import it.mensa.app.features.tableport._components.PassportPage
 import it.mensa.app.features.tableport._components.PassportPalette
+import it.mensa.app.features.tableport._components.PassportStampScroll
 import it.mensa.app.features.tableport._components.StampConfirmSheet
 import it.mensa.app.features.tableport._components.StampDetailSheet
+import it.mensa.app.features.tableport.medals.RainbowMedalIcon
 import it.mensa.app.features.tableport.util.StampImagePrefetcher
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.mensaImageLoader
 import it.mensa.app.ui.theme.MensaMotion
 import it.mensa.shared.model.StampUserModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 private const val STAMPS_PER_PAGE = 6
@@ -79,6 +86,7 @@ private const val STAMPS_PER_PAGE = 6
 @Composable
 fun PassportScreen(
     onNavigateToScanner: () -> Unit,
+    onNavigateToMedals: () -> Unit = {},
     onNavigateBack: (() -> Unit)? = null,
     backStackEntry: NavBackStackEntry? = null,
     vm: PassportViewModel = koinViewModel(),
@@ -103,17 +111,22 @@ fun PassportScreen(
         }
     }
 
+    // Closed, the cover; open (turned like a book's, see `PassportCoverTurn`)
+    // the stamps, which sit under the cover all along.
     var isOpen by rememberSaveable { mutableStateOf(false) }
-    var stampsRevealed by rememberSaveable { mutableStateOf(false) }
     // Non `rememberSaveable`: StampUserModel non e' Parcelable, e riaprire il
     // dettaglio dopo una rotazione non vale un wrapper.
     var selectedStamp by remember { mutableStateOf<StampUserModel?>(null) }
 
     val stamps = uiState.stamps
-    val pageCount = maxOf(1, (stamps.size + STAMPS_PER_PAGE - 1) / STAMPS_PER_PAGE)
-    val pagerState = rememberPagerState(pageCount = { pageCount + 1 }) // +1 for cover
+    // The six-stamp page the scroll is at: what the prefetch warms ahead of.
+    var scrollPage by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(stamps, pagerState.currentPage) {
+    LaunchedEffect(stamps) {
+        StampImagePrefetcher.warmCollection(stamps, context, mensaImageLoader(context))
+    }
+
+    LaunchedEffect(stamps, scrollPage) {
         if (stamps.isNotEmpty()) {
             // `mensaImageLoader` e non `ImageLoader(context)`: quest'ultimo
             // costruiva un loader nuovo a ogni effetto, con la propria memory
@@ -121,41 +134,58 @@ fun PassportScreen(
             // cache diversa da quella da cui poi vengono disegnate.
             StampImagePrefetcher.warmAround(
                 stamps = stamps,
-                // Pagina 0 e' la copertina: le pagine dei timbri partono da 1.
-                pageIndex = (pagerState.currentPage - 1).coerceAtLeast(0),
+                pageIndex = scrollPage,
                 perPage = STAMPS_PER_PAGE,
                 context = context,
                 imageLoader = mensaImageLoader(context),
+                // A fling crosses several pages: warm well ahead of it.
+                ahead = 4,
             )
-        }
-    }
-
-    LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage > 0) {
-            isOpen = true
-            stampsRevealed = true
         }
     }
 
     MensaScaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = tr("tableport.title", "Passaporto"),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.White,
-                    )
-                },
+                // No title, as on iOS: the cover says what it is, and over the
+                // stamps it would sit on the parchment.
+                title = {},
                 navigationIcon = {
                     if (onNavigateBack != null) {
-                        IconButton(onClick = onNavigateBack) {
+                        IconButton(
+                            onClick = onNavigateBack,
+                            // Over the stamps scrolling under it, on a disc of
+                            // paper so it stays readable (iOS: the glass X).
+                            modifier = if (isOpen) {
+                                Modifier
+                                    .padding(start = 4.dp)
+                                    .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
+                            } else {
+                                Modifier
+                            },
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = tr("app.back", "Indietro"),
-                                tint = Color.White,
+                                tint = if (isOpen) PassportPalette.coverDeep else Color.White,
                             )
                         }
+                    }
+                },
+                actions = {
+                    // The medal collection, its icon cycling through the
+                    // rainbow so it gets noticed.
+                    IconButton(
+                        onClick = onNavigateToMedals,
+                        modifier = if (isOpen) {
+                            Modifier
+                                .padding(end = 4.dp)
+                                .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
+                        } else {
+                            Modifier
+                        },
+                    ) {
+                        RainbowMedalIcon(contentDescription = tr("medals.title", "Medagliere"))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -166,35 +196,16 @@ fun PassportScreen(
             )
         },
         floatingActionButton = {
+            // The ENTRY stamp, as on iOS, once the passport is open.
             AnimatedVisibility(
-                visible = pagerState.currentPage > 0,
-                enter = scaleIn(animationSpec = MensaMotion.springHeroOvershoot) +
-                    fadeIn(animationSpec = MensaMotion.tweenEnter),
-                exit = scaleOut(animationSpec = MensaMotion.springStandard) +
-                    fadeOut(animationSpec = MensaMotion.tweenExit),
+                visible = isOpen,
+                enter = fadeIn(animationSpec = MensaMotion.tweenEnter),
+                exit = fadeOut(animationSpec = MensaMotion.tweenExit),
             ) {
-                ExtendedFloatingActionButton(
-                    text = {
-                        Text(
-                            text = tr("tableport.scan_cta", "Scansiona QR"),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.QrCodeScanner,
-                            contentDescription = null,
-                        )
-                    },
-                    onClick = onNavigateToScanner,
-                    containerColor = colorScheme.primary,
-                    contentColor = colorScheme.onPrimary,
-                    // Niente navigationBarsPadding: ci pensa MensaScaffold con
-                    // contentWindowInsets = navigationBars, altrimenti il FAB
-                    // sale del doppio.
-                )
+                EntryScanButton(onClick = onNavigateToScanner)
             }
         },
+        floatingActionButtonPosition = FabPosition.Center,
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -212,60 +223,66 @@ fun PassportScreen(
                     .background(velvet),
             )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // ── Passport book — the one hero of the screen ──────────────
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    val passportWidth = 300.dp
-                    val passportHeight = passportWidth * (125f / 88f)
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.width(passportWidth),
-                        pageSpacing = 14.dp,
-                    ) { page ->
-                        if (page == 0) {
-                            PassportCover(
-                                width = passportWidth,
-                                height = passportHeight,
-                                isOpen = isOpen,
-                                onTap = {
-                                    isOpen = true
-                                    stampsRevealed = true
-                                },
-                            )
-                        } else {
-                            PassportPage(
-                                stamps = stamps,
-                                pageIndex = page - 1,
-                                totalPages = pageCount,
-                                totalStamps = stamps.size,
-                                stampsRevealed = stampsRevealed,
-                                width = passportWidth,
-                                height = passportHeight,
-                                onTapStamp = { selectedStamp = it },
-                            )
-                        }
+            // ── Passport — the one hero of the screen ───────────────────────
+            // Closed, the cover; open, every stamp in one floating scroll
+            // (`PassportStampScroll`) instead of a pager of six-stamp pages,
+            // running the full height of the screen under the bars.
+            val pages: @Composable () -> Unit = {
+                if (stamps.isEmpty()) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(top = innerPadding.calculateTopPadding())
+                            .padding(bottom = 96.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val passportWidth = 300.dp
+                        PassportPage(
+                            stamps = stamps,
+                            pageIndex = 0,
+                            totalPages = 1,
+                            totalStamps = 0,
+                            stampsRevealed = true,
+                            width = passportWidth,
+                            height = passportWidth * (125f / 88f),
+                            onTapStamp = { selectedStamp = it },
+                        )
                     }
+                } else {
+                    PassportStampScroll(
+                        stamps = stamps,
+                        stampsRevealed = true,
+                        onTapStamp = { selectedStamp = it },
+                        onPageChange = { scrollPage = it },
+                        // Starts below the top bar, ends above the scan
+                        // button; in between the stamps pass under both.
+                        contentPadding = PaddingValues(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = innerPadding.calculateBottomPadding() + 72.dp,
+                        ),
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
-
-                // ── Page indicator (springs to current) ─────────────────────
-                PageIndicator(
-                    pageCount = pageCount + 1,
-                    currentPage = pagerState.currentPage,
-                    modifier = Modifier.padding(vertical = 16.dp),
+            }
+            // The cover fills the screen, as on iOS, and is swiped (or
+            // tapped) open like a book's, the stamps already underneath.
+            if (isOpen) {
+                pages()
+            } else {
+                PassportCoverTurn(
+                    onOpened = { isOpen = true },
+                    pages = pages,
+                    cover = {
+                        PassportCover(
+                            contentPadding = PaddingValues(
+                                top = innerPadding.calculateTopPadding(),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            ),
+                        )
+                    },
+                    lining = { PassportCoverLining() },
+                    modifier = Modifier.fillMaxSize(),
                 )
-
-                Spacer(modifier = Modifier.height(96.dp)) // breathing room for FAB
             }
 
             // ── Dettaglio del timbro ────────────────────────────────────────
@@ -284,44 +301,6 @@ fun PassportScreen(
                     onDone = { vm.clearPendingVerification() },
                 )
             }
-        }
-    }
-}
-
-// ─── Page indicator dots ─────────────────────────────────────────────────────
-
-@Composable
-private fun PageIndicator(
-    pageCount: Int,
-    currentPage: Int,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        repeat(pageCount) { idx ->
-            val isCurrent = currentPage == idx
-            val width by animateDpAsState(
-                targetValue = if (isCurrent) 22.dp else 8.dp,
-                animationSpec = MensaMotion.springShape,
-                label = "dotWidth_$idx",
-            )
-            val alpha by animateFloatAsState(
-                targetValue = if (isCurrent) 1f else 0.40f,
-                animationSpec = MensaMotion.springStandard,
-                label = "dotAlpha_$idx",
-            )
-            // Cover dot is gold, page dots are secondary — colour echoes the document.
-            val color = if (idx == 0) PassportPalette.gold else MaterialTheme.colorScheme.secondary
-            Box(
-                modifier = Modifier
-                    .width(width)
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(color.copy(alpha = alpha)),
-            )
         }
     }
 }

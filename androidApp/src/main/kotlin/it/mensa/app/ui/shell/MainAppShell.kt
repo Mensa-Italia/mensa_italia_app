@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
@@ -40,12 +39,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.mensa.app.features.addonshub.AddonsHubRoutes
 import it.mensa.app.features.addonshub.addonsHubNavGraph
-import it.mensa.app.features.card.CardScreen
 import it.mensa.app.features.contacts.ContactsRoutes
 import it.mensa.app.features.contacts.contactsNavGraph
 import it.mensa.app.features.deals.DealsRoute
 import it.mensa.app.features.deals.dealsNavGraph
-import it.mensa.app.features.discover.DiscoverCategory
 import it.mensa.app.features.discover.DiscoverScreen
 import it.mensa.app.features.documents.DocumentsRoutes
 import it.mensa.app.features.documents.documentsNavGraph
@@ -64,6 +61,7 @@ import it.mensa.app.features.notifications.NotificationsRoutes
 import it.mensa.app.features.notifications.notificationsNavGraph
 import it.mensa.app.features.notifications.notificationTarget
 import it.mensa.app.navigation.DeepLinkHandler
+import it.mensa.app.navigation.PendingAppLink
 import it.mensa.app.features.podcasts.PodcastsRoutes
 import it.mensa.app.features.podcasts.podcastsNavGraph
 import it.mensa.app.features.profile.ProfileNavGraph
@@ -100,7 +98,7 @@ import org.koin.compose.koinInject
  *
  * Shell architecture:
  * - Single [rememberNavController] shared by ALL destinations (tabs + drill).
- * - 5 tab composables: today / discover / search / card / profile
+ * - 3 tab composables: today / discover / profile (search is a drill route)
  * - 17 drill nav graphs registered at root level.
  * - NavigationBar hidden via AnimatedVisibility when on drill destinations.
  * - MiniAudioPlayer floats above NavigationBar.
@@ -119,7 +117,6 @@ enum class MainTab(
 ) {
     Today("today", "app.tab.today", "Oggi", Icons.Outlined.AutoAwesome),
     Discover("discover", "app.tab.discover", "Scopri", Icons.Outlined.GridView),
-    Card("card", "app.tab.card", "Tessera", Icons.Outlined.CreditCard),
     Profile("profile", "app.tab.profile", "Profilo", Icons.Outlined.AccountCircle),
 }
 
@@ -143,7 +140,8 @@ private val tabRoutes = MainTab.values().map { it.route }.toSet()
 private fun harnessRoute(alias: String): String? = when (alias.lowercase()) {
     "today" -> MainTab.Today.route
     "discover" -> MainTab.Discover.route
-    "card" -> MainTab.Card.route
+    // The card lives on Today now.
+    "card" -> MainTab.Today.route
     "profile" -> MainTab.Profile.route
     "search" -> SearchRoute.ROUTE
     "events" -> EventRoutes.LIST
@@ -219,6 +217,14 @@ fun MainAppShell() {
                 openUrl = { url -> ExternalLinks.open(context, url) },
             )
         }
+    }
+
+    // Link `svc.mensa.it/links/...` aperto dall'esterno: stessa trafila delle push.
+    val pendingAppLink by PendingAppLink.link.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingAppLink, navBackStackEntry != null) {
+        if (navBackStackEntry == null || pendingAppLink == null) return@LaunchedEffect
+        val link = PendingAppLink.consume() ?: return@LaunchedEffect
+        runCatching { DeepLinkHandler.handleAppLink(link, navController) }
     }
 
     // Profile uses its own nested NavController, so master only sees route="profile".
@@ -311,6 +317,7 @@ fun MainAppShell() {
                             }
                         },
                         onTableportClick = { navController.navigate(TableportRoutes.PASSPORT) },
+                        onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
                         onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
                     )
                 }
@@ -318,13 +325,7 @@ fun MainAppShell() {
                 composable(MainTab.Discover.route) {
                     DiscoverScreen(
                         onCategoryClick = { category ->
-                            when (category) {
-                                DiscoverCategory.Card -> navController.navigateToTab(MainTab.Card)
-                                else -> {
-                                    val route = category.toRoute()
-                                    if (route != null) navController.navigate(route)
-                                }
-                            }
+                            category.toRoute()?.let { navController.navigate(it) }
                         },
                         onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
                     )
@@ -339,18 +340,10 @@ fun MainAppShell() {
                     )
                 }
 
-                composable(MainTab.Card.route) {
-                    CardScreen(
-                        onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
-                        onReceiptsClick = { navController.navigate(ReceiptsRoutes.LIST) },
-                        onShareClick = { /* TODO: share card as image */ },
-                        onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
-                    )
-                }
-
                 composable(MainTab.Profile.route) {
                     ProfileNavGraph(
                         onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
+                        onReceiptsClick = { navController.navigate(ReceiptsRoutes.LIST) },
                         onAtRootChange = { profileAtRoot = it },
                     )
                 }

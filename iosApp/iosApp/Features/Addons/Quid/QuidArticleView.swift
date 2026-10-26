@@ -17,29 +17,23 @@ struct QuidArticleView: View {
 
     private let bodyHPadding: CGFloat = 22
 
-    /// Synchronous screen-width read. We resolve this once at body evaluation
-    /// time and pass it as an explicit `.frame(width:)` to inline images.
-    /// Previous attempts using `.containerRelativeFrame` or a `GeometryReader`
-    /// in `.background` both failed: the geometry-derived width wasn't known on
-    /// the first render pass, so the resizable image briefly took its intrinsic
-    /// (huge) width and dragged the parent VStack(.leading) wider than the
-    /// screen — and SwiftUI didn't always relayout it back when the width
-    /// arrived a tick later.
-    private var deviceWidth: CGFloat {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .first?
-            .screen.bounds.width ?? UIScreen.main.bounds.width
-    }
-
-    private var screenContentWidth: CGFloat {
-        max(0, deviceWidth - 2 * bodyHPadding)
+    /// Width of the text column. The space the article has comes from a
+    /// `GeometryReader` around the scroll view, and everything in the column
+    /// gets an explicit `.frame(width:)` from it, inline images included.
+    ///
+    /// It used to be the screen's width, read synchronously, because a width
+    /// stored from geometry arrived a pass late: the resizable image took its
+    /// intrinsic (huge) width meanwhile and dragged the `.leading` VStack wider,
+    /// and SwiftUI didn't always lay it back out. But the screen isn't the space
+    /// the article has: beside iPhone Duo's vertical bar, or in a split view's
+    /// detail column, the column came out wider than its container and,
+    /// centred, was cut off on both sides. The reader hands the width over in
+    /// the same pass that builds the column, so there's no late pass either.
+    private func contentWidth(in containerWidth: CGFloat) -> CGFloat {
+        max(0, containerWidth - 2 * bodyHPadding)
     }
 
     var body: some View {
-        // Capture the available width once, store in @State, and feed it to
-        // anything that needs an explicit width cap (inline images).
-        // The GeometryReader itself doesn't render — it's a zero-frame overlay.
         Group {
             if let loadError {
                 ContentUnavailableView(
@@ -54,10 +48,9 @@ struct QuidArticleView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        // No title text — the hero image is the visual anchor and the article
-        // title is rendered inline as the headline below it. Transparent toolbar
-        // so the cover image reads edge-to-edge to the top of the device; the
-        // system back button keeps its Liquid Glass capsule and stays legible.
+        // No title text — the cover card is the visual anchor and the article
+        // title is rendered inline as the headline below it. Transparent
+        // toolbar: the system back button keeps its Liquid Glass capsule.
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -71,12 +64,12 @@ struct QuidArticleView: View {
                     Button {
                         toggleAudio(article: article, audio: audio)
                     } label: {
-                        Image(systemName: toolbarAudioGlyph)
-                            .accessibilityLabel(Text(
-                                isThisArticlePlaying
-                                    ? tr("addons.quid.audio.pause", fallback: "Pausa")
-                                    : tr("addons.quid.audio.play", fallback: "Riproduci")
-                            ))
+                        Label(
+                            isThisArticlePlaying
+                                ? tr("addons.quid.audio.pause", fallback: "Pausa")
+                                : tr("addons.quid.audio.play", fallback: "Riproduci"),
+                            systemImage: toolbarAudioGlyph
+                        )
                     }
                 }
             }
@@ -86,8 +79,7 @@ struct QuidArticleView: View {
             if let article, let url = ExternalLink.url(article.link) {
                 ToolbarItem(placement: .topBarTrailing) {
                     ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                            .accessibilityLabel(Text(tr("app.share", fallback: "Condividi")))
+                        Label(tr("app.share", fallback: "Condividi"), systemImage: "square.and.arrow.up")
                     }
                 }
             }
@@ -97,14 +89,20 @@ struct QuidArticleView: View {
 
     // MARK: - Content
 
-    @ViewBuilder
     private func content(article: QuidArticle) -> some View {
-        ScrollView {
+        GeometryReader { geo in
+            column(article: article, containerWidth: geo.size.width)
+        }
+    }
+
+    private func column(article: QuidArticle, containerWidth: CGFloat) -> some View {
+        let contentWidth = contentWidth(in: containerWidth)
+        return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                // Hero cover image — bleeds to the very top edge of the device.
-                // The `.ignoresSafeArea` on the ScrollView below pushes this whole
-                // column up under the (transparent) navigation bar.
+                // Cover card, on the same margins as the text.
                 heroImage(article: article)
+                    .padding(.horizontal, bodyHPadding)
+                    .padding(.top, 8)
                     .padding(.bottom, 20)
 
                 VStack(alignment: .leading, spacing: 14) {
@@ -144,7 +142,7 @@ struct QuidArticleView: View {
 
                     // Body
                     if !blocks.isEmpty {
-                        bodyContent
+                        bodyContent(contentWidth: contentWidth)
                             .padding(.top, 4)
                     } else {
                         ProgressView(tr("addons.quid.loading", fallback: "Caricamento…"))
@@ -170,15 +168,12 @@ struct QuidArticleView: View {
                         .padding(.top, 20)
                     }
                 }
-                .frame(width: screenContentWidth, alignment: .leading)
+                .frame(width: contentWidth, alignment: .leading)
                 .padding(.horizontal, bodyHPadding)
                 .padding(.bottom, 32)
             }
-            .frame(width: deviceWidth, alignment: .leading)
+            .frame(width: containerWidth, alignment: .leading)
         }
-        // Push the entire scroll content up under the (transparent) navigation bar
-        // and the device top safe area so the hero image bleeds to the very top.
-        .ignoresSafeArea(.container, edges: .top)
     }
 
     // MARK: - Byline row with newsprint rules
@@ -204,7 +199,7 @@ struct QuidArticleView: View {
     // MARK: - Body content (with drop cap + pull-quotes)
 
     @ViewBuilder
-    private var bodyContent: some View {
+    private func bodyContent(contentWidth: CGFloat) -> some View {
         // Determine whether the first text block is eligible for a drop cap.
         let dropCapIndex: Int? = firstDropCapEligibleIndex()
 
@@ -233,7 +228,7 @@ struct QuidArticleView: View {
                     pullQuote(attr)
 
                 case .image(let url, let alt):
-                    inlineImage(url: url, alt: alt)
+                    inlineImage(url: url, alt: alt, width: contentWidth)
                 }
             }
         }
@@ -287,14 +282,14 @@ struct QuidArticleView: View {
 
     /// Inline image with optional italic caption (newspaper-style).
     ///
-    /// Width is bound to the scroll container's width minus body padding via
-    /// `containerRelativeFrame(.horizontal)`. The simpler `.frame(maxWidth: .infinity)`
+    /// Width is bound to the scroll container's width minus body padding
+    /// (`contentWidth`). The simpler `.frame(maxWidth: .infinity)`
     /// did NOT work because the SwiftUI propagation chain
     ///   ScrollView → VStack(.leading) → VStack(.leading) → resizable image
     /// has no enforced upper bound: a `.leading` VStack adopts its widest child's
     /// intrinsic width, so a big image dragged the whole column wider than the screen.
     @ViewBuilder
-    private func inlineImage(url: URL, alt: String?) -> some View {
+    private func inlineImage(url: URL, alt: String?, width: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             CachedAsyncImage(url: url) { img in
                 img.resizable()
@@ -304,7 +299,7 @@ struct QuidArticleView: View {
                     .fill(Color.secondary.opacity(0.12))
                     .aspectRatio(16/9, contentMode: .fit)
             }
-            .frame(width: screenContentWidth)
+            .frame(width: width)
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
             .accessibilityLabel(Text(alt ?? ""))
 
@@ -333,51 +328,23 @@ struct QuidArticleView: View {
         return nil
     }
 
-    // MARK: - Hero (parallax stretchy, mirrors EventDetailView)
+    // MARK: - Hero card
 
-    @ViewBuilder
+    /// The cover as a Liquid Glass card (see `GlassCoverCard`), like the
+    /// event poster.
     private func heroImage(article: QuidArticle) -> some View {
         let coverURL: URL? = {
             guard let raw = article.coverImageUrl, !raw.isEmpty else { return nil }
             return URL(string: raw)
         }()
-
-        GeometryReader { geo in
-            let minY = geo.frame(in: .global).minY
-            let stretch = max(0, minY) // grows when user pulls the scroll down
-            ZStack(alignment: .bottom) {
-                Group {
-                    if let coverURL {
-                        CachedAsyncImage(url: coverURL) { img in
-                            img.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            AppTheme.brandGradient
-                        }
-                    } else {
-                        AppTheme.brandGradient
-                            .overlay(
-                                Image(systemName: "magazine.fill")
-                                    .font(.system(size: 48, weight: .semibold))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            )
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-                .clipped()
-
-                // Subtle bottom-fade so the page title below sits on a darker
-                // base — matches the EventDetailView treatment.
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.45)],
-                    startPoint: .top, endPoint: .bottom
+        return GlassCoverCard(url: coverURL) {
+            AppTheme.brandGradient
+                .overlay(
+                    Image(systemName: "magazine.fill")
+                        .font(.system(size: 48, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.85))
                 )
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-            }
-            .frame(width: geo.size.width, height: geo.size.height + stretch)
-            .clipped()
-            .offset(y: -stretch)
         }
-        .frame(height: 360)
     }
 
     // MARK: - Helpers

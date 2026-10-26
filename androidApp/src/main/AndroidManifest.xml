@@ -133,6 +133,20 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="mensa" />
             </intent-filter>
+
+            <!-- App Links: i QR dei francobolli e i link condivisi degli eventi
+                 (https://svc.mensa.it/links/stamp/…, /links/event/…). Il server
+                 pubblica gia' assetlinks.json con l'impronta della firma di
+                 release; senza questo filtro il link apriva il browser. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="svc.mensa.it"
+                    android:pathPrefix="/links/" />
+            </intent-filter>
         </activity>
 
         <!-- Media3 playback service -->

@@ -143,6 +143,7 @@ struct MembersDirectoryView: View {
                             .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 2, trailing: 16))
+                            .listRowBackground(Color.clear)
                             .id(section.letter)
 
                         ForEach(section.members, id: \.id) { member in
@@ -155,6 +156,9 @@ struct MembersDirectoryView: View {
                             }
                             .listRowSeparator(.visible, edges: .bottom)
                             .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 22))
+                            // A plain list paints every row white even with its
+                            // own background hidden: let the page's show through.
+                            .listRowBackground(Color.clear)
                         }
                     }
                 }

@@ -304,7 +304,7 @@ private val ProfileHeroShape = GenericShape { size, _ ->
     close()
 }
 
-// ─── Name / line / initial derivation — mirrors CardScreen fallback chain ─────
+// ─── Name / line / initial derivation — same fallback chain as the old Card tab
 
 private fun deriveDisplayName(user: UserModel?): String {
     if (user == null) return "Socio Mensa"

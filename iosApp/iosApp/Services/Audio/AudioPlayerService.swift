@@ -52,6 +52,10 @@ final class AudioPlayerService: NSObject, ObservableObject {
     @Published private(set) var queue: [AudioTrack] = []
     @Published private(set) var currentIndex: Int = 0
 
+    /// Spoken-audio speed, kept across tracks like Podcasts does.
+    @Published private(set) var playbackRate: Float = 1
+    static let playbackRates: [Float] = [0.75, 1, 1.25, 1.5, 1.75, 2]
+
     var hasNext: Bool { currentIndex < queue.count - 1 }
     var hasPrevious: Bool { currentIndex > 0 }
     var upNext: [AudioTrack] { Array(queue.dropFirst(currentIndex + 1)) }
@@ -177,6 +181,14 @@ final class AudioPlayerService: NSObject, ObservableObject {
         seek(to: currentTime - seconds)
     }
 
+    func setPlaybackRate(_ rate: Float) {
+        playbackRate = rate
+        // `defaultRate` is what `play()` resumes at; `rate` changes it now.
+        player?.defaultRate = rate
+        if isPlaying { player?.rate = rate }
+        nowPlaying.update()
+    }
+
     func presentFullPlayer() {
         guard currentTrack != nil else { return }
         isPresentingFullPlayer = true
@@ -200,15 +212,26 @@ final class AudioPlayerService: NSObject, ObservableObject {
 
         currentTrack = track
         activateSessionIfNeeded()
-
-        let item = AVPlayerItem(url: track.audioURL)
-        player = AVPlayer(playerItem: item)
-
-        observeItem(item)
-        observeRate()
-
-        player?.play()
         nowPlaying.configure(track: track)
+
+        // Our files are only served to authenticated requests, and AVPlayer
+        // can't send headers: play the signed link the backend redirects to.
+        // Without it the backend answers 404 and the item just fails.
+        Task { [weak self] in
+            let url = await MensaAuth.playableURL(for: track.audioURL)
+            guard let self, self.currentTrack?.id == track.id, self.player == nil else { return }
+            guard let url else {
+                self.stop()
+                return
+            }
+            let item = AVPlayerItem(url: url)
+            self.player = AVPlayer(playerItem: item)
+            self.observeItem(item)
+            self.observeRate()
+            self.player?.defaultRate = self.playbackRate
+            self.player?.play()
+            self.nowPlaying.update()
+        }
     }
 
     private func activateSessionIfNeeded() {
@@ -332,13 +355,16 @@ final class AudioNowPlayingCenter {
         registerCommandsOnce()
         buildInfo(track: track)
         if let url = track.artworkURL {
+            // With the Bearer, like every other file of ours (`MensaAuth`).
             Task { [weak self] in
-                guard let self else { return }
-                if let data = try? Data(contentsOf: url),
-                   let image = UIImage(data: data) {
-                    self.artworkCache = image
-                    self.update()
-                }
+                let request = MensaAuth.request(url: url, timeoutInterval: 30)
+                guard let (data, _) = try? await URLSession.shared.data(
+                    for: request,
+                    delegate: MensaRedirectAuthStripper.shared
+                ), let image = UIImage(data: data) else { return }
+                guard let self, self.artworkURL == url else { return }
+                self.artworkCache = image
+                self.update()
             }
         }
     }
@@ -352,7 +378,7 @@ final class AudioNowPlayingCenter {
         guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo,
               let player else { return }
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime
-        info[MPNowPlayingInfoPropertyPlaybackRate] = player.isPlaying ? 1.0 : 0.0
+        info[MPNowPlayingInfoPropertyPlaybackRate] = player.isPlaying ? Double(player.playbackRate) : 0.0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
@@ -363,7 +389,8 @@ final class AudioNowPlayingCenter {
             MPMediaItemPropertyArtist: track.subtitle,
             MPMediaItemPropertyPlaybackDuration: track.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime,
-            MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? 1.0 : 0.0
+            MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? Double(player.playbackRate) : 0.0,
+            MPNowPlayingInfoPropertyDefaultPlaybackRate: Double(player.playbackRate)
         ]
         if let cachedImage = artworkCache {
             let artwork = MPMediaItemArtwork(boundsSize: CGSize(width: 600, height: 600)) { _ in cachedImage }

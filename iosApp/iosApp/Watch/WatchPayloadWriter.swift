@@ -102,7 +102,7 @@ final class WatchPayloadWriter: NSObject {
         let fullName = user.name.isEmpty ? user.username : user.name
         let expiryFormatted = formatAppDate(user.expireMembership)
         let isActive: Bool = {
-            // Stessa euristica di CardView: scadenza nel futuro = attiva.
+            // Come la sezione Iscrizione in Home: scadenza nel futuro = attiva.
             let nowSec = Int64(Date().timeIntervalSince1970)
             return user.expireMembership.epochSeconds > nowSec
         }()

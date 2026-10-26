@@ -366,11 +366,7 @@ struct SigListView: View {
                 Button {
                     showCreate = true
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .accessibilityLabel(Text(tr(
-                            "sigs.action.add",
-                            fallback: "Aggiungi community"
-                        )))
+                    Label(tr("sigs.action.add", fallback: "Aggiungi community"), systemImage: "plus.circle.fill")
                 }
                 .tint(AppTheme.Colors.brandTintAdaptive)
             }
@@ -392,13 +388,12 @@ struct SigListView: View {
                     }
                 }
             } label: {
-                Image(systemName: filter == .all
-                      ? "line.3.horizontal.decrease.circle"
-                      : "line.3.horizontal.decrease.circle.fill")
-                    .accessibilityLabel(Text(tr(
-                        "community.filter.label",
-                        fallback: "Filtra gruppi"
-                    )))
+                Label(
+                    tr("community.filter.label", fallback: "Filtra gruppi"),
+                    systemImage: filter == .all
+                        ? "line.3.horizontal.decrease.circle"
+                        : "line.3.horizontal.decrease.circle.fill"
+                )
             }
             .tint(AppTheme.Colors.brandTintAdaptive)
         }

@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.today._components.MembershipSection
 import it.mensa.app.features.today._components.NotificationsPreview
 import it.mensa.app.features.today._components.SectionLabel
 import it.mensa.app.support.FilesUrl
@@ -63,9 +64,10 @@ import org.koin.androidx.compose.koinViewModel
  *
  * Sections (matches Swift one-to-one):
  *  1. Greeting (avatar inside the M3 SearchBar — Gmail/Photos pattern)
- *  2. Membership card hero (distinctive brand element)
- *  3. Next event hero card
- *  4. Notifications preview (max 3 + "see all")
+ *  2. Membership card hero (tap flips it)
+ *  3. Membership: expiry, status, tickets (the former Card tab)
+ *  4. Next event hero card
+ *  5. Notifications preview (max 3 + "see all")
  *
  * Design language: M3 Expressive (not Liquid Glass) — tonal containers,
  * SectionHeader with kicker + emphasized title, Card components.
@@ -81,6 +83,7 @@ fun TodayScreen(
     onNotificationsClick: () -> Unit = {},
     onNotificationTap: (NotificationModel) -> Unit = {},
     onTableportClick: () -> Unit = {},
+    onTicketsClick: () -> Unit = {},
     onSearchTap: () -> Unit = {},
 ) {
     val viewModel: TodayViewModel = koinViewModel()
@@ -161,6 +164,8 @@ fun TodayScreen(
                         uiState = uiState,
                         onNavigateToTab = onNavigateToTab,
                         onEventClick = onEventClick,
+                        onTableportClick = onTableportClick,
+                        onTicketsClick = onTicketsClick,
                         onNotificationsClick = onNotificationsClick,
                         onNotificationTap = { notif ->
                             viewModel.markNotificationSeen(notif.id)
@@ -178,6 +183,8 @@ private fun TodayContent(
     uiState: TodayUiState,
     onNavigateToTab: (MainTab) -> Unit,
     onEventClick: (String) -> Unit,
+    onTableportClick: () -> Unit,
+    onTicketsClick: () -> Unit,
     onNotificationsClick: () -> Unit,
     onNotificationTap: (NotificationModel) -> Unit,
     modifier: Modifier = Modifier,
@@ -202,17 +209,26 @@ private fun TodayContent(
                         .padding(horizontal = 20.dp, vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    // The card lives here now (there's no Card tab any
+                    // more): tapping it flips it, as the Card page did.
                     MembershipCardHero(
                         fullName = fullName,
                         memberId = user.id,
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .clickable(
-                                onClick = { onNavigateToTab(MainTab.Card) },
-                                role = Role.Button,
-                            ),
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
+            }
+        }
+
+        item(key = "membership") {
+            val user = uiState.user
+            if (user != null) {
+                MembershipSection(
+                    user = user,
+                    onTableportClick = onTableportClick,
+                    onTicketsClick = onTicketsClick,
+                    modifier = Modifier.padding(horizontal = 20.dp).padding(top = 12.dp),
+                )
             }
         }
 

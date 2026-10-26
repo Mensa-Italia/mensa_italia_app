@@ -1,7 +1,6 @@
 package it.mensa.app.di
 
 import it.mensa.app.features.auth.LoginViewModel
-import it.mensa.app.features.card.CardViewModel
 import it.mensa.app.features.discover.DiscoverViewModel
 import it.mensa.app.features.locations.LocationSearchService
 import it.mensa.app.features.locations.NewLocationViewModel
@@ -75,7 +74,6 @@ val appModule = module {
     // ViewModels
     viewModel { RootViewModel(get()) }
     viewModel { LoginViewModel() }
-    viewModel { CardViewModel() }
     viewModel { DiscoverViewModel() }
     viewModel { TodayViewModel(get()) }
     viewModel { SearchViewModel(androidContext()) }

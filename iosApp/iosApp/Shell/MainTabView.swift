@@ -4,7 +4,7 @@ import Combine
 // toccava solo tipi Swift e non ne aveva bisogno.
 import Shared
 
-/// 5-tab shell with iOS 26 Liquid Glass tab bar.
+/// 4-tab shell with iOS 26 Liquid Glass tab bar.
 /// iOS 26 automatically applies the Liquid Glass style to TabView.
 struct MainTabView: View {
     @State private var selectedTab: AppTab = {
@@ -14,7 +14,8 @@ struct MainTabView: View {
             case "today": return .today
             case "discover": return .discover
             case "search": return .search
-            case "card": return .card
+            // The card lives in the Home tab now.
+            case "card": return .today
             case "profile": return .profile
             default: return .today
             }
@@ -28,6 +29,9 @@ struct MainTabView: View {
     /// the user is on.
     @State private var pushDestination: NotificationTarget?
 
+    /// Francobollo da confermare, arrivato da un link universale.
+    @State private var stampClaim: PendingStamp?
+
     /// Slot shared with `AppDelegate` for cold-launch taps that arrive before
     /// this view is mounted (mirrors Flutter `getInitialMessage`). We observe
     /// `target` so a tap that lands the value while we're already alive also
@@ -40,6 +44,7 @@ struct MainTabView: View {
     /// cadence and reset NavigationStack contents.
     @State private var hasAudioTrack: Bool = false
     @State private var isPresentingFullPlayer: Bool = false
+    @Namespace private var nowPlayingNamespace
 
     /// Live-measured bottom inset of the iOS 26 floating tab bar
     /// (tab-bar pill height + home-indicator). Captured by reading
@@ -89,6 +94,19 @@ struct MainTabView: View {
             if let target = pendingDeepLink.consume() {
                 pushDestination = target
             }
+            if let stamp = pendingDeepLink.consumeStamp() {
+                stampClaim = stamp
+            }
+        }
+        .onChange(of: pendingDeepLink.stamp) { _, newValue in
+            if newValue != nil, let stamp = pendingDeepLink.consumeStamp() {
+                stampClaim = stamp
+            }
+        }
+        .sheet(item: $stampClaim) { claim in
+            StampConfirmSheet(stampId: claim.stampId, code: claim.code) {
+                stampClaim = nil
+            }
         }
         .onChange(of: pendingDeepLink.target) { _, newValue in
             // Belt-and-braces: any push tap that lands a target while we're
@@ -122,7 +140,9 @@ struct MainTabView: View {
         // — so NavigationStack state is preserved across playback events.
         // Hardcoded bottom inset (`miniPlayerBottomInset`) clears the floating
         // tab bar's visual footprint.
-        if hasAudioTrack {
+        // From iOS 26.1 the player is the tab bar's own accessory instead
+        // (`MiniPlayerTabAccessory` on `tabShell`).
+        if hasAudioTrack && !MiniPlayerTabAccessory.usesSystemAccessory {
             MiniAudioPlayer()
                 .padding(.horizontal, 12)
                 .padding(.bottom, tabBarBottomInset + miniPlayerGap)
@@ -135,16 +155,10 @@ struct MainTabView: View {
                 tabBarBottomInset = newValue
             }
         }
-        // Sheet con detent `.large` — pattern Apple-canonical (Developer
-        // Forums 820932): l'esatta animazione Apple Music è private API,
-        // questo è il match più stretto possibile con SwiftUI puro.
-        .sheet(isPresented: $isPresentingFullPlayer) {
-            NowPlayingFullScreenView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(Color.black)
-                .presentationCornerRadius(28)
-        }
+        .modifier(NowPlayingPresentation(
+            isPresented: $isPresentingFullPlayer,
+            namespace: nowPlayingNamespace
+        ))
         .onReceive(
             AudioPlayerService.shared.$currentTrack
                 .map { $0 != nil }
@@ -166,7 +180,7 @@ struct MainTabView: View {
         }
     }
 
-    /// The 5-tab shell. iOS 18+ uses the `Tab` builder (needed for the
+    /// The 4-tab shell. iOS 18+ uses the `Tab` builder (needed for the
     /// `.search` role and the iOS 26 floating bar); iOS 17 falls back to the
     /// classic `.tabItem`/`.tag` syntax, which renders the same tabs.
     @ViewBuilder
@@ -177,49 +191,29 @@ struct MainTabView: View {
                     todayContent
                 }
                 Tab(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2", value: AppTab.discover) { // i18n
-                    NavigationStack {
-                        DiscoverView()
-                    }
+                    DiscoverView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
                 Tab(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass", value: AppTab.search, role: .search) { // i18n
-                    NavigationStack {
-                        SearchView()
-                    }
-                }
-                Tab(tr("app.tab.card", fallback: "Tessera"), systemImage: "person.text.rectangle", value: AppTab.card) { // i18n
-                    NavigationStack {
-                        CardView()
-                    }
+                    SearchView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
                 Tab(tr("app.tab.profile", fallback: "Profilo"), systemImage: "person.crop.circle", value: AppTab.profile) { // i18n
-                    NavigationStack {
-                        ProfileView()
-                    }
+                    ProfileView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
             }
+            .modifier(SearchTabActivation())
+            .modifier(MiniPlayerTabAccessory(isEnabled: hasAudioTrack))
         } else {
             TabView(selection: $selectedTab) {
                 todayContent
                     .tabItem { Label(tr("app.tab.today", fallback: "Oggi"), systemImage: "sparkles") } // i18n
                     .tag(AppTab.today)
-                NavigationStack {
-                    DiscoverView()
-                }
+                DiscoverView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 .tabItem { Label(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2") } // i18n
                 .tag(AppTab.discover)
-                NavigationStack {
-                    SearchView()
-                }
+                SearchView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 .tabItem { Label(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass") } // i18n
                 .tag(AppTab.search)
-                NavigationStack {
-                    CardView()
-                }
-                .tabItem { Label(tr("app.tab.card", fallback: "Tessera"), systemImage: "person.text.rectangle") } // i18n
-                .tag(AppTab.card)
-                NavigationStack {
-                    ProfileView()
-                }
+                ProfileView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 .tabItem { Label(tr("app.tab.profile", fallback: "Profilo"), systemImage: "person.crop.circle") } // i18n
                 .tag(AppTab.profile)
             }
@@ -273,6 +267,21 @@ private struct TabBarBottomInsetKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         let next = nextValue()
         if next > 0 { value = next }
+    }
+}
+
+/// Selecting the Search tab activates its search field. That is also what
+/// makes the tab prominent (`UITabBarController.prominentTabIdentifier`
+/// falls back to a search tab with `automaticallyActivatesSearch`), so
+/// iPhone Duo's vertical bar draws Search apart from the other tabs instead
+/// of inside the same capsule.
+private struct SearchTabActivation: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.tabViewSearchActivation(.searchTabSelection)
+        } else {
+            content
+        }
     }
 }
 

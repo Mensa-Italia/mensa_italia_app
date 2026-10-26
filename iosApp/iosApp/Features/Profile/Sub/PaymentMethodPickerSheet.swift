@@ -27,7 +27,7 @@ struct PaymentMethodPickerSheet: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: onDismiss) {
-                            Image(systemName: "xmark.circle.fill")
+                            Label(tr("app.close", fallback: "Chiudi"), systemImage: "xmark.circle.fill")
                                 .foregroundStyle(.secondary)
                         }
                     }

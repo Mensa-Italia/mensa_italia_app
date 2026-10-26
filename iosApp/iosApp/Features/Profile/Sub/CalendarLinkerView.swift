@@ -221,7 +221,7 @@ struct CalendarLinkerView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemBackground),
+        .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 16))
     }
 
@@ -241,7 +241,7 @@ struct CalendarLinkerView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(24)
-        .background(Color(.secondarySystemBackground),
+        .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 16))
     }
 

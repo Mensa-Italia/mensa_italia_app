@@ -2,7 +2,9 @@ import SwiftUI
 import Shared
 
 /// Entry point for the Quid magazine addon.
-/// Shows a vertical list of magazine issues (Numeri), each as a large cover card.
+/// Shows the magazine issues (Numeri), each as a large cover card: one column
+/// on a phone, as many as fit where there's room (unfolded iPhone Duo, iPad),
+/// so a cover never stretches to the full width of a wide screen.
 struct QuidIssuesView: View {
     @State private var issues: [QuidIssue] = []
     @State private var refreshing = false
@@ -11,7 +13,10 @@ struct QuidIssuesView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 20) {
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 240), spacing: 20, alignment: .top)],
+                spacing: 20
+            ) {
                 ForEach(Array(issues.enumerated()), id: \.element.id) { idx, issue in
                     // Destination inline: vedi commento in
                     // `PodcastsListView`. Stesso motivo (push ambiguo con

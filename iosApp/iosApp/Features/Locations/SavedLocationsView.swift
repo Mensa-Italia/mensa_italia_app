@@ -25,9 +25,8 @@ struct SavedLocationsView: View {
                     Button {
                         onAddClick()
                     } label: {
-                        Image(systemName: "plus")
+                        Label(tr("app.location.add", fallback: "Aggiungi"), systemImage: "plus")
                     }
-                    .accessibilityLabel(tr("app.location.add", fallback: "Aggiungi"))
                 }
             }
             .confirmationDialog(

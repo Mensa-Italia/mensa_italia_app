@@ -112,7 +112,7 @@ struct PodcastEpisodesView: View {
                         Label("Aggiungi alla coda", systemImage: "text.badge.plus")
                     }
                 } label: {
-                    Image(systemName: "play.circle.fill")
+                    Label(tr("addons.podcasts.play_menu", fallback: "Riproduci"), systemImage: "play.circle.fill")
                         .font(.system(size: 22))
                         .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
                 }

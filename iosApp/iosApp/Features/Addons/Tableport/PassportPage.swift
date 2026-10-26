@@ -28,305 +28,214 @@ enum PassportLayout {
     /// `gridThumb` deve restare identico fra griglia e prefetcher: l'URL e' la
     /// chiave di cache, e scaldare una misura per disegnarne un'altra rende il
     /// prefetch lavoro sprecato.
-    static let gridThumb = "320x0"
+    ///
+    /// Deve essere una misura dichiarata sul campo `stamp.image` del backend
+    /// (`0x50`, `0x250`, `0x500`): PocketBase ignora le altre e manda
+    /// l'originale. `320x0` non c'era, quindi ogni timbro arrivava a
+    /// 1024×1024, ~850 KB da scaricare e 4 MB decodificato: la memory cache ne
+    /// teneva una ventina e, sfogliando, i timbri si ricaricavano di continuo.
+    /// `0x500` pesa ~145 KB e 1 MB in memoria, nitido ai ~430 px a cui si
+    /// disegna.
+    static let gridThumb = "0x500"
     static let detailThumb = "800x0"
 }
 
-struct PassportInside: View {
+/// A phone's passport: every stamp in one scroll, in order, on a single
+/// parchment page. Paging six at a time made a long collection a chore to
+/// leaf through; the two-page book with its curl stays for the unfolded
+/// iPhone Duo (`PassportSpread`).
+///
+/// While it scrolls the stamps float: each trails the motion a little more
+/// the farther it is from the middle of the view, so the gaps between them
+/// stretch with the speed and settle back, wobbling, when the scroll stops.
+struct PassportStampScroll: View {
     let width: CGFloat
     let height: CGFloat
     let stamps: [StampUserModel]
-    let visible: Bool
     let stampsRevealed: Bool
     let onTapStamp: (StampUserModel) -> Void
+    /// The six-stamp page the scroll is at: what the prefetch warms around,
+    /// and the spread an unfolding iPhone Duo opens on.
     @Binding var currentPage: Int
-    @Binding var totalPages: Int
+    /// See `SinglePassportPage.insets`.
+    var insets = EdgeInsets()
 
-    private let stampsPerPage = PassportLayout.stampsPerPage
+    /// How far, in points, the stamps trail the scroll right now (signed).
+    @State private var drift: CGFloat = 0
 
-    @State private var dragAngle: Double = 0   // -180...0 forward, 0...180 backward
-    @State private var isDragging: Bool = false
-    @State private var hasInteracted: Bool = false
-    @State private var hintPhase: Int = 0       // 0 idle, 1 peek up
-    @State private var hintTask: Task<Void, Never>?
-    @State private var didHapticAt90: Bool = false
+    private static let columnSpacing: CGFloat = 16
+    private static let rowSpacing: CGFloat = 22
+    private static let sidePadding: CGFloat = 22
 
-    private var pages: [[StampUserModel]] {
-        guard !stamps.isEmpty else { return [[]] }
-        return stride(from: 0, to: stamps.count, by: stampsPerPage)
-            .map { Array(stamps[$0..<min($0 + stampsPerPage, stamps.count)]) }
+    /// Two across, inside the side insets.
+    private var stampSize: CGFloat {
+        let inner = width - insets.leading - insets.trailing - 2 * Self.sidePadding
+        return max(0, (inner - Self.columnSpacing) / 2)
     }
 
-    private var hasNext: Bool { currentPage < pages.count - 1 }
-    private var hasPrev: Bool { currentPage > 0 }
+    /// The bottom band the stamps fade out in: the ENTRY button's area and
+    /// a little above it.
+    private var fadeHeight: CGFloat { insets.bottom + 80 }
 
     var body: some View {
         ZStack {
-            // Underlay = the destination page. It's the page that the user
-            // will see once the current sheet has flipped away.
-            //   forward (dragAngle < 0)  → next page underneath
-            //   backward (dragAngle > 0) → previous page underneath (covered
-            //     by the returning sheet)
-            //   idle                     → current page (stable)
-            Group {
-                if dragAngle < 0, hasNext {
-                    pageView(at: currentPage + 1)
-                } else if dragAngle > 0, hasPrev {
-                    pageView(at: currentPage - 1)
-                } else {
-                    pageView(at: currentPage)
-                }
+            // The paper, edge to edge. With stamps it has no gold rule: they
+            // run the whole height of the phone, under the bars and the ENTRY
+            // button, rather than inside a window.
+            SinglePassportPage(
+                width: width, height: height, pageIndex: 0, totalPages: 1,
+                chunk: [], totalStamps: stamps.count, stampsRevealed: false,
+                onTapStamp: { _ in }, blank: !stamps.isEmpty,
+                outerRadius: 0, insets: insets, showsRule: stamps.isEmpty
+            )
+            if !stamps.isEmpty {
+                scroll.mask(bottomFade)
             }
-            .frame(width: width, height: height)
-
-            // Flipping page = the sheet currently being turned. Pivots on
-            // the LEFT EDGE (the spine of the passport).
-            if dragAngle != 0 || isDragging || hintPhase != 0 {
-                flippingPage
-            }
-
-            // Edge curl hint on the bottom-right corner (forward) and a
-            // smaller one on bottom-left if a previous page exists.
-            edgeCurlHints
-
-            // Tap zones near outer edges for tap-to-turn fallback.
-            HStack(spacing: 0) {
-                Color.clear
-                    .frame(width: 28)
-                    .contentShape(Rectangle())
-                    .onTapGesture { turnBackward() }
-                Spacer()
-                Color.clear
-                    .frame(width: 28)
-                    .contentShape(Rectangle())
-                    .onTapGesture { turnForward() }
-            }
-            .frame(width: width, height: height)
         }
         .frame(width: width, height: height)
-        .gesture(flipDrag)
-        .onChange(of: visible) { _, newValue in
-            if newValue { scheduleHint() } else { cancelHint() }
-        }
-        .onChange(of: pages.count) { _, newValue in
-            if totalPages != newValue { totalPages = newValue }
-        }
-        .onAppear {
-            if totalPages != pages.count { totalPages = pages.count }
-            if visible { scheduleHint() }
-        }
-        .onDisappear { cancelHint() }
     }
 
-    // MARK: - Page view
-
-    @ViewBuilder
-    private func pageView(at index: Int) -> some View {
-        let safeIndex = max(0, min(index, max(pages.count - 1, 0)))
-        let chunk = pages.indices.contains(safeIndex) ? pages[safeIndex] : []
-        let revealed = stampsRevealed || safeIndex != currentPage
-        SinglePassportPage(
-            width: width,
-            height: height,
-            pageIndex: safeIndex,
-            totalPages: pages.count,
-            chunk: chunk,
-            totalStamps: stamps.count,
-            stampsRevealed: revealed,
-            onTapStamp: onTapStamp
+    /// Stamps fade into the paper at the bottom, so they don't crowd the
+    /// ENTRY button floating over them.
+    private var bottomFade: some View {
+        let start = max(0, 1 - fadeHeight / max(height, 1))
+        return LinearGradient(
+            stops: [
+                .init(color: .black, location: 0),
+                .init(color: .black, location: start),
+                .init(color: .black.opacity(0.25), location: start + (1 - start) * 0.55),
+                .init(color: .clear, location: 1)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
         )
     }
 
-    // MARK: - Flipping page (true book flip, anchor LEFT)
-
-    private var flippingPage: some View {
-        let angle: Double
-        let frontIndex: Int
-        let backIndex: Int
-
-        if dragAngle < 0 {
-            // Forward: current page lifts from the right, rotates around
-            // the left edge from 0° to -180°. Front = current. Back face
-            // shows the *next* page (mirrored), so the user sees a real
-            // sheet flipping over onto the next.
-            angle = dragAngle
-            frontIndex = currentPage
-            backIndex  = min(currentPage + 1, max(pages.count - 1, 0))
-        } else if dragAngle > 0 {
-            // Backward: previous page comes BACK from behind the spine.
-            // Render at angle (dragAngle - 180) so it sweeps -180° → 0°.
-            // Front = previous (visible once we cross 90°). Back face shows
-            // the current page (mirrored) while it's still partly turned.
-            angle = dragAngle - 180
-            frontIndex = currentPage - 1
-            backIndex  = currentPage
-        } else {
-            // Hint peek
-            angle = (hintPhase == 1) ? -14 : 0
-            frontIndex = currentPage
-            backIndex  = min(currentPage + 1, max(pages.count - 1, 0))
-        }
-
-        let absAngle = abs(angle)
-        let showingFront = absAngle < 90
-        let lift = min(absAngle / 180.0, 1.0)
-
-        return ZStack {
-            // FRONT face (0..90°)
-            pageView(at: max(frontIndex, 0))
-                .overlay(
-                    LinearGradient(
-                        colors: [.black.opacity(lift * 0.28), .clear],
-                        startPoint: .leading, endPoint: .trailing
-                    )
-                    .allowsHitTesting(false)
-                )
-                .opacity(showingFront ? 1 : 0)
-
-            // BACK face (90..180°) — the next page peeking through, mirrored
-            // so when rotation passes 180° it reads correctly.
-            pageView(at: max(backIndex, 0))
-                .overlay(
-                    Rectangle()
-                        .fill(.black.opacity(0.06))
-                )
-                .scaleEffect(x: -1, y: 1)
-                .opacity(showingFront ? 0 : 1)
-        }
-        .frame(width: width, height: height)
-        .rotation3DEffect(
-            .degrees(angle),
-            axis: (x: 0, y: 1, z: 0),
-            anchor: .leading,
-            perspective: 0.6
-        )
-        .shadow(color: .black.opacity(lift * 0.42),
-                radius: 16, x: 6, y: 10)
-    }
-
-    // MARK: - Edge curl hints
-
-    @ViewBuilder
-    private var edgeCurlHints: some View {
-        ZStack {
-            if hasNext {
-                PageCurlCorner(size: hintPhase != 0 ? 36 : 32,
-                               opacity: hintPhase != 0 ? 0.9 : 0.5,
-                               corner: .bottomTrailing)
-                    .frame(width: width, height: height, alignment: .bottomTrailing)
-                    .opacity(hasInteracted ? 0 : 1)
-                    .animation(.easeOut(duration: 0.3), value: hasInteracted)
-                    .onTapGesture { turnForward() }
-            }
-            if hasPrev {
-                PageCurlCorner(size: 26, opacity: 0.4, corner: .bottomLeading)
-                    .frame(width: width, height: height, alignment: .bottomLeading)
-                    .onTapGesture { turnBackward() }
-            }
-        }
-        .frame(width: width, height: height)
-        .allowsHitTesting(true)
-    }
-
-    // MARK: - Gestures
-
-    private var flipDrag: some Gesture {
-        DragGesture(minimumDistance: 8)
-            .onChanged { value in
-                if !isDragging { isDragging = true }
-                if !hasInteracted { hasInteracted = true; cancelHint() }
-                let dx = value.translation.width
-                let raw = Double(dx / width) * 180.0
-                let clamped: Double
-                if raw < 0 {
-                    clamped = hasNext ? max(raw, -180) : max(raw * 0.25, -25)
-                } else {
-                    clamped = hasPrev ? min(raw, 180) : min(raw * 0.25, 25)
-                }
-                dragAngle = clamped
-                if !didHapticAt90, abs(clamped) > 90 {
-                    didHapticAt90 = true
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                }
-            }
-            .onEnded { value in
-                let dx = value.translation.width
-                let vx = value.predictedEndTranslation.width - value.translation.width
-                let pct = abs(dx) / width
-                let fast = abs(vx) > 80
-                let shouldComplete = pct > 0.45 || fast
-
-                isDragging = false
-                didHapticAt90 = false
-
-                if shouldComplete {
-                    if dx < 0, hasNext {
-                        completeFlip(to: -180) { currentPage += 1; dragAngle = 0 }
-                    } else if dx > 0, hasPrev {
-                        completeFlip(to: 180) { currentPage -= 1; dragAngle = 0 }
-                    } else {
-                        snapBack()
+    private var scroll: some View {
+        ScrollView {
+            VStack(spacing: 22) {
+                header
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: Self.columnSpacing),
+                        GridItem(.flexible(), spacing: Self.columnSpacing)
+                    ],
+                    spacing: Self.rowSpacing
+                ) {
+                    ForEach(Array(stamps.enumerated()), id: \.element.id) { index, stamp in
+                        stampView(stamp, at: index)
                     }
-                } else {
-                    snapBack()
                 }
             }
-    }
-
-    private func turnForward() {
-        guard hasNext else { return }
-        hasInteracted = true; cancelHint()
-        completeFlip(to: -180) { currentPage += 1; dragAngle = 0 }
-    }
-
-    private func turnBackward() {
-        guard hasPrev else { return }
-        hasInteracted = true; cancelHint()
-        completeFlip(to: 180) { currentPage -= 1; dragAngle = 0 }
-    }
-
-    private func completeFlip(to target: Double, finalize: @escaping () -> Void) {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        withAnimation(.spring(response: 0.55, dampingFraction: 0.78)) {
-            dragAngle = target
+            .padding(.leading, insets.leading + Self.sidePadding)
+            .padding(.trailing, insets.trailing + Self.sidePadding)
+            // Starts clear of the bars, ends clear of the button; in between
+            // the stamps scroll under both.
+            .padding(.top, insets.top + 12)
+            .padding(.bottom, insets.bottom + 24)
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            finalize()
-        }
+        .scrollIndicators(.hidden)
+        .ignoresSafeArea()
+        .modifier(DriftTracking(
+            drift: $drift,
+            currentPage: $currentPage,
+            rowHeight: stampSize + Self.rowSpacing
+        ))
     }
 
-    private func snapBack() {
-        withAnimation(.spring(response: 0.45, dampingFraction: 0.8)) {
-            dragAngle = 0
+    private var header: some View {
+        HStack {
+            Text(tr("addons.stamp.passport.collection", fallback: "COLLEZIONE"))
+                .tracking(3)
+            Spacer()
+            Text("№ \(String(format: "%03d", stamps.count))")
+                .tracking(2)
         }
+        .font(.system(size: 9, weight: .heavy, design: .serif))
+        .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.55))
     }
 
-    // MARK: - Hint orchestration
+    private func stampView(_ stamp: StampUserModel, at index: Int) -> some View {
+        let seed = deterministicSeed(stamp.id)
+        return PassportStampDecal(
+            url: stampImageURL(stamp),
+            size: stampSize,
+            rotation: (seed.angle - 0.5) * 14,
+            showsCancel: index % 3 == 0
+        )
+        .scaleEffect(stampsRevealed ? 1 : 0.7)
+        .opacity(stampsRevealed ? 1 : 0)
+        .animation(
+            .spring(response: 0.55, dampingFraction: 0.78).delay(Double(min(index, 6)) * 0.08),
+            value: stampsRevealed
+        )
+        .modifier(FloatingStamp(drift: drift, phase: seed.dx + 0.5))
+        .onTapGesture { onTapStamp(stamp) }
+    }
+}
 
-    private func scheduleHint() {
-        guard !hasInteracted, pages.count > 1 else { return }
-        cancelHint()
-        hintTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 600_000_000)
-            if hasInteracted { return }
-            withAnimation(.easeOut(duration: 0.6)) { hintPhase = 1 }
-            try? await Task.sleep(nanoseconds: 600_000_000)
-            if hasInteracted { return }
-            withAnimation(.easeInOut(duration: 0.45)) { hintPhase = 0 }
+/// Trails the scroll in proportion to the distance from the middle of the
+/// view, with a hint of tilt that differs per stamp.
+private struct FloatingStamp: ViewModifier {
+    let drift: CGFloat
+    /// 0…1, fixed per stamp: no two float alike.
+    let phase: Double
+
+    func body(content: Content) -> some View {
+        content.visualEffect { [drift, phase] content, proxy in
+            let viewport = proxy.bounds(of: .scrollView) ?? CGRect(origin: .zero, size: proxy.size)
+            // -0.5 at the top of the view, 0 in the middle, 0.5 at the bottom.
+            let position = (proxy.size.height / 2 - viewport.midY) / max(viewport.height, 1)
+            let reach = 0.8 + 0.4 * phase
+            return content
+                .offset(y: drift * position * 2 * reach)
+                .rotationEffect(.degrees(Double(drift) * 0.08 * (phase - 0.5)))
         }
     }
+}
 
-    private func cancelHint() {
-        hintTask?.cancel(); hintTask = nil
-        if hintPhase != 0 {
-            withAnimation(.easeOut(duration: 0.3)) { hintPhase = 0 }
+/// Drift from the scroll's speed, eased by a spring and let go with a
+/// looser one when the scroll stops, so the stamps bob back into line. Also
+/// reports the page the scroll is at. iOS 18 (scroll geometry and phase):
+/// before it the scroll is plain.
+private struct DriftTracking: ViewModifier {
+    @Binding var drift: CGFloat
+    @Binding var currentPage: Int
+    let rowHeight: CGFloat
+
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content
+                .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                    geometry.contentOffset.y + geometry.contentInsets.top
+                } action: { old, new in
+                    let target = max(-26, min(26, (new - old) * 1.4))
+                    withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.7)) {
+                        drift = target
+                    }
+                    let row = max(0, Int(new / max(rowHeight, 1)))
+                    let page = row * 2 / PassportLayout.stampsPerPage
+                    if page != currentPage { currentPage = page }
+                }
+                .onScrollPhaseChange { _, phase in
+                    if phase == .idle {
+                        withAnimation(.spring(response: 0.55, dampingFraction: 0.45)) { drift = 0 }
+                    }
+                }
+        } else {
+            content
         }
     }
+}
+
+private func stampImageURL(_ stamp: StampUserModel) -> URL? {
+    guard let r = stamp.stampRecord, !r.image.isEmpty else { return nil }
+    return Files.url(collection: "stamp", recordId: r.id, filename: r.image, thumb: PassportLayout.gridThumb)
 }
 
 // MARK: - SinglePassportPage (one parchment page, 6 stamps)
 
-private struct SinglePassportPage: View {
+struct SinglePassportPage: View {
     let width: CGFloat
     let height: CGFloat
     let pageIndex: Int
@@ -335,16 +244,64 @@ private struct SinglePassportPage: View {
     let totalStamps: Int
     let stampsRevealed: Bool
     let onTapStamp: (StampUserModel) -> Void
+    /// The bound edge. A two-page spread binds its left page on the trailing
+    /// edge (its top page on the bottom one, held upright) and squares the
+    /// corners on the spine, where the pages meet.
+    var spineEdge: Edge = .leading
+    var squareSpine: Bool = false
+    /// The page after the last stamps of a spread: parchment only, no page
+    /// number and no "no stamps yet" hint.
+    var blank: Bool = false
+    /// Corner radius away from the spine. 0 when the page fills the screen
+    /// edge to edge: the display's own corners round it.
+    var outerRadius: CGFloat = 18
+    /// Where the page runs under something (status bar, camera, bars, the
+    /// hinge, the ENTRY button): the paper goes there, its contents don't.
+    var insets = EdgeInsets()
+    /// The gold rule framing the page's contents. Off under a scroll that
+    /// runs past the page's edges.
+    var showsRule = true
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
+    /// The six stamps go two across and three down on an upright page, three
+    /// across and two down on a page lying on its side (an upright, unfolded
+    /// iPhone Duo stacks two such pages).
+    private var columnCount: Int { width > height * 1.15 ? 3 : 2 }
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 12), count: columnCount)
+    }
+
+    /// Sized to fit both ways inside the grid's padding. Sized by width
+    /// alone, three rows outgrew a passport-proportioned page, so the page
+    /// drew taller than its frame (and than the cover).
+    private var stampSize: CGFloat {
+        let cols = CGFloat(columnCount)
+        let rows = CGFloat(PassportLayout.stampsPerPage / columnCount)
+        let byWidth = (width - insets.leading - insets.trailing - 64 - 12 * (cols - 1)) / cols
+        let byHeight = (height - insets.top - insets.bottom - 56 - 50 - 14 * (rows - 1)) / rows
+        return max(0, min(byWidth, byHeight))
+    }
+
+    private var pageShape: UnevenRoundedRectangle {
+        let outer = outerRadius
+        let spine: CGFloat = squareSpine ? min(2, outer) : outer
+        func radius(_ edges: Edge...) -> CGFloat { edges.contains(spineEdge) ? spine : outer }
+        return UnevenRoundedRectangle(
+            topLeadingRadius: radius(.top, .leading),
+            bottomLeadingRadius: radius(.bottom, .leading),
+            bottomTrailingRadius: radius(.bottom, .trailing),
+            topTrailingRadius: radius(.top, .trailing),
+            style: .continuous
+        )
+    }
 
     var body: some View {
         ZStack {
-            // Parchment background
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            // Parchment background, on solid paper: the gradient's middle
+            // stop is translucent, and a page curling up showed through it.
+            pageShape
+                .fill(PassportPalette.parchment)
+            pageShape
                 .fill(
                     LinearGradient(
                         colors: [
@@ -372,47 +329,56 @@ private struct SinglePassportPage: View {
                     )
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(pageShape)
             .allowsHitTesting(false)
 
             // Watermark "M"
             Text("M")
-                .font(.system(size: width * 0.7, weight: .black, design: .serif))
+                .font(.system(size: min(width, height) * 0.7, weight: .black, design: .serif))
                 .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.05))
                 .allowsHitTesting(false)
 
             // Gold rule inset
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(PassportPalette.gold.opacity(0.55), lineWidth: 0.8)
-                .padding(12)
-                .allowsHitTesting(false)
+            if showsRule {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(PassportPalette.gold.opacity(0.55), lineWidth: 0.8)
+                    .padding(12)
+                    .padding(insets)
+                    .allowsHitTesting(false)
+            }
 
             // Header + footer chrome
-            VStack {
-                HStack {
-                    Text(tr("addons.stamp.passport.collection", fallback: "COLLEZIONE"))
-                        .font(.system(size: 9, weight: .heavy, design: .serif))
-                        .tracking(3)
-                        .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.55))
+            if !blank {
+                VStack {
+                    HStack {
+                        Text(tr("addons.stamp.passport.collection", fallback: "COLLEZIONE"))
+                            .font(.system(size: 9, weight: .heavy, design: .serif))
+                            .tracking(3)
+                            .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.55))
+                        Spacer()
+                        Text("№ \(String(format: "%03d", totalStamps))")
+                            .font(.system(size: 9, weight: .heavy, design: .serif))
+                            .tracking(2)
+                            .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.55))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 22)
                     Spacer()
-                    Text("№ \(String(format: "%03d", totalStamps))")
-                        .font(.system(size: 9, weight: .heavy, design: .serif))
+                    Text("· \(pageIndex + 1) / \(max(totalPages, 1)) ·")
+                        .font(.system(size: 9, weight: .semibold, design: .serif))
                         .tracking(2)
-                        .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.55))
+                        .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.45))
+                        .padding(.bottom, 22)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 22)
-                Spacer()
-                Text("· \(pageIndex + 1) / \(max(totalPages, 1)) ·")
-                    .font(.system(size: 9, weight: .semibold, design: .serif))
-                    .tracking(2)
-                    .foregroundStyle(AppTheme.Colors.mensaBlue.opacity(0.45))
-                    .padding(.bottom, 22)
+                .padding(insets)
             }
 
             // Stamps 3×2 grid (6 per page)
-            if chunk.isEmpty {
+            if blank {
+                EmptyView()
+            } else if chunk.isEmpty {
                 emptyPlaceholder
+                    .padding(insets)
             } else {
                 LazyVGrid(columns: columns, spacing: 14) {
                     ForEach(Array(chunk.enumerated()), id: \.element.id) { idx, stamp in
@@ -420,7 +386,7 @@ private struct SinglePassportPage: View {
                         let rotation = (seed.angle - 0.5) * 14
                         PassportStampDecal(
                             url: imageURL(for: stamp),
-                            size: (width - 76) / 2,
+                            size: stampSize,
                             rotation: rotation,
                             showsCancel: (pageIndex + idx) % 3 == 0
                         )
@@ -437,9 +403,10 @@ private struct SinglePassportPage: View {
                 .padding(.horizontal, 28)
                 .padding(.top, 56)
                 .padding(.bottom, 50)
+                .padding(insets)
             }
 
-            // SPINE on the LEFT edge of the page — soft inner shadow + tiny
+            // SPINE on the bound edge of the page — soft inner shadow + tiny
             // gold thread stitches. NO cobalt, no leather strip.
             spineDecor
                 .allowsHitTesting(false)
@@ -464,35 +431,38 @@ private struct SinglePassportPage: View {
     }
 
     private var spineDecor: some View {
-        HStack(spacing: 0) {
-            ZStack {
-                // Inner shadow gradient falling onto the page from the spine.
-                LinearGradient(
-                    colors: [.black.opacity(0.28), .clear],
-                    startPoint: .leading, endPoint: .trailing
-                )
-                .frame(width: 22)
-
-                // Gold thread stitches — three tiny capsules anchored close
-                // to the binding edge to suggest the sewing of a real book.
-                VStack(spacing: 60) {
-                    stitch()
-                    stitch()
-                    stitch()
-                }
-                .padding(.leading, 5)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(width: 22)
-            Spacer()
+        let alongSide = spineEdge == .leading || spineEdge == .trailing
+        let (from, to, alignment): (UnitPoint, UnitPoint, Alignment) = switch spineEdge {
+        case .leading: (.leading, .trailing, .leading)
+        case .trailing: (.trailing, .leading, .trailing)
+        case .top: (.top, .bottom, .top)
+        case .bottom: (.bottom, .top, .bottom)
         }
-        .frame(width: width, height: height)
+        return ZStack(alignment: alignment) {
+            // Inner shadow gradient falling onto the page from the spine.
+            LinearGradient(colors: [.black.opacity(0.28), .clear], startPoint: from, endPoint: to)
+
+            // Gold thread stitches — three tiny capsules anchored close
+            // to the binding edge to suggest the sewing of a real book.
+            Group {
+                if alongSide {
+                    VStack(spacing: 60) { stitch(across: true); stitch(across: true); stitch(across: true) }
+                } else {
+                    HStack(spacing: 60) { stitch(across: false); stitch(across: false); stitch(across: false) }
+                }
+            }
+            .padding(Edge.Set(spineEdge), 5)
+        }
+        .frame(width: alongSide ? 22 : nil, height: alongSide ? nil : 22)
+        .frame(width: width, height: height, alignment: alignment)
     }
 
-    private func stitch() -> some View {
+    /// A stitch crosses the spine: horizontal on a side spine, vertical on
+    /// one along the top or bottom.
+    private func stitch(across horizontal: Bool) -> some View {
         Capsule()
             .fill(PassportPalette.gold.opacity(0.85))
-            .frame(width: 6, height: 1.4)
+            .frame(width: horizontal ? 6 : 1.4, height: horizontal ? 1.4 : 6)
             .shadow(color: PassportPalette.goldDeep.opacity(0.6), radius: 0.5, x: 0, y: 0.5)
     }
 
@@ -514,54 +484,3 @@ private func deterministicSeed(_ id: String) -> Seed {
     return Seed(angle: a, dx: b - 0.5, dy: c - 0.5)
 }
 
-// MARK: - Page curl corner (decorative + tap target)
-
-private struct PageCurlCorner: View {
-    let size: CGFloat
-    let opacity: Double
-    enum Corner { case bottomTrailing, bottomLeading }
-    let corner: Corner
-
-    var body: some View {
-        Canvas { ctx, canvasSize in
-            var path = Path()
-            switch corner {
-            case .bottomTrailing:
-                path.move(to: CGPoint(x: canvasSize.width, y: canvasSize.height))
-                path.addLine(to: CGPoint(x: canvasSize.width - size, y: canvasSize.height))
-                path.addQuadCurve(
-                    to: CGPoint(x: canvasSize.width, y: canvasSize.height - size),
-                    control: CGPoint(x: canvasSize.width - size * 0.4,
-                                     y: canvasSize.height - size * 0.4)
-                )
-            case .bottomLeading:
-                path.move(to: CGPoint(x: 0, y: canvasSize.height))
-                path.addLine(to: CGPoint(x: size, y: canvasSize.height))
-                path.addQuadCurve(
-                    to: CGPoint(x: 0, y: canvasSize.height - size),
-                    control: CGPoint(x: size * 0.4, y: canvasSize.height - size * 0.4)
-                )
-            }
-            path.closeSubpath()
-            let grad = Gradient(colors: [
-                PassportPalette.parchmentEdge.opacity(opacity),
-                PassportPalette.parchment.opacity(opacity * 0.6),
-                Color.black.opacity(opacity * 0.35)
-            ])
-            ctx.fill(path, with: .linearGradient(
-                grad,
-                startPoint: corner == .bottomTrailing
-                    ? CGPoint(x: canvasSize.width - size, y: canvasSize.height - size)
-                    : CGPoint(x: size, y: canvasSize.height - size),
-                endPoint: corner == .bottomTrailing
-                    ? CGPoint(x: canvasSize.width, y: canvasSize.height)
-                    : CGPoint(x: 0, y: canvasSize.height)
-            ))
-            ctx.stroke(path, with: .color(PassportPalette.goldDeep.opacity(opacity * 0.5)),
-                       lineWidth: 0.6)
-        }
-        .frame(width: size, height: size)
-        .allowsHitTesting(true)
-        .contentShape(Rectangle())
-    }
-}

@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>it.mensa.app.spotlight-refresh</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -35,16 +39,16 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>maps</string>
+	</array>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Mensa Italia chiede accesso al tuo calendario per aggiungere eventi che ti interessano.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Mensa Italia usa la fotocamera per scansionare i QR dei francobolli Tableport.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Mensa Italia usa la tua posizione per mostrarti eventi vicini sulla mappa.</string>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>it.mensa.app.spotlight-refresh</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

@@ -562,7 +562,7 @@ struct AddEventView: View {
                 Button(role: .destructive) {
                     showDeleteConfirm = true
                 } label: {
-                    Image(systemName: "trash")
+                    Label(tr("app.delete", fallback: "Elimina"), systemImage: "trash")
                 }
                 .disabled(vm.saving)
             }

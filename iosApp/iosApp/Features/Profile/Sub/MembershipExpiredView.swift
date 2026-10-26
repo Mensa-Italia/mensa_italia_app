@@ -18,8 +18,17 @@ struct MembershipExpiredView: View {
     /// Esito dell'ultimo "Ho rinnovato". Nessun caso "andata bene": se il
     /// rinnovo risulta, `RootView` cambia fase e questa view sparisce, quindi
     /// un messaggio di successo non farebbe in tempo a vedersi.
-    private enum RecheckOutcome { case stillExpired, unreachable }
+    private enum RecheckOutcome { case stillExpired, unreachable, needsPassword, wrongPassword }
     @State private var recheck: RecheckOutcome?
+
+    /// Password dell'area soci, chiesta solo quando la scadenza arriva dal
+    /// database e non dal portale (vedi `AuthRepository.recheckMembership`).
+    @State private var password = ""
+    @FocusState private var passwordFocused: Bool
+
+    private var asksPassword: Bool {
+        recheck == .needsPassword || recheck == .wrongPassword
+    }
 
     private var renewURL: URL? { URL(string: Membership.shared.RENEWAL_URL) }
 
@@ -68,6 +77,7 @@ struct MembershipExpiredView: View {
                     renewButton
                     recheckButton
                     recheckNotice
+                    if asksPassword { passwordForm }
 
                     Button {
                         guard !loggingOut else { return }
@@ -109,13 +119,78 @@ struct MembershipExpiredView: View {
         case .unreachable:
             return tr("app.renew.gate.unreachable",
                       fallback: "Non riesco a contattare il server. Controlla la connessione e riprova.")
+        case .needsPassword:
+            return tr("app.renew.gate.needs_password",
+                      fallback: "Sul portale risulti in regola? L'app rilegge la scadenza dall'area soci solo quando accedi con la password. Scrivila qui sotto per aggiornarla.")
+        case .wrongPassword:
+            return tr("app.renew.gate.wrong_password",
+                      fallback: "Password non accettata. È quella con cui entri nell'area soci.")
         }
     }
 
     private func noticeIcon(_ outcome: RecheckOutcome) -> String {
         switch outcome {
-        case .stillExpired: return "clock.badge.exclamationmark"
-        case .unreachable:  return "wifi.exclamationmark"
+        case .stillExpired:  return "clock.badge.exclamationmark"
+        case .unreachable:   return "wifi.exclamationmark"
+        case .needsPassword: return "key.fill"
+        case .wrongPassword: return "exclamationmark.lock.fill"
+        }
+    }
+
+    private func outcome(_ result: MembershipRecheck) -> RecheckOutcome? {
+        switch result {
+        case .renewed:        return nil
+        case .stillExpired:   return .stillExpired
+        case .needsPassword:  return .needsPassword
+        case .wrongPassword:  return .wrongPassword
+        default:              return .unreachable
+        }
+    }
+
+    private var passwordForm: some View {
+        VStack(spacing: 12) {
+            SecureField(
+                "",
+                text: $password,
+                prompt: Text(tr("app.renew.gate.password_placeholder", fallback: "Password dell'area soci"))
+                    .foregroundStyle(.white.opacity(0.6))
+            )
+            .textContentType(.password)
+            .focused($passwordFocused)
+            .submitLabel(.go)
+            .onSubmit(submitPassword)
+            .foregroundStyle(.white)
+            .padding(14)
+            .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
+
+            Button(action: submitPassword) {
+                HStack(spacing: 10) {
+                    if checking {
+                        ProgressView().tint(AppTheme.Colors.mensaBlue).controlSize(.small)
+                    }
+                    Text(tr("app.renew.gate.password_submit", fallback: "Aggiorna la scadenza"))
+                        .fontWeight(.semibold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(.white, in: RoundedRectangle(cornerRadius: AppTheme.Radius.button))
+                .foregroundStyle(AppTheme.Colors.mensaBlue)
+            }
+            .disabled(checking || password.isEmpty)
+            .opacity(password.isEmpty ? 0.6 : 1)
+        }
+    }
+
+    private func submitPassword() {
+        guard !checking, !password.isEmpty else { return }
+        checking = true
+        passwordFocused = false
+        let typed = password
+        Task {
+            let result = (try? await koin.auth.recheckMembershipWithPassword(password: typed)) ?? .unreachable
+            recheck = outcome(result)
+            if recheck == .wrongPassword { password = "" }
+            checking = false
         }
     }
 
@@ -177,22 +252,15 @@ struct MembershipExpiredView: View {
             checking = true
             recheck = nil
             Task {
-                // `reloadUser` rifà il login per intero quando le credenziali
-                // ci sono — email e password rimandate a
-                // `/api/cs/auth-with-zitadel`, come uscire e rientrare — e
-                // ricade su `/api/cs/me` per chi è entrato con la passkey.
-                // Torna il record se il server ha risposto, anche quando
-                // risponde "ancora scaduta", e nil solo se non si è letto
-                // niente: sono due esiti diversi e vanno detti, altrimenti il
-                // tasto sembra morto.
-                let refreshed = try? await koin.auth.reloadUser()
-                if refreshed == nil {
-                    recheck = .unreachable
-                } else if Membership.shared.isExpired(user: refreshed) {
-                    recheck = .stillExpired
-                }
-                // Se non è più scaduta non si imposta niente: RootView rivaluta
-                // la fase sul nuovo `currentUser` e smonta questa schermata.
+                // Rifà il login per intero quando le credenziali ci sono, che è
+                // l'unico modo in cui il backend rilegge la scadenza dal
+                // portale. Senza (passkey, password cambiata) il dato è quello
+                // del database e l'esito lo dice: si chiede la password invece
+                // di ripetere "non risulta ancora" per sempre.
+                let result = (try? await koin.auth.recheckMembership()) ?? .unreachable
+                // Se non è più scaduta l'esito è nil: RootView rivaluta la fase
+                // sul nuovo `currentUser` e smonta questa schermata.
+                recheck = outcome(result)
                 checking = false
             }
         } label: {

@@ -10,7 +10,6 @@ enum DiscoverRoute: Hashable {
     case members
     case addonsHub
     case documents
-    case tableport
     case quid
     case podcasts
     case testAssistant
@@ -18,7 +17,14 @@ enum DiscoverRoute: Hashable {
     case localOffices
 }
 
+/// Settings-style index of the app's sections. Compact width (iPhone, iPhone
+/// Duo folded) is a plain list that pushes each section; regular width
+/// (iPhone Duo unfolded, iPad) keeps the list as a sidebar with the chosen
+/// section beside it, like Settings does. Owns its own navigation container,
+/// so don't wrap it in a NavigationStack.
 struct DiscoverView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var selection: DiscoverRoute?
     @State private var notificationsSub: Closeable?
     @State private var unreadNotificationsCount: Int = 0
 
@@ -31,7 +37,49 @@ struct DiscoverView: View {
     }
 
     var body: some View {
-        List {
+        NavigationSplitView {
+            sidebar
+        } detail: {
+            // One stack per section, so switching section drops whatever was
+            // pushed inside the previous one.
+            NavigationStack {
+                if let selection {
+                    destination(for: selection)
+                }
+            }
+            .id(selection)
+        }
+        .onChange(of: horizontalSizeClass, initial: true) { _, sizeClass in
+            // Side by side, open on the first section like Settings does.
+            // Collapsed that would push it straight away, so only with room.
+            if sizeClass == .regular, selection == nil {
+                selection = .events
+            }
+            // Collapsing (iPhone Duo turned upright) would push that default
+            // section over the index: back to the index instead.
+            if sizeClass == .compact, selection == .events {
+                selection = nil
+            }
+        }
+        .task {
+            // Subscribe to notifications flow to track unread count for badge.
+            notificationsSub?.close()
+            let notifFlow = koin.notifications.observeAll() as Kotlinx_coroutines_coreFlow
+            notificationsSub = subscribeFlow(notifFlow) { (list: NSArray) in
+                Task { @MainActor in
+                    let notifications = (list as? [NotificationModel]) ?? []
+                    self.unreadNotificationsCount = notifications.filter { $0.seen == nil }.count
+                }
+            }
+        }
+        .onDisappear {
+            notificationsSub?.close()
+            notificationsSub = nil
+        }
+    }
+
+    private var sidebar: some View {
+        List(selection: $selection) {
             // Section 1 — Community / browse
             Section(header: header(tr("app.discover.community", fallback: "Community"))) {
                 if koin.featureFlags.localGroupsEnabled {
@@ -64,10 +112,6 @@ struct DiscoverView: View {
 
             // Section 2 — Addons (Test Assistant power-gated)
             Section(header: header(tr("app.discover.addons", fallback: "Addons"))) {
-                row(icon: "qrcode.viewfinder",
-                    color: .green,
-                    title: tr("addons.stamp.title", fallback: "Tableport · Francobolli"),
-                    route: .tableport)
                 row(icon: "newspaper.fill",
                     color: .indigo,
                     title: tr("addons.quid.title", fallback: "Quid"),
@@ -88,43 +132,33 @@ struct DiscoverView: View {
                     route: .addonsHub)
             }
         }
-        .listStyle(.insetGrouped)
+        .indexListStyle(sidebar: horizontalSizeClass == .regular)
         .navigationTitle(tr("app.discover.title", fallback: "Esplora"))
         .cleanNavBar()
+        // Like Settings, the index stays put beside the detail.
+        .toolbar(removing: .sidebarToggle)
         .toolbar {
             // Notifications moved out of an explicit list row into a top-right
             // toolbar action — the Mail / Music / Wallet pattern. Bell glyph,
             // brand-tinted, opens the same NotificationsListView.
             // Badge shows unread count (only when > 0).
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: DiscoverRoute.notifications) {
+                Button {
+                    selection = .notifications
+                } label: {
                     notificationsBellIcon
                 }
                 .tint(AppTheme.Colors.brandTintAdaptive)
             }
         }
-        .navigationDestination(for: DiscoverRoute.self) { route in
-            destination(for: route)
-        }
-        .task {
-            // Subscribe to notifications flow to track unread count for badge.
-            notificationsSub?.close()
-            let notifFlow = koin.notifications.observeAll() as Kotlinx_coroutines_coreFlow
-            notificationsSub = subscribeFlow(notifFlow) { (list: NSArray) in
-                Task { @MainActor in
-                    let notifications = (list as? [NotificationModel]) ?? []
-                    self.unreadNotificationsCount = notifications.filter { $0.seen == nil }.count
-                }
-            }
-        }
-        .onDisappear {
-            notificationsSub?.close()
-            notificationsSub = nil
-        }
+    }
+
+    private func destination(for route: DiscoverRoute) -> some View {
+        sectionPage(for: route).indexPageBackground()
     }
 
     @ViewBuilder
-    private func destination(for route: DiscoverRoute) -> some View {
+    private func sectionPage(for route: DiscoverRoute) -> some View {
         switch route {
         case .events:           EventListView()
         case .eventsMap:        EventMapView()
@@ -134,7 +168,6 @@ struct DiscoverView: View {
         case .members:          MembersDirectoryView()
         case .addonsHub:        AddonsHubView()
         case .documents:        AreaDocumentsView()
-        case .tableport:        TableportStampView()
         case .quid:             QuidIssuesView()
         case .podcasts:         PodcastsListView()
         case .testAssistant:    TestAssistantView()
@@ -179,5 +212,5 @@ struct DiscoverView: View {
 }
 
 #Preview {
-    NavigationStack { DiscoverView() }
+    DiscoverView()
 }

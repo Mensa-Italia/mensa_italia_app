@@ -43,7 +43,12 @@ struct QuidIssueView: View {
         // to render). Loading and empty states live in the overlay — same pattern
         // as EventListView.
         ScrollView {
-            LazyVStack(spacing: 16) {
+            // One column on a phone, more where there's room (unfolded iPhone
+            // Duo, iPad), so a card never stretches across a wide screen.
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 260), spacing: 16, alignment: .top)],
+                spacing: 16
+            ) {
                 ForEach(Array(filtered.enumerated()), id: \.element.id) { idx, article in
                     // Destination inline: vedi commento in `PodcastsListView`.
                     NavigationLink {
@@ -112,7 +117,7 @@ struct QuidIssueView: View {
                             ProgressView()
                                 .tint(AppTheme.Colors.brandTintAdaptive)
                         } else {
-                            Image(systemName: "play.circle.fill")
+                            Label(tr("addons.podcasts.play_menu", fallback: "Riproduci"), systemImage: "play.circle.fill")
                                 .font(.system(size: 22))
                                 .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
                         }

@@ -105,7 +105,7 @@ struct LocalOfficeLinktreeView: View {
                             )
                         }
                     } label: {
-                        Image(systemName: "plus")
+                        Label(tr("local_office.linktree.add", fallback: "Aggiungi"), systemImage: "plus")
                     }
                 }
                 ToolbarItem(placement: .secondaryAction) {

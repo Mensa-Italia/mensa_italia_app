@@ -6,6 +6,9 @@ struct TodayView: View {
     @State private var vm = TodayViewModel()
     @State private var notificationRoute: NotificationTarget?
     @State private var showAllNotifications = false
+    /// Tableport's passport: full screen, the phone being the passport.
+    @State private var showPassport = false
+    @State private var medalStore = MedalStore.shared
     var onSearchTap: (() -> Void)?
 
     var body: some View {
@@ -27,24 +30,64 @@ struct TodayView: View {
             // either already emitted (data on screen instantly) or is one
             // frame away. A brief empty layout is far less jarring than the
             // spinner-flash → content swap we used to do here.
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(spacing: 20) {
-                    headerSection
-                    membershipCardSection
-                    nextEventSection
-                    notificationsSection
-                    // TODO: SIGs section — integrate koin.sigs into TodayViewModel when SIGs
-                    //       are needed here; add SigPreviewCard horizontal scroll.
+            GeometryReader { proxy in
+                if let fold = foldLayout(in: proxy) {
+                    // Unfolded foldable, or a screen this wide: one column per
+                    // half, so no card gets stretched across (or creased by)
+                    // the hinge, nor blown up to the whole width.
+                    HStack(spacing: 0) {
+                        // Left what's going on — next event and notifications —
+                        // right the member: card, membership, tickets. The
+                        // right half is where the folded phone's screen sits,
+                        // so unfolding keeps the card where it already was —
+                        // at the same height too: the right column starts as
+                        // the single one does, only the left one keeps clear
+                        // of the display's rounded corner.
+                        column(top: fold.topInset + 8, horizontal: fold.sideMargin) {
+                            nextEventSection
+                            notificationsSection
+                        }
+                        .frame(width: max(fold.hinge.minX, 0))
+
+                        Color.clear.frame(width: fold.hinge.width)
+
+                        column(horizontal: fold.sideMargin) {
+                            headerSection
+                            membershipCardSection
+                            membershipSection
+                        }
+                    }
+                } else {
+                    column {
+                        headerSection
+                        membershipCardSection
+                        membershipSection
+                        nextEventSection
+                        notificationsSection
+                        // TODO: SIGs section — integrate koin.sigs into TodayViewModel when SIGs
+                        //       are needed here; add SigPreviewCard horizontal scroll.
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 40)
             }
-            .refreshable { await vm.refresh() }
         }
         .navigationTitle(tr("app.today.title", fallback: "Today")) // i18n
         .navigationBarHidden(true)
         .task { await vm.load() }
+        .task { await medalStore.refresh() }
+        .task {
+            // I timbri del passaporto su disco prima che lo si apra: chi lo
+            // sfoglia li trova gia' li', come con una cache piena da sempre.
+            // Dal database; dalla rete solo se il database e' ancora vuoto.
+            var stamps = (try? await koin.stamps.current()) ?? []
+            if stamps.isEmpty {
+                try? await koin.stamps.refresh(filter: nil, sort: "-created")
+                stamps = (try? await koin.stamps.current()) ?? []
+            }
+            StampImagePrefetcher.warmCollection(stamps)
+        }
+        .fullScreenCover(isPresented: $showPassport) {
+            PassportScreen()
+        }
         .navigationDestination(isPresented: $showAllNotifications) {
             NotificationsListView()
         }
@@ -110,23 +153,144 @@ struct TodayView: View {
 
     // MARK: - Membership Card
 
-    @ViewBuilder
+    /// The card lives here now (there's no Card tab any more): tapping it
+    /// flips it, as the Card page did.
     private var membershipCardSection: some View {
-        // NavigationLink navigates inside the same NavigationStack owned by MainTabView.
-        // The tab switch to Card tab is handled via AppTab coordinator — for now deep-link to CardView.
-        NavigationLink(destination: CardView()) {
-            MembershipCardHero(
-                fullName: vm.userName,
-                memberSince: vm.memberSince,
-                expiry: vm.membershipExpiry,
-                memberId: vm.user?.id ?? "-",
-                avatarURL: vm.userAvatar,
-                isFullScreen: false,
-                avatarSize: 54
-            )
-            .frame(height: 180)
+        MembershipCardHero(
+            fullName: vm.userName,
+            memberSince: vm.memberSince,
+            expiry: vm.membershipExpiry,
+            memberId: vm.user?.id ?? "-",
+            avatarURL: vm.userAvatar,
+            isFullScreen: false,
+            avatarSize: 54
+        )
+        .frame(maxWidth: 420)
+        .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 8)
+    }
+
+    // MARK: - Membership
+
+    /// Same rule as the renewal wall (`Membership` in :shared), so the badge
+    /// here and the screen that blocks the app can't disagree.
+    private var membershipExpired: Bool {
+        Membership.shared.isExpired(user: vm.user)
+    }
+
+    /// Expiry with its status, and the tickets, from the former Card page.
+    private var membershipSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionLabel(title: tr("card.membership", fallback: "Iscrizione"), icon: "person.text.rectangle")
+
+            VStack(spacing: 0) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(tr("card.expires_on", fallback: "Scadenza"))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text(vm.membershipExpiry)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                    }
+                    Spacer(minLength: 8)
+                    membershipStatus
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+
+                Divider().padding(.leading, 16)
+
+                // Tableport lives with the member's things, not in Explore:
+                // full screen from there the passport fought the split view.
+                Button {
+                    showPassport = true
+                } label: {
+                    membershipRow(
+                        icon: "qrcode.viewfinder",
+                        color: .green,
+                        title: tr("addons.stamp.short_title", fallback: "Tableport"),
+                        // The medals earned, beside the chevron: a reason to
+                        // look inside and find out what they are.
+                        medalCount: medalStore.medals.isEmpty ? nil : medalStore.earnedCount
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Divider().padding(.leading, 60)
+
+                NavigationLink {
+                    TicketsListView()
+                } label: {
+                    membershipRow(
+                        icon: "ticket.fill",
+                        color: AppTheme.Colors.mensaBlue,
+                        title: tr("card.my_tickets", fallback: "I miei ticket")
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+            .compatGlass(cornerRadius: 18)
         }
-        .buttonStyle(.plain)
+    }
+
+    private func membershipRow(icon: String, color: Color, title: String, medalCount: Int? = nil) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(color)
+                    .frame(width: 30, height: 30)
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            Text(title)
+                .font(.body)
+                .foregroundStyle(.primary)
+            Spacer()
+            if let medalCount {
+                HStack(spacing: 4) {
+                    Image(systemName: "medal.fill")
+                        .font(.footnote.weight(.semibold))
+                    Text("\(medalCount)")
+                        .font(.subheadline.weight(.semibold).monospacedDigit())
+                }
+                .foregroundStyle(.secondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(
+                    tr("medals.count_a11y", fallback: "%d medaglie").replacingOccurrences(of: "%d", with: "\(medalCount)")
+                ))
+            }
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private var membershipStatus: some View {
+        if membershipExpired, let url = URL(string: "https://cloud32.mensa.it/rinnovo") {
+            Link(destination: url) {
+                Text(tr("card.renew", fallback: "Rinnova"))
+                    .font(.subheadline.weight(.semibold))
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .tint(AppTheme.Colors.mensaBlue)
+        } else {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.caption.weight(.semibold))
+                Text(tr("card.active", fallback: "Attiva"))
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(.green)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Capsule().fill(Color.green.opacity(0.15)))
+        }
     }
 
     // MARK: - Quick Search
@@ -245,6 +409,63 @@ struct TodayView: View {
         if let target = notificationTarget(from: n) {
             notificationRoute = target
         }
+    }
+
+    // MARK: - Layout
+
+    private func column<Content: View>(
+        top: CGFloat = 8,
+        horizontal: CGFloat = 16,
+        @ViewBuilder _ content: () -> Content
+    ) -> some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(spacing: 20) {
+                content()
+            }
+            .padding(.horizontal, horizontal)
+            .padding(.top, top)
+            .padding(.bottom, 40)
+        }
+        // Side by side, a column clips to its own width by default, which
+        // cut the cards' shadows at the hinge; let them spill over.
+        .scrollClipDisabled()
+        .refreshable { await vm.refresh() }
+    }
+
+    private struct FoldLayout {
+        /// The hinge in the proxy's space, margins included.
+        var hinge: CGRect
+        var topInset: CGFloat
+        var sideMargin: CGFloat
+    }
+
+    /// Two-column geometry: split at the hinge of an unfolded foldable on its
+    /// side (iPhone Duo), down the middle of any screen with room for two
+    /// phone-wide columns (the same phone unfolded and upright, where one
+    /// column blew the event poster up to the whole screen). Nil on phones
+    /// and while folded.
+    ///
+    /// Insets are read from the system rather than applied with
+    /// `containerCornerOffset` / `contentMargins(for: .container)`: on iOS 27.1
+    /// those only see the real screen edges, so they leave no margin along the
+    /// hinge and treat the camera column as a corner.
+    private func foldLayout(in proxy: GeometryProxy) -> FoldLayout? {
+        if #available(iOS 27.1, *), let hinge = proxy.verticalHinge {
+            // Unfolded there is no status bar on top (top safe area is 0), so
+            // start below the display's rounded top-leading corner instead.
+            return FoldLayout(
+                hinge: hinge,
+                topInset: max(8, proxy.containerCornerInsets.topLeading.height),
+                sideMargin: max(16, proxy.contentMargins(for: .container).leading)
+            )
+        }
+        guard proxy.size.width >= 600 else { return nil }
+        let gutter: CGFloat = 16
+        return FoldLayout(
+            hinge: CGRect(x: (proxy.size.width - gutter) / 2, y: 0, width: gutter, height: proxy.size.height),
+            topInset: 8,
+            sideMargin: 16
+        )
     }
 
     // MARK: - Helpers

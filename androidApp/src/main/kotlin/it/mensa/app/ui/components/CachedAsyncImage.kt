@@ -13,8 +13,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import it.mensa.shared.api.isMensaHost
-import it.mensa.shared.auth.AuthHolder
+import it.mensa.app.support.MensaAuthInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -23,7 +22,7 @@ import okio.Path.Companion.toOkioPath
 /**
  * CachedAsyncImage — Coil3 wrapper with:
  * - OkHttp network fetcher
- * - Memory cache: 50 MB
+ * - Memory cache: 100 MB
  * - Disk cache: 500 MB, named "mensa-images"
  * - Cache-Control rewrite interceptor: injects max-age=86400,public on responses
  *   that lack a Cache-Control header (common with PocketBase file endpoints)
@@ -122,7 +121,7 @@ private fun buildMensaImageLoader(context: android.content.Context): ImageLoader
     val cacheDir = context.cacheDir.resolve("mensa-images")
 
     val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(AuthHeaderInterceptor())
+        .addInterceptor(MensaAuthInterceptor())
         .addNetworkInterceptor(CacheControlInterceptor())
         .build()
 
@@ -132,7 +131,9 @@ private fun buildMensaImageLoader(context: android.content.Context): ImageLoader
         }
         .memoryCache {
             MemoryCache.Builder()
-                .maxSizeBytes(50 * 1024 * 1024) // 50 MB
+                // 100 MB: at 50 the passport pages just turned were
+                // already gone when turned back to. Same as iOS.
+                .maxSizeBytes(100 * 1024 * 1024)
                 .build()
         }
         .diskCache {
@@ -153,46 +154,6 @@ private fun buildMensaImageLoader(context: android.content.Context): ImageLoader
 
     cachedImageLoader = loader
     return loader
-}
-
-/**
- * Mette l'`Authorization` sulle richieste di immagini dirette al nostro
- * backend.
- *
- * Le immagini non passano da Ktor — le scarica Coil con il suo OkHttp — quindi
- * il Bearer che [it.mensa.shared.api.AuthPlugin] aggiunge alle chiamate API non
- * le tocca. Senza questo, ogni `/api/files/...` arriva al server come richiesta
- * anonima, e da anonima il server non produce piu' il link firmato verso S3
- * (vedi l'hook `OnFileDownloadRequest` di MensaCore): le immagini
- * continuerebbero ad arrivare, ma servite da PocketBase invece che da S3.
- *
- * Tre dettagli che contano:
- *
- *  - il token si legge DENTRO `intercept`, a ogni richiesta, non alla
- *    costruzione del client: l'ImageLoader e' un singleton che vive quanto il
- *    processo, e catturare il token una volta sola vorrebbe dire tenersi
- *    quello di chi era loggato all'avvio;
- *  - `isMensaHost` e' la stessa regola del client Ktor, per la stessa ragione:
- *    lo stesso ImageLoader carica anche copertine da CDN esterni, e a un
- *    origine estranea il Bearer non va mandato mai — perde la sessione e in
- *    almeno un caso noto si becca un 403;
- *  - e' un `addInterceptor` (applicativo) e non un `addNetworkInterceptor`:
- *    il server risponde 307 verso S3, e OkHttp toglie da solo
- *    l'`Authorization` quando un redirect cambia host. Un interceptor di rete
- *    girerebbe di nuovo sulla richiesta verso S3 e ce lo rimetterebbe,
- *    spedendo il token della sessione a un dominio che non e' nostro.
- */
-private class AuthHeaderInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        if (!isMensaHost(request.url.host)) return chain.proceed(request)
-        val token = AuthHolder.token ?: return chain.proceed(request)
-        return chain.proceed(
-            request.newBuilder()
-                .header("Authorization", "Bearer $token")
-                .build()
-        )
-    }
 }
 
 /**

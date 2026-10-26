@@ -2,13 +2,23 @@ package it.mensa.app.services.audio
 
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSourceBitmapLoader
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.session.CacheBitmapLoader
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.google.common.util.concurrent.MoreExecutors
+import it.mensa.app.support.MensaAuthInterceptor
+import okhttp3.OkHttpClient
+import java.util.concurrent.Executors
 
 /**
  * PlaybackService — Media3 MediaSessionService for background audio playback.
@@ -26,6 +36,7 @@ import androidx.media3.session.MediaSessionService
  *   intent-filter: androidx.media3.session.MediaSessionService
  *   Permission: FOREGROUND_SERVICE_MEDIA_PLAYBACK
  */
+@OptIn(UnstableApi::class)
 class PlaybackService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
@@ -38,7 +49,18 @@ class PlaybackService : MediaSessionService() {
             .setUsage(C.USAGE_MEDIA)
             .build()
 
+        // Our files are only served to authenticated requests: with the default
+        // data source the backend answered 404 and nothing played. OkHttp reads
+        // the token at every request (seeks included) and drops it on the 307
+        // to S3. The artwork on the notification/lock screen goes through the
+        // same client.
+        val httpClient = OkHttpClient.Builder()
+            .addInterceptor(MensaAuthInterceptor())
+            .build()
+        val dataSourceFactory = OkHttpDataSource.Factory(httpClient)
+
         val player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
             .setAudioAttributes(audioAttributes, /* handleAudioFocus = */ true)
             .setHandleAudioBecomingNoisy(true)
             .build()
@@ -54,8 +76,16 @@ class PlaybackService : MediaSessionService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
+        val bitmapLoader = CacheBitmapLoader(
+            DataSourceBitmapLoader(
+                MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor()),
+                dataSourceFactory,
+            ),
+        )
+
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(sessionActivityIntent)
+            .setBitmapLoader(bitmapLoader)
             .build()
     }
 

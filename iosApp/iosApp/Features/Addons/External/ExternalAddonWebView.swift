@@ -111,7 +111,7 @@ struct ExternalAddonWebView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button { dismiss() } label: {
-                    Image(systemName: "xmark")
+                    Label(tr("app.close", fallback: "Chiudi"), systemImage: "xmark")
                 }
             }
         }

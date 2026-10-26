@@ -11,7 +11,12 @@ struct PodcastsListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16) {
+            // One column on a phone, more where there's room (unfolded iPhone
+            // Duo, iPad), so a card never stretches across a wide screen.
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 260), spacing: 16, alignment: .top)],
+                spacing: 16
+            ) {
                 ForEach(Array(podcasts.enumerated()), id: \.element.id) { idx, podcast in
                     // Destination inline (vs `NavigationLink(value:)` +
                     // `navigationDestination(for:)`): la doppia

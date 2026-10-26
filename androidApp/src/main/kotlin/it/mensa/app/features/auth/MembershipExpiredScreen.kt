@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Warning
@@ -26,6 +28,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,6 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,6 +62,7 @@ import it.mensa.app.ui.root.LogoVariant
 import it.mensa.app.ui.root.MensaLogoMark
 import it.mensa.app.ui.theme.LocalMensaGradients
 import it.mensa.shared.auth.Membership
+import it.mensa.shared.auth.MembershipRecheck
 import kotlinx.coroutines.launch
 
 /**
@@ -75,6 +86,23 @@ fun MembershipExpiredScreen() {
     var checking by remember { mutableStateOf(false) }
     var loggingOut by remember { mutableStateOf(false) }
     var recheck by remember { mutableStateOf<RecheckOutcome?>(null) }
+    var password by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    val asksPassword = recheck == RecheckOutcome.NEEDS_PASSWORD || recheck == RecheckOutcome.WRONG_PASSWORD
+
+    fun submitPassword() {
+        if (checking || password.isEmpty()) return
+        checking = true
+        focusManager.clearFocus()
+        val typed = password
+        scope.launch {
+            recheck = runCatching { auth.recheckMembershipWithPassword(typed) }
+                .getOrDefault(MembershipRecheck.UNREACHABLE)
+                .toOutcome()
+            if (recheck == RecheckOutcome.WRONG_PASSWORD) password = ""
+            checking = false
+        }
+    }
 
     val expiryText = remember(user, locale) {
         val instant = user?.expireMembership
@@ -188,22 +216,16 @@ fun MembershipExpiredScreen() {
                     checking = true
                     recheck = null
                     scope.launch {
-                        // `reloadUser` rifa' il login per intero quando le
-                        // credenziali ci sono — email e password rimandate a
-                        // `/api/cs/auth-with-zitadel`, come uscire e rientrare
-                        // — e ricade su `/api/cs/me` per chi e' entrato con la
-                        // passkey. Torna il record se il server ha risposto,
-                        // anche quando risponde "ancora scaduta", e null solo
-                        // se non si e' letto niente: sono due esiti diversi e
-                        // vanno detti, altrimenti il tasto sembra morto.
-                        val refreshed = runCatching { auth.reloadUser() }.getOrNull()
-                        recheck = when {
-                            refreshed == null -> RecheckOutcome.UNREACHABLE
-                            Membership.isExpired(refreshed) -> RecheckOutcome.STILL_EXPIRED
-                            // Non piu' scaduta: RootViewModel rivaluta la fase
-                            // sul nuovo `currentUser` e questa schermata sparisce.
-                            else -> null
-                        }
+                        // Rifa' il login per intero quando le credenziali ci
+                        // sono, che e' l'unico modo in cui il backend rilegge
+                        // la scadenza dal portale. Senza (passkey, password
+                        // cambiata) il dato e' quello del database e l'esito lo
+                        // dice: si chiede la password invece di ripetere "non
+                        // risulta ancora" per sempre. Non piu' scaduta: esito
+                        // null, RootViewModel cambia fase e la schermata sparisce.
+                        recheck = runCatching { auth.recheckMembership() }
+                            .getOrDefault(MembershipRecheck.UNREACHABLE)
+                            .toOutcome()
                         checking = false
                     }
                 },
@@ -237,6 +259,37 @@ fun MembershipExpiredScreen() {
                 Spacer(Modifier.height(12.dp))
                 RecheckNotice(outcome)
             }
+            if (asksPassword) {
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    placeholder = {
+                        Text(tr("app.renew.gate.password_placeholder", fallback = "Password dell'area soci"))
+                    },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
+                    keyboardActions = KeyboardActions(onGo = { submitPassword() }),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.6f),
+                        focusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+                        unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+                        cursorColor = Color.White,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(12.dp))
+                PrimaryButton(
+                    text = tr("app.renew.gate.password_submit", fallback = "Aggiorna la scadenza"),
+                    onClick = { submitPassword() },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !checking && password.isNotEmpty(),
+                )
+            }
             Spacer(Modifier.height(16.dp))
 
             TextButton(
@@ -261,7 +314,15 @@ fun MembershipExpiredScreen() {
  * risulta, la fase cambia e questa schermata sparisce, quindi un messaggio di
  * successo non farebbe in tempo a vedersi.
  */
-private enum class RecheckOutcome { STILL_EXPIRED, UNREACHABLE }
+private enum class RecheckOutcome { STILL_EXPIRED, UNREACHABLE, NEEDS_PASSWORD, WRONG_PASSWORD }
+
+private fun MembershipRecheck.toOutcome(): RecheckOutcome? = when (this) {
+    MembershipRecheck.RENEWED -> null
+    MembershipRecheck.STILL_EXPIRED -> RecheckOutcome.STILL_EXPIRED
+    MembershipRecheck.NEEDS_PASSWORD -> RecheckOutcome.NEEDS_PASSWORD
+    MembershipRecheck.WRONG_PASSWORD -> RecheckOutcome.WRONG_PASSWORD
+    MembershipRecheck.UNREACHABLE -> RecheckOutcome.UNREACHABLE
+}
 
 @Composable
 private fun RecheckNotice(outcome: RecheckOutcome) {
@@ -274,10 +335,21 @@ private fun RecheckNotice(outcome: RecheckOutcome) {
             "app.renew.gate.unreachable",
             fallback = "Non riesco a contattare il server. Controlla la connessione e riprova.",
         )
+        RecheckOutcome.NEEDS_PASSWORD -> tr(
+            "app.renew.gate.needs_password",
+            fallback = "Sul portale risulti in regola? L'app rilegge la scadenza dall'area soci solo " +
+                "quando accedi con la password. Scrivila qui sotto per aggiornarla.",
+        )
+        RecheckOutcome.WRONG_PASSWORD -> tr(
+            "app.renew.gate.wrong_password",
+            fallback = "Password non accettata. È quella con cui entri nell'area soci.",
+        )
     }
     val icon = when (outcome) {
         RecheckOutcome.STILL_EXPIRED -> Icons.Outlined.Schedule
         RecheckOutcome.UNREACHABLE -> Icons.Outlined.CloudOff
+        RecheckOutcome.NEEDS_PASSWORD -> Icons.Outlined.Key
+        RecheckOutcome.WRONG_PASSWORD -> Icons.Outlined.Lock
     }
     Surface(
         shape = MaterialTheme.shapes.medium,
