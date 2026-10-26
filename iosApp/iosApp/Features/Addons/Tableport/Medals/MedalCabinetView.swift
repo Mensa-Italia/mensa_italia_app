@@ -160,7 +160,7 @@ private struct CasePressStyle: ButtonStyle {
 
 /// One medal in its glass case on a pedestal.
 ///
-/// Drawn to stay cheap with thirty on screen: the medal is flattened into
+/// Drawn to stay cheap with dozens on screen: the medal is flattened into
 /// one layer and its bob is a repeating animation the render server plays,
 /// so nothing here is recomputed frame by frame; soft light and shadows are
 /// gradients rather than blurs.

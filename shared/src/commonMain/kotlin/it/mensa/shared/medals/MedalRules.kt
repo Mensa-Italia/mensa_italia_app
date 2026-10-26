@@ -9,7 +9,7 @@ enum class MedalTier { BRONZE, SILVER, GOLD, PLATINUM }
 /**
  * A medal: the counter it's earned from and the threshold for each metal.
  * A tiered medal climbs bronze → platinum as its counter grows; a single
- * medal has one level.
+ * medal has one level, platinum straight away: every medal tops out there.
  *
  * Secret medals (the occasions: Halloween, New Year…) aren't shown until
  * earned, so finding them is part of the game.
@@ -61,11 +61,11 @@ object MedalRules {
     private fun tiered(id: String, b: Int, s: Int, g: Int, p: Int, value: (MedalStatsModel) -> Double) =
         MedalRule(id, listOf(B to b, S to s, G to g, P to p)) { stats, _ -> value(stats).toInt() }
 
-    private fun single(id: String, tier: MedalTier, threshold: Int = 1, secret: Boolean = false, value: (MedalStatsModel) -> Double) =
-        MedalRule(id, listOf(tier to threshold), secret) { stats, _ -> value(stats).toInt() }
+    private fun single(id: String, threshold: Int = 1, secret: Boolean = false, value: (MedalStatsModel) -> Double) =
+        MedalRule(id, listOf(P to threshold), secret) { stats, _ -> value(stats).toInt() }
 
-    private fun flag(id: String, tier: MedalTier, value: (MedalStatsModel) -> Boolean) =
-        MedalRule(id, listOf(tier to 1)) { stats, _ -> if (value(stats)) 1 else 0 }
+    private fun flag(id: String, value: (MedalStatsModel) -> Boolean) =
+        MedalRule(id, listOf(P to 1)) { stats, _ -> if (value(stats)) 1 else 0 }
 
     val all: List<MedalRule> = listOf(
         // Passport and stamps
@@ -73,7 +73,7 @@ object MedalRules {
         tiered("steady", 3, 6, 12, 24) { it.stampsDistinctMonths },
         tiered("unstoppable", 3, 6, 12, 24) { it.stampsMaxMonthStreak },
         tiered("marathon", 2, 3, 5, 8) { it.stampsMaxSameDay },
-        single("four_seasons", G, threshold = 4) { it.stampsMaxSeasonsInYear },
+        single("four_seasons", threshold = 4) { it.stampsMaxSeasonsInYear },
         tiered("pioneer", 1, 5, 15, 30) { it.stampsPioneer },
 
         // Travel
@@ -82,34 +82,30 @@ object MedalRules {
         tiered("national_rally", 1, 3, 5, 10) { it.stampsNational },
 
         // Times and occasions
-        single("night_owl", B) { it.stampsNight },
-        single("early_bird", B) { it.stampsMorning },
-        single("halloween", S, secret = true) { it.stampsHalloween },
-        single("new_year", S, secret = true) { it.stampsNewYear },
-        single("valentine", S, secret = true) { it.stampsValentine },
-        single("pi_day", G, secret = true) { it.stampsPiDay },
-        single("birthday", G, secret = true) { it.stampsBirthday },
-        single("front_row", B) { it.stampsFirstDay },
-        single("better_late", B) { it.stampsLate },
+        single("night_owl") { it.stampsNight },
+        single("early_bird") { it.stampsMorning },
+        single("halloween", secret = true) { it.stampsHalloween },
+        single("new_year", secret = true) { it.stampsNewYear },
+        single("valentine", secret = true) { it.stampsValentine },
+        single("pi_day", secret = true) { it.stampsPiDay },
+        single("birthday", secret = true) { it.stampsBirthday },
+        single("front_row") { it.stampsFirstDay },
+        single("better_late") { it.stampsLate },
 
         // Community
         tiered("always_there", 1, 10, 25, 50) { it.eventRegistrations },
-        tiered("spectator", 1, 5, 15, 30) { it.ticketsTotal },
         tiered("organizer", 1, 5, 15, 30) { it.eventsCreated },
-        single("national_director", P) { it.eventsCreatedNational },
-        tiered("patron", 1, 3, 5, 10) { it.donations },
-        MedalRule("elegant", listOf(B to 1, S to 3, G to 10)) { stats, _ -> stats.boutiqueOrders.toInt() },
+        single("national_director") { it.eventsCreatedNational },
 
         // Membership and app
-        flag("active_member", B) { it.isMembershipActive },
-        flag("farsighted", G) { it.renewedAhead },
+        flag("active_member") { it.isMembershipActive },
         MedalRule("early_adopter", listOf(B to 1, S to 2, G to 3, P to 5)) { stats, now ->
             if (stats.appSince.toEpochMilliseconds() <= 0) 0
             else ((now - stats.appSince).inWholeDays / 365).toInt()
         },
-        flag("up_to_date", B) { it.calendarLinked },
+        flag("up_to_date") { it.calendarLinked },
         tiered("cartographer", 1, 3, 5, 10) { it.calendarRegions },
-        single("multiscreen", B, threshold = 2) { it.devices },
+        single("multiscreen", threshold = 2) { it.devices },
     )
 
     fun evaluate(stats: MedalStatsModel, now: Instant = Clock.System.now()): List<MedalStatus> =

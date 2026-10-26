@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Celebration
-import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.DirectionsRun
@@ -24,13 +23,10 @@ import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.PhoneIphone
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.filled.TheaterComedy
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.VerifiedUser
-import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.runtime.Composable
@@ -130,13 +126,9 @@ object MedalCatalog {
         "front_row" to MedalInfo("Prima fila", "Un francobollo raccolto il giorno stesso in cui è uscito.", Icons.Filled.Bolt),
         "better_late" to MedalInfo("Meglio tardi", "Un francobollo raccolto sei mesi dopo la sua uscita.", Icons.Filled.HourglassBottom),
         "always_there" to MedalInfo("Sempre presente", "Iscrizioni agli appuntamenti degli eventi.", Icons.Filled.Groups),
-        "spectator" to MedalInfo("Spettatore", "Biglietti acquistati.", Icons.Filled.ConfirmationNumber),
         "organizer" to MedalInfo("Organizzatore", "Eventi che hai organizzato.", Icons.Filled.Campaign),
         "national_director" to MedalInfo("Regista nazionale", "Hai organizzato un evento nazionale.", Icons.Filled.Stars),
-        "patron" to MedalInfo("Mecenate", "Donazioni fatte all'associazione.", Icons.Filled.VolunteerActivism),
-        "elegant" to MedalInfo("Elegante", "Ordini dalla boutique.", Icons.Filled.ShoppingBag),
         "active_member" to MedalInfo("Socio attivo", "Iscrizione in corso di validità.", Icons.Filled.VerifiedUser),
-        "farsighted" to MedalInfo("Previdente", "Rinnovo fatto con più di un anno di anticipo.", Icons.Filled.Update),
         "early_adopter" to MedalInfo("Della prima ora", "Anni passati con l'app.", Icons.Filled.PhoneIphone),
         "up_to_date" to MedalInfo("Sempre aggiornato", "Calendario degli eventi collegato.", Icons.Filled.EventAvailable),
         "cartographer" to MedalInfo("Cartografo", "Regioni seguite nel calendario.", Icons.Filled.Map),

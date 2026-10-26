@@ -75,7 +75,7 @@ class Changelog internal constructor(
                 titleKey = "changelog.2026_11.medals.title",
                 titleFallback = "Il medagliere",
                 bodyKey = "changelog.2026_11.medals.body",
-                bodyFallback = "Trenta medaglie da sbloccare con timbri, eventi e vita associativa. Alcune sono segrete: le trovi nel passaporto.",
+                bodyFallback = "Ventisei medaglie da sbloccare con timbri, eventi e vita associativa. Alcune sono segrete: le trovi nel passaporto.",
             ),
             ChangelogItem(
                 icon = "fixes",

@@ -44,20 +44,28 @@ class MedalRulesTest {
         assertTrue(pi.secret)
         assertTrue(pi.isSingle)
         assertFalse(pi.isEarned)
-        assertEquals(MedalTier.GOLD, status("pi_day", MedalStatsModel(stampsPiDay = 1.0)).earnedTier)
+        assertEquals(MedalTier.PLATINUM, status("pi_day", MedalStatsModel(stampsPiDay = 1.0)).earnedTier)
     }
 
     @Test
     fun flagsAndYearsSinceJoining() {
-        assertEquals(MedalTier.GOLD, status("farsighted", MedalStatsModel(renewedAhead = true)).earnedTier)
+        assertEquals(MedalTier.PLATINUM, status("up_to_date", MedalStatsModel(calendarLinked = true)).earnedTier)
         val since = Instant.parse("2023-09-01T00:00:00Z")
         assertEquals(MedalTier.GOLD, status("early_adopter", MedalStatsModel(appSince = since)).earnedTier)
         assertNull(status("early_adopter", MedalStatsModel()).earnedTier)
     }
 
     @Test
-    fun theTableHasThirtyMedals() {
-        assertEquals(30, MedalRules.all.size)
+    fun everyMedalTopsOutAtPlatinum() {
+        MedalRules.all.forEach { assertEquals(MedalTier.PLATINUM, it.levels.last().first, it.id) }
+        val single = status("night_owl", MedalStatsModel())
+        assertTrue(single.isSingle)
+        assertEquals(MedalTier.PLATINUM, single.displayTier)
+    }
+
+    @Test
+    fun theTableHasTwentySixMedals() {
+        assertEquals(26, MedalRules.all.size)
         assertEquals(MedalRules.all.size, MedalRules.all.map { it.id }.toSet().size)
     }
 }

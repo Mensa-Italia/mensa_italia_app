@@ -21,7 +21,6 @@ data class MedalStatsModel(
     @SerialName("app_since") val appSince: Instant = Instant.fromEpochMilliseconds(0),
     @SerialName("expire_membership") val expireMembership: Instant = Instant.fromEpochMilliseconds(0),
     @SerialName("is_membership_active") val isMembershipActive: Boolean = false,
-    @SerialName("renewed_ahead") val renewedAhead: Boolean = false,
 
     @SerialName("stamps_total") val stampsTotal: Double = 0.0,
     @SerialName("stamps_distinct_months") val stampsDistinctMonths: Double = 0.0,
@@ -42,12 +41,9 @@ data class MedalStatsModel(
     @SerialName("stamps_national") val stampsNational: Double = 0.0,
     @SerialName("stamps_out_of_region") val stampsOutOfRegion: Double = 0.0,
 
-    @SerialName("tickets_total") val ticketsTotal: Double = 0.0,
     @SerialName("events_created") val eventsCreated: Double = 0.0,
     @SerialName("events_created_national") val eventsCreatedNational: Double = 0.0,
     @SerialName("event_registrations") val eventRegistrations: Double = 0.0,
-    @SerialName("donations") val donations: Double = 0.0,
-    @SerialName("boutique_orders") val boutiqueOrders: Double = 0.0,
     @SerialName("devices") val devices: Double = 0.0,
     @SerialName("calendar_linked") val calendarLinked: Boolean = false,
     @SerialName("calendar_regions") val calendarRegions: Double = 0.0,
