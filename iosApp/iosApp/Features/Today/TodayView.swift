@@ -223,18 +223,22 @@ struct TodayView: View {
                 }
                 .buttonStyle(.plain)
 
-                Divider().padding(.leading, 60)
+                // Solo con un ticket ancora valido: una voce che apre una
+                // lista vuota o di ticket scaduti era rumore.
+                if vm.hasUpcomingTickets {
+                    Divider().padding(.leading, 60)
 
-                NavigationLink {
-                    TicketsListView()
-                } label: {
-                    membershipRow(
-                        icon: "ticket.fill",
-                        color: AppTheme.Colors.mensaBlue,
-                        title: tr("card.my_tickets", fallback: "I miei ticket")
-                    )
+                    NavigationLink {
+                        TicketsListView()
+                    } label: {
+                        membershipRow(
+                            icon: "ticket.fill",
+                            color: AppTheme.Colors.mensaBlue,
+                            title: tr("card.my_tickets", fallback: "I miei ticket")
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .compatGlass(cornerRadius: 18)
         }

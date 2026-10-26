@@ -66,6 +66,8 @@ fun MembershipSection(
     onTableportClick: () -> Unit,
     onTicketsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Almeno un ticket ancora valido: solo allora la voce "I miei ticket". */
+    showTickets: Boolean = true,
 ) {
     val context = LocalContext.current
     val medals = rememberMedals()
@@ -148,12 +150,16 @@ fun MembershipSection(
                 // inside and find out what they are.
                 medalCount = medals.earnedCount.takeIf { medals.medals.isNotEmpty() },
             )
-            HorizontalDivider(modifier = Modifier.padding(start = 20.dp))
-            SectionRow(
-                title = tr("card.nav_tickets", fallback = "I miei ticket"),
-                icon = Icons.Outlined.ConfirmationNumber,
-                onClick = onTicketsClick,
-            )
+            // Solo con un ticket ancora valido: una voce che apre una lista
+            // vuota o di ticket scaduti era rumore.
+            if (showTickets) {
+                HorizontalDivider(modifier = Modifier.padding(start = 20.dp))
+                SectionRow(
+                    title = tr("card.nav_tickets", fallback = "I miei ticket"),
+                    icon = Icons.Outlined.ConfirmationNumber,
+                    onClick = onTicketsClick,
+                )
+            }
         }
     }
 }

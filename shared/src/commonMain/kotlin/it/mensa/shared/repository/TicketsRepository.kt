@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -31,6 +32,13 @@ class TicketsRepository(
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
+
+    /**
+     * Se c'e' almeno un ticket ancora valido: la Home mostra "I miei ticket"
+     * solo in quel caso. Vedi [hasUpcoming].
+     */
+    fun observeHasUpcoming(): Flow<Boolean> =
+        observeAll().map { hasUpcoming(it, Clock.System.now()) }
 
     fun observeOne(id: String): Flow<TicketModel?> =
         db.ticketQueries.selectById(id)
@@ -89,5 +97,14 @@ class TicketsRepository(
             createdAt = t.created.toEpochMilliseconds(),
             updatedAt = now,
         )
+    }
+
+    companion object {
+        /**
+         * Un ticket e' futuro se ha una scadenza (`deadline`) non ancora
+         * passata. Senza scadenza non conta: non si sa a quando si riferisce.
+         */
+        fun hasUpcoming(tickets: List<TicketModel>, now: Instant): Boolean =
+            tickets.any { t -> t.deadline?.let { it > now } == true }
     }
 }

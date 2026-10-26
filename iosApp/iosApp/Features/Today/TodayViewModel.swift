@@ -18,6 +18,8 @@ final class TodayViewModel {
     var user: UserModel?
     /// I soci che compiono gli anni oggi; vuoto, la sezione non compare.
     var birthdays: [Birthday] = []
+    /// Almeno un ticket ancora valido: solo allora "I miei ticket" in Home.
+    var hasUpcomingTickets = false
 
     /// Snapshot eventi (chronological, ascending start) — cached così
     /// quando la posizione utente arriva possiamo ricalcolare `nextEvent`
@@ -44,6 +46,7 @@ final class TodayViewModel {
     private var eventsSub: Closeable?
     private var notifSub: Closeable?
     private var userSub: Closeable?
+    private var ticketsSub: Closeable?
     /// Last user location captured. Re-applied to upcoming events whenever the
     /// cache flow re-emits, so a fresh refresh respects geo-proximity without
     /// a second location request.
@@ -70,6 +73,7 @@ final class TodayViewModel {
         subscribeEventsFromCache()
         subscribeNotificationsFromCache()
         startUserSubscription()
+        subscribeUpcomingTickets()
 
         // 2. Best-effort location lookup (non-blocking).
         Task { [weak self] in
@@ -88,7 +92,10 @@ final class TodayViewModel {
         Task.detached(priority: .userInitiated) { [weak self] in
             async let _ev: () = { try? await koin.events.refresh(filter: nil, sort: "when_end") }()
             async let _no: () = { try? await koin.notifications.refresh() }()
-            _ = await (_ev, _no)
+            // I ticket si scaricavano solo aprendone la pagina: ora che il
+            // tasto compare solo con un ticket valido, li scarica la Home.
+            async let _ti: () = { try? await koin.tickets.refresh() }()
+            _ = await (_ev, _no, _ti)
             // Safety net: clear the spinner once the round-trip is done even
             // if the Flow somehow never emitted (shouldn't happen, but).
             await MainActor.run { self?.loading = false }
@@ -102,7 +109,16 @@ final class TodayViewModel {
         async let _ev: () = { try? await koin.events.refresh(filter: nil, sort: "when_end") }()
         async let _no: () = { try? await koin.notifications.refresh() }()
         async let _bd: () = loadBirthdays()
-        _ = await (_ev, _no, _bd)
+        async let _ti: () = { try? await koin.tickets.refresh() }()
+        _ = await (_ev, _no, _bd, _ti)
+    }
+
+    private func subscribeUpcomingTickets() {
+        ticketsSub?.close()
+        let flow = koin.tickets.observeHasUpcoming() as Kotlinx_coroutines_coreFlow
+        ticketsSub = subscribeFlow(flow) { [weak self] (value: KotlinBoolean) in
+            Task { @MainActor [weak self] in self?.hasUpcomingTickets = value.boolValue }
+        }
     }
 
     private func loadBirthdays() async {

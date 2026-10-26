@@ -96,6 +96,7 @@ fun TodayScreen(
     val viewModel: TodayViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val birthdays by viewModel.birthdays.collectAsStateWithLifecycle()
+    val hasUpcomingTickets by viewModel.hasUpcomingTickets.collectAsStateWithLifecycle()
 
     val refreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
@@ -172,6 +173,7 @@ fun TodayScreen(
                     TodayContent(
                         uiState = uiState,
                         birthdays = birthdays,
+                        hasUpcomingTickets = hasUpcomingTickets,
                         onMemberClick = onMemberClick,
                         onNavigateToTab = onNavigateToTab,
                         onEventClick = onEventClick,
@@ -193,6 +195,7 @@ fun TodayScreen(
 private fun TodayContent(
     uiState: TodayUiState,
     birthdays: List<Birthday>,
+    hasUpcomingTickets: Boolean,
     onMemberClick: (String) -> Unit,
     onNavigateToTab: (MainTab) -> Unit,
     onEventClick: (String) -> Unit,
@@ -244,6 +247,7 @@ private fun TodayContent(
                     user = user,
                     onTableportClick = onTableportClick,
                     onTicketsClick = onTicketsClick,
+                    showTickets = hasUpcomingTickets,
                     modifier = Modifier.padding(horizontal = 20.dp).padding(top = 12.dp),
                 )
             }

@@ -12,6 +12,8 @@ import it.mensa.shared.model.NotificationModel
 import it.mensa.shared.model.SigModel
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -59,6 +61,10 @@ class TodayViewModel(
     private val _birthdays = MutableStateFlow<List<Birthday>>(emptyList())
     val birthdays: StateFlow<List<Birthday>> = _birthdays.asStateFlow()
 
+    /** Almeno un ticket ancora valido: solo allora "I miei ticket" in Home. */
+    val hasUpcomingTickets: StateFlow<Boolean> = koin.tickets.observeHasUpcoming()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+
     private var lastLocation: Location? = null
     private var upcomingSnapshot: List<EventModel> = emptyList()
 
@@ -80,6 +86,9 @@ class TodayViewModel(
             launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
             launch { runCatching { koin.notifications.refresh() } }
             launch { loadBirthdays() }
+            // I ticket si scaricavano solo aprendone la pagina: ora che il
+            // tasto compare solo con un ticket valido, li scarica la Home.
+            launch { runCatching { koin.tickets.refresh() } }
         }
     }
 
@@ -146,6 +155,9 @@ class TodayViewModel(
             launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
             launch { runCatching { koin.notifications.refresh() } }
             launch { loadBirthdays() }
+            // I ticket si scaricavano solo aprendone la pagina: ora che il
+            // tasto compare solo con un ticket valido, li scarica la Home.
+            launch { runCatching { koin.tickets.refresh() } }
         }
     }
 
