@@ -38,6 +38,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material3.Surface
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.MarkdownColors
+import com.mikepenz.markdown.model.MarkdownTypography
+import com.mikepenz.markdown.model.markdownDimens
+import com.mikepenz.markdown.model.rememberMarkdownState
 import com.mikepenz.markdown.model.markdownPadding
 import it.mensa.app.support.tr
 import kotlinx.coroutines.flow.first
@@ -81,13 +96,32 @@ fun DeveloperMessageSheet(
         properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
     ) {
         Column(modifier = Modifier.navigationBarsPadding()) {
-            Text(
-                text = tr("developer_message.title", "Un messaggio dagli sviluppatori"),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 12.dp),
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    modifier = Modifier.size(44.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.Filled.Campaign,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
+                Text(
+                    text = tr("developer_message.title", "Un messaggio dagli sviluppatori"),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                )
+            }
             HorizontalDivider()
             Column(
                 modifier = Modifier
@@ -95,14 +129,7 @@ fun DeveloperMessageSheet(
                     .verticalScroll(scroll)
                     .padding(horizontal = 24.dp, vertical = 16.dp),
             ) {
-                SelectionContainer {
-                    Markdown(
-                        content = message,
-                        // Senza, i paragrafi stanno attaccati.
-                        padding = markdownPadding(block = 6.dp),
-                        modifier = Modifier.fillMaxWidth().onSizeChanged { textHeight = it.height },
-                    )
-                }
+                MessageMarkdown(message = message, onTextHeight = { textHeight = it })
             }
             HorizontalDivider()
             Column(
@@ -140,4 +167,80 @@ fun DeveloperMessageSheet(
     }
 }
 
+/**
+ * Il testo, per conto suo: quando "Avanti" si accende la scheda si ridisegna,
+ * e con il Markdown dentro lo stesso blocco la libreria lo rianalizzava da
+ * capo. Per un attimo il testo era vuoto e lo scorrimento tornava in cima.
+ * Qui non si ridisegna (parametri uguali) e l'analisi resta ricordata.
+ */
+@Composable
+private fun MessageMarkdown(message: String, onTextHeight: (Int) -> Unit) {
+    val state = rememberMarkdownState(message)
+    SelectionContainer {
+        Markdown(
+            markdownState = state,
+            colors = developerMessageColors(),
+            typography = developerMessageTypography(),
+            padding = markdownPadding(
+                // Senza, i paragrafi stanno attaccati.
+                block = 6.dp,
+                listItemTop = 3.dp,
+                listItemBottom = 3.dp,
+                listIndent = 6.dp,
+                codeBlock = PaddingValues(14.dp),
+                blockQuoteText = PaddingValues(start = 12.dp, top = 2.dp, bottom = 2.dp),
+            ),
+            dimens = markdownDimens(
+                blockQuoteThickness = 3.dp,
+                codeBackgroundCornerSize = 12.dp,
+                dividerThickness = 1.dp,
+            ),
+            modifier = Modifier.fillMaxWidth().onSizeChanged { onTextHeight(it.height) },
+        )
+    }
+}
+
 private const val END_SLACK_PX = 8
+
+/**
+ * Il markdown del messaggio: quello delle chat, non quello di un documento.
+ * Di serie i titoli usano i display di Material (un `#` prendeva mezzo
+ * schermo) e i link sono neri sottolineati; qui titoli poco piu' grandi del
+ * testo, interlinea larga, link nel colore del brand, codice su fondo grigio.
+ * Mirrors iOS `Theme.developerMessage`.
+ */
+@Composable
+private fun developerMessageTypography(): MarkdownTypography {
+    val body = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 24.sp)
+    val heading = body.copy(fontWeight = FontWeight.SemiBold)
+    val mono = body.copy(fontFamily = FontFamily.Monospace, fontSize = 14.sp, lineHeight = 21.sp)
+    val brand = MaterialTheme.colorScheme.primary
+    return markdownTypography(
+        h1 = heading.copy(fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold),
+        h2 = heading.copy(fontSize = 19.sp, lineHeight = 26.sp),
+        h3 = heading.copy(fontSize = 17.sp, lineHeight = 24.sp),
+        h4 = heading,
+        h5 = heading,
+        h6 = heading.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+        text = body,
+        code = mono,
+        inlineCode = mono.copy(fontSize = 14.5.sp),
+        quote = body.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+        paragraph = body,
+        ordered = body,
+        bullet = body,
+        list = body,
+        textLink = TextLinkStyles(style = SpanStyle(color = brand, fontWeight = FontWeight.Medium)),
+    )
+}
+
+@Composable
+private fun developerMessageColors(): MarkdownColors = markdownColor(
+    text = MaterialTheme.colorScheme.onSurface,
+    codeText = MaterialTheme.colorScheme.onSurface,
+    inlineCodeText = MaterialTheme.colorScheme.onSurface,
+    linkText = MaterialTheme.colorScheme.primary,
+    codeBackground = MaterialTheme.colorScheme.surfaceContainerHighest,
+    inlineCodeBackground = MaterialTheme.colorScheme.surfaceContainerHighest,
+    dividerColor = MaterialTheme.colorScheme.outlineVariant,
+)
