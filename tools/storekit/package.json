@@ -17,5 +17,10 @@
     "@types/bun": "^1.2.0",
     "puppeteer-core": "^24.10.0",
     "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "basic-ftp": "^6.2.1",
+    "ip-address": "^10.7.4",
+    "zod": "^4.6.6"
   }
 }
