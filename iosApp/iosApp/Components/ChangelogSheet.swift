@@ -85,6 +85,7 @@ private struct LaunchNoticesModifier: ViewModifier {
 
     @State private var developerMessage: PendingMessage?
     @State private var showChangelog = false
+    @Environment(\.scenePhase) private var scenePhase
 
     func body(content: Content) -> some View {
         content
@@ -96,6 +97,16 @@ private struct LaunchNoticesModifier: ViewModifier {
                     developerMessage = PendingMessage(text: message)
                 } else {
                     await presentChangelogIfNeeded()
+                }
+            }
+            // Anche al ritorno in primo piano: un messaggio cambiato mentre
+            // l'app era aperta si vede subito, senza chiuderla del tutto.
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active, developerMessage == nil, !showChangelog else { return }
+                Task {
+                    if let message = try? await koin.developerMessage.pending() {
+                        developerMessage = PendingMessage(text: message)
+                    }
                 }
             }
             .sheet(item: $developerMessage, onDismiss: {

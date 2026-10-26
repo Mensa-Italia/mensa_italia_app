@@ -12,7 +12,9 @@ import it.mensa.shared.db.MensaDatabase
  * volta che il testo cambia rispetto all'ultimo letto. Conta solo l'ultimo,
  * non lo storico: "problema X", poi "problema Y", poi di nuovo "problema X"
  * compaiono tutti e tre, perche' rimettere un testo vecchio e' un messaggio
- * nuovo per chi legge. Per spegnerlo basta svuotare la chiave.
+ * nuovo per chi legge. Per spegnerlo basta svuotare la chiave, e anche il
+ * vuoto conta come un messaggio arrivato: X, vuoto, di nuovo X fa comparire X
+ * due volte.
  *
  * L'ultimo valore arrivato dal server resta salvato: chi apre l'app offline
  * vede comunque un messaggio che non ha ancora letto.
@@ -21,11 +23,24 @@ class DeveloperMessage internal constructor(
     private val settings: SettingsApi,
     private val db: MensaDatabase,
 ) {
-    /** Il messaggio da mostrare adesso, o null se non c'e' o e' gia' stato letto. */
+    /**
+     * Il messaggio da mostrare adesso, o null se non c'e' o e' gia' stato letto.
+     *
+     * Sempre dal server, non da `SettingsApi.configs`: quello si scarica una
+     * volta per sessione, e un messaggio cambiato con l'app gia' aperta non
+     * si sarebbe visto finche' non la si chiudeva del tutto. Le UI lo chiamano
+     * all'apertura e a ogni ritorno in primo piano.
+     */
     @Throws(Exception::class)
     suspend fun pending(): String? {
-        val message = runCatching { settings.configs()[KEY] }
-            .onSuccess { fresh -> store(KEY_LATEST, fresh?.trim().orEmpty()) }
+        val message = runCatching { settings.settings()[KEY] }
+            .onSuccess { fresh ->
+                store(KEY_LATEST, fresh?.trim().orEmpty())
+                // Svuotato dal server: non si mostra niente, ma e' come se
+                // fosse arrivato e letto, cosi' un X rimesso dopo ricompare.
+                // Solo con la risposta in mano: offline non si sa.
+                if (fresh.isNullOrBlank()) store(KEY_SEEN, EMPTY_SEEN)
+            }
             .getOrElse { read(KEY_LATEST) }
         return pendingOf(message, lastSeen())
     }
@@ -54,6 +69,9 @@ class DeveloperMessage internal constructor(
         const val KEY = "developer_message"
         private const val KEY_LATEST = "developer_message.latest"
         private const val KEY_SEEN = "developer_message.seen"
+
+        /** L'ultimo "letto" quando il server ha svuotato la chiave. */
+        val EMPTY_SEEN: String = fingerprint("")
 
         /** La regola, separata per i test: un testo, diverso dall'ultimo letto. */
         fun pendingOf(message: String?, lastSeen: String?): String? {

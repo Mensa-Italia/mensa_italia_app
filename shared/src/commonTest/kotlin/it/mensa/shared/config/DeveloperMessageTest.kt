@@ -36,6 +36,16 @@ class DeveloperMessageTest {
     }
 
     @Test
+    fun anEmptyMessageInBetweenCountsAsReceived() {
+        // X, poi la chiave vuota, poi di nuovo X: il vuoto e' l'ultimo
+        // "letto", quindi X compare una seconda volta.
+        val x = "Problema X"
+        assertEquals(x, DeveloperMessage.pendingOf(x, null))
+        assertNull(DeveloperMessage.pendingOf("", DeveloperMessage.fingerprint(x)))
+        assertEquals(x, DeveloperMessage.pendingOf(x, DeveloperMessage.EMPTY_SEEN))
+    }
+
+    @Test
     fun fingerprintIsStableAndTellsTextsApart() {
         // FNV-1a 64 di "a": valore noto, uguale su ogni piattaforma.
         assertEquals("af63dc4c8601ec8c", DeveloperMessage.fingerprint("a"))

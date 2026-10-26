@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.shared.changelog.ChangelogItem
@@ -63,6 +65,16 @@ fun LaunchNotices() {
         delay(600)
         developerMessage = runCatching { koin.developerMessage.pending() }.getOrNull()
         if (developerMessage == null) changelogTurn = true
+    }
+
+    // Anche al ritorno in primo piano: un messaggio cambiato mentre l'app
+    // era aperta si vede subito, senza chiuderla del tutto.
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        if (developerMessage == null) {
+            scope.launch {
+                runCatching { koin.developerMessage.pending() }.getOrNull()?.let { developerMessage = it }
+            }
+        }
     }
 
     val message = developerMessage
