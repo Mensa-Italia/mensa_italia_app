@@ -26,18 +26,26 @@ struct OnboardingView: View {
     }
 
     var body: some View {
-        ZStack {
-            AnimatedBackdrop(page: vm.currentPage)
-            carousel
-        }
-        .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 18) {
-                BreathingDots(count: vm.pages.count, current: vm.currentPage)
-                ctaButton
+        GeometryReader { proxy in
+            let split = OnboardingSplit(in: proxy)
+            ZStack {
+                AnimatedBackdrop(page: vm.currentPage)
+                carousel(split: split)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 12)
-            .padding(.top, 8)
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 18) {
+                    BreathingDots(count: vm.pages.count, current: vm.currentPage)
+                    ctaButton
+                }
+                .frame(maxWidth: 520)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+                .padding(.top, 8)
+                // Aperto, i comandi stanno sotto il testo, a destra della
+                // cerniera; a sinistra resta solo l'illustrazione.
+                .frame(width: split?.trailing.width)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
         }
         .onAppear {
             // Mark the initial page as "landed" after a beat so the entrance animation runs.
@@ -55,7 +63,7 @@ struct OnboardingView: View {
 
     // MARK: Carousel
 
-    private var carousel: some View {
+    private func carousel(split: OnboardingSplit?) -> some View {
         GeometryReader { proxy in
             let pageWidth = proxy.size.width
             HStack(spacing: 0) {
@@ -64,7 +72,8 @@ struct OnboardingView: View {
                         page: vm.pages[i],
                         index: i,
                         currentIndex: vm.currentPage,
-                        hasLanded: landedPages.contains(i)
+                        hasLanded: landedPages.contains(i),
+                        split: split
                     )
                     .frame(width: pageWidth)
                     .rotation3DEffect(
@@ -151,6 +160,33 @@ struct OnboardingView: View {
     }
 }
 
+// MARK: - Split layout (iPhone Duo unfolded)
+
+/// Le due meta' dello schermo ai lati della cerniera di un iPhone Duo aperto,
+/// o a meta' di uno schermo largo abbastanza per due colonne. Come la Home
+/// (`TodayView.foldLayout`): niente sulla piega.
+struct OnboardingSplit {
+    var leading: CGRect
+    var hinge: CGRect
+    var trailing: CGRect
+
+    init?(in proxy: GeometryProxy) {
+        let size = proxy.size
+        let hinge: CGRect
+        if let h = proxy.verticalHinge {
+            hinge = h
+        } else if size.width >= 600 {
+            let gutter: CGFloat = 16
+            hinge = CGRect(x: (size.width - gutter) / 2, y: 0, width: gutter, height: size.height)
+        } else {
+            return nil
+        }
+        self.hinge = hinge
+        leading = CGRect(x: 0, y: 0, width: max(hinge.minX, 0), height: size.height)
+        trailing = CGRect(x: hinge.maxX, y: 0, width: max(size.width - hinge.maxX, 0), height: size.height)
+    }
+}
+
 // MARK: - Page Container (hero + kinetic copy)
 
 private struct OnboardingPageContainer: View {
@@ -158,25 +194,67 @@ private struct OnboardingPageContainer: View {
     let index: Int
     let currentIndex: Int
     let hasLanded: Bool
+    /// Aperto (iPhone Duo) o su uno schermo largo: illustrazione a sinistra,
+    /// testo a destra. Nil su un telefono e da chiuso.
+    let split: OnboardingSplit?
 
     private var isActive: Bool { index == currentIndex }
     private var showCopy: Bool { hasLanded && isActive }
 
+    /// Le illustrazioni sono disegnate per 280 punti d'altezza.
+    private static let heroDesignHeight: CGFloat = 280
+
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 0)
-            hero
-                .frame(height: 280)
-                .padding(.bottom, 36)
+        GeometryReader { geo in
+            if let split {
+                HStack(spacing: 0) {
+                    heroScaled(toFit: min(geo.size.height * 0.7, split.leading.width * 0.8))
+                        // La ricerca prende tutta la larghezza: senza margine
+                        // toccava il bordo dello schermo.
+                        .padding(.horizontal, 24)
+                        .frame(width: split.leading.width)
+                    Color.clear.frame(width: split.hinge.width)
+                    copy
+                        .frame(maxWidth: 480)
+                        .frame(width: split.trailing.width)
+                }
+                .frame(maxHeight: .infinity)
+            } else {
+                // Da chiuso il Duo e' basso e largo: a 280 punti fissi
+                // l'illustrazione si mangiava l'altezza e il sottotitolo
+                // finiva troncato a una riga. Cosi' si stringe lei.
+                let heroHeight = min(Self.heroDesignHeight, max(150, geo.size.height * 0.42))
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    heroScaled(toFit: heroHeight)
+                        .padding(.bottom, heroHeight < Self.heroDesignHeight ? 20 : 36)
+                    copy
+                        .frame(maxWidth: 520)
+                    Spacer(minLength: 0)
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, min(64, geo.size.height * 0.06))
+            }
+        }
+    }
+
+    /// L'illustrazione ridotta (mai ingrandita) per stare in [height].
+    private func heroScaled(toFit height: CGFloat) -> some View {
+        let scale = min(1, height / Self.heroDesignHeight)
+        return hero
+            .frame(height: Self.heroDesignHeight)
+            .scaleEffect(scale)
+            .frame(height: Self.heroDesignHeight * scale)
+    }
+
+    private var copy: some View {
+        VStack(spacing: 14) {
             kineticTitle
                 .padding(.horizontal, 32)
-                .padding(.bottom, 14)
             subtitle
                 .padding(.horizontal, 36)
-            Spacer(minLength: 0)
-            Spacer(minLength: 0)
         }
-        .padding(.top, 64)
     }
 
     // MARK: Hero (different per page)
@@ -208,6 +286,8 @@ private struct OnboardingPageContainer: View {
             .font(.title3.weight(.regular))
             .multilineTextAlignment(.center)
             .foregroundStyle(.secondary)
+            // Va a capo, non si tronca: se manca spazio cede l'illustrazione.
+            .fixedSize(horizontal: false, vertical: true)
             .opacity(showCopy ? 1 : 0)
             .offset(y: showCopy ? 0 : 16)
             .blur(radius: showCopy ? 0 : 3)
@@ -686,9 +766,16 @@ private struct HeroSearch: View {
         }
         .padding(.horizontal, 18)
         .frame(height: 56)
+        // Pieno, col blu della tessera di pagina 3: in vetro con il testo
+        // bianco spariva sullo sfondo chiaro (bianco su bianco).
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
+                .fill(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.mensaBlueDeep, AppTheme.Colors.mensaBlue],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(AppTheme.Colors.mensaCyan.opacity(0.4), lineWidth: 1)
@@ -703,7 +790,7 @@ private struct HeroSearch: View {
     private var chipResults: some View {
         VStack(alignment: .leading, spacing: 8) {
             chip(label: tr("onboarding.search.chip.events", fallback: "Eventi · 12"), iconColor: AppTheme.Colors.mensaCyan, delay: 0.32)
-            chip(label: tr("onboarding.search.chip.deals", fallback: "Convenzioni · 7"), iconColor: .white.opacity(0.9), delay: 0.42)
+            chip(label: tr("onboarding.search.chip.deals", fallback: "Convenzioni · 7"), iconColor: AppTheme.Colors.mensaBlue, delay: 0.42)
             chip(label: tr("onboarding.search.chip.people", fallback: "Persone · 3"), iconColor: AppTheme.Colors.mensaCyan, delay: 0.52)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -715,17 +802,19 @@ private struct HeroSearch: View {
             Circle()
                 .fill(iconColor)
                 .frame(width: 6, height: 6)
+            // Colori di sistema: si leggono sullo sfondo chiaro e su quello scuro.
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.92))
+                .foregroundStyle(.primary)
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 12).padding(.vertical, 9)
         .background(
             Capsule()
-                .fill(.ultraThinMaterial)
-                .overlay(Capsule().strokeBorder(.white.opacity(0.14), lineWidth: 1))
+                .fill(.regularMaterial)
+                .overlay(Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 1))
         )
+        .shadow(color: AppTheme.Colors.mensaBlue.opacity(0.12), radius: 8, y: 3)
         .opacity(active ? 1 : 0)
         .offset(x: active ? 0 : 30)
         .blur(radius: active ? 0 : 4)

@@ -239,6 +239,9 @@ struct RootView: View {
     private let previewBypass = ProcessInfo.processInfo.arguments.contains("--preview-authed")
     private let previewLogin = ProcessInfo.processInfo.arguments.contains("--preview-login")
     private let previewOnboarding = ProcessInfo.processInfo.arguments.contains("--preview-onboarding")
+    /// "Inizia" premuto nell'anteprima dell'onboarding: si entra nell'app come
+    /// dopo un primo accesso, invece di restare fermi sull'ultima pagina.
+    @State private var previewOnboardingDone = false
     private let initialPage: Int = {
         let args = ProcessInfo.processInfo.arguments
         if let idx = args.firstIndex(of: "--initial-page"), args.indices.contains(idx + 1) {
@@ -251,8 +254,11 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if previewOnboarding {
-                OnboardingView(initialPage: initialPage, onComplete: {})
+            if previewOnboarding && !previewOnboardingDone {
+                OnboardingView(initialPage: initialPage, onComplete: {
+                    previewOnboardingDone = true
+                    Task { await vm.start() }
+                })
             } else if previewBypass {
                 MainTabView()
             } else if previewLogin {
