@@ -8,24 +8,31 @@ import kotlin.test.assertNull
 class DeveloperMessageTest {
     @Test
     fun emptyOrMissingShowsNothing() {
-        assertNull(DeveloperMessage.pendingOf(null, emptySet()))
-        assertNull(DeveloperMessage.pendingOf("", emptySet()))
-        assertNull(DeveloperMessage.pendingOf("  \n ", emptySet()))
+        assertNull(DeveloperMessage.pendingOf(null, null))
+        assertNull(DeveloperMessage.pendingOf("", null))
+        assertNull(DeveloperMessage.pendingOf("  \n ", null))
     }
 
     @Test
     fun newMessageShowsTrimmed() {
-        assertEquals("# Ciao", DeveloperMessage.pendingOf("\n# Ciao  ", emptySet()))
+        assertEquals("# Ciao", DeveloperMessage.pendingOf("\n# Ciao  ", null))
     }
 
     @Test
-    fun seenMessageDoesNotComeBackEvenAfterAnother() {
-        val first = "Primo messaggio"
-        val second = "Secondo messaggio"
-        val seen = setOf(DeveloperMessage.fingerprint(first), DeveloperMessage.fingerprint(second))
-        assertNull(DeveloperMessage.pendingOf(first, seen))
-        assertNull(DeveloperMessage.pendingOf(" $first\n", seen))
-        assertEquals("Terzo", DeveloperMessage.pendingOf("Terzo", seen))
+    fun lastReadDoesNotComeBackUntilTheTextChanges() {
+        val x = "Problema X"
+        assertNull(DeveloperMessage.pendingOf(x, DeveloperMessage.fingerprint(x)))
+        assertNull(DeveloperMessage.pendingOf(" $x\n", DeveloperMessage.fingerprint(x)))
+    }
+
+    @Test
+    fun aTextPutBackAfterAnotherShowsAgain() {
+        // X, poi Y, poi di nuovo X: tutti e tre compaiono. Conta solo l'ultimo letto.
+        val x = "Problema X"
+        val y = "Problema Y"
+        assertEquals(x, DeveloperMessage.pendingOf(x, null))
+        assertEquals(y, DeveloperMessage.pendingOf(y, DeveloperMessage.fingerprint(x)))
+        assertEquals(x, DeveloperMessage.pendingOf(x, DeveloperMessage.fingerprint(y)))
     }
 
     @Test
