@@ -219,7 +219,7 @@ final class PaymentMethodPickerViewModel {
             defaultId = id
             showPicker = false
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 
@@ -235,7 +235,7 @@ final class PaymentMethodPickerViewModel {
             case .canceled:
                 break
             case .failed(let error):
-                errorMessage = error.localizedDescription
+                errorMessage = error.userMessage
             }
         }
     }

@@ -1,5 +1,6 @@
 package it.mensa.app.features.quid
 
+import it.mensa.app.support.userMessage
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,7 +62,7 @@ class QuidPdfViewModel(
                 }
                 _state.update { it.copy(localFile = file, downloading = false) }
             } catch (e: Exception) {
-                _state.update { it.copy(downloading = false, error = e.message ?: "Errore durante il download") }
+                _state.update { it.copy(downloading = false, error = e.userMessage) }
             }
         }
     }

@@ -1,5 +1,6 @@
 package it.mensa.app.features.tableport._components
 
+import it.mensa.app.support.userMessage
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -81,7 +82,7 @@ fun StampConfirmSheet(
         loading = true
         runCatching { repo.verify(id = stampId, code = code) }
             .onSuccess { stamp = it }
-            .onFailure { errorMessage = it.message }
+            .onFailure { errorMessage = it.userMessage }
         loading = false
     }
 
@@ -127,7 +128,7 @@ fun StampConfirmSheet(
                                 saving = true
                                 runCatching {
                                     repo.claim(stampId = stampId, code = code)
-                                }.onFailure { errorMessage = it.message }
+                                }.onFailure { errorMessage = it.userMessage }
                                 saving = false
                                 onDone()
                             }

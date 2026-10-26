@@ -1,5 +1,6 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stripe.android.paymentsheet.PaymentSheet
@@ -135,7 +136,7 @@ class MakeDonationViewModel : ViewModel() {
                         it.copy(
                             submitting = false,
                             showResult = true,
-                            resultMessage = e.message ?: "Errore durante la donazione",
+                            resultMessage = e.userMessage,
                         )
                     }
                 },

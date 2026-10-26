@@ -20,6 +20,7 @@ class OidcDiscoveryCache(private val client: HttpClient) {
     private val cache = mutableMapOf<String, OidcDiscovery>()
     private val mutex = Mutex()
 
+    @Throws(Exception::class)
     suspend fun get(issuer: String): OidcDiscovery = mutex.withLock {
         cache[issuer]?.let { return@withLock it }
         val url = issuer.trimEnd('/') + "/.well-known/openid-configuration"

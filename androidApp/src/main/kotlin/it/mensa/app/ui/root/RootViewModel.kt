@@ -7,7 +7,7 @@ import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
-import it.mensa.shared.auth.Membership
+import it.mensa.shared.auth.MembershipGate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -126,15 +126,17 @@ class RootViewModel(
         }
 
         // 4. Subscribe to authState + currentUser and derive phase
-        combine(auth.authState, auth.currentUser) { state, user -> Pair(state, user) }
-            .collect { (state, user) ->
-                _phase.value = derivePhase(state, user)
-            }
+        combine(auth.authState, auth.currentUser, auth.membershipGate) { state, user, gate ->
+            Triple(state, user, gate)
+        }.collect { (state, user, gate) ->
+            _phase.value = derivePhase(state, user, gate)
+        }
     }
 
     private suspend fun derivePhase(
         state: AuthState,
         user: it.mensa.shared.model.UserModel?,
+        gate: MembershipGate,
     ): RootPhase = when (state) {
         is AuthState.Authenticated -> {
             if (user == null) {
@@ -144,10 +146,14 @@ class RootViewModel(
                 // Screenshot harness always wants the authenticated shell —
                 // a fresh automation login would otherwise land on onboarding.
                 RootPhase.Main
-            } else if (Membership.isExpired(user)) {
+            } else if (gate == MembershipGate.EXPIRED) {
                 // Prima dell'onboarding: chi non e' in regola non entra, e non
                 // ha senso fargli fare il giro di presentazione dell'app.
                 RootPhase.MembershipExpired
+            } else if (gate == MembershipGate.CHECKING) {
+                // Scaduta solo secondo la cache: lo splash aspetta il server,
+                // invece di aprire la Home e chiuderla subito dopo.
+                RootPhase.Loading
             } else {
                 val showOnboarding = onboarding.shouldShow(user)
                 if (showOnboarding) RootPhase.Onboarding else RootPhase.Main

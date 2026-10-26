@@ -1,5 +1,6 @@
 package it.mensa.app.features.localoffices._components
 
+import it.mensa.app.support.userMessage
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -125,7 +126,7 @@ fun LocalOfficeTestDateEditorSheet(
                                     }
                                     onDismiss()
                                 } catch (e: Exception) {
-                                    error = e.message
+                                    error = e.userMessage
                                 } finally {
                                     saving = false
                                 }

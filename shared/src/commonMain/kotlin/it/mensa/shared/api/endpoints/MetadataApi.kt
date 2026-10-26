@@ -30,6 +30,7 @@ private data class UpdateMetadataPayload(
  */
 class MetadataApi(private val pb: PocketBaseClient) {
 
+    @Throws(Exception::class)
     suspend fun getMetadataMap(userId: String): Map<String, String> {
         val safe = userId.replace("'", "")
         val items = pb.fullList<MetadataEntry>(
@@ -39,6 +40,7 @@ class MetadataApi(private val pb: PocketBaseClient) {
         return items.associate { it.key to it.value }
     }
 
+    @Throws(Exception::class)
     suspend fun getByKey(userId: String, key: String): MetadataEntry? {
         val sU = userId.replace("'", "")
         val sK = key.replace("'", "")
@@ -49,6 +51,7 @@ class MetadataApi(private val pb: PocketBaseClient) {
         ).items.firstOrNull()
     }
 
+    @Throws(Exception::class)
     suspend fun setMetadata(userId: String, key: String, value: String): MetadataEntry {
         val existing = getByKey(userId, key)
         return if (existing != null) {

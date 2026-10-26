@@ -386,7 +386,7 @@ final class OrgChartViewModel {
             self.groups = model.groups
             self.errorMessage = nil
         } catch {
-            self.errorMessage = error.localizedDescription
+            self.errorMessage = error.userMessage
         }
     }
 }

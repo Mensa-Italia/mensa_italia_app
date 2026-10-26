@@ -19,6 +19,7 @@ open class SearchApi(private val client: HttpClient) {
      * (default, lancia ClientRequestException per 4xx) sia con expectSuccess=false
      * (gestione manuale dello status).
      */
+    @Throws(Exception::class)
     open suspend fun search(request: SearchRequest, maxRetries: Int = 5): SearchResponse {
         var attempt = 0
         while (true) {
@@ -58,6 +59,7 @@ open class SearchApi(private val client: HttpClient) {
     }
 
     /** Shorthand */
+    @Throws(Exception::class)
     open suspend fun search(
         q: String,
         types: List<String>? = null,

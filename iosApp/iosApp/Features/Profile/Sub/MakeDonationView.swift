@@ -244,13 +244,13 @@ struct MakeDonationView: View {
                     case .canceled:
                         break
                     case .failed(let error):
-                        resultMessage = error.localizedDescription
+                        resultMessage = error.userMessage
                         showResult = true
                     }
                 }
             } catch {
                 vm.submitting = false
-                resultMessage = error.localizedDescription
+                resultMessage = error.userMessage
                 showResult = true
             }
         }
@@ -314,7 +314,7 @@ final class MakeDonationViewModel {
             _ = try await koin.paymentMethods.donate(amountCents: Int32(amount * 100))
             return true
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
             return false
         }
     }

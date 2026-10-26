@@ -10,6 +10,7 @@ import it.mensa.shared.model.withDefaultAvatarStripped
  */
 class RegSociApi(private val pb: PocketBaseClient) {
 
+    @Throws(Exception::class)
     suspend fun list(
         filter: String? = null,
         sort: String = "name",
@@ -17,6 +18,7 @@ class RegSociApi(private val pb: PocketBaseClient) {
         pb.fullList<RegSociModel>("members_registry", filter = filter, sort = sort)
             .map { it.withDefaultAvatarStripped() }
 
+    @Throws(Exception::class)
     suspend fun get(id: String): RegSociModel =
         pb.getOne<RegSociModel>("members_registry", id).withDefaultAvatarStripped()
 
@@ -24,6 +26,7 @@ class RegSociApi(private val pb: PocketBaseClient) {
      * Server-side filtered search by name. Uses PocketBase `~` (like) operator.
      * The caller is responsible for offline-first fallback to local DB.
      */
+    @Throws(Exception::class)
     suspend fun searchByName(query: String, perPage: Int = 50): List<RegSociModel> {
         val safe = query.replace("'", "")
         return pb.list<RegSociModel>(

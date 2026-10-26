@@ -154,7 +154,7 @@ final class AddDealViewModel {
             }
             dismissed = true
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 
@@ -166,7 +166,7 @@ final class AddDealViewModel {
             try await koin.deals.delete(id: d.id)
             dismissed = true
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 

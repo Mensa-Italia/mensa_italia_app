@@ -26,6 +26,7 @@ class CalendarLinksRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.firstOrNull()?.toModel(json) }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val link = api.current() ?: return
         val now = Clock.System.now().toEpochMilliseconds()
@@ -43,9 +44,11 @@ class CalendarLinksRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): CalendarLinkModel? = observeCurrent().first()
 
     /** Update the included regions for the given calendar link and mirror to DB. */
+    @Throws(Exception::class)
     suspend fun changeState(id: String, state: List<String>): CalendarLinkModel {
         val updated = api.updateState(id, state)
         val now = Clock.System.now().toEpochMilliseconds()

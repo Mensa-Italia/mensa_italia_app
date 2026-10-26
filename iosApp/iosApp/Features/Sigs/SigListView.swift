@@ -47,7 +47,7 @@ final class SigListViewModel {
         do {
             try await koin.sigs.refresh(filter: nil, sort: "name")
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.refreshMessage
         }
     }
 
@@ -61,7 +61,7 @@ final class SigListViewModel {
             imageFilename: payload.imageData != nil ? (payload.imageFilename ?? "cover.jpg") : nil,
             imageContentType: payload.imageContentType ?? "image/jpeg"
         )
-        do { _ = try await koin.sigs.create(draft: draft) } catch { self.error = (error as NSError).localizedDescription }
+        do { _ = try await koin.sigs.create(draft: draft) } catch { self.error = error.userMessage }
     }
 
     func update(id: String, payload: SigDraftPayload) async {
@@ -74,11 +74,11 @@ final class SigListViewModel {
             imageFilename: payload.imageData != nil ? (payload.imageFilename ?? "cover.jpg") : nil,
             imageContentType: payload.imageContentType ?? "image/jpeg"
         )
-        do { _ = try await koin.sigs.update(id: id, draft: draft) } catch { self.error = (error as NSError).localizedDescription }
+        do { _ = try await koin.sigs.update(id: id, draft: draft) } catch { self.error = error.userMessage }
     }
 
     func delete(id: String) async {
-        do { try await koin.sigs.delete(id: id) } catch { self.error = (error as NSError).localizedDescription }
+        do { try await koin.sigs.delete(id: id) } catch { self.error = error.userMessage }
     }
 }
 

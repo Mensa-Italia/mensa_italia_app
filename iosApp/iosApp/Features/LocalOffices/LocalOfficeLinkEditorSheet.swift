@@ -237,7 +237,7 @@ struct LocalOfficeLinkEditorSheet: View {
             }
             dismiss()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
             showError = true
         }
     }

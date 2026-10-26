@@ -70,6 +70,7 @@ class PocketBaseClient(@PublishedApi internal val client: HttpClient) {
             setBody(body)
         }.body()
 
+    @Throws(Exception::class)
     suspend fun delete(collection: String, id: String) {
         client.delete("/api/collections/$collection/records/$id")
     }

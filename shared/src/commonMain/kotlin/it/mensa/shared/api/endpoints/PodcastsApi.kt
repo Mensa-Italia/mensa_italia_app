@@ -67,10 +67,12 @@ private fun PbPodcastEpisode.toEpisode(): PodcastEpisode = PodcastEpisode(
 
 class PodcastsApi(private val pb: PocketBaseClient) {
 
+    @Throws(Exception::class)
     suspend fun listPodcasts(): List<Podcast> =
         pb.fullList<PbPodcast>("podcasts", sort = "-created")
             .map { it.toPodcast() }
 
+    @Throws(Exception::class)
     suspend fun listEpisodes(
         podcastId: String,
         page: Int = 1,

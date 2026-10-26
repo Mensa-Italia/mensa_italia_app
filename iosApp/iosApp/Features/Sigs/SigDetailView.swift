@@ -47,7 +47,7 @@ final class SigDetailViewModel {
         do {
             sig = try await koin.sigs.getById(id: id)
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 
@@ -66,7 +66,7 @@ final class SigDetailViewModel {
         do {
             sig = try await koin.sigs.update(id: id, draft: draft)
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 
@@ -78,7 +78,7 @@ final class SigDetailViewModel {
             try await koin.sigs.delete(id: id)
             return true
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
             return false
         }
     }

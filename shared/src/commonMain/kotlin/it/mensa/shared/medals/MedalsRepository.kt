@@ -26,6 +26,7 @@ class MedalsRepository(
         }
 
     /** Rereads the counters. Throws on network errors; the last read stays. */
+    @Throws(Exception::class)
     suspend fun refresh(): List<MedalStatus> {
         val userId = auth.currentUser.value?.id ?: return emptyList()
         val stats: MedalStatsModel = pb.getOne(COLLECTION, userId)

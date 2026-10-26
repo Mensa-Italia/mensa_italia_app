@@ -16,6 +16,7 @@ class PodcastsRepository(
 
     fun observePodcasts(): Flow<List<Podcast>> = _podcasts.asStateFlow()
 
+    @Throws(Exception::class)
     suspend fun refreshPodcasts() {
         _podcasts.value = api.listPodcasts()
     }
@@ -23,6 +24,7 @@ class PodcastsRepository(
     fun observeEpisodes(podcastId: String): Flow<List<PodcastEpisode>> =
         _episodes.map { it[podcastId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshEpisodes(podcastId: String) {
         val episodes = api.listEpisodes(podcastId)
         _episodes.value = _episodes.value + (podcastId to episodes)

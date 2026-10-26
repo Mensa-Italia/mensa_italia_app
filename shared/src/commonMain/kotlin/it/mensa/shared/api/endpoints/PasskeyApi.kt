@@ -26,6 +26,7 @@ import it.mensa.shared.auth.passkey.PasskeyRegistrationChallengeResponse
 class PasskeyApi(private val client: HttpClient) {
 
     /** `POST /api/cs/auth-with-passkey/begin` — apre la challenge per `email`. */
+    @Throws(Exception::class)
     suspend fun beginLogin(email: String): PasskeyLoginChallengeResponse =
         client.post("/api/cs/auth-with-passkey/begin") {
             attributes.put(SkipAuthAttribute, true)
@@ -44,6 +45,7 @@ class PasskeyApi(private val client: HttpClient) {
      * Risponde con la stessa forma di `/auth-with-zitadel`, quindi riusiamo
      * [OidcTokenResponse] senza adattamenti.
      */
+    @Throws(Exception::class)
     suspend fun finishLogin(loginId: String, credentialJson: String): OidcTokenResponse =
         client.post("/api/cs/auth-with-passkey/finish") {
             attributes.put(SkipAuthAttribute, true)
@@ -59,10 +61,12 @@ class PasskeyApi(private val client: HttpClient) {
         }.body()
 
     /** `POST /api/cs/passkeys/begin` — avvia la registrazione per l'utente in sessione. */
+    @Throws(Exception::class)
     suspend fun beginRegistration(): PasskeyRegistrationChallengeResponse =
         client.post("/api/cs/passkeys/begin").body()
 
     /** `POST /api/cs/passkeys/finish` — conferma la registrazione. */
+    @Throws(Exception::class)
     suspend fun finishRegistration(passkeyId: String, credentialJson: String, name: String) {
         client.post("/api/cs/passkeys/finish") {
             setBody(
@@ -78,10 +82,12 @@ class PasskeyApi(private val client: HttpClient) {
     }
 
     /** `GET /api/cs/passkeys` */
+    @Throws(Exception::class)
     suspend fun list(): List<PasskeyModel> =
         client.get("/api/cs/passkeys").body<PasskeyListResponse>().passkeys
 
     /** `DELETE /api/cs/passkeys/{id}` */
+    @Throws(Exception::class)
     suspend fun remove(passkeyId: String) {
         client.delete("/api/cs/passkeys/$passkeyId")
     }

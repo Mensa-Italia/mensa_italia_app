@@ -29,6 +29,7 @@ class DealsRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel(json) } }
 
+    @Throws(Exception::class)
     suspend fun refresh(filter: String? = null, sort: String = "created") {
         val items = api.list(filter = filter, sort = sort)
         db.transaction {
@@ -44,6 +45,7 @@ class DealsRepository(
      * convenzione nuova arriva prima che la lista l'abbia scaricata, e il
      * dettaglio restava vuoto. Null se manca anche sul server o non c'e' rete.
      */
+    @Throws(Exception::class)
     suspend fun getById(id: String): DealModel? {
         db.dealQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
         // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
@@ -80,6 +82,7 @@ class DealsRepository(
      * Fetches the contacts associated with a deal directly from the API.
      * Network-only: contacts are rarely viewed, so no local cache for now.
      */
+    @Throws(Exception::class)
     suspend fun contacts(dealId: String): List<DealsContactModel> =
         api.contacts(dealId)
 
@@ -87,6 +90,7 @@ class DealsRepository(
      * Creates a new deal on the backend and triggers a `refresh()` so the
      * local cache picks it up. Returns the server-confirmed model.
      */
+    @Throws(Exception::class)
     suspend fun create(deal: DealModel): DealModel {
         val created = api.create(deal)
         runCatching { refresh() }
@@ -128,6 +132,7 @@ class DealsRepository(
      * provided POST `/deals_contacts` linked to the new deal id.
      * Refreshes the local cache so observers see the new row.
      */
+    @Throws(Exception::class)
     suspend fun create(draft: DealDraft, contact: ContactDraft?): DealModel {
         val created = api.createDeal(draft.toBody())
         if (contact != null) {
@@ -142,6 +147,7 @@ class DealsRepository(
      * field set as create (plus `is_active=true`). Then for the contact:
      * if `contact.id == null` → CREATE; else → PATCH at that contact id.
      */
+    @Throws(Exception::class)
     suspend fun update(id: String, draft: DealDraft, contact: ContactDraft?): DealModel {
         val updated = api.updateDeal(id, draft.toBody())
         if (contact != null) {
@@ -158,6 +164,7 @@ class DealsRepository(
     /**
      * Deletes a deal both on the backend and from the local cache.
      */
+    @Throws(Exception::class)
     suspend fun delete(id: String) {
         api.delete(id)
         runCatching {

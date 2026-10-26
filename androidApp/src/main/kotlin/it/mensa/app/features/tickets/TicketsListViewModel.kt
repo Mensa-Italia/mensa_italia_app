@@ -1,5 +1,7 @@
 package it.mensa.app.features.tickets
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -55,7 +57,7 @@ class TicketsListViewModel : ViewModel() {
                 _uiState.update { it.copy(tickets = list, loading = false, error = null) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -71,7 +73,7 @@ class TicketsListViewModel : ViewModel() {
             _uiState.update { it.copy(loading = true, error = null) }
             runCatching { repo.refresh() }
                 .onFailure { e ->
-                    _uiState.update { it.copy(loading = false, error = e.message) }
+                    _uiState.update { it.copy(loading = false, error = e.refreshMessage) }
                 }
         }
     }

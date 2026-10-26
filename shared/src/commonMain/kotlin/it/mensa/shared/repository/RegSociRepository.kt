@@ -33,6 +33,7 @@ class RegSociRepository(
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toModel(json) }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         refreshAndReturn()
     }
@@ -42,6 +43,7 @@ class RegSociRepository(
      * changed in data vs. in image) is computed by [refreshAndDiff]; callers
      * that just want the data should use this variant.
      */
+    @Throws(Exception::class)
     suspend fun refreshAndReturn(): List<RegSociModel> {
         val items = api.list()
         db.transaction {
@@ -57,6 +59,7 @@ class RegSociRepository(
      * sync engine to decide per-member what changed (data only, image only,
      * both, nothing, brand-new) without re-querying the DB.
      */
+    @Throws(Exception::class)
     suspend fun refreshAndDiff(): RegSociRefreshResult {
         val items = api.list()
         // Snapshot OUTSIDE the transaction so we can suspend on awaitAsList;
@@ -81,6 +84,7 @@ class RegSociRepository(
         val previousHashes: Map<String, HashPair>,
     )
 
+    @Throws(Exception::class)
     suspend fun searchByName(query: String): List<RegSociModel> {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
@@ -91,8 +95,10 @@ class RegSociRepository(
         return items
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<RegSociModel> = observeAll().first()
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): RegSociModel? {
         runCatching { val r = api.get(id); upsertIfChanged(r); return r }
         return db.regSociQueries.selectById(id).awaitAsOneOrNull()?.toModel(json)

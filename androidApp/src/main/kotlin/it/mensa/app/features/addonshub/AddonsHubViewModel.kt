@@ -1,5 +1,7 @@
 package it.mensa.app.features.addonshub
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,7 +38,7 @@ class AddonsHubViewModel : ViewModel() {
                 _uiState.update { it.copy(addons = list, loading = false, error = null) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -53,7 +55,7 @@ class AddonsHubViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true) }
             runCatching { repo.refresh() }
-                .onFailure { e -> _uiState.update { it.copy(loading = false, error = e.message) } }
+                .onFailure { e -> _uiState.update { it.copy(loading = false, error = e.refreshMessage) } }
         }
     }
 

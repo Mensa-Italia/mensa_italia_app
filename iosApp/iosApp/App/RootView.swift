@@ -6,6 +6,7 @@ final class RootViewModel {
     var phase: RootPhase = .loading
     private var authSub: Closeable?
     private var userSub: Closeable?
+    private var gateSub: Closeable?
 
     /// True when this app process was launched with NO persisted session, i.e.
     /// the user is about to (or just did) sign in interactively. Used by the
@@ -71,6 +72,14 @@ final class RootViewModel {
             Log.auth.error("authState error: \(err.localizedDescription)")
         }
 
+        // 4b. E quando cambia il verdetto sulla tessera (arriva il server).
+        let gateFlow = koin.auth.membershipGate as Kotlinx_coroutines_coreFlow
+        gateSub = subscribeFlow(gateFlow) { [weak self] (_: MembershipGate) in
+            Task { @MainActor [weak self] in
+                await self?.evaluatePhase()
+            }
+        } onError: { _ in }
+
         // 4. Subscribe to currentUser so phase re-evaluates when user record arrives
         let userFlow = koin.auth.currentUser as Kotlinx_coroutines_coreFlow
         userSub = subscribeOptionalFlow(userFlow) { [weak self] (_: UserModel?) in
@@ -93,6 +102,8 @@ final class RootViewModel {
         authSub = nil
         userSub?.close()
         userSub = nil
+        gateSub?.close()
+        gateSub = nil
     }
 
     /// Block on a single emission of `events.observeAll()` so the Today
@@ -155,9 +166,17 @@ final class RootViewModel {
             // Tessera scaduta: si passa dal muro del rinnovo, prima
             // dell'onboarding. Chi non è in regola non entra, e non ha senso
             // fargli fare il giro di presentazione dell'app. La regola sta in
-            // `Membership` (:shared) così Android chiude nello stesso momento.
-            if Membership.shared.isExpired(user: user) {
+            // `Membership.gate` (:shared) così Android chiude nello stesso
+            // momento, e tiene conto di quanto è fresca la data: scaduta solo
+            // secondo la cache si aspetta il server sullo splash, offline si
+            // entra.
+            let gate = koin.auth.membershipGate.value as? MembershipGate
+            if gate == MembershipGate.expired {
                 phase = .membershipExpired
+                return
+            }
+            if gate == MembershipGate.checking {
+                phase = .loading
                 return
             }
             #if DEBUG

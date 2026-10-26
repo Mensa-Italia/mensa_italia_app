@@ -106,7 +106,7 @@ struct StampConfirmSheet: View {
             let result = try await koin.stamps.verify(id: stampId, code: code)
             self.stamp = result
         } catch {
-            self.errorMessage = (error as NSError).localizedDescription
+            self.errorMessage = error.userMessage
         }
     }
 
@@ -124,7 +124,7 @@ struct StampConfirmSheet: View {
             try await koin.stamps.claim(stampId: stamp.id, code: code)
             onDone()
         } catch {
-            errorMessage = (error as NSError).localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

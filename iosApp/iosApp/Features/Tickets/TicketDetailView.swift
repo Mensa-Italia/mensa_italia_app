@@ -14,7 +14,7 @@ final class TicketDetailViewModel {
         do {
             ticket = try await koin.tickets.getById(id: id)
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.userMessage
         }
     }
 }

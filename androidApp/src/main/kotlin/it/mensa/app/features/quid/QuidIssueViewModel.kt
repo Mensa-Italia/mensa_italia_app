@@ -1,5 +1,6 @@
 package it.mensa.app.features.quid
 
+import it.mensa.app.support.refreshMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -85,7 +86,7 @@ class QuidIssueViewModel(private val issueId: Long, initialName: String = "") : 
             try {
                 repo.refreshIssueArticles(issueId)
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
+                _state.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _state.update { it.copy(refreshing = false) }
             }

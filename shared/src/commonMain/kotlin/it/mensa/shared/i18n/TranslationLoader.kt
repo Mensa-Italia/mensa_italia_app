@@ -44,6 +44,7 @@ class TranslationLoader(
      *                  Tolgee `languages` list, falling back to `base_language`.
      */
     @Suppress("TooGenericExceptionCaught")
+    @Throws(Exception::class)
     suspend fun bootstrap(preferred: String) {
         // Defensive: this is invoked from Swift through an ObjC-bridged async
         // wrapper. Any unhandled Throwable here would abort the host process

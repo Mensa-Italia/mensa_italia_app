@@ -47,6 +47,7 @@ class MensaTestClient {
         }
     }
 
+    @Throws(Exception::class)
     suspend fun loadTest(): MensaTestPayload {
         val response = runCatching {
             client.get(TEST_URL) {
@@ -96,6 +97,7 @@ class MensaTestClient {
      * instead of `Map<Int, Int>` keeps the Swift call site clean (Swift can't
      * ergonomically construct a `Map<KotlinInt, KotlinInt>` boxed type).
      */
+    @Throws(Exception::class)
     suspend fun submit(
         payload: MensaTestPayload,
         answers: Map<String, Int>,

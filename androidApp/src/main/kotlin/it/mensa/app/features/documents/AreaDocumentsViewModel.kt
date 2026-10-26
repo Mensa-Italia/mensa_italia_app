@@ -1,5 +1,7 @@
 package it.mensa.app.features.documents
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -34,7 +36,7 @@ class AreaDocumentsViewModel : ViewModel() {
                 _uiState.update { it.copy(documents = list, loading = false, error = null) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -46,7 +48,7 @@ class AreaDocumentsViewModel : ViewModel() {
             _uiState.update { it.copy(loading = true, error = null) }
             runCatching { repo.refresh() }
                 .onFailure { e ->
-                    _uiState.update { it.copy(loading = false, error = e.message) }
+                    _uiState.update { it.copy(loading = false, error = e.refreshMessage) }
                 }
         }
     }

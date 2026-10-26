@@ -1,5 +1,6 @@
 package it.mensa.app.features.deals
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -194,7 +195,7 @@ class AddDealViewModel(private val dealId: String?) : ViewModel() {
                 }
                 _state.update { it.copy(dismissed = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Errore nel salvataggio") }
+                _state.update { it.copy(error = e.userMessage) }
             } finally {
                 _state.update { it.copy(saving = false) }
             }
@@ -212,7 +213,7 @@ class AddDealViewModel(private val dealId: String?) : ViewModel() {
                 koin.deals.delete(dealId)
                 _state.update { it.copy(dismissed = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Errore nell'eliminazione") }
+                _state.update { it.copy(error = e.userMessage) }
             } finally {
                 _state.update { it.copy(deleting = false) }
             }

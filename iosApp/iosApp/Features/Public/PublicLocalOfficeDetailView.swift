@@ -480,7 +480,7 @@ struct PublicLocalOfficeDetailView: View {
                     return
                 }
             } catch {
-                await MainActor.run { self.error = (error as NSError).localizedDescription }
+                await MainActor.run { self.error = error.userMessage }
                 return
             }
         }

@@ -31,9 +31,11 @@ class AddonsApi(
     private val pb: PocketBaseClient,
     private val client: HttpClient,
 ) {
+    @Throws(Exception::class)
     suspend fun list(): List<AddonModel> =
         pb.fullList("addons", sort = "name")
 
+    @Throws(Exception::class)
     suspend fun get(id: String): AddonModel =
         pb.getOne("addons", id)
 
@@ -41,6 +43,7 @@ class AddonsApi(
      * Calls the custom endpoint GET /api/cs/sign-payload/{addonId}.
      * Returns the signed payload as a list of (name, value) query-param pairs.
      */
+    @Throws(Exception::class)
     suspend fun getAccessData(addonId: String): AddonAccessData {
         val body: JsonObject = client.get("/api/cs/sign-payload/$addonId").body()
         val params = linkedMapOf<String, String>()

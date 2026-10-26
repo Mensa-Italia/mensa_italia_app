@@ -67,6 +67,6 @@ final class TicketsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.tickets.refresh() } catch { self.error = error.localizedDescription }
+        do { try await koin.tickets.refresh() } catch { self.error = error.refreshMessage }
     }
 }

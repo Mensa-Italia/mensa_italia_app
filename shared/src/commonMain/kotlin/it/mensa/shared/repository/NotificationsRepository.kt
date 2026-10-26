@@ -36,6 +36,7 @@ class NotificationsRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel(json) } }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         // Strategia: tutte le non-lette (qualunque siano) + solo le ultime
         // 20 lette. Evita di scaricare uno storico potenzialmente enorme
@@ -66,6 +67,7 @@ class NotificationsRepository(
     /**
      * Marks notification as seen on the backend and updates local cache.
      */
+    @Throws(Exception::class)
     suspend fun markSeen(id: String) {
         val updated = api.see(id)
         db.notificationQueries.insertOrReplace(
@@ -90,6 +92,7 @@ class NotificationsRepository(
      * failures are swallowed so that a single failing call does not prevent the others from
      * being marked. Each successful response updates the local cache (mirroring [markSeen]).
      */
+    @Throws(Exception::class)
     suspend fun markAllSeen() {
         val unseenIds = db.notificationQueries.selectAll().awaitAsList()
             .filter { it.seen == null }
@@ -127,6 +130,7 @@ class NotificationsRepository(
     /**
      * Deletes a notification from the backend and removes it from the local cache.
      */
+    @Throws(Exception::class)
     suspend fun removeOne(id: String) {
         api.delete(id)
         db.notificationQueries.deleteById(id)

@@ -30,7 +30,7 @@ final class MemberDetailViewModel {
             let fetched = try await koin.regSoci.getById(id: id)
             if let fetched { member = fetched }
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 }

@@ -1,5 +1,7 @@
 package it.mensa.app.features.receipts
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.CreditCard
@@ -112,7 +114,7 @@ class ReceiptsListViewModel : ViewModel() {
                 _uiState.update { it.copy(receipts = sorted, loading = false, error = null) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -128,7 +130,7 @@ class ReceiptsListViewModel : ViewModel() {
             _uiState.update { it.copy(loading = true, error = null) }
             runCatching { repo.refresh() }
                 .onFailure { e ->
-                    _uiState.update { it.copy(loading = false, error = e.message) }
+                    _uiState.update { it.copy(loading = false, error = e.refreshMessage) }
                 }
         }
     }

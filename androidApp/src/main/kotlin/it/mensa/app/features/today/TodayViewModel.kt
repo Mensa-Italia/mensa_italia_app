@@ -69,10 +69,11 @@ class TodayViewModel(
         }
 
         viewModelScope.launch {
-            runCatching {
-                launch { koin.events.refresh(filter = null, sort = "when_end") }
-                launch { koin.notifications.refresh() }
-            }
+            // runCatching dentro ogni launch, non attorno: attorno prende solo
+            // l'avvio delle coroutine, e un refresh fallito (offline, server
+            // giu') saliva fino al viewModelScope e chiudeva l'app.
+            launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
+            launch { runCatching { koin.notifications.refresh() } }
         }
     }
 
@@ -124,10 +125,11 @@ class TodayViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            runCatching {
-                launch { koin.events.refresh(filter = null, sort = "when_end") }
-                launch { koin.notifications.refresh() }
-            }
+            // runCatching dentro ogni launch, non attorno: attorno prende solo
+            // l'avvio delle coroutine, e un refresh fallito (offline, server
+            // giu') saliva fino al viewModelScope e chiudeva l'app.
+            launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
+            launch { runCatching { koin.notifications.refresh() } }
         }
     }
 

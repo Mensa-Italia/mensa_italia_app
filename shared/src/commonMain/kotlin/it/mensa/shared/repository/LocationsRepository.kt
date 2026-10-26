@@ -22,6 +22,7 @@ class LocationsRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         db.transaction {
@@ -43,6 +44,7 @@ class LocationsRepository(
     /**
      * Creates a new location via the API and persists it locally.
      */
+    @Throws(Exception::class)
     suspend fun createAndAddLocal(
         name: String,
         address: String,
@@ -66,6 +68,7 @@ class LocationsRepository(
     /**
      * Soft-deletes a location via the API (sets saved=false) and removes it from local cache.
      */
+    @Throws(Exception::class)
     suspend fun deleteOne(id: String) {
         api.delete(id)
         db.locationQueries.deleteById(id)

@@ -40,10 +40,12 @@ class TokenRefresher(
     @Volatile
     var onSessionLost: (() -> Unit)? = null
 
+    @Throws(Exception::class)
     suspend fun refresh(): OidcSession = refreshInternal(force = false)
 
     /** Bypass the expiry check — used when /api/cs/me failed and we suspect
      *  the access token is stale even though its `exp` is in the future. */
+    @Throws(Exception::class)
     suspend fun forceRefresh(): OidcSession = refreshInternal(force = true)
 
     private suspend fun refreshInternal(force: Boolean): OidcSession = mutex.withLock {

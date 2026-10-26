@@ -1,5 +1,7 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -47,7 +49,7 @@ class CalendarLinkerViewModel : ViewModel() {
     fun refresh() {
         viewModelScope.launch {
             runCatching { calendarLinks.refresh() }.onFailure { e ->
-                _uiState.update { it.copy(loading = false, errorMessage = e.message) }
+                _uiState.update { it.copy(loading = false, errorMessage = e.refreshMessage) }
             }
             _uiState.update { it.copy(loading = false) }
         }
@@ -66,7 +68,7 @@ class CalendarLinkerViewModel : ViewModel() {
             runCatching {
                 calendarLinks.changeState(current.id, newState)
             }.onFailure { e ->
-                _uiState.update { it.copy(errorMessage = e.message) }
+                _uiState.update { it.copy(errorMessage = e.userMessage) }
                 refresh() // revert
             }
         }

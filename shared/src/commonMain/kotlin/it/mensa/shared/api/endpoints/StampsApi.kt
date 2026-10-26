@@ -25,21 +25,26 @@ class StampsApi(private val pb: PocketBaseClient) {
      * `expand=stamp` — e l'unico chiamante vero era [getStamp], cioe' la
      * verifica dopo una scansione, che infatti falliva sempre.
      */
+    @Throws(Exception::class)
     suspend fun list(
         filter: String? = null,
         sort: String = "-created"
     ): List<StampModel> =
         pb.fullList(COLLECTION, filter = filter, sort = sort)
 
+    @Throws(Exception::class)
     suspend fun get(id: String): StampModel =
         pb.getOne(COLLECTION, id)
 
+    @Throws(Exception::class)
     suspend fun create(body: StampModel): StampModel =
         pb.create(COLLECTION, body)
 
+    @Throws(Exception::class)
     suspend fun update(id: String, body: StampModel): StampModel =
         pb.update(COLLECTION, id, body)
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) =
         pb.delete(COLLECTION, id)
 
@@ -47,12 +52,14 @@ class StampsApi(private val pb: PocketBaseClient) {
      * Add a user_stamp record — POST /api/collections/stamp_users/records.
      * Flutter: pb.collection('stamp_users').create(body: { "stamp": id, "code": code, "user": userId })
      */
+    @Throws(Exception::class)
     suspend fun addUserStamp(stampId: String, code: String, userId: String): StampUserModel =
         pb.create("stamp_users", AddUserStampBody(stamp = stampId, code = code, user = userId))
 
     /**
      * Fetch user stamps for the authenticated user — expand=stamp, sort=-created.
      */
+    @Throws(Exception::class)
     suspend fun getUserStamps(
         filter: String? = null
     ): List<StampUserModel> =
@@ -80,12 +87,14 @@ class StampsApi(private val pb: PocketBaseClient) {
      * Torna null se il francobollo non esiste, perche' chi chiama distingue
      * "non trovato" da un errore di rete mostrando due stati diversi.
      */
+    @Throws(Exception::class)
     suspend fun getStamp(id: String, @Suppress("UNUSED_PARAMETER") code: String): StampModel? =
         runCatching { pb.getOne<StampModel>(COLLECTION, id) }.getOrNull()
 
     /**
      * Shorthand for [addUserStamp] — the user id comes from the caller context.
      */
+    @Throws(Exception::class)
     suspend fun addStamp(stampId: String, code: String, userId: String): StampUserModel =
         addUserStamp(stampId, code, userId)
 

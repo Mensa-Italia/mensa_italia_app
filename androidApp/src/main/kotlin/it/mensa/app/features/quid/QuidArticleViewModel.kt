@@ -1,5 +1,6 @@
 package it.mensa.app.features.quid
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -59,7 +60,7 @@ class QuidArticleViewModel(private val articleId: Long) : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(loading = false, error = e.message ?: "Errore sconosciuto") }
+                _state.update { it.copy(loading = false, error = e.userMessage) }
             }
         }
     }

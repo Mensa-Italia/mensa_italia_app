@@ -38,7 +38,7 @@ final class EventListViewModel {
         do {
             try await koin.events.refresh(filter: nil, sort: "when_end")
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.refreshMessage
         }
     }
 

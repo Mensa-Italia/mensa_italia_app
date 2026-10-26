@@ -49,7 +49,7 @@ struct QuidPDFViewer: View {
         } catch is CancellationError {
             // .task cancelled on disappear — don't show an error.
         } catch {
-            await MainActor.run { self.loadError = error.localizedDescription }
+            await MainActor.run { self.loadError = error.userMessage }
         }
     }
 }

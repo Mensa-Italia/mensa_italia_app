@@ -81,6 +81,6 @@ final class ReceiptsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.receipts.refresh() } catch { self.error = error.localizedDescription }
+        do { try await koin.receipts.refresh() } catch { self.error = error.refreshMessage }
     }
 }

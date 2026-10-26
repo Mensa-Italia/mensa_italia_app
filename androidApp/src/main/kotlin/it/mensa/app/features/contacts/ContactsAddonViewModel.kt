@@ -1,5 +1,6 @@
 package it.mensa.app.features.contacts
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -37,7 +38,7 @@ class ContactsAddonViewModel : ViewModel() {
                     _uiState.update { it.copy(groups = model.groups, loading = false) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(loading = false, error = e.message) }
+                    _uiState.update { it.copy(loading = false, error = e.userMessage) }
                 },
             )
         }

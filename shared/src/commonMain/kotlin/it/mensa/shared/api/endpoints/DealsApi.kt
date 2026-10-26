@@ -37,6 +37,7 @@ class DealsApi(private val pb: PocketBaseClient) {
      * Contacts associated with a deal. Mirrors the Flutter
      * `getDealsContacts(dealId)` call on `deals_contacts` collection.
      */
+    @Throws(Exception::class)
     suspend fun contacts(dealId: String): List<DealsContactModel> =
         pb.fullList(
             "deals_contacts",
@@ -47,21 +48,26 @@ class DealsApi(private val pb: PocketBaseClient) {
     /**
      * Flutter default: sort=created, filter=ending>=now, expand=position
      */
+    @Throws(Exception::class)
     suspend fun list(
         filter: String? = null,
         sort: String = "created"
     ): List<DealModel> =
         pb.fullList("deals", filter = filter, sort = sort, expand = "position")
 
+    @Throws(Exception::class)
     suspend fun get(id: String): DealModel =
         pb.getOne("deals", id, expand = "position")
 
+    @Throws(Exception::class)
     suspend fun create(body: DealModel): DealModel =
         pb.create("deals", body)
 
+    @Throws(Exception::class)
     suspend fun update(id: String, body: DealModel): DealModel =
         pb.update("deals", id, body)
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) =
         pb.delete("deals", id)
 

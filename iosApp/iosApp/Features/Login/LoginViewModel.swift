@@ -163,7 +163,7 @@ final class LoginViewModel {
             return true
         } catch {
             Log.auth.error("Login failed: \(error.localizedDescription)")
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
             return false
         }
     }

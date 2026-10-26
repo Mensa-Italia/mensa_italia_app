@@ -84,7 +84,7 @@ final class NotificationsListViewModel {
         do {
             try await koin.notifications.refresh()
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.refreshMessage
         }
     }
 

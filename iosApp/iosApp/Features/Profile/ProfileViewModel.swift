@@ -56,7 +56,7 @@ final class ProfileViewModel {
             // reset la verifica verrebbe saltata per tutta la sessione.
             PushTokenStore.shared.reset()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

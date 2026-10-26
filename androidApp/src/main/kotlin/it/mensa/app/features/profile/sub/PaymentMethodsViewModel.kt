@@ -1,5 +1,7 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stripe.android.paymentsheet.PaymentSheet
@@ -46,7 +48,7 @@ class PaymentMethodsViewModel : ViewModel() {
             _uiState.update { it.copy(loading = true) }
             runCatching { paymentMethods.refresh() }.fold(
                 onSuccess = { list -> _uiState.update { it.copy(methods = list, loading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(loading = false, errorMessage = e.message) } },
+                onFailure = { e -> _uiState.update { it.copy(loading = false, errorMessage = e.refreshMessage) } },
             )
         }
     }
@@ -55,7 +57,7 @@ class PaymentMethodsViewModel : ViewModel() {
         viewModelScope.launch {
             runCatching { paymentMethods.setDefault(id) }.fold(
                 onSuccess = { _uiState.update { it.copy(defaultId = id) } },
-                onFailure = { e -> _uiState.update { it.copy(errorMessage = e.message) } },
+                onFailure = { e -> _uiState.update { it.copy(errorMessage = e.userMessage) } },
             )
         }
     }
@@ -91,7 +93,7 @@ class PaymentMethodsViewModel : ViewModel() {
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(adding = false, errorMessage = e.message) }
+                    _uiState.update { it.copy(adding = false, errorMessage = e.userMessage) }
                 },
             )
         }

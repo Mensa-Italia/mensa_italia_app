@@ -51,7 +51,7 @@ final class DealDetailViewModel {
             try await koin.deals.delete(id: id)
             return true
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
             return false
         }
     }
@@ -80,7 +80,7 @@ final class DealDetailViewModel {
                 )
             }
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 

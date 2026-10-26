@@ -49,6 +49,38 @@ object Membership {
      */
     fun isExpired(user: UserModel?): Boolean = isExpired(user, Clock.System.now())
 
+    /**
+     * Se il muro del rinnovo va chiuso adesso, tenendo conto di quanto sono
+     * freschi i dati.
+     *
+     * [isExpired] guarda solo la data e l'orologio del telefono. Con l'avvio
+     * dalla cache non basta: la data e' quella dell'ultimo controllo, e fra
+     * allora e adesso il socio puo' aver rinnovato.
+     *
+     *  - [verified]: il record viene dal server in questa esecuzione;
+     *  - [checking]: il controllo col server e' in corso;
+     *  - [syncedAt]: quando il record in cache e' arrivato dal server.
+     *
+     * Scaduta secondo il server — adesso, o gia' all'ultimo controllo — il
+     * muro si chiude subito. Scaduta solo nel frattempo: si aspetta il server
+     * (CHECKING, lo splash) invece di aprire la Home e chiuderla un secondo
+     * dopo. Se il server non risponde (offline) l'app si apre: chiudere fuori
+     * qualcuno per una data che non si puo' verificare e' peggio.
+     */
+    fun gate(
+        user: UserModel?,
+        verified: Boolean,
+        checking: Boolean,
+        syncedAt: Instant?,
+        now: Instant,
+    ): MembershipGate {
+        val u = user ?: return MembershipGate.OPEN
+        if (!isExpired(u, now)) return MembershipGate.OPEN
+        if (verified) return MembershipGate.EXPIRED
+        if (syncedAt != null && u.expireMembership <= syncedAt) return MembershipGate.EXPIRED
+        return if (checking) MembershipGate.CHECKING else MembershipGate.OPEN
+    }
+
     /** Giorni che mancano alla scadenza; negativo se e' gia' passata. */
     fun daysUntilExpiry(user: UserModel?, now: Instant): Long? {
         val u = user ?: return null
@@ -72,4 +104,14 @@ object Membership {
     val RENEWAL_URL: String = "https://www.cloud32.it/Associazioni/utenti/richirinnovo"
 
     private const val MILLIS_PER_DAY = 24L * 60 * 60 * 1000
+}
+
+/** Vedi [Membership.gate]. */
+enum class MembershipGate {
+    /** Si entra. */
+    OPEN,
+    /** Il muro del rinnovo. */
+    EXPIRED,
+    /** Scaduta solo secondo la cache: si aspetta il server. */
+    CHECKING,
 }

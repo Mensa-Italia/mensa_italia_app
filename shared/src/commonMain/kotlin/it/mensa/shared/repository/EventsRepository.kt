@@ -73,6 +73,7 @@ class EventsRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel(json) } }
 
+    @Throws(Exception::class)
     suspend fun refresh(filter: String? = null, sort: String = "when_end") {
         val items = api.list(filter = filter, sort = sort)
         db.transaction {
@@ -130,8 +131,10 @@ class EventsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<EventModel> = observeAll().first()
 
+    @Throws(Exception::class)
     suspend fun fetchPublicEvents(): List<EventModel> = api.listPublic()
 
     /**
@@ -139,6 +142,7 @@ class EventsRepository(
      * nuovo (o un link condiviso) puo' arrivare prima che la lista l'abbia
      * scaricato. Null se manca anche sul server o non c'e' rete.
      */
+    @Throws(Exception::class)
     suspend fun getById(id: String): EventModel? {
         db.eventQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
         // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
@@ -149,6 +153,7 @@ class EventsRepository(
     }
 
     /** Create an event with optional image cover and nested schedules. */
+    @Throws(Exception::class)
     suspend fun create(draft: EventDraft): EventModel {
         val fields = baseFields(draft, includeOwner = true)
         val files = imageFiles(draft)
@@ -165,6 +170,7 @@ class EventsRepository(
     }
 
     /** Update an event. Image is sent only if [EventDraft.imageBytes] is non-null. */
+    @Throws(Exception::class)
     suspend fun update(id: String, draft: EventDraft): EventModel {
         val fields = baseFields(draft, includeOwner = false)
         val files = imageFiles(draft)
@@ -190,6 +196,7 @@ class EventsRepository(
         return updated
     }
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) {
         api.delete(id)
         db.eventQueries.deleteById(id)

@@ -10,24 +10,30 @@ class EventsApi(internal val pb: PocketBaseClient) {
      * List all events. Flutter default: sort=when_end, filter=when_end>=now, expand=position,owner
      * For simplicity we allow callers to override filter/sort; the default sort follows the Flutter app.
      */
+    @Throws(Exception::class)
     suspend fun list(
         filter: String? = null,
         sort: String = "when_end"
     ): List<EventModel> =
         pb.fullList("events", filter = filter, sort = sort, expand = "position,owner")
 
+    @Throws(Exception::class)
     suspend fun get(id: String): EventModel =
         pb.getOne("events", id, expand = "position,owner")
 
+    @Throws(Exception::class)
     suspend fun create(body: EventModel): EventModel =
         pb.create("events", body)
 
+    @Throws(Exception::class)
     suspend fun update(id: String, body: EventModel): EventModel =
         pb.update("events", id, body)
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) =
         pb.delete("events", id)
 
+    @Throws(Exception::class)
     suspend fun listPublic(): List<EventModel> {
         val nowIso = Clock.System.now().toString()
         return pb.fullListUnauthenticated(

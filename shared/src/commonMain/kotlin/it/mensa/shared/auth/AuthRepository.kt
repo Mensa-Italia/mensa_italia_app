@@ -20,14 +20,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
 private const val KEY_CURRENT_USER = "auth.current_user"
+/** Quando il record in [KEY_CURRENT_USER] e' arrivato dal server (epoch ms). */
+private const val KEY_CURRENT_USER_SYNCED_AT = "auth.current_user.synced_at"
+private const val MEMBERSHIP_CHECK_MAX_WAIT_MS = 8_000L
 private const val EXPIRES_SAFETY_MARGIN_SECONDS = 30L
 
 class AuthRepository(
@@ -50,6 +58,21 @@ class AuthRepository(
     /** Dove gira la verifica col server di un avvio dalla cache (vedi [init]). */
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var revalidation: Job? = null
+
+    // Quanto e' fresco il socio pubblicato: vedi [Membership.gate].
+    private val _verified = MutableStateFlow(false)
+    private val _checking = MutableStateFlow(false)
+    private val _syncedAt = MutableStateFlow<Instant?>(null)
+
+    /**
+     * Se aprire l'app, chiuderla sul muro del rinnovo o aspettare il server.
+     * Le due UI decidono la fase da qui e non da [Membership.isExpired], che
+     * non sa se la data in cache e' ancora vera.
+     */
+    val membershipGate: StateFlow<MembershipGate> =
+        combine(_currentUser, _verified, _checking, _syncedAt) { user, verified, checking, syncedAt ->
+            Membership.gate(user, verified, checking, syncedAt, Clock.System.now())
+        }.stateIn(backgroundScope, SharingStarted.Eagerly, MembershipGate.OPEN)
 
     /**
      * Come l'utente e' entrato *in questa esecuzione dell'app*, o null se la
@@ -80,6 +103,7 @@ class AuthRepository(
      * e marcarlo come PASSWORD farebbe comparire la proposta di attivazione
      * della passkey a ogni avvio (vedi [it.mensa.shared.auth.passkey.PasskeyEnrollmentGate]).
      */
+    @Throws(Exception::class)
     suspend fun reloginWithStoredCredentials(): UserModel? {
         val stored = runCatching { credentials.read() }.getOrNull() ?: return null
         return runCatching {
@@ -99,6 +123,7 @@ class AuthRepository(
      * pull-to-refresh che mostri dati della tessera. Torna null solo quando
      * nessuna delle due strade ha prodotto un record.
      */
+    @Throws(Exception::class)
     suspend fun reloadUser(): UserModel? =
         reloginWithStoredCredentials() ?: refreshCurrentUser()
 
@@ -117,6 +142,7 @@ class AuthRepository(
      * e' quello del database, non quello del portale, e per rileggerlo serve
      * la password ([recheckMembershipWithPassword]).
      */
+    @Throws(Exception::class)
     suspend fun recheckMembership(): MembershipRecheck {
         val relogged = reloginWithStoredCredentials()
         val user = relogged ?: refreshCurrentUser() ?: return MembershipRecheck.UNREACHABLE
@@ -133,6 +159,7 @@ class AuthRepository(
      * viene salvata come in ogni login, cosi' il prossimo controllo non la
      * richiede.
      */
+    @Throws(Exception::class)
     suspend fun recheckMembershipWithPassword(password: String): MembershipRecheck {
         val email = runCatching { credentials.read()?.email }.getOrNull()
             ?: db.keyValueQueries.selectById(KEY_CURRENT_USER).awaitAsOneOrNull()?.value_
@@ -171,6 +198,7 @@ class AuthRepository(
      * questo non capita, ma il fallback ci protegge anche da altre rotture
      * del Keychain (corrupt entry, accessibilità cambiata, ecc.).
      */
+    @Throws(Exception::class)
     suspend fun init() {
         try {
             initImpl()
@@ -192,9 +220,11 @@ class AuthRepository(
         val cached = readCachedUser()
         if (stored != null && cached != null) {
             AuthHolder.session = stored
+            _syncedAt.value = readSyncedAt()
+            _checking.value = true
             _authState.value = AuthState.Authenticated(stored.accessToken)
             _currentUser.value = DemoIdentity.redact(cached)
-            revalidation = backgroundScope.launch {
+            val job = backgroundScope.launch {
                 try {
                     revalidate()
                 } catch (e: CancellationException) {
@@ -203,11 +233,46 @@ class AuthRepository(
                     // Offline o server giu': resta la cache, come gia' faceva
                     // l'avvio senza rete.
                     println("MENSA_AUTH_REVALIDATE_FAILED: ${t::class.simpleName}: ${t.message}")
+                } finally {
+                    _checking.value = false
                 }
+            }
+            revalidation = job
+            // Lo splash aspetta il server solo per una tessera scaduta nel
+            // frattempo, e comunque non oltre questo: un login che non
+            // risponde non deve tenere fuori nessuno.
+            backgroundScope.launch {
+                delay(MEMBERSHIP_CHECK_MAX_WAIT_MS)
+                _checking.value = false
             }
             return
         }
         revalidate()
+    }
+
+    private suspend fun readSyncedAt(): Instant? = runCatching {
+        db.keyValueQueries.selectById(KEY_CURRENT_USER_SYNCED_AT).awaitAsOneOrNull()?.value_
+            ?.toLongOrNull()?.let(Instant::fromEpochMilliseconds)
+    }.getOrNull()
+
+    /**
+     * Il socio come l'ha appena mandato il server: in cache, con l'ora, e
+     * segnato come verificato per [membershipGate].
+     */
+    private suspend fun storeServerUser(user: UserModel) {
+        val now = Clock.System.now()
+        db.keyValueQueries.insertOrReplace(
+            key = KEY_CURRENT_USER,
+            value_ = json.encodeToString(UserModel.serializer(), user),
+        )
+        runCatching {
+            db.keyValueQueries.insertOrReplace(
+                key = KEY_CURRENT_USER_SYNCED_AT,
+                value_ = now.toEpochMilliseconds().toString(),
+            )
+        }
+        _syncedAt.value = now
+        _verified.value = true
     }
 
     private suspend fun readCachedUser(): UserModel? {
@@ -274,10 +339,7 @@ class AuthRepository(
         _currentUser.value = DemoIdentity.redact(cachedUser)
         when (val outcome = fetchMeOrWipe()) {
             is MeOutcome.Ok -> {
-                db.keyValueQueries.insertOrReplace(
-                    key = KEY_CURRENT_USER,
-                    value_ = json.encodeToString(UserModel.serializer(), outcome.user),
-                )
+                storeServerUser(outcome.user)
                 _currentUser.value = DemoIdentity.redact(outcome.user)
             }
             MeOutcome.Offline -> Unit   // keep cached UI, will retry next init/login
@@ -314,6 +376,7 @@ class AuthRepository(
      * "non sono riuscito a chiedere". Il muro del rinnovo la buttava via e il
      * suo tasto "Ho rinnovato" sembrava morto in entrambi i casi.
      */
+    @Throws(Exception::class)
     suspend fun refreshCurrentUser(): UserModel? {
         if (_authState.value !is AuthState.Authenticated) return null
         return when (val outcome = fetchMeOrWipe()) {
@@ -323,10 +386,7 @@ class AuthRepository(
                 // gira a ogni ritorno in foreground, quindi pubblicarlo
                 // vorrebbe dire sostituire un socio buono con uno vuoto.
                 val user = outcome.user.takeIfUsable() ?: return null
-                db.keyValueQueries.insertOrReplace(
-                    key = KEY_CURRENT_USER,
-                    value_ = json.encodeToString(UserModel.serializer(), user),
-                )
+                storeServerUser(user)
                 DemoIdentity.redact(user).also { _currentUser.value = it }
             }
             MeOutcome.Offline -> null
@@ -429,8 +489,11 @@ class AuthRepository(
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null
+        _verified.value = false
+        _syncedAt.value = null
     }
 
+    @Throws(Exception::class)
     suspend fun login(email: String, password: String): Result<UserModel> = runCatching {
         // Un login esplicito vince sulla verifica di un avvio dalla cache.
         revalidation?.cancel()
@@ -472,8 +535,7 @@ class AuthRepository(
         // Entrambi gli endpoint di login allegano il record utente ai token OIDC;
         // solo la risposta di refresh lo omette (gestito in init).
         val user = requireNotNull(tokens.record) { "$source response missing user record" }
-        val userJsonStr = json.encodeToString(UserModel.serializer(), user)
-        db.keyValueQueries.insertOrReplace(key = KEY_CURRENT_USER, value_ = userJsonStr)
+        storeServerUser(user)
         // Il record vero e' gia' su DB: da qui in poi si espone solo cio' che
         // la UI deve mostrare, che in modalita' screenshot e' un segnaposto.
         _currentUser.value = DemoIdentity.redact(user)
@@ -500,6 +562,7 @@ class AuthRepository(
      * l'originale. Torna false se ce n'erano gia' di nostre, che sono per
      * definizione piu' recenti, o se non c'e' niente da adottare.
      */
+    @Throws(Exception::class)
     suspend fun adoptLegacyCredentials(email: String, password: String): Boolean {
         if (email.isBlank() || password.isBlank()) return false
         if (runCatching { credentials.read() }.getOrNull() != null) return false
@@ -514,6 +577,7 @@ class AuthRepository(
      * password ancora su disco e la cache dei soci al suo posto. Ora ogni passo
      * e' isolato e l'uscita avviene comunque.
      */
+    @Throws(Exception::class)
     suspend fun logout() {
         // Senza questo, un relogin dell'avvio ancora in volo rientrerebbe
         // subito dopo l'uscita.
@@ -525,6 +589,9 @@ class AuthRepository(
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null
+        _verified.value = false
+        _syncedAt.value = null
+        _checking.value = false
     }
 
     private suspend fun buildSession(tokens: OidcTokenResponse): OidcSession {
@@ -569,7 +636,10 @@ class AuthRepository(
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null
+        _verified.value = false
+        _syncedAt.value = null
         runCatching { db.keyValueQueries.deleteById(KEY_CURRENT_USER) }
+        runCatching { db.keyValueQueries.deleteById(KEY_CURRENT_USER_SYNCED_AT) }
     }
 }
 

@@ -46,6 +46,7 @@ class SigsRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
 
+    @Throws(Exception::class)
     suspend fun refresh(filter: String? = null, sort: String = "name") {
         val items = api.list(filter = filter, sort = sort)
         db.transaction {
@@ -54,12 +55,14 @@ class SigsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): SigModel? {
         val row = db.sigQueries.selectById(id).awaitAsOneOrNull() ?: return null
         return row.toModel()
     }
 
     /** Create a SIG with an optional cover image. */
+    @Throws(Exception::class)
     suspend fun create(draft: SigDraft): SigModel {
         val fields = baseFields(draft)
         val files = imageFiles(draft)
@@ -69,6 +72,7 @@ class SigsRepository(
     }
 
     /** Update a SIG. Image is sent only if [SigDraft.imageBytes] is non-null. */
+    @Throws(Exception::class)
     suspend fun update(id: String, draft: SigDraft): SigModel {
         val fields = baseFields(draft)
         val files = imageFiles(draft)
@@ -77,6 +81,7 @@ class SigsRepository(
         return updated
     }
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) {
         api.delete(id)
         db.sigQueries.deleteById(id)

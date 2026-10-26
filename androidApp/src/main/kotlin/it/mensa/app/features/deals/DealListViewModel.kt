@@ -1,5 +1,6 @@
 package it.mensa.app.features.deals
 
+import it.mensa.app.support.refreshMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -87,7 +88,7 @@ class DealListViewModel : ViewModel() {
             try {
                 koin.deals.refresh()
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Errore sconosciuto") }
+                _state.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _state.update { it.copy(refreshing = false) }
             }

@@ -1,5 +1,7 @@
 package it.mensa.app.features.localoffices
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -46,7 +48,7 @@ class LocalOfficeLinktreeViewModel(private val officeId: String) : ViewModel() {
     private fun startObserving() {
         jobs += repo.observeLinktree(officeId)
             .onEach { list -> _uiState.update { it.copy(linktree = list, loading = false) } }
-            .catch { e -> _uiState.update { it.copy(error = e.message, loading = false) } }
+            .catch { e -> _uiState.update { it.copy(error = e.userMessage, loading = false) } }
             .launchIn(viewModelScope)
 
         jobs += repo.observeAdmins(officeId)
@@ -81,7 +83,7 @@ class LocalOfficeLinktreeViewModel(private val officeId: String) : ViewModel() {
                 repo.refreshAdmins(officeId)
                 repo.refreshAssistants(officeId)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             }
         }
     }
@@ -97,7 +99,7 @@ class LocalOfficeLinktreeViewModel(private val officeId: String) : ViewModel() {
             try {
                 repo.deleteLink(officeId, id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }

@@ -25,6 +25,7 @@ import kotlinx.serialization.Serializable
  */
 class OrgChartApi(private val pb: PocketBaseClient) {
 
+    @Throws(Exception::class)
     suspend fun get(): OrgChartModel = coroutineScope {
         // 1) Tutti i gruppi.
         val groups = pb.fullList<OrgChartGroupRecord>(

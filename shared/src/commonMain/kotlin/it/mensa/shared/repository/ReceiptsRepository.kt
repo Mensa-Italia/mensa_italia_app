@@ -38,6 +38,7 @@ class ReceiptsRepository(
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toModel() }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         val now = Clock.System.now().toEpochMilliseconds()
@@ -47,11 +48,14 @@ class ReceiptsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<ReceiptModel> = observeAll().first()
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): ReceiptModel? =
         db.receiptQueries.selectById(id).awaitAsOneOrNull()?.toModel()
 
+    @Throws(Exception::class)
     suspend fun getReceiptUrl(id: String): String = api.getReceiptUrl(id)
 
     fun observeRealtime(scope: CoroutineScope): Job =

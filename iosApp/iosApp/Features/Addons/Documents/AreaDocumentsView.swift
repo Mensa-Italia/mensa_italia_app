@@ -26,7 +26,7 @@ final class DocumentsListViewModel {
     }
 
     func refresh() async {
-        do { try await koin.documents.refresh() } catch { self.error = (error as NSError).localizedDescription }
+        do { try await koin.documents.refresh() } catch { self.error = error.refreshMessage }
     }
 
     var categories: [String] {

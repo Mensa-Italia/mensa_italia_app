@@ -279,7 +279,7 @@ final class CalendarLinkerViewModel {
         do {
             try await koin.calendarLinks.refresh()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
         loading = false
     }
@@ -302,7 +302,7 @@ final class CalendarLinkerViewModel {
         do {
             _ = try await koin.calendarLinks.changeState(id: current.id, state: newState)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
             // Revert by re-fetching.
             await refresh()
         }

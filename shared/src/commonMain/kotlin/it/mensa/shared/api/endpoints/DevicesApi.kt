@@ -20,9 +20,11 @@ data class UpdateDeviceLanguageBody(
 
 class DevicesApi(private val pb: PocketBaseClient) {
 
+    @Throws(Exception::class)
     suspend fun list(): List<DeviceModel> =
         pb.fullList("users_devices", sort = "-created")
 
+    @Throws(Exception::class)
     suspend fun register(
         userId: String,
         firebaseToken: String,
@@ -38,12 +40,15 @@ class DevicesApi(private val pb: PocketBaseClient) {
         )
     )
 
+    @Throws(Exception::class)
     suspend fun updateLanguage(id: String, language: String): DeviceModel =
         pb.update("users_devices", id, UpdateDeviceLanguageBody(language))
 
+    @Throws(Exception::class)
     suspend fun delete(id: String) =
         pb.delete("users_devices", id)
 
+    @Throws(Exception::class)
     suspend fun findByFirebaseId(firebaseId: String): PbListResponse<DeviceModel> =
         pb.list("users_devices", filter = "firebase_id='$firebaseId'")
 }

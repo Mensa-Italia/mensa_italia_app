@@ -169,7 +169,7 @@ final class SavedLocationsModel {
                 try await koin.locations.deleteOne(id: loc.id)
             } catch {
                 await MainActor.run {
-                    self.error = (error as NSError).localizedDescription
+                    self.error = error.userMessage
                 }
             }
         }

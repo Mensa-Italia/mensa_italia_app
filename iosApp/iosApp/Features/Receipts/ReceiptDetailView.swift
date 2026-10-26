@@ -17,7 +17,7 @@ final class ReceiptDetailViewModel {
         do {
             receipt = try await koin.receipts.getById(id: id)
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.userMessage
         }
     }
 
@@ -32,7 +32,7 @@ final class ReceiptDetailViewModel {
                 self.pdfURL = url
             }
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.userMessage
         }
     }
 }

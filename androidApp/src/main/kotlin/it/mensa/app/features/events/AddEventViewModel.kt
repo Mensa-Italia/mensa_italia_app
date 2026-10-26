@@ -1,5 +1,6 @@
 package it.mensa.app.features.events
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -187,7 +188,7 @@ class AddEventViewModel(private val eventId: String? = null) : ViewModel() {
                 if (eventId != null) eventsRepo.update(eventId, draft) else eventsRepo.create(draft)
                 _uiState.update { it.copy(dismissed = true) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             } finally {
                 _uiState.update { it.copy(saving = false) }
             }
@@ -202,7 +203,7 @@ class AddEventViewModel(private val eventId: String? = null) : ViewModel() {
                 eventsRepo.delete(eventId)
                 _uiState.update { it.copy(dismissed = true) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             } finally {
                 _uiState.update { it.copy(saving = false) }
             }

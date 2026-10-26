@@ -36,7 +36,7 @@ final class MembersDirectoryViewModel {
         do {
             try await koin.regSoci.refresh()
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.refreshMessage
         }
     }
 

@@ -22,6 +22,7 @@ class DevicesRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         val now = Clock.System.now().toEpochMilliseconds()
@@ -41,6 +42,7 @@ class DevicesRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<DeviceModel> = observeAll().first()
 
     /**
@@ -52,6 +54,7 @@ class DevicesRepository(
      * dell'app; sparisce al logout insieme al resto della cache
      * (`wipeAllUserData`), che e' esattamente cio' che vogliamo.
      */
+    @Throws(Exception::class)
     suspend fun currentFirebaseId(): String? =
         db.keyValueQueries.selectById(KEY_CURRENT_FIREBASE_ID)
             .awaitAsOneOrNull()
@@ -59,6 +62,7 @@ class DevicesRepository(
             ?.takeIf { it.isNotBlank() }
 
     /** True se [device] e' il dispositivo su cui sta girando l'app. */
+    @Throws(Exception::class)
     suspend fun isCurrent(device: DeviceModel): Boolean {
         val mine = currentFirebaseId() ?: return false
         return device.firebaseId == mine
@@ -81,6 +85,7 @@ class DevicesRepository(
      * oppure null se non c'e' niente da registrare (nessun token, nessun
      * utente) o se la rete non risponde.
      */
+    @Throws(Exception::class)
     suspend fun ensureRegistered(
         userId: String,
         firebaseToken: String,
@@ -108,6 +113,7 @@ class DevicesRepository(
         return runCatching { register(userId, firebaseToken, deviceName, language) }.getOrNull()
     }
 
+    @Throws(Exception::class)
     suspend fun register(
         userId: String,
         firebaseToken: String,
@@ -135,6 +141,7 @@ class DevicesRepository(
      * [it.mensa.shared.auth.AuthRepository.init], cioe' un modo per far
      * terminare il processo invece di mostrare un errore.
      */
+    @Throws(Exception::class)
     suspend fun delete(id: String): Boolean {
         val row = db.deviceQueries.selectById(id).awaitAsOneOrNull()
         val mine = currentFirebaseId()

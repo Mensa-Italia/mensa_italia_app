@@ -20,6 +20,7 @@ class I18n internal constructor(
     val ready: StateFlow<TranslationLoader.Ready?> get() = loader.ready
     val availableLocales: StateFlow<List<String>> get() = loader.availableLocales
 
+    @Throws(Exception::class)
     suspend fun bootstrap(preferred: String) = loader.bootstrap(preferred)
 
     /**

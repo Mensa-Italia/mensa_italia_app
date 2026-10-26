@@ -53,7 +53,7 @@ struct PublicEventsView: View {
             let result = try await koin.events.fetchPublicEvents()
             events = result as? [EventModel] ?? []
         } catch {
-            errorMessage = (error as NSError).localizedDescription
+            errorMessage = error.userMessage
         }
         isLoading = false
     }

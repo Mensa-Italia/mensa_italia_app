@@ -56,6 +56,7 @@ class SpotlightSyncEngine(
      * therefore automatically cleared by `wipeAllUserData()` on logout /
      * session-dead — the next login is always due regardless of clock.
      */
+    @Throws(Exception::class)
     suspend fun isDueForSync(): Boolean {
         val last = readLastRunEpochSeconds() ?: return true
         return Clock.System.now().epochSeconds - last >= throttleSeconds
@@ -66,6 +67,7 @@ class SpotlightSyncEngine(
      * gate is `isDueForSync`. On success, persists the "last run" timestamp
      * so subsequent throttle checks see it.
      */
+    @Throws(Exception::class)
     suspend fun syncMembers(
         expirationEpochSeconds: Long,
         ignoreCache: Boolean = false,
@@ -151,6 +153,7 @@ class SpotlightSyncEngine(
         var failures = 0
         val failuresMutex = Mutex()
 
+        @Throws(Exception::class)
         suspend fun flushIfFull() {
             val toFlush: List<SpotlightMemberBlock>? = pendingMutex.withLock {
                 if (pending.size >= downloadBatchSize) {

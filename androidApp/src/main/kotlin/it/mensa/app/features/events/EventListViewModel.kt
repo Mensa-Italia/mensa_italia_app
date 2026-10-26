@@ -1,5 +1,7 @@
 package it.mensa.app.features.events
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.features.events.util.EventFilterHelpers
@@ -49,7 +51,7 @@ class EventListViewModel : ViewModel() {
                 _uiState.update { it.copy(events = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
             .launchIn(viewModelScope)
     }
@@ -70,7 +72,7 @@ class EventListViewModel : ViewModel() {
             try {
                 repo.refresh(sort = "when_end")
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _uiState.update { it.copy(refreshing = false) }
             }

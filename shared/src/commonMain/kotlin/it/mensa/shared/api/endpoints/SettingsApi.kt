@@ -33,6 +33,7 @@ class SettingsApi(
     private val client: HttpClient,
 ) {
     /** Returns all config entries as key→value map (collection: configs). */
+    @Throws(Exception::class)
     suspend fun settings(): Map<String, String> {
         val items = pb.fullList<ConfigEntry>("configs")
         return items.associate { it.key to it.value }
@@ -45,6 +46,7 @@ class SettingsApi(
      * Returns configs map (collection: configs). Memoized: fetched once per session
      * then returned from cache. Used by TranslationLoader.
      */
+    @Throws(Exception::class)
     suspend fun configs(): Map<String, String> {
         _cachedConfigs?.let { return it }
         val fresh = settings()
@@ -53,12 +55,14 @@ class SettingsApi(
     }
 
     /** Returns all user_metadata entries as key→value map. */
+    @Throws(Exception::class)
     suspend fun getMetadata(): Map<String, String> {
         val items = pb.fullList<UserMetadata>("users_metadata")
         return items.associate { it.key to it.value }
     }
 
     /** Gets a single metadata entry by key. Returns null if not found. */
+    @Throws(Exception::class)
     suspend fun getMetadataByKey(key: String): UserMetadata? {
         val resp = pb.list<UserMetadata>(
             "users_metadata",
@@ -69,6 +73,7 @@ class SettingsApi(
     }
 
     /** Creates or updates a user_metadata entry. */
+    @Throws(Exception::class)
     suspend fun setMetadata(userId: String, key: String, value: String) {
         val existing = getMetadataByKey(key)
         if (existing != null) {
@@ -86,6 +91,7 @@ class SettingsApi(
     }
 
     /** Fetches the calendar link from PocketBase. */
+    @Throws(Exception::class)
     suspend fun getCalendarLink(): CalendarLinkModel {
         val resp = pb.list<CalendarLinkModel>("calendar_link", perPage = 1)
         return resp.items.first()

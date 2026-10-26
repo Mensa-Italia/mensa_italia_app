@@ -21,6 +21,7 @@ class EventSchedulesRepository(
             .mapToList(Dispatchers.Default)
             .map { rows -> rows.map { it.toModel() } }
 
+    @Throws(Exception::class)
     suspend fun refresh(eventId: String) {
         val items = api.listForEvent(eventId)
         val now = Clock.System.now().toEpochMilliseconds()
@@ -45,6 +46,7 @@ class EventSchedulesRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(eventId: String): List<EventScheduleModel> =
         observeForEvent(eventId).first()
 }

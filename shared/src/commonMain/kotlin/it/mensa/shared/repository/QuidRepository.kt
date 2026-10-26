@@ -20,6 +20,7 @@ class QuidRepository(
     /// Throws on network failure — Swift bridges this as a throwing async call.
     /// kotlin.Result intentionally NOT used here because it doesn't survive K/N → Swift
     /// interop (Swift would receive an opaque box that won't cast back to T).
+    @Throws(Exception::class)
     suspend fun refreshIssues() {
         _issues.value = api.listIssues()
     }
@@ -27,12 +28,15 @@ class QuidRepository(
     fun observeIssueArticles(issueId: Long): Flow<List<QuidArticle>> =
         _issueArticles.map { it[issueId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshIssueArticles(issueId: Long) {
         val articles = api.listPostsInIssue(issueId)
         _issueArticles.value = _issueArticles.value + (issueId to articles)
     }
 
+    @Throws(Exception::class)
     suspend fun getArticle(id: Long): QuidArticle = api.getPost(id)
 
+    @Throws(Exception::class)
     suspend fun getAudioForArticle(wpId: Long): QuidArticleAudio? = api.getAudioForArticle(wpId)
 }

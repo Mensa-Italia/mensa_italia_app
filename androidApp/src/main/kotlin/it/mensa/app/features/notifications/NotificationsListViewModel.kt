@@ -1,5 +1,7 @@
 package it.mensa.app.features.notifications
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -218,7 +220,7 @@ class NotificationsListViewModel : ViewModel() {
                 _uiState.update { it.copy(notifications = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -237,7 +239,7 @@ class NotificationsListViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(refreshing = true, error = null) }
             runCatching { repo.refresh() }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
+                .onFailure { e -> _uiState.update { it.copy(error = e.refreshMessage) } }
             _uiState.update { it.copy(refreshing = false, loading = false) }
         }
     }

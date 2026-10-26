@@ -162,10 +162,12 @@ class QuidApi(
     private val client: HttpClient,
 ) {
 
+    @Throws(Exception::class)
     suspend fun listIssues(): List<QuidIssue> =
         pb.fullList<PbQuidIssue>("quid_issues", sort = "-number")
             .map { it.toIssue() }
 
+    @Throws(Exception::class)
     suspend fun listPostsInIssue(issueId: Long, page: Int = 1, perPage: Int = 50): List<QuidArticle> {
         // PDF issues (negative id) have no articles in PocketBase.
         if (issueId <= 0L) return emptyList()
@@ -180,6 +182,7 @@ class QuidApi(
         ).items.mapNotNull { it.toArticle() }
     }
 
+    @Throws(Exception::class)
     suspend fun getPost(id: Long): QuidArticle {
         val post: WpPost = client.get("$BASE_URL/posts/$id") {
             parameter("_embed", "wp:featuredmedia,wp:term")
@@ -187,6 +190,7 @@ class QuidApi(
         return post.toArticle()
     }
 
+    @Throws(Exception::class)
     suspend fun getAudioForArticle(wpId: Long): QuidArticleAudio? {
         val result = pb.list<PbQuidArticleAudio>(
             collection = "quid_articles_audio",

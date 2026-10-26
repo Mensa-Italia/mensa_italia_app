@@ -13,7 +13,7 @@ final class DocumentDetailViewModel {
         do {
             document = try await koin.documents.getById(id: id)
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.userMessage
         }
     }
 }

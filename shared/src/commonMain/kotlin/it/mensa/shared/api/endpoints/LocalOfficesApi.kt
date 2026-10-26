@@ -16,16 +16,19 @@ import kotlinx.serialization.json.JsonObject
 class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Full list of all local offices, sorted by name. Requires auth.
+    @Throws(Exception::class)
     suspend fun listAll(): List<LocalOfficeModel> =
         pb.fullList("local_offices", sort = "name")
 
     /// Public-area variant: legge la view dedicata `view_local_office` (path
     /// e shape diversi dalla collection interna — solo i campi che vanno
     /// esposti a un visitatore non autenticato).
+    @Throws(Exception::class)
     suspend fun listAllPublic(): List<LocalOfficeModel> =
         pb.fullListUnauthenticated("view_local_office", sort = "name")
 
     /// Public variant by slug — stessa view `view_local_office`.
+    @Throws(Exception::class)
     suspend fun bySlugPublic(slug: String): LocalOfficeModel? {
         val escaped = slug.replace("'", "\\'")
         return pb.fullListUnauthenticated<LocalOfficeModel>(
@@ -35,6 +38,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
     }
 
     /// Public variant by id — stessa view.
+    @Throws(Exception::class)
     suspend fun byIdPublic(id: String): LocalOfficeModel? {
         val escaped = id.replace("'", "\\'")
         return pb.fullListUnauthenticated<LocalOfficeModel>(
@@ -45,6 +49,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Resolve a single office by slug (used by deep-link entry).
     /// Returns the first match or null.
+    @Throws(Exception::class)
     suspend fun bySlug(slug: String): LocalOfficeModel? {
         val escaped = slug.replace("'", "\\'")
         return pb.fullList<LocalOfficeModel>(
@@ -55,6 +60,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Full linktree (sections + links) for a single office, sorted by sort_order.
     /// Uses the public view — no auth required.
+    @Throws(Exception::class)
     suspend fun linktreeByOffice(officeId: String): List<LocalOfficeLinktreeRowModel> =
         pb.fullListUnauthenticated(
             "view_local_office_linktree",
@@ -64,6 +70,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Same data resolved by slug (used when navigating from a deep link where
     /// only the slug is known).
+    @Throws(Exception::class)
     suspend fun linktreeBySlug(slug: String): List<LocalOfficeLinktreeRowModel> {
         val escaped = slug.replace("'", "\\'")
         return pb.fullListUnauthenticated(
@@ -74,6 +81,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
     }
 
     /// Segretario + cosegretari (admins) of a local office. Public view.
+    @Throws(Exception::class)
     suspend fun adminsByOffice(officeId: String): List<LocalOfficeAdminModel> =
         pb.fullListUnauthenticated(
             "view_local_office_admins",
@@ -81,6 +89,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
         )
 
     /// Test assistants of a local office. Public view.
+    @Throws(Exception::class)
     suspend fun assistantsByOffice(officeId: String): List<LocalOfficeAssistantModel> =
         pb.fullListUnauthenticated(
             "view_local_office_assistants",
@@ -89,6 +98,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Upcoming test dates (date >= now) for a single office, sorted ascending.
     /// Public view.
+    @Throws(Exception::class)
     suspend fun upcomingTestDatesByOffice(officeId: String): List<LocalOfficeTestDateModel> {
         val isoNow = Clock.System.now().toString()
         return pb.fullListUnauthenticated(
@@ -101,6 +111,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
     /// Events relation-filtered to a local office. Uses the existing EventModel —
     /// the extra `local_office` field in the PocketBase JSON is ignored by the
     /// deserializer (ignoreUnknownKeys = true).
+    @Throws(Exception::class)
     suspend fun eventsByOffice(officeId: String): List<EventModel> =
         pb.fullList(
             "events",
@@ -109,6 +120,7 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
         )
 
     /// Sigs relation-filtered to a local office (territoriali).
+    @Throws(Exception::class)
     suspend fun sigsByOffice(officeId: String): List<SigModel> =
         pb.fullList(
             "sigs",
@@ -119,29 +131,35 @@ class LocalOfficesApi(private val pb: PocketBaseClient) {
 
     /// Create a new test-date record. PocketBase assigns the id; the `id` field
     /// on the returned record holds the newly created id.
+    @Throws(Exception::class)
     suspend fun createTestDate(record: LocalOfficeTestDateRecord): LocalOfficeTestDateRecord =
         pb.create("local_offices_test_dates", record)
 
     /// Partial-patch a test-date record. Pass only the fields you want to change
     /// as a `JsonObject` (kotlinx-serialization's `buildJsonObject { ... }`).
+    @Throws(Exception::class)
     suspend fun updateTestDate(id: String, patch: JsonObject): LocalOfficeTestDateRecord =
         pb.update("local_offices_test_dates", id, patch)
 
     /// Delete a test-date record by id.
+    @Throws(Exception::class)
     suspend fun deleteTestDate(id: String) =
         pb.delete("local_offices_test_dates", id)
 
     // --- Linktree entries CRUD ---
 
     /// Create a new linktree entry (section or link).
+    @Throws(Exception::class)
     suspend fun createLink(record: LocalOfficeLinkRecord): LocalOfficeLinkRecord =
         pb.create("local_offices_links", record)
 
     /// Partial-patch a linktree entry.
+    @Throws(Exception::class)
     suspend fun updateLink(id: String, patch: JsonObject): LocalOfficeLinkRecord =
         pb.update("local_offices_links", id, patch)
 
     /// Delete a linktree entry by id.
+    @Throws(Exception::class)
     suspend fun deleteLink(id: String) =
         pb.delete("local_offices_links", id)
 }

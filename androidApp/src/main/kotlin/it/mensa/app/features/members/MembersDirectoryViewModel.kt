@@ -1,5 +1,7 @@
 package it.mensa.app.features.members
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -43,7 +45,7 @@ class MembersDirectoryViewModel : ViewModel() {
                 _uiState.update { it.copy(members = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
             .launchIn(viewModelScope)
     }
@@ -54,7 +56,7 @@ class MembersDirectoryViewModel : ViewModel() {
             try {
                 repo.refresh()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _uiState.update { it.copy(loading = false) }
             }

@@ -39,7 +39,7 @@ final class ExternalAddonViewModel {
         do {
             accessData = try await koin.addons.getAccessData(addonId: addonId)
         } catch {
-            self.state = .failed((error as NSError).localizedDescription)
+            self.state = .failed(error.userMessage)
             return
         }
 

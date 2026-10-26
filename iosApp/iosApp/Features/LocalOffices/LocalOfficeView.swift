@@ -857,7 +857,7 @@ struct LocalOfficeView: View {
                     return
                 }
             } catch {
-                await MainActor.run { self.error = error.localizedDescription }
+                await MainActor.run { self.error = error.userMessage }
                 return
             }
         }
@@ -1010,7 +1010,7 @@ struct LocalOfficeBySlugLoader: View {
                 }
             }
         } catch {
-            await MainActor.run { self.error = error.localizedDescription }
+            await MainActor.run { self.error = error.userMessage }
         }
     }
 }

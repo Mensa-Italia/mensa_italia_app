@@ -166,7 +166,7 @@ final class DevicesViewModel {
         do {
             try await koin.devices.refresh()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
         loading = false
     }
@@ -177,7 +177,7 @@ final class DevicesViewModel {
             // offre nemmeno lo swipe, quindi qui il valore non serve.
             _ = try await koin.devices.delete(id: id)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

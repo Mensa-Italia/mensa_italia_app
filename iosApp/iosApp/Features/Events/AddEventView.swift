@@ -200,7 +200,7 @@ final class AddEventViewModel {
             }
             dismissed = true
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.userMessage
         }
     }
 
@@ -212,7 +212,7 @@ final class AddEventViewModel {
             try await koin.events.delete(id: id)
             dismissed = true
         } catch {
-            self.error = error.localizedDescription
+            self.error = error.userMessage
         }
     }
 }

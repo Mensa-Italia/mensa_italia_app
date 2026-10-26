@@ -15,12 +15,14 @@ class MetadataRepository(
     private val _state = MutableStateFlow<Map<String, String>>(emptyMap())
     val state: StateFlow<Map<String, String>> = _state.asStateFlow()
 
+    @Throws(Exception::class)
     suspend fun refresh(userId: String): Map<String, String> {
         val map = api.getMetadataMap(userId)
         _state.value = map
         return map
     }
 
+    @Throws(Exception::class)
     suspend fun set(userId: String, key: String, value: String) {
         api.setMetadata(userId, key, value)
         _state.value = _state.value.toMutableMap().apply { put(key, value) }
@@ -45,6 +47,7 @@ class MetadataRepository(
      * ritorno in foreground, quindi senza il confronto sarebbe una scrittura
      * per ogni volta che l'utente riapre l'app.
      */
+    @Throws(Exception::class)
     suspend fun syncAppVersion(userId: String, version: String) {
         if (userId.isBlank() || version.isBlank()) return
         // La cache e' in memoria e parte vuota a ogni avvio: senza una lettura

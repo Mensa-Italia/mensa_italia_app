@@ -65,4 +65,42 @@ class MembershipTest {
         assertNull(Membership.daysUntilExpiry(user(), now))
         assertNull(Membership.daysUntilExpiry(null, now))
     }
+
+    // ── Gate con la cache (avvio senza aspettare il server) ──────────────────
+
+    private val expiredLastWeek = Instant.parse("2026-08-15T00:00:00Z")
+
+    @Test
+    fun activeOpensWhateverTheFreshness() {
+        val ok = user(expiresAt = Instant.parse("2027-01-01T00:00:00Z"))
+        assertEquals(MembershipGate.OPEN, Membership.gate(ok, verified = false, checking = true, syncedAt = null, now = now))
+    }
+
+    @Test
+    fun expiredForTheServerClosesAtOnce() {
+        val u = user(expiresAt = expiredLastWeek)
+        // Confermata adesso.
+        assertEquals(MembershipGate.EXPIRED, Membership.gate(u, verified = true, checking = false, syncedAt = null, now = now))
+        // Gia' scaduta all'ultimo controllo: anche offline, anche durante la verifica.
+        val syncedAfter = Instant.parse("2026-08-20T00:00:00Z")
+        assertEquals(MembershipGate.EXPIRED, Membership.gate(u, verified = false, checking = true, syncedAt = syncedAfter, now = now))
+        assertEquals(MembershipGate.EXPIRED, Membership.gate(u, verified = false, checking = false, syncedAt = syncedAfter, now = now))
+    }
+
+    /** Scaduta solo dopo l'ultimo controllo: lo splash aspetta il server, nessuna Home chiusa in faccia. */
+    @Test
+    fun lapsedSinceTheLastCheckWaitsForTheServer() {
+        val u = user(expiresAt = expiredLastWeek)
+        val syncedBefore = Instant.parse("2026-08-01T00:00:00Z")
+        assertEquals(MembershipGate.CHECKING, Membership.gate(u, verified = false, checking = true, syncedAt = syncedBefore, now = now))
+        assertEquals(MembershipGate.CHECKING, Membership.gate(u, verified = false, checking = true, syncedAt = null, now = now))
+    }
+
+    /** Offline (il controllo e' finito senza risposta): non si chiude fuori nessuno su una data non verificabile. */
+    @Test
+    fun lapsedAndUnverifiableOpens() {
+        val u = user(expiresAt = expiredLastWeek)
+        val syncedBefore = Instant.parse("2026-08-01T00:00:00Z")
+        assertEquals(MembershipGate.OPEN, Membership.gate(u, verified = false, checking = false, syncedAt = syncedBefore, now = now))
+    }
 }

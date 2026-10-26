@@ -32,6 +32,7 @@ class AddonsRepository(
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toModel() }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         db.transaction {
@@ -51,11 +52,14 @@ class AddonsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<AddonModel> = observeAll().first()
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): AddonModel? =
         db.addonQueries.selectById(id).awaitAsOneOrNull()?.toModel()
 
+    @Throws(Exception::class)
     suspend fun getAccessData(addonId: String): AddonAccessData =
         api.getAccessData(addonId)
 }

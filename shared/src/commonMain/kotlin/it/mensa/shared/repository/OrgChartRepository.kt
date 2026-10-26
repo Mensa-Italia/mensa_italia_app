@@ -10,5 +10,6 @@ import it.mensa.shared.model.OrgChartModel
  * aggiungere un cache in-memory con TTL.
  */
 class OrgChartRepository(private val api: OrgChartApi) {
+    @Throws(Exception::class)
     suspend fun fetch(): OrgChartModel = api.get()
 }

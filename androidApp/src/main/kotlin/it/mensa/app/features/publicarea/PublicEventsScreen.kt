@@ -1,5 +1,6 @@
 package it.mensa.app.features.publicarea
 
+import it.mensa.app.support.userMessage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,7 +56,7 @@ fun PublicEventsScreen(onBack: () -> Unit) {
             // Public endpoint — does not require auth (parity with iOS PublicEventsView).
             events = koinAccess().events.fetchPublicEvents()
         }.onFailure {
-            error = it.message
+            error = it.userMessage
         }
         loading = false
     }

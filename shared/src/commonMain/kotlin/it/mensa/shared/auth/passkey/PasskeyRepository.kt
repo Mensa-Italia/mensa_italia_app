@@ -31,6 +31,7 @@ class PasskeyRepository(
      * percorso passkey non deve mai produrre un errore rosso — al massimo
      * riporta l'utente alla password.
      */
+    @Throws(Exception::class)
     suspend fun beginLogin(email: String): PasskeyStartResult {
         val response = try {
             api.beginLogin(email.trim().lowercase())
@@ -63,6 +64,7 @@ class PasskeyRepository(
      * richiederebbe di riaprire il prompt biometrico, che e' responsabilita'
      * dell'app module.
      */
+    @Throws(Exception::class)
     suspend fun finishLogin(loginId: String, credentialJson: String): PasskeyLoginResult {
         val tokens = try {
             api.finishLogin(loginId, credentialJson)
@@ -97,6 +99,7 @@ class PasskeyRepository(
      *
      * Ritorna null se il server non e' in grado di avviare la registrazione.
      */
+    @Throws(Exception::class)
     suspend fun beginRegistration(): PasskeyRegistrationChallenge? {
         val response = try {
             api.beginRegistration()
@@ -125,6 +128,7 @@ class PasskeyRepository(
      * fallimento silenzioso proprio nel punto in cui l'utente crede di aver
      * attivato la passkey.
      */
+    @Throws(Exception::class)
     suspend fun finishRegistration(
         passkeyId: String,
         credentialJson: String,
@@ -132,6 +136,7 @@ class PasskeyRepository(
     ): Boolean = runCatching { api.finishRegistration(passkeyId, credentialJson, name) }.isSuccess
 
     /** Le passkey dell'utente. Lista vuota anche in caso di errore di rete. */
+    @Throws(Exception::class)
     suspend fun list(): List<PasskeyModel> = runCatching { api.list() }.getOrDefault(emptyList())
 
     /**
@@ -139,9 +144,11 @@ class PasskeyRepository(
      * del prompt, che non deve proporre l'attivazione basandosi su una lista
      * vuota solo perche' la rete era giu'.
      */
+    @Throws(Exception::class)
     suspend fun listOrNull(): List<PasskeyModel>? = runCatching { api.list() }.getOrNull()
 
     /** `Boolean` per la stessa ragione di [finishRegistration]. */
+    @Throws(Exception::class)
     suspend fun remove(passkeyId: String): Boolean = runCatching { api.remove(passkeyId) }.isSuccess
 }
 

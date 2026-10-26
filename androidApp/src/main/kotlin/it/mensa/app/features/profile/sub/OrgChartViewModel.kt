@@ -1,5 +1,6 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -36,7 +37,7 @@ class OrgChartViewModel : ViewModel() {
                     _uiState.update { it.copy(groups = model.groups, loading = false) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(loading = false, errorMessage = e.message) }
+                    _uiState.update { it.copy(loading = false, errorMessage = e.userMessage) }
                 },
             )
         }

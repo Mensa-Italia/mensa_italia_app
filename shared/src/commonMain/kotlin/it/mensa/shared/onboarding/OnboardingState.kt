@@ -21,6 +21,7 @@ class OnboardingState internal constructor(
      * the user was created within the last 24h, AND we haven't already
      * recorded `onboarding.shown.<userId>` locally.
      */
+    @Throws(Exception::class)
     suspend fun shouldShow(user: UserModel): Boolean {
         if (user.id.isEmpty()) return false
         val key = keyFor(user.id)

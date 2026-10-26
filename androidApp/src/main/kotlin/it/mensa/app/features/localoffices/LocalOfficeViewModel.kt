@@ -1,5 +1,7 @@
 package it.mensa.app.features.localoffices
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -89,7 +91,7 @@ class LocalOfficeViewModel(private val officeId: String) : ViewModel() {
                 val office = repo.officeById(officeId)
                 _uiState.update { it.copy(office = office, loading = office == null) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
         }
     }
@@ -102,7 +104,7 @@ class LocalOfficeViewModel(private val officeId: String) : ViewModel() {
                 val office = repo.officeById(officeId)
                 _uiState.update { it.copy(office = office, loading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.refreshMessage, loading = false) }
             }
         }
     }
@@ -121,7 +123,7 @@ class LocalOfficeViewModel(private val officeId: String) : ViewModel() {
             try {
                 repo.deleteTestDate(officeId, id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }
@@ -133,7 +135,7 @@ class LocalOfficeViewModel(private val officeId: String) : ViewModel() {
             try {
                 repo.deleteLink(officeId, id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }

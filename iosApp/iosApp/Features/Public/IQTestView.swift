@@ -455,7 +455,7 @@ struct IQTestView: View {
             secondsRemaining = Int(p.durationSeconds)
             phase = .ageGate
         } catch {
-            phase = .failed(error.localizedDescription)
+            phase = .failed(error.userMessage)
         }
     }
 
@@ -497,7 +497,7 @@ struct IQTestView: View {
             )
             phase = .result(result)
         } catch {
-            phase = .failed(error.localizedDescription)
+            phase = .failed(error.userMessage)
         }
     }
 

@@ -33,10 +33,12 @@ class LocationsApi(
     private val client: HttpClient,
 ) {
     /** Returns all saved positions for the current user. */
+    @Throws(Exception::class)
     suspend fun list(): List<LocationModel> =
         pb.fullList("positions")
 
     /** Creates a new position entry. */
+    @Throws(Exception::class)
     suspend fun create(
         name: String,
         address: String,
@@ -58,6 +60,7 @@ class LocationsApi(
     /**
      * Soft-deletes a location by setting saved=false (as per the Flutter reference).
      */
+    @Throws(Exception::class)
     suspend fun delete(id: String): LocationModel =
         pb.update("positions", id, DeleteLocationBody(saved = false))
 
@@ -65,6 +68,7 @@ class LocationsApi(
      * Calls GET /api/position/state?lat=&lon= to determine the geographic state
      * for the given coordinates.
      */
+    @Throws(Exception::class)
     suspend fun locateState(lat: Double, lon: Double): StateResponse =
         client.get("/api/position/state") {
             parameter("lat", lat)

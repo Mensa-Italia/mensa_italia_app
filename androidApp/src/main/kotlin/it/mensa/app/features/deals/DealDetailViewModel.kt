@@ -1,5 +1,6 @@
 package it.mensa.app.features.deals
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -67,7 +68,7 @@ class DealDetailViewModel(private val dealId: String) : ViewModel() {
             val deal = koin.deals.getById(dealId)
             _state.update { it.copy(deal = deal, loading = false) }
         } catch (e: Exception) {
-            _state.update { it.copy(error = e.message, loading = false) }
+            _state.update { it.copy(error = e.userMessage, loading = false) }
         }
     }
 

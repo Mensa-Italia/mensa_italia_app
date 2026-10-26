@@ -49,6 +49,7 @@ class PasskeyEnrollmentGate internal constructor(
      *  - non siamo in modalita' screenshot, dove un prompt inatteso finirebbe
      *    dentro le immagini per gli store.
      */
+    @Throws(Exception::class)
     suspend fun shouldShow(user: UserModel, deviceSupportsPasskeys: Boolean): Boolean {
         // `enable_passkeys` off: qui si spegne la proposta automatica su
         // entrambe le piattaforme in un colpo solo. I due punti d'ingresso

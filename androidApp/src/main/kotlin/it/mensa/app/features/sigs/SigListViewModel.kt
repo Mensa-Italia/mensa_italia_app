@@ -1,5 +1,7 @@
 package it.mensa.app.features.sigs
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -49,7 +51,7 @@ class SigListViewModel : ViewModel() {
                 _uiState.update { it.copy(sigs = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
             .launchIn(viewModelScope)
     }
@@ -72,7 +74,7 @@ class SigListViewModel : ViewModel() {
             try {
                 repo.refresh(filter = null, sort = "name")
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _uiState.update { it.copy(refreshing = false) }
             }
@@ -88,7 +90,7 @@ class SigListViewModel : ViewModel() {
             try {
                 repo.create(draft)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }
@@ -98,7 +100,7 @@ class SigListViewModel : ViewModel() {
             try {
                 repo.update(id, draft)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }
@@ -108,7 +110,7 @@ class SigListViewModel : ViewModel() {
             try {
                 repo.delete(id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.userMessage) }
             }
         }
     }

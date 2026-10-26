@@ -38,6 +38,7 @@ class TicketsRepository(
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toModel() }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         val now = Clock.System.now().toEpochMilliseconds()
@@ -47,8 +48,10 @@ class TicketsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<TicketModel> = observeAll().first()
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): TicketModel? =
         db.ticketQueries.selectById(id).awaitAsOneOrNull()?.toModel()
 

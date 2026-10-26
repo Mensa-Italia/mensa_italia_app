@@ -1,5 +1,6 @@
 package it.mensa.app.features.auth
 
+import it.mensa.app.support.userMessage
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -68,7 +69,7 @@ class LoginViewModel : ViewModel() {
                             _uiState.update {
                                 it.copy(
                                     loading = false,
-                                    error = err.message ?: "Errore di accesso",
+                                    error = err.userMessage,
                                 )
                             }
                         },
@@ -79,7 +80,7 @@ class LoginViewModel : ViewModel() {
                     _uiState.update {
                         it.copy(
                             loading = false,
-                            error = err.message ?: "Errore di rete",
+                            error = err.userMessage,
                         )
                     }
                 },

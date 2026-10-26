@@ -1,5 +1,6 @@
 package it.mensa.app.features.tickets
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -32,7 +33,7 @@ class TicketDetailViewModel(private val ticketId: String) : ViewModel() {
                 _uiState.update { it.copy(ticket = ticket, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 

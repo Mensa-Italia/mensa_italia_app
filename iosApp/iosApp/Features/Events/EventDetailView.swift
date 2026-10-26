@@ -45,7 +45,7 @@ final class EventDetailViewModel {
                 self.event = e
             }
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.refreshMessage
         }
     }
 }
@@ -466,7 +466,7 @@ struct EventDetailView: View {
             )
             calendarSuccess = true
         } catch {
-            calendarError = error.localizedDescription
+            calendarError = error.userMessage
         }
     }
 

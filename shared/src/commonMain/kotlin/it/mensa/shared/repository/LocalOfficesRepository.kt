@@ -39,6 +39,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// Throws on network failure — Swift bridges this as a throwing async call.
     /// kotlin.Result intentionally NOT used here because it doesn't survive K/N → Swift
     /// interop (Swift would receive an opaque box that won't cast back to T).
+    @Throws(Exception::class)
     suspend fun refreshAllOffices() {
         _allOffices.value = api.listAll()
     }
@@ -46,6 +47,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// Public-area refresh: hits the unauthenticated `view_local_office`
     /// endpoint so the offices list works pre-login. Same cache as the
     /// authenticated path.
+    @Throws(Exception::class)
     suspend fun refreshAllOfficesPublic() {
         _allOffices.value = api.listAllPublic()
     }
@@ -53,6 +55,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// Public-area lookup by id — usa la view pubblica.
     /// Cache-or-fetch: se l'office e' gia' in cache (popolato dalla list)
     /// ritorna quello, altrimenti rifresca la view pubblica.
+    @Throws(Exception::class)
     suspend fun officeByIdPublic(id: String): LocalOfficeModel? {
         val cached = _allOffices.value.firstOrNull { it.id == id }
         if (cached != null) return cached
@@ -66,6 +69,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
 
     /// Returns the cached office for a slug if known, otherwise fetches it from
     /// the network (without populating the full list cache).
+    @Throws(Exception::class)
     suspend fun officeBySlug(slug: String): LocalOfficeModel? {
         val cached = _allOffices.value.firstOrNull { it.slug == slug }
         if (cached != null) return cached
@@ -75,6 +79,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// Cache-or-refresh lookup by PocketBase id. Used by the in-app list →
     /// detail navigation path, where the id is always known and unambiguous
     /// (slug-based lookup is fragile when slugs are missing or duplicated).
+    @Throws(Exception::class)
     suspend fun officeById(id: String): LocalOfficeModel? {
         val cached = _allOffices.value.firstOrNull { it.id == id }
         if (cached != null) return cached
@@ -87,6 +92,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeLinktree(officeId: String): Flow<List<LocalOfficeLinktreeRowModel>> =
         _linktree.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshLinktreeByOffice(officeId: String) {
         val rows = api.linktreeByOffice(officeId)
         _linktree.value = _linktree.value + (officeId to rows)
@@ -94,6 +100,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
 
     /// Entry path used when navigating from a deep link: resolves slug → office,
     /// caches both the office and its linktree in one shot, returns the office.
+    @Throws(Exception::class)
     suspend fun loadBySlug(slug: String): LocalOfficeModel? {
         val office = officeBySlug(slug) ?: return null
         val rows = api.linktreeBySlug(slug)
@@ -106,6 +113,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeAdmins(officeId: String): Flow<List<LocalOfficeAdminModel>> =
         _admins.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshAdmins(officeId: String) {
         val items = api.adminsByOffice(officeId)
         _admins.value = _admins.value + (officeId to items)
@@ -114,6 +122,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeAssistants(officeId: String): Flow<List<LocalOfficeAssistantModel>> =
         _assistants.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshAssistants(officeId: String) {
         val items = api.assistantsByOffice(officeId)
         _assistants.value = _assistants.value + (officeId to items)
@@ -124,6 +133,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeUpcomingTestDates(officeId: String): Flow<List<LocalOfficeTestDateModel>> =
         _testDates.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshUpcomingTestDates(officeId: String) {
         val items = api.upcomingTestDatesByOffice(officeId)
         _testDates.value = _testDates.value + (officeId to items)
@@ -134,6 +144,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeEvents(officeId: String): Flow<List<EventModel>> =
         _events.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshEvents(officeId: String) {
         val items = api.eventsByOffice(officeId)
         _events.value = _events.value + (officeId to items)
@@ -142,6 +153,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     fun observeSigs(officeId: String): Flow<List<SigModel>> =
         _sigs.map { it[officeId] ?: emptyList() }
 
+    @Throws(Exception::class)
     suspend fun refreshSigs(officeId: String) {
         val items = api.sigsByOffice(officeId)
         _sigs.value = _sigs.value + (officeId to items)
@@ -151,6 +163,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
 
     /// Throws on failure. Refreshes the upcoming-test-dates cache for the office
     /// so observers re-render without an explicit pull.
+    @Throws(Exception::class)
     suspend fun createTestDate(
         officeId: String,
         record: LocalOfficeTestDateRecord,
@@ -160,6 +173,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         return created
     }
 
+    @Throws(Exception::class)
     suspend fun updateTestDate(
         officeId: String,
         id: String,
@@ -170,6 +184,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         return updated
     }
 
+    @Throws(Exception::class)
     suspend fun deleteTestDate(officeId: String, id: String) {
         api.deleteTestDate(id)
         refreshUpcomingTestDates(officeId)
@@ -179,6 +194,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
 
     /// Throws on failure. Refreshes the linktree cache for the office
     /// so observers re-render without an explicit pull.
+    @Throws(Exception::class)
     suspend fun createLink(
         officeId: String,
         record: LocalOfficeLinkRecord,
@@ -194,6 +210,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         return created
     }
 
+    @Throws(Exception::class)
     suspend fun updateLink(
         officeId: String,
         id: String,
@@ -204,6 +221,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         return updated
     }
 
+    @Throws(Exception::class)
     suspend fun deleteLink(officeId: String, id: String) {
         api.deleteLink(id)
         refreshLinktreeByOffice(officeId)
@@ -214,6 +232,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     // optional typed fields and construct the patch internally. Any non-null
     // argument is included in the PATCH body; null means "leave unchanged".
 
+    @Throws(Exception::class)
     suspend fun updateTestDateFields(
         officeId: String,
         id: String,
@@ -241,6 +260,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// Kotlin data-class initializers with `Boolean` defaults occasionally
     /// dropped the value (sent `active=false` even when Swift passed `true`).
     /// Building the record inside Kotlin avoids that footgun.
+    @Throws(Exception::class)
     suspend fun createLinkFromFields(
         officeId: String,
         kind: String,
@@ -267,6 +287,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
 
     /// Mirror of `createLinkFromFields` for test-date creation. Keeps the
     /// Swift call site free of Kotlin data-class constructor bridging.
+    @Throws(Exception::class)
     suspend fun createTestDateFromFields(
         officeId: String,
         date: kotlinx.datetime.Instant,
@@ -287,6 +308,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         return createTestDate(officeId, record)
     }
 
+    @Throws(Exception::class)
     suspend fun updateLinkFields(
         officeId: String,
         id: String,
@@ -317,6 +339,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     /// One-shot batch refresh for a single office — fires all per-office
     /// refreshes in parallel and waits for all to complete. Individual failures
     /// are propagated; the caller's `try` decides whether to log them.
+    @Throws(Exception::class)
     suspend fun refreshAllForOffice(officeId: String): Unit = coroutineScope {
         val linktreeJob = async { refreshLinktreeByOffice(officeId) }
         val adminsJob = async { refreshAdmins(officeId) }

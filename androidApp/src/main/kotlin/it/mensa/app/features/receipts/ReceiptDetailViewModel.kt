@@ -1,5 +1,6 @@
 package it.mensa.app.features.receipts
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -35,7 +36,7 @@ class ReceiptDetailViewModel(private val receiptId: String) : ViewModel() {
                 _uiState.update { it.copy(receipt = receipt, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -52,7 +53,7 @@ class ReceiptDetailViewModel(private val receiptId: String) : ViewModel() {
                 }
                 .onFailure { e ->
                     _uiState.update {
-                        it.copy(downloadingPdf = false, error = e.message)
+                        it.copy(downloadingPdf = false, error = e.userMessage)
                     }
                 }
         }

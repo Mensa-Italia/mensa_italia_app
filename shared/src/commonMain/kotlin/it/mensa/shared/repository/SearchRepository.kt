@@ -56,8 +56,10 @@ class SearchRepository(private val api: SearchApi) {
         }
 
     /** Per ricerche programmatic (es. "trova tutto su Mario Rossi"). */
+    @Throws(Exception::class)
     suspend fun queryOnce(params: Params): SearchResponse =
         api.search(params.q, params.types, params.region, params.limitPerType, params.hydrate)
 
+    @Throws(Exception::class)
     suspend fun queryOnce(q: String): SearchResponse = queryOnce(Params(q))
 }

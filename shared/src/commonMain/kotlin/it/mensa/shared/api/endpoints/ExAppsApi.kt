@@ -43,10 +43,12 @@ class ExAppsApi(
     private val client: HttpClient,
 ) {
 
+    @Throws(Exception::class)
     suspend fun getExApp(id: String): ExAppModel =
         pb.getOne("ex_apps", id)
 
     /** First record matching (user, ex_app) or null. */
+    @Throws(Exception::class)
     suspend fun getGrantedPermissions(userId: String, appId: String): ExGrantedPermissionsModel? =
         pb.fullList<ExGrantedPermissionsModel>(
             "ex_granted_permissions",
@@ -56,6 +58,7 @@ class ExAppsApi(
     internal suspend fun create(body: ExGrantedPermissionsCreateBody): ExGrantedPermissionsModel =
         pb.create("ex_granted_permissions", body)
 
+    @Throws(Exception::class)
     suspend fun patchPermissions(id: String, perms: List<String>): ExGrantedPermissionsModel =
         pb.update("ex_granted_permissions", id, ExGrantedPermissionsPatchBody(perms))
 
@@ -64,6 +67,7 @@ class ExAppsApi(
      * the PocketBase Authorization header here so we don't leak the user's
      * token to an arbitrary external host.
      */
+    @Throws(Exception::class)
     suspend fun postCallback(url: String, accepted: Boolean) {
         client.post(url) {
             headers { remove(HttpHeaders.Authorization) }

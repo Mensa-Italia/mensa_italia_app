@@ -95,7 +95,7 @@ struct PaymentMethodsView: View {
             case .canceled:
                 break
             case .failed(let error):
-                vm.errorMessage = error.localizedDescription
+                vm.errorMessage = error.userMessage
             }
         }
     }
@@ -189,7 +189,7 @@ final class PaymentMethodsViewModel {
             let list = try await koin.paymentMethods.refresh()
             self.methods = list
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
         loading = false
     }
@@ -199,7 +199,7 @@ final class PaymentMethodsViewModel {
             try await koin.paymentMethods.setDefault(paymentMethodId: id)
             defaultId = id
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

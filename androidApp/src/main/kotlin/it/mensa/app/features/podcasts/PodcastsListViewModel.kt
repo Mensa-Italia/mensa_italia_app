@@ -1,5 +1,7 @@
 package it.mensa.app.features.podcasts
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -32,7 +34,7 @@ class PodcastsListViewModel : ViewModel() {
                 _uiState.update { it.copy(podcasts = list, loading = false, error = null) }
             }
             .catch { e ->
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
             .launchIn(viewModelScope)
 
@@ -44,7 +46,7 @@ class PodcastsListViewModel : ViewModel() {
             _uiState.update { it.copy(loading = true, error = null) }
             runCatching { repo.refreshPodcasts() }
                 .onFailure { e ->
-                    _uiState.update { it.copy(loading = false, error = e.message) }
+                    _uiState.update { it.copy(loading = false, error = e.refreshMessage) }
                 }
         }
     }

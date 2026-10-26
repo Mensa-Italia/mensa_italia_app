@@ -30,6 +30,7 @@ class DocumentsRepository(
             .mapToOneOrNull(Dispatchers.Default)
             .map { it?.toModel() }
 
+    @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
         val now = Clock.System.now().toEpochMilliseconds()
@@ -51,6 +52,7 @@ class DocumentsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun firstSnapshot(): List<DocumentModel> = observeAll().first()
 
     /**
@@ -63,6 +65,7 @@ class DocumentsRepository(
      * funzionava. Lo hanno notato i soci. Null solo se manca anche sul server
      * o la rete non risponde.
      */
+    @Throws(Exception::class)
     suspend fun getById(id: String): DocumentModel? {
         db.documentQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel() }
         // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
@@ -85,6 +88,7 @@ class DocumentsRepository(
     /**
      * Loads the AI-elaborated summary for a document, caching it locally.
      */
+    @Throws(Exception::class)
     suspend fun getElaborated(elaboratedId: String): DocumentElaboratedModel? {
         if (elaboratedId.isEmpty()) return null
         val cached = db.documentElaboratedQueries.selectById(elaboratedId).awaitAsOneOrNull()

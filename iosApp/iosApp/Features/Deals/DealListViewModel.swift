@@ -52,7 +52,7 @@ final class DealListViewModel {
         do {
             try await koin.deals.refresh(filter: nil, sort: "created")
         } catch {
-            self.error = (error as NSError).localizedDescription
+            self.error = error.refreshMessage
         }
     }
 

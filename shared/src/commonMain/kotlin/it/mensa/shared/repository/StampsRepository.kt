@@ -35,9 +35,11 @@ class StampsRepository(
      * I timbri gia' in database, una volta sola. Per chi deve solo scaldarne
      * le immagini (la Home) senza tenere aperto un flow.
      */
+    @Throws(Exception::class)
     suspend fun current(): List<StampUserModel> = observeAll().first()
 
     /** Refresh the user's `stamp_users` records (expand=stamp). */
+    @Throws(Exception::class)
     suspend fun refresh(filter: String? = null, @Suppress("UNUSED_PARAMETER") sort: String = "-created") {
         val userId = auth.currentUser.value?.id
         val effectiveFilter = when {
@@ -75,18 +77,22 @@ class StampsRepository(
         }
     }
 
+    @Throws(Exception::class)
     suspend fun getById(id: String): StampUserModel? =
         db.stampUserQueries.selectById(id).awaitAsOneOrNull()?.toModel()
 
     /** Lookup a catalog stamp by id from the local mirror. */
+    @Throws(Exception::class)
     suspend fun getStampById(id: String): StampModel? =
         db.stampQueries.selectById(id).awaitAsOneOrNull()?.toModel()
 
     /** Verify a QR scan: fetch the catalog stamp by id+code from the server. */
+    @Throws(Exception::class)
     suspend fun verify(id: String, code: String): StampModel? =
         api.getStamp(id = id, code = code)
 
     /** Claim a stamp for the current user (after a successful QR verify). */
+    @Throws(Exception::class)
     suspend fun claim(stampId: String, code: String) {
         val userId = auth.currentUser.value?.id ?: error("Not authenticated")
         api.addStamp(stampId = stampId, code = code, userId = userId)

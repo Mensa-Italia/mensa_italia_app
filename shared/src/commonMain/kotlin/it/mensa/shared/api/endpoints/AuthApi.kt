@@ -21,6 +21,7 @@ class AuthApi(private val client: HttpClient) {
      * No Authorization header on the request: a stale Bearer would either
      * be ignored or, worse, cause a 401 from the auth proxy.
      */
+    @Throws(Exception::class)
     suspend fun loginWithZitadel(email: String, password: String): OidcTokenResponse {
         val response = client.post("/api/cs/auth-with-zitadel") {
             attributes.put(SkipAuthAttribute, true)
@@ -47,6 +48,7 @@ class AuthApi(private val client: HttpClient) {
      * carries only tokens) and on cold start to keep the cached profile
      * fresh (membership state, powers, addons can change server-side).
      */
+    @Throws(Exception::class)
     suspend fun me(): UserModel = client.get("/api/cs/me").body()
 }
 

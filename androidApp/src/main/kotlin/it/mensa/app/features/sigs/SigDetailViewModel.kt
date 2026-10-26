@@ -1,5 +1,6 @@
 package it.mensa.app.features.sigs
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -49,7 +50,7 @@ class SigDetailViewModel(private val sigId: String) : ViewModel() {
                 if (fetched != null) _uiState.update { it.copy(sig = fetched, loading = false) }
                 else _uiState.update { it.copy(loading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
         }
     }

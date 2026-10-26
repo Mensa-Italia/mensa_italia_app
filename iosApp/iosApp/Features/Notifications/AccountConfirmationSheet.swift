@@ -128,7 +128,7 @@ struct AccountConfirmationSheet: View {
         do {
             exApp = try await koin.exApps.getExApp(appId: exAppId)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
             exApp = nil
         }
         loading = false
@@ -146,7 +146,7 @@ struct AccountConfirmationSheet: View {
             await markNotificationSeen()
             onDismiss()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 
@@ -158,7 +158,7 @@ struct AccountConfirmationSheet: View {
             await markNotificationSeen()
             onDismiss()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 

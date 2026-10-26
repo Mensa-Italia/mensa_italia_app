@@ -1,5 +1,6 @@
 package it.mensa.app.features.events
 
+import it.mensa.app.support.refreshMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -75,7 +76,7 @@ class EventDetailViewModel(private val eventId: String) : ViewModel() {
                 if (updated != null) _uiState.update { it.copy(event = updated, loading = false) }
                 else _uiState.update { it.copy(loading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.refreshMessage, loading = false) }
             }
         }
     }

@@ -1,5 +1,6 @@
 package it.mensa.app.features.notifications
 
+import it.mensa.app.support.userMessage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,7 +75,7 @@ fun AccountConfirmationSheet(
             exApp = koin.exApps.getExApp(request.exAppId)
         } catch (e: Exception) {
             exApp = null
-            errorMessage = e.message
+            errorMessage = e.userMessage
         } finally {
             loading = false
         }
@@ -97,7 +98,7 @@ fun AccountConfirmationSheet(
                 koin.exApps.postCallback(request.callbackUrl, true)
                 markSeen()
             }.onFailure { e ->
-                errorMessage = e.message
+                errorMessage = e.userMessage
                 submitting = false
                 return@launch
             }
@@ -114,7 +115,7 @@ fun AccountConfirmationSheet(
                 koin.exApps.postCallback(request.callbackUrl, false)
                 markSeen()
             }.onFailure { e ->
-                errorMessage = e.message
+                errorMessage = e.userMessage
                 submitting = false
                 return@launch
             }

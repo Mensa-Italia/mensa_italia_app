@@ -83,10 +83,12 @@ data class DonateResponse(
 class PaymentMethodsApi(private val client: HttpClient) {
 
     /** GET /api/payment/method — list saved payment methods for the user. */
+    @Throws(Exception::class)
     suspend fun list(): List<PaymentMethodModel> =
         client.get("/api/payment/method").body()
 
     /** POST /api/payment/method — start the "add new method" flow. */
+    @Throws(Exception::class)
     suspend fun addMethod(): StripeCustomerResponse =
         client.post("/api/payment/method") {
             setBody(FormDataContent(Parameters.Empty))
@@ -94,6 +96,7 @@ class PaymentMethodsApi(private val client: HttpClient) {
 
     /** POST /api/payment/default — set the default payment method.
      *  Form field name `payment_method_id` matches Flutter's contract. */
+    @Throws(Exception::class)
     suspend fun setDefault(paymentMethodId: String) {
         client.post("/api/payment/default") {
             setBody(
@@ -107,10 +110,12 @@ class PaymentMethodsApi(private val client: HttpClient) {
     /** GET /api/payment/customer — bootstrap Stripe customer info.
      *  Returns the bare Stripe customer object (with `invoice_settings`),
      *  unlike `addMethod()` which wraps it in a SetupIntent response. */
+    @Throws(Exception::class)
     suspend fun customer(): StripeCustomerObject =
         client.get("/api/payment/customer").body()
 
     /** POST /api/payment/donate — initiates a donation PaymentIntent. */
+    @Throws(Exception::class)
     suspend fun donate(amountCents: Int): DonateResponse =
         client.post("/api/payment/donate") {
             setBody(

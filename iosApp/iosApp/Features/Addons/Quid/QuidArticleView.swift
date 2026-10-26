@@ -400,7 +400,7 @@ struct QuidArticleView: View {
                 self.blocks = QuidHTMLRenderer.parse(html: fetched.contentHtml)
             }
         } catch {
-            loadError = error.localizedDescription
+            loadError = error.userMessage
         }
         // Audio narration is best-effort: a fetch failure must NOT block the
         // article view. The banner simply doesn't appear if `audio` stays nil.

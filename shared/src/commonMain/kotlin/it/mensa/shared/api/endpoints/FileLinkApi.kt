@@ -44,6 +44,7 @@ data class FileLinkResponse(
 class FileLinkApi(
     private val client: HttpClient,
 ) {
+    @Throws(Exception::class)
     suspend fun get(
         collection: String,
         recordId: String,

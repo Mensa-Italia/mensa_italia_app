@@ -38,6 +38,7 @@ internal object MensaDatabaseHolder {
     private var driver: SqlDriver? = null
 
     /** Idempotent. Constructs the database via the [DriverFactory] on first call. */
+    @Throws(Exception::class)
     suspend fun initialize(factory: DriverFactory) {
         if (instance == null) {
             val d = factory.createDriver()
@@ -61,6 +62,7 @@ internal object MensaDatabaseHolder {
 }
 
 /** Suspend bootstrap entry point for hosts. Idempotent; safe to call more than once. */
+@Throws(Exception::class)
 suspend fun initializeMensaDatabase(factory: DriverFactory) {
     MensaDatabaseHolder.initialize(factory)
 }
@@ -85,6 +87,7 @@ private val ALL_TABLES = listOf(
  * database. Prima erano 18 DELETE sincrone — gia' abbastanza per un
  * micro-freeze; con il VACUUM sarebbe diventato visibile.
  */
+@Throws(Exception::class)
 suspend fun wipeAllUserData(): Unit = withContext(ioDispatcher) {
     val driver = MensaDatabaseHolder.requireDriver()
 

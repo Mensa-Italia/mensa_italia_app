@@ -1,5 +1,6 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stripe.android.paymentsheet.PaymentSheet
@@ -85,7 +86,7 @@ class PaymentMethodPickerViewModel : ViewModel() {
                 },
                 onFailure = { e ->
                     _uiState.update {
-                        it.copy(loading = false, errorMessage = e.message)
+                        it.copy(loading = false, errorMessage = e.userMessage)
                     }
                 },
             )
@@ -123,7 +124,7 @@ class PaymentMethodPickerViewModel : ViewModel() {
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(adding = false, errorMessage = e.message) }
+                    _uiState.update { it.copy(adding = false, errorMessage = e.userMessage) }
                 },
             )
         }

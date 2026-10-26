@@ -177,6 +177,7 @@
   "app.donate.success": "Grazie per il tuo supporto!",
   "app.done": "Fine",
   "app.edit": "Modifica",
+  "app.error.offline": "Sei offline. Riprova quando torna la connessione.",
   "app.error.title": "Errore",
   "app.event.title": "Evento",
   "app.language.available": "Disponibili",

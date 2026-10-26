@@ -1,5 +1,7 @@
 package it.mensa.app.features.localoffices
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -42,7 +44,7 @@ class LocalOfficesListViewModel : ViewModel() {
                 _uiState.update { it.copy(offices = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
             .launchIn(viewModelScope)
     }
@@ -53,7 +55,7 @@ class LocalOfficesListViewModel : ViewModel() {
             try {
                 repo.refreshAllOffices()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _uiState.update { it.copy(loading = false) }
             }

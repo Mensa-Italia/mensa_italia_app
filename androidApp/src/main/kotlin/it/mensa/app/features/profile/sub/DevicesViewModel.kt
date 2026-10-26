@@ -1,5 +1,7 @@
 package it.mensa.app.features.profile.sub
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -53,7 +55,7 @@ class DevicesViewModel : ViewModel() {
     fun refresh() {
         viewModelScope.launch {
             runCatching { devices.refresh() }.onFailure { e ->
-                _uiState.update { it.copy(loading = false, errorMessage = e.message) }
+                _uiState.update { it.copy(loading = false, errorMessage = e.refreshMessage) }
             }
             _uiState.update { it.copy(loading = false) }
         }
@@ -65,7 +67,7 @@ class DevicesViewModel : ViewModel() {
             // quello non mostra nemmeno il cestino: qui interessa solo
             // l'errore di rete.
             runCatching { devices.delete(id) }.onFailure { e ->
-                _uiState.update { it.copy(errorMessage = e.message) }
+                _uiState.update { it.copy(errorMessage = e.userMessage) }
             }
         }
     }

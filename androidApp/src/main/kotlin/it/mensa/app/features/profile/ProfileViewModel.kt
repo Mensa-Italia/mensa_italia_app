@@ -1,5 +1,6 @@
 package it.mensa.app.features.profile
 
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.LocaleManager
@@ -110,7 +111,7 @@ class ProfileViewModel(
             _uiState.update { it.copy(showLogoutDialog = false, loggingOut = true) }
             runCatching { auth.logout() }.onFailure { e ->
                 _uiState.update {
-                    it.copy(loggingOut = false, errorMessage = e.message)
+                    it.copy(loggingOut = false, errorMessage = e.userMessage)
                 }
                 Logger.w("ProfileVM", "logout", "failed: ${e.message}")
                 return@launch

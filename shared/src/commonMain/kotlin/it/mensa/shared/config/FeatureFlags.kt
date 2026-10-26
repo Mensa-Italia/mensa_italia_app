@@ -96,6 +96,7 @@ class FeatureFlags(
      * cache (primo avvio) si aspetta: i default spegnerebbero sezioni che il
      * server tiene accese.
      */
+    @Throws(Exception::class)
     suspend fun bootstrap() {
         val cached = try {
             readCached()

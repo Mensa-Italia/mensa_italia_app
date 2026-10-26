@@ -1,5 +1,7 @@
 package it.mensa.app.features.publicarea
 
+import it.mensa.app.support.refreshMessage
+import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
@@ -51,7 +53,7 @@ class PublicLocalOfficesListViewModel : ViewModel() {
                 _uiState.update { it.copy(offices = list, loading = false) }
             }
             .catch { e ->
-                _uiState.update { it.copy(error = e.message, loading = false) }
+                _uiState.update { it.copy(error = e.userMessage, loading = false) }
             }
             .launchIn(viewModelScope)
     }
@@ -62,7 +64,7 @@ class PublicLocalOfficesListViewModel : ViewModel() {
             try {
                 repo.refreshAllOfficesPublic()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { it.copy(error = e.refreshMessage) }
             } finally {
                 _uiState.update { it.copy(loading = false) }
             }
@@ -132,7 +134,7 @@ class PublicLocalOfficeDetailViewModel(
                 subscribeAll()
                 refresh()
             } catch (e: Exception) {
-                _uiState.update { it.copy(loading = false, error = e.message) }
+                _uiState.update { it.copy(loading = false, error = e.userMessage) }
             }
         }
     }

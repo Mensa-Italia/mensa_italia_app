@@ -21,18 +21,21 @@ class ReceiptsApi(
     private val pb: PocketBaseClient,
     private val client: HttpClient,
 ) {
+    @Throws(Exception::class)
     suspend fun list(
         filter: String? = null,
         sort: String = "-created",
     ): List<ReceiptModel> =
         pb.fullList("payments", filter = filter, sort = sort)
 
+    @Throws(Exception::class)
     suspend fun get(id: String): ReceiptModel =
         pb.getOne("payments", id)
 
     /**
      * GET /api/payment/receipt-url?id=<receiptId> returns a signed PDF URL.
      */
+    @Throws(Exception::class)
     suspend fun getReceiptUrl(id: String): String {
         val resp: ReceiptUrlResponse = client.get("/api/payment/receipt-url") {
             parameter("id", id)

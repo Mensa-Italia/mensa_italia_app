@@ -107,7 +107,7 @@ struct BootstrapGate<Content: View>: View {
                 // Vedi `SpotlightRefreshCoordinator.markBootstrapped()`.
                 SpotlightRefreshCoordinator.shared.markBootstrapped()
             } catch {
-                self.error = error.localizedDescription
+                self.error = error.userMessage
             }
         }
     }
