@@ -5,6 +5,7 @@
 [![Pipeline](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml/badge.svg?branch=main)](https://github.com/Mensa-Italia/mensa_italia_app/actions/workflows/pipeline.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mensa-Italia/mensa_italia_app?label=release&color=blue)](https://github.com/Mensa-Italia/mensa_italia_app/releases/latest)
 [![Tag latest](https://img.shields.io/github/v/tag/Mensa-Italia/mensa_italia_app?label=tag&color=lightgrey)](https://github.com/Mensa-Italia/mensa_italia_app/tags)
+[![License](https://img.shields.io/badge/license-GPL--2.0-green)](LICENSE.md)
 
 ### Stack
 
@@ -199,4 +200,4 @@ d'intent su Android, attivo solo su build debuggable), non simulando tap.
 
 ## License
 
-Proprietary — Associazione Mensa Italia ETS.
+Distribuito sotto licenza **GNU General Public License v2.0**. Vedi [`LICENSE.md`](LICENSE.md) per il testo completo.
