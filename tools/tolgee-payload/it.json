@@ -1043,5 +1043,10 @@
   "views.signin.form.field.hint.password": "Password",
   "views.signin.form.field.password.hide": "Nascondi password",
   "views.signin.form.field.password.show": "Mostra password",
-  "views.signin.title2": "Accedi"
+  "views.signin.title2": "Accedi",
+  "today.birthdays.title": "Compleanni di oggi",
+  "today.birthdays.one": "{name} compie gli anni oggi",
+  "today.birthdays.many": "{count} soci compiono gli anni oggi",
+  "today.birthdays.cta": "Fagli gli auguri",
+  "today.birthdays.age": "Compie {age} anni"
 }

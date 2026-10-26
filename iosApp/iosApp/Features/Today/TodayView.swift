@@ -56,6 +56,7 @@ struct TodayView: View {
                             OfflineBanner()
                             membershipCardSection
                             membershipSection
+                            birthdaysSection
                         }
                     }
                 } else {
@@ -64,6 +65,9 @@ struct TodayView: View {
                         OfflineBanner()
                         membershipCardSection
                         membershipSection
+                        // Birthdays sit with the member's things, right under
+                        // the membership details — here and unfolded alike.
+                        birthdaysSection
                         nextEventSection
                         notificationsSection
                         // TODO: SIGs section — integrate koin.sigs into TodayViewModel when SIGs
@@ -330,6 +334,18 @@ struct TodayView: View {
                 .buttonStyle(.plain)
             } else {
                 emptyState(icon: "calendar.badge.exclamationmark", message: tr("app.today.no_event", fallback: "Nessun evento in arrivo")) // i18n
+            }
+        }
+    }
+
+    // MARK: - Birthdays
+
+    @ViewBuilder
+    private var birthdaysSection: some View {
+        if !vm.birthdays.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionLabel(title: tr("today.birthdays.title", fallback: "Compleanni di oggi"), icon: "birthday.cake")
+                BirthdaysCard(birthdays: vm.birthdays)
             }
         }
     }

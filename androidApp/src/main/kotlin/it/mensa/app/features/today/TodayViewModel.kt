@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.services.location.LocationProvider
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.members.Birthday
 import it.mensa.shared.model.DealModel
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.NotificationModel
@@ -54,6 +55,10 @@ class TodayViewModel(
     )
     val uiState: StateFlow<TodayUiState> = _uiState.asStateFlow()
 
+    /** I soci che compiono gli anni oggi; vuoto, la sezione non compare. */
+    private val _birthdays = MutableStateFlow<List<Birthday>>(emptyList())
+    val birthdays: StateFlow<List<Birthday>> = _birthdays.asStateFlow()
+
     private var lastLocation: Location? = null
     private var upcomingSnapshot: List<EventModel> = emptyList()
 
@@ -74,7 +79,17 @@ class TodayViewModel(
             // giu') saliva fino al viewModelScope e chiudeva l'app.
             launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
             launch { runCatching { koin.notifications.refresh() } }
+            launch { loadBirthdays() }
         }
+    }
+
+    /** Subito dal registro in locale, se c'e', poi dal server. */
+    private suspend fun loadBirthdays() {
+        if (_birthdays.value.isEmpty()) {
+            runCatching { koin.regSoci.cachedTodaysBirthdays() }
+                .getOrNull()?.takeIf { it.isNotEmpty() }?.let { _birthdays.value = it }
+        }
+        runCatching { koin.regSoci.todaysBirthdays() }.getOrNull()?.let { _birthdays.value = it }
     }
 
     // ─── Cache observation ────────────────────────────────────────────────────
@@ -130,6 +145,7 @@ class TodayViewModel(
             // giu') saliva fino al viewModelScope e chiudeva l'app.
             launch { runCatching { koin.events.refresh(filter = null, sort = "when_end") } }
             launch { runCatching { koin.notifications.refresh() } }
+            launch { loadBirthdays() }
         }
     }
 

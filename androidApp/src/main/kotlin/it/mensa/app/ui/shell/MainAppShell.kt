@@ -318,6 +318,7 @@ fun MainAppShell() {
                         },
                         onTableportClick = { navController.navigate(TableportRoutes.PASSPORT) },
                         onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
+                        onMemberClick = { id -> navController.navigate(MembersRoutes.detail(id)) },
                         onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
                     )
                 }

@@ -16,6 +16,8 @@ final class TodayViewModel {
     var nextEvent: EventModel?
     var notifications: [NotificationModel] = []
     var user: UserModel?
+    /// I soci che compiono gli anni oggi; vuoto, la sezione non compare.
+    var birthdays: [Birthday] = []
 
     /// Snapshot eventi (chronological, ascending start) — cached così
     /// quando la posizione utente arriva possiamo ricalcolare `nextEvent`
@@ -78,7 +80,10 @@ final class TodayViewModel {
             }
         }
 
-        // 3. Background refresh — fire-and-forget. UI doesn't wait. Offline →
+        // 3. Compleanni: subito dal registro in locale, se c'è, poi dal server.
+        Task { [weak self] in await self?.loadBirthdays() }
+
+        // 4. Background refresh — fire-and-forget. UI doesn't wait. Offline →
         //    silent failure, cached data stays on screen.
         Task.detached(priority: .userInitiated) { [weak self] in
             async let _ev: () = { try? await koin.events.refresh(filter: nil, sort: "when_end") }()
@@ -96,7 +101,17 @@ final class TodayViewModel {
     func refresh() async {
         async let _ev: () = { try? await koin.events.refresh(filter: nil, sort: "when_end") }()
         async let _no: () = { try? await koin.notifications.refresh() }()
-        _ = await (_ev, _no)
+        async let _bd: () = loadBirthdays()
+        _ = await (_ev, _no, _bd)
+    }
+
+    private func loadBirthdays() async {
+        if birthdays.isEmpty, let cached = try? await koin.regSoci.cachedTodaysBirthdays(), !cached.isEmpty {
+            birthdays = cached
+        }
+        if let fresh = try? await koin.regSoci.todaysBirthdays() {
+            birthdays = fresh
+        }
     }
 
     private func subscribeEventsFromCache() {

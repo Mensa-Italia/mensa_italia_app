@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.today._components.BirthdaysCard
 import it.mensa.app.features.today._components.MembershipSection
 import it.mensa.app.features.today._components.NotificationsPreview
 import it.mensa.app.features.today._components.OfflineBanner
@@ -55,6 +57,7 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchAppBar
 import it.mensa.app.ui.components.SearchAppBarNotificationsButton
 import it.mensa.app.ui.shell.MainTab
+import it.mensa.shared.members.Birthday
 import it.mensa.shared.model.NotificationModel
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.launch
@@ -67,8 +70,9 @@ import org.koin.androidx.compose.koinViewModel
  *  1. Greeting (avatar inside the M3 SearchBar — Gmail/Photos pattern)
  *  2. Membership card hero (tap flips it)
  *  3. Membership: expiry, status, tickets (the former Card tab)
- *  4. Next event hero card
- *  5. Notifications preview (max 3 + "see all")
+ *  4. Today's birthdays (only when someone has one)
+ *  5. Next event hero card
+ *  6. Notifications preview (max 3 + "see all")
  *
  * Design language: M3 Expressive (not Liquid Glass) — tonal containers,
  * SectionHeader with kicker + emphasized title, Card components.
@@ -85,10 +89,12 @@ fun TodayScreen(
     onNotificationTap: (NotificationModel) -> Unit = {},
     onTableportClick: () -> Unit = {},
     onTicketsClick: () -> Unit = {},
+    onMemberClick: (String) -> Unit = {},
     onSearchTap: () -> Unit = {},
 ) {
     val viewModel: TodayViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val birthdays by viewModel.birthdays.collectAsStateWithLifecycle()
 
     val refreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
@@ -163,6 +169,8 @@ fun TodayScreen(
                 is TodayPhase.Ready -> {
                     TodayContent(
                         uiState = uiState,
+                        birthdays = birthdays,
+                        onMemberClick = onMemberClick,
                         onNavigateToTab = onNavigateToTab,
                         onEventClick = onEventClick,
                         onTableportClick = onTableportClick,
@@ -182,6 +190,8 @@ fun TodayScreen(
 @Composable
 private fun TodayContent(
     uiState: TodayUiState,
+    birthdays: List<Birthday>,
+    onMemberClick: (String) -> Unit,
     onNavigateToTab: (MainTab) -> Unit,
     onEventClick: (String) -> Unit,
     onTableportClick: () -> Unit,
@@ -234,6 +244,22 @@ private fun TodayContent(
                     onTicketsClick = onTicketsClick,
                     modifier = Modifier.padding(horizontal = 20.dp).padding(top = 12.dp),
                 )
+            }
+        }
+
+        if (birthdays.isNotEmpty()) {
+            item(key = "birthdays") {
+                Spacer(Modifier.height(20.dp))
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    SectionLabel(
+                        title = tr("today.birthdays.title", fallback = "Compleanni di oggi"),
+                        icon = Icons.Outlined.Cake,
+                    )
+                    BirthdaysCard(birthdays = birthdays, onMemberClick = onMemberClick)
+                }
             }
         }
 

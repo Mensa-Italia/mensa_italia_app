@@ -7,6 +7,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import it.mensa.shared.api.endpoints.RegSociApi
 import it.mensa.shared.db.MensaDatabase
+import it.mensa.shared.members.Birthday
+import it.mensa.shared.members.Birthdays
 import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -94,6 +96,23 @@ class RegSociRepository(
         }
         return items
     }
+
+    /**
+     * I compleanni di oggi dal server: una richiesta filtrata (vedi
+     * [Birthdays.serverFilter]), non l'intero registro. Senza rete ripiega
+     * sul registro salvato in locale, se c'e'.
+     */
+    @Throws(Exception::class)
+    suspend fun todaysBirthdays(): List<Birthday> {
+        val today = Birthdays.today()
+        return runCatching { Birthdays.of(api.list(filter = Birthdays.serverFilter(today)), today) }
+            .getOrElse { cachedTodaysBirthdays() }
+    }
+
+    /** I compleanni di oggi dal registro in locale: subito, anche offline; vuoti se non e' mai stato scaricato. */
+    @Throws(Exception::class)
+    suspend fun cachedTodaysBirthdays(): List<Birthday> =
+        Birthdays.of(firstSnapshot(), Birthdays.today())
 
     @Throws(Exception::class)
     suspend fun firstSnapshot(): List<RegSociModel> = observeAll().first()
