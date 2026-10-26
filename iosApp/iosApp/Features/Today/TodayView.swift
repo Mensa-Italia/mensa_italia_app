@@ -53,6 +53,7 @@ struct TodayView: View {
 
                         column(horizontal: fold.sideMargin) {
                             headerSection
+                            OfflineBanner()
                             membershipCardSection
                             membershipSection
                         }
@@ -60,6 +61,7 @@ struct TodayView: View {
                 } else {
                     column {
                         headerSection
+                        OfflineBanner()
                         membershipCardSection
                         membershipSection
                         nextEventSection
@@ -74,6 +76,7 @@ struct TodayView: View {
         .navigationBarHidden(true)
         .task { await vm.load() }
         .task { await medalStore.refresh() }
+        .animation(.smooth, value: ConnectivityStore.shared.isOffline)
         .task {
             // I timbri del passaporto su disco prima che lo si apra: chi lo
             // sfoglia li trova gia' li', come con una cache piena da sempre.

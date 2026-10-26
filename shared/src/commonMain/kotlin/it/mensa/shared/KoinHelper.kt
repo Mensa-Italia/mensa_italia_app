@@ -5,6 +5,7 @@ import it.mensa.shared.auth.passkey.PasskeyEnrollmentGate
 import it.mensa.shared.auth.passkey.PasskeyRepository
 import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.i18n.I18n
+import it.mensa.shared.net.Connectivity
 import it.mensa.shared.onboarding.OnboardingState
 import it.mensa.shared.repository.AddonsRepository
 import it.mensa.shared.repository.CalendarLinksRepository
@@ -68,6 +69,7 @@ class KoinAccess(
     val mensaTest: MensaTestClient,
     val spotlightSync: SpotlightSyncEngine,
     val medals: MedalsRepository,
+    val connectivity: Connectivity,
 )
 
 fun koinAccess(): KoinAccess = KoinAccess(
@@ -102,6 +104,7 @@ fun koinAccess(): KoinAccess = KoinAccess(
     mensaTest = KoinPlatform.getKoin().get(),
     spotlightSync = KoinPlatform.getKoin().get(),
     medals = KoinPlatform.getKoin().get(),
+    connectivity = KoinPlatform.getKoin().get(),
 )
 
 fun appScope(): CoroutineScope =

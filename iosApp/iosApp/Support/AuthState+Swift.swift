@@ -33,4 +33,8 @@ enum RootPhase: Equatable {
     /// nell'app come se niente fosse. La regola sta in `Membership` (:shared),
     /// cosi' Android e iOS chiudono la porta nello stesso momento.
     case membershipExpired
+
+    /// Offline da più di un giorno: per continuare serve collegarsi. Vedi
+    /// `Connectivity` (:shared).
+    case offlineBlocked
 }

@@ -14,6 +14,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import it.mensa.shared.auth.ITokenStore
+import it.mensa.shared.net.installReachabilityTracking
 import kotlinx.serialization.json.Json
 
 actual class HttpClientFactory actual constructor(@Suppress("unused") private val tokenStore: ITokenStore) {
@@ -40,5 +41,8 @@ actual class HttpClientFactory actual constructor(@Suppress("unused") private va
             url(ApiConfig.BASE_URL)
             contentType(ContentType.Application.Json)
         }
-    }.apply { installAuthRetry() }
+    }.apply {
+        installAuthRetry()
+        installReachabilityTracking()
+    }
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.auth.LoginScreen
 import it.mensa.app.features.auth.MembershipExpiredScreen
+import it.mensa.app.features.auth.OfflineBlockedScreen
 import it.mensa.app.features.onboarding.OnboardingScreen
 import it.mensa.app.features.publicarea.PublicAreaScreen
 import it.mensa.app.ui.components.LoadingDots
@@ -109,6 +110,9 @@ fun RootScreen(
             // registrato, `auth.currentUser` riemette e la fase torna a Main
             // da sola — nessuno deve navigare via a mano.
             is RootPhase.MembershipExpired -> MembershipExpiredScreen()
+            // Offline da piu' di un giorno: se ne va da sola quando il server
+            // risponde (il controllo gira in sottofondo).
+            is RootPhase.OfflineBlocked -> OfflineBlockedScreen()
         }
     }
 }

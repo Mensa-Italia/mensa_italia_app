@@ -8,6 +8,7 @@ import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.auth.AuthState
 import it.mensa.shared.auth.MembershipGate
+import it.mensa.shared.net.OnlineGate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,12 @@ sealed class RootPhase {
      * nell'app come se niente fosse.
      */
     data object MembershipExpired : RootPhase()
+
+    /**
+     * Offline da piu' di un giorno: per continuare serve collegarsi. Vedi
+     * `Connectivity` (:shared).
+     */
+    data object OfflineBlocked : RootPhase()
 }
 
 class RootViewModel(
@@ -126,17 +133,30 @@ class RootViewModel(
         }
 
         // 4. Subscribe to authState + currentUser and derive phase
-        combine(auth.authState, auth.currentUser, auth.membershipGate) { state, user, gate ->
-            Triple(state, user, gate)
-        }.collect { (state, user, gate) ->
-            _phase.value = derivePhase(state, user, gate)
+        combine(
+            auth.authState,
+            auth.currentUser,
+            auth.membershipGate,
+            koinAccess().connectivity.gate,
+        ) { state, user, gate, online ->
+            PhaseInputs(state, user, gate, online)
+        }.collect { inputs ->
+            _phase.value = derivePhase(inputs.state, inputs.user, inputs.gate, inputs.online)
         }
     }
+
+    private data class PhaseInputs(
+        val state: AuthState,
+        val user: it.mensa.shared.model.UserModel?,
+        val gate: MembershipGate,
+        val online: OnlineGate,
+    )
 
     private suspend fun derivePhase(
         state: AuthState,
         user: it.mensa.shared.model.UserModel?,
         gate: MembershipGate,
+        online: OnlineGate,
     ): RootPhase = when (state) {
         is AuthState.Authenticated -> {
             if (user == null) {
@@ -146,6 +166,12 @@ class RootViewModel(
                 // Screenshot harness always wants the authenticated shell —
                 // a fresh automation login would otherwise land on onboarding.
                 RootPhase.Main
+            } else if (online == OnlineGate.BLOCKED) {
+                // Prima del muro del rinnovo: offline da piu' di un giorno la
+                // tessera non si puo' verificare in nessun senso.
+                RootPhase.OfflineBlocked
+            } else if (online == OnlineGate.CHECKING) {
+                RootPhase.Loading
             } else if (gate == MembershipGate.EXPIRED) {
                 // Prima dell'onboarding: chi non e' in regola non entra, e non
                 // ha senso fargli fare il giro di presentazione dell'app.

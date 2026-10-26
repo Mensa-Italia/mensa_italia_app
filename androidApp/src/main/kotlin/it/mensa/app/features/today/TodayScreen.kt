@@ -45,6 +45,7 @@ import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.events._components.EventRowCard
 import it.mensa.app.features.today._components.MembershipSection
 import it.mensa.app.features.today._components.NotificationsPreview
+import it.mensa.app.features.today._components.OfflineBanner
 import it.mensa.app.features.today._components.SectionLabel
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.tr
@@ -195,6 +196,10 @@ private fun TodayContent(
     ) {
         item(key = "greeting") {
             TodayGreeting(user = uiState.user)
+        }
+
+        item(key = "offline") {
+            OfflineBanner(modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 4.dp))
         }
 
         item(key = "membership_card") {

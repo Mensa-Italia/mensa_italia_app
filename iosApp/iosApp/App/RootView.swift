@@ -7,6 +7,7 @@ final class RootViewModel {
     private var authSub: Closeable?
     private var userSub: Closeable?
     private var gateSub: Closeable?
+    private var onlineSub: Closeable?
 
     /// True when this app process was launched with NO persisted session, i.e.
     /// the user is about to (or just did) sign in interactively. Used by the
@@ -72,6 +73,14 @@ final class RootViewModel {
             Log.auth.error("authState error: \(err.localizedDescription)")
         }
 
+        // 4c. E quando cambia lo stato della connessione (24 ore offline).
+        let onlineFlow = koin.connectivity.gate as Kotlinx_coroutines_coreFlow
+        onlineSub = subscribeFlow(onlineFlow) { [weak self] (_: OnlineGate) in
+            Task { @MainActor [weak self] in
+                await self?.evaluatePhase()
+            }
+        } onError: { _ in }
+
         // 4b. E quando cambia il verdetto sulla tessera (arriva il server).
         let gateFlow = koin.auth.membershipGate as Kotlinx_coroutines_coreFlow
         gateSub = subscribeFlow(gateFlow) { [weak self] (_: MembershipGate) in
@@ -104,6 +113,8 @@ final class RootViewModel {
         userSub = nil
         gateSub?.close()
         gateSub = nil
+        onlineSub?.close()
+        onlineSub = nil
     }
 
     /// Block on a single emission of `events.observeAll()` so the Today
@@ -170,6 +181,17 @@ final class RootViewModel {
             // momento, e tiene conto di quanto è fresca la data: scaduta solo
             // secondo la cache si aspetta il server sullo splash, offline si
             // entra.
+            // Prima del muro del rinnovo: offline da più di un giorno la
+            // tessera non si può verificare in nessun senso.
+            let online = koin.connectivity.gate.value as? OnlineGate
+            if online == OnlineGate.blocked {
+                phase = .offlineBlocked
+                return
+            }
+            if online == OnlineGate.checking {
+                phase = .loading
+                return
+            }
             let gate = koin.auth.membershipGate.value as? MembershipGate
             if gate == MembershipGate.expired {
                 phase = .membershipExpired
@@ -258,6 +280,10 @@ struct RootView: View {
                     })
                 case .membershipExpired:
                     MembershipExpiredView()
+                        .transition(.opacity)
+                case .offlineBlocked:
+                    // Se ne va da sola quando il server risponde.
+                    OfflineBlockedView()
                         .transition(.opacity)
                 case .main:
                     MainTabView()
