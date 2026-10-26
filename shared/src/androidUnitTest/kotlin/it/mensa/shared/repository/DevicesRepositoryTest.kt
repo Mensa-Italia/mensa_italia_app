@@ -82,13 +82,13 @@ class DevicesRepositoryTest {
         val repo = repo(createInMemoryDb(), calls) { req ->
             when {
                 req.method == HttpMethod.Get && req.url.parameters.contains("firebase_id") ->
-                    ok(list(row("old", "montanari"), row("mine", "sipione")))
-                req.method == HttpMethod.Get -> ok(list(row("mine", "sipione")))
+                    ok(list(row("old", "user-other"), row("mine", "user-me")))
+                req.method == HttpMethod.Get -> ok(list(row("mine", "user-me")))
                 else -> ok("{}")
             }
         }
 
-        val device = repo.ensureRegistered("sipione", token, "iPhone")
+        val device = repo.ensureRegistered("user-me", token, "iPhone")
 
         assertEquals("mine", device?.id)
         val deletes = calls.filter { it.method == HttpMethod.Delete }
@@ -107,14 +107,14 @@ class DevicesRepositoryTest {
         val calls = mutableListOf<Call>()
         val repo = repo(db, calls) { req ->
             when (req.method) {
-                HttpMethod.Get -> ok(list(row("mine", "sipione")))
+                HttpMethod.Get -> ok(list(row("mine", "user-me")))
                 else -> ok("{}")
             }
         }
-        repo.ensureRegistered("sipione", token, "iPhone")
+        repo.ensureRegistered("user-me", token, "iPhone")
         calls.clear()
 
-        repo.unregisterCurrent("sipione")
+        repo.unregisterCurrent("user-me")
 
         assertEquals(
             listOf("/api/collections/users_devices/records/mine"),
@@ -127,7 +127,7 @@ class DevicesRepositoryTest {
         val calls = mutableListOf<Call>()
         val repo = repo(createInMemoryDb(), calls) { ok("{}") }
 
-        repo.unregisterCurrent("sipione")
+        repo.unregisterCurrent("user-me")
 
         assertTrue(calls.isEmpty())
     }
