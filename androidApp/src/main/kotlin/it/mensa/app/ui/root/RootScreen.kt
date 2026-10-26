@@ -1,5 +1,6 @@
 package it.mensa.app.ui.root
 
+import it.mensa.app.ui.components.ChangelogOnLaunch
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -94,7 +95,12 @@ fun RootScreen(
                 onExplorePublic = { vm.enterPublic() },
             )
             is RootPhase.Onboarding -> OnboardingScreen(
-                onComplete = { vm.onOnboardingComplete() },
+                onComplete = {
+                    // Un socio nuovo ha appena visto l'app intera: le "novità"
+                    // di questa versione non gli dicono niente.
+                    koinAccess().changelog.markSeen()
+                    vm.onOnboardingComplete()
+                },
             )
             is RootPhase.Main -> {
                 MainAppShell()
@@ -102,6 +108,8 @@ fun RootScreen(
                 // dopo un accesso con password. Agganciata qui e non alla login
                 // per non sovrapporsi all'onboarding.
                 PasskeyEnrollmentPrompt()
+                // "Novità" una volta per versione, a chi ha aggiornato.
+                ChangelogOnLaunch()
             }
             is RootPhase.Public -> PublicAreaScreen(
                 onLogin = { vm.exitPublic() },

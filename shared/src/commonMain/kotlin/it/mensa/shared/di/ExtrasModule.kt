@@ -1,5 +1,6 @@
 package it.mensa.shared.di
 
+import it.mensa.shared.changelog.Changelog
 import it.mensa.shared.api.endpoints.AddonsApi
 import it.mensa.shared.api.endpoints.LocalOfficesApi
 import it.mensa.shared.api.endpoints.CalendarLinksApi
@@ -101,6 +102,7 @@ val extrasModule = module {
 
     // Onboarding gate
     single { OnboardingState(get()) }
+    single { Changelog(get(), get()) }
 
     // Public IQ test scraper (dedicated Ktor client with cookie storage)
     single { MensaTestClient() }

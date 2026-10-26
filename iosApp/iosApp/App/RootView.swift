@@ -276,6 +276,9 @@ struct RootView: View {
                     }
                 case .onboarding:
                     OnboardingView(onComplete: { [weak vm] in
+                        // Un socio nuovo ha appena visto l'app intera: le
+                        // "novità" di questa versione non gli dicono niente.
+                        koin.changelog.markSeen()
                         vm?.phase = .main
                     })
                 case .membershipExpired:
@@ -291,6 +294,8 @@ struct RootView: View {
                         // e solo dopo un accesso con password. Agganciata qui e
                         // non alla LoginView per non sovrapporsi all'onboarding.
                         .passkeyEnrollmentPrompt()
+                        // "Novità" una volta per versione, a chi ha aggiornato.
+                        .changelogOnLaunch()
                 }
             }
         }

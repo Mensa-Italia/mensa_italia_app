@@ -4,6 +4,7 @@ import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.passkey.PasskeyEnrollmentGate
 import it.mensa.shared.auth.passkey.PasskeyRepository
 import it.mensa.shared.config.FeatureFlags
+import it.mensa.shared.changelog.Changelog
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.net.Connectivity
 import it.mensa.shared.onboarding.OnboardingState
@@ -70,6 +71,7 @@ class KoinAccess(
     val spotlightSync: SpotlightSyncEngine,
     val medals: MedalsRepository,
     val connectivity: Connectivity,
+    val changelog: Changelog,
 )
 
 fun koinAccess(): KoinAccess = KoinAccess(
@@ -105,6 +107,7 @@ fun koinAccess(): KoinAccess = KoinAccess(
     spotlightSync = KoinPlatform.getKoin().get(),
     medals = KoinPlatform.getKoin().get(),
     connectivity = KoinPlatform.getKoin().get(),
+    changelog = KoinPlatform.getKoin().get(),
 )
 
 fun appScope(): CoroutineScope =
