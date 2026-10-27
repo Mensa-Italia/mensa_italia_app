@@ -1,0 +1,7 @@
+Il Tableport è in Home: il passaporto dei timbri ora sta sopra i tuoi ticket, si apre come un libro e i timbri scorrono tutti insieme.
+
+Il medagliere: ventisei medaglie da sbloccare con timbri, eventi e vita associativa. Alcune sono segrete: le trovi nel passaporto.
+
+In Home trovi i compleanni dei soci di oggi.
+
+Risolti bug minori: i QR dei francobolli e i link aprono l'app, l'avvio è più veloce e funziona anche offline, le notifiche portano dritte al contenuto.

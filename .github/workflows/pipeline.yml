@@ -751,7 +751,15 @@ jobs:
                 automatic_release: true,
                 force: true,
                 skip_screenshots: true,
-                skip_metadata: true,
+                # Le novita' della versione ("whatsNew"): senza, App Store
+                # Connect rifiuta l'invio in revisione — v22.2.14 e v22.2.16
+                # si sono fermate li', con la build gia' caricata. Si scrivono
+                # a ogni rilascio in iosApp/release-notes/<lingua>/
+                # release_notes.txt, una cartella per lingua dello store (it,
+                # en-US). La cartella contiene solo quelle: deliver carica i
+                # file che trova e lascia com'e' il resto della scheda.
+                skip_metadata: false,
+                metadata_path: File.expand_path("../iosApp/release-notes", __dir__),
                 skip_app_version_update: false,
                 precheck_include_in_app_purchases: false,
                 submission_information: {
