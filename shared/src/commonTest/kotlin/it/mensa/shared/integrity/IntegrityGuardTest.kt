@@ -28,6 +28,7 @@ import it.mensa.shared.auth.AccountStatus
 import it.mensa.shared.net.ServerReachability
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
@@ -61,6 +62,13 @@ class IntegrityGuardTest {
         /** Fa fallire la prossima `prove` come se la chiave fosse invalida. */
         var invalidateKeyOnNextProve = false
 
+        /** Chiavi che `prove` rifiuta come invalide (app reinstallata). */
+        val staleKeys = mutableSetOf<String>()
+
+        /** Quante `prove` sono in corso adesso, e il massimo visto. */
+        private var proving = 0
+        var maxConcurrentProofs = 0
+
         override suspend fun isSupported() = supported
         override suspend fun hasKey(userId: String) = key != null
 
@@ -80,6 +88,14 @@ class IntegrityGuardTest {
             if (invalidateKeyOnNextProve) {
                 invalidateKeyOnNextProve = false
                 throw IntegrityKeyInvalidException("chiave invalida")
+            }
+            if (key in staleKeys) throw IntegrityKeyInvalidException("chiave invalida")
+            proving++
+            maxConcurrentProofs = maxOf(maxConcurrentProofs, proving)
+            try {
+                delay(10) // come generateAssertion: lascia correre le altre coroutine
+            } finally {
+                proving--
             }
             return if (requiresKeyEnrollment) {
                 mapOf(IntegrityHeaders.KEY_ID to key!!, IntegrityHeaders.ASSERTION to "asr($clientData)")
@@ -671,12 +687,12 @@ class IntegrityGuardTest {
         assertEquals(1, provider.keysGenerated)
     }
 
-    // ── Sessione Android ─────────────────────────────────────────────────────
+    // ── Sessione ─────────────────────────────────────────────────────────────
 
     /**
      * Un server che si comporta come quello vero: senza prova 428, con la prova
      * completa ok + una sessione nuova, con la sessione ok solo se e' l'ultima
-     * emessa e la richiesta non e' sensibile.
+     * emessa.
      */
     private inner class SessionServer(var ttl: Int = 600) {
         var issued = 0
@@ -688,9 +704,10 @@ class IntegrityGuardTest {
             val session = req.headers[IntegrityHeaders.SESSION]
             when {
                 session != null ->
-                    if (session == valid && !IntegrityScope.isSensitive(req.method.value, path)) null
+                    if (session == valid) null
                     else error(PreconditionRequired, "integrity_required")
-                req.headers.contains(IntegrityHeaders.TOKEN) -> {
+                req.headers.contains(IntegrityHeaders.TOKEN) ||
+                    req.headers.contains(IntegrityHeaders.ASSERTION) -> {
                     fullProofs += path
                     val s = "sess-${++issued}"
                     valid = s
@@ -727,7 +744,7 @@ class IntegrityGuardTest {
     }
 
     @Test
-    fun stampsAndMedalsAlwaysCarryTheFullProof() = runTest {
+    fun stampsAndMedalsUseTheSessionToo() = runTest {
         val fake = SessionServer()
         val server = FakeServer { fake.route(this, it) }
         val client = guard(server, FakeProvider())
@@ -736,13 +753,9 @@ class IntegrityGuardTest {
         client.get("/api/collections/stamp_users/records")
         client.get("/api/collections/view_medals/records")
 
-        assertEquals(
-            listOf("/api/collections/events/records", "/api/collections/stamp_users/records", "/api/collections/view_medals/records"),
-            fake.fullProofs,
-        )
-        server.api.filter { it.url.encodedPath != "/api/collections/events/records" }.forEach {
-            assertNull(it.headers[IntegrityHeaders.SESSION])
-        }
+        assertEquals(listOf("/api/collections/events/records"), fake.fullProofs)
+        // il primo 428, la prova completa, poi solo sessione
+        server.api.drop(2).forEach { assertEquals("sess-1", it.headers[IntegrityHeaders.SESSION]) }
     }
 
     @Test
@@ -775,23 +788,47 @@ class IntegrityGuardTest {
     }
 
     @Test
-    fun iosNeverUsesSessions() = runTest {
+    fun iosUsesTheSessionToo() = runTest {
         val fake = SessionServer()
-        val server = FakeServer { req ->
-            when {
-                req.headers.contains(IntegrityHeaders.ASSERTION) -> respond(
-                    "{}", HttpStatusCode.OK,
-                    headersOf(IntegrityHeaders.SESSION to listOf("sess-x"), IntegrityHeaders.SESSION_TTL to listOf("600")),
-                )
-                else -> fake.route(this, req)
-            }
-        }
-        val client = guard(server, FakeProvider(platform = "ios", requiresKeyEnrollment = true))
+        val server = FakeServer { fake.route(this, it) }
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
 
-        client.get("/api/collections/events/records")
+        val responses = List(12) { i -> async { client.get("/api/collections/events/records?page=$i") } }.awaitAll()
+
+        assertTrue(responses.all { it.status == HttpStatusCode.OK })
+        assertEquals(1, fake.fullProofs.size)
+        assertEquals(1, provider.keysGenerated)
+    }
+
+    /** Le asserzioni App Attest con la stessa chiave non devono mai partire insieme. */
+    @Test
+    fun iosProofsNeverRunConcurrently() = runTest {
+        // server senza sessioni: ogni richiesta vuole la prova completa
+        val server = FakeServer { req -> if (!req.hasProof()) error(PreconditionRequired, "integrity_required") else null }
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "key-0")
+        val client = guard(server, provider)
+
         client.get("/api/cs/me")
+        val responses = List(10) { i -> async { client.get("/api/collections/events/records?page=$i") } }.awaitAll()
 
-        assertTrue(server.api.none { it.headers.contains(IntegrityHeaders.SESSION) })
+        assertTrue(responses.all { it.status == HttpStatusCode.OK })
+        assertEquals(1, provider.maxConcurrentProofs)
+    }
+
+    /** Una chiave invalida scoperta da venti richieste insieme si rifa' una volta sola. */
+    @Test
+    fun aStaleKeyIsReenrolledOnce() = runTest {
+        val server = FakeServer { req -> if (!req.hasProof()) error(PreconditionRequired, "integrity_required") else null }
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "stale")
+        provider.staleKeys += "stale"
+        val client = guard(server, provider)
+
+        val responses = List(10) { i -> async { client.get("/api/collections/events/records?page=$i") } }.awaitAll()
+
+        assertTrue(responses.all { it.status == HttpStatusCode.OK })
+        assertEquals(1, provider.keysGenerated)
+        assertEquals("key-1", provider.key)
     }
 
     @Test

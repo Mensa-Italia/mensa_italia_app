@@ -43,7 +43,6 @@ private const val CODE_INTEGRITY_FAILED = "integrity_failed"
 private const val CODE_INTEGRITY_REQUIRED = "integrity_required"
 private const val CODE_ATTEST_KEY_REQUIRED = "attest_key_required"
 
-private const val PLATFORM_ANDROID = "android"
 
 /** Si smette di usare una sessione questi secondi prima che scada sul server. */
 private const val SESSION_MARGIN_SECONDS = 30L
@@ -75,13 +74,14 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
  *     raddoppiare le chiamate. Una sfida per richiesta: la sfida e' monouso, e le
  *     richieste concorrenti non la condividono mai. Si azzera da sola quando
  *     l'utente cambia o sparisce (logout).
- *  4. **Sessione Android.** Il server limita le decode di Play Integrity, quindi
- *     dopo una prova riuscita manda una sessione (`X-Integrity-Session`) che per
- *     qualche minuto vale al posto di sfida + token, tranne su timbri, medaglie e
- *     realtime ([IntegrityScope.isSensitive]). Le richieste che la vorrebbero e non
- *     ce l'hanno si mettono in fila dietro [sessionLock]: la prima fa la prova
- *     completa, le altre usano la sessione che ne torna, cosi' una schermata che
- *     parte con venti richieste costa una decode e non venti.
+ *  4. **Sessione.** Dopo una prova completa riuscita il server manda una
+ *     sessione (`X-Integrity-Session`) che per qualche minuto vale al posto di
+ *     sfida + prova, su tutto. Le richieste che non ce l'hanno si mettono in fila
+ *     dietro [sessionLock]: la prima fa la prova completa, le altre usano la
+ *     sessione che ne torna. Su Android cosi' una schermata che parte con venti
+ *     richieste costa una decode di Play Integrity e non venti; su iOS le
+ *     asserzioni App Attest non partono mai in parallelo con la stessa chiave,
+ *     che e' quello che nella 22.2.18 le faceva fallire a catena.
  *
  * Il corpo viene rimandato com'e': col ContentNegotiation e' gia' un
  * `TextContent`/`ByteArrayContent`, e il multipart si riscrive. Un corpo che e'
@@ -258,8 +258,8 @@ class IntegrityGuard(
     // ── Costruzione della prova ──────────────────────────────────────────────
 
     /**
-     * Manda [request] con la sessione Android se ce n'e' una valida e la richiesta
-     * la ammette, altrimenti con la prova completa. Vedi il punto 4 della classe.
+     * Manda [request] con la sessione se ce n'e' una valida, altrimenti con la
+     * prova completa, una alla volta. Vedi il punto 4 della classe.
      */
     private suspend fun sendWithProof(
         sender: Sender,
@@ -275,8 +275,6 @@ class IntegrityGuard(
             captureSession(user, call)
             Sent(call, session = null)
         }
-        if (provider.platform != PLATFORM_ANDROID || IntegrityScope.isSensitive(method, path)) return full()
-
         sessionFor(user)?.let { return Sent(sender.execute(withSession(request, it)), it) }
         return sessionLock.withLock {
             sessionFor(user)?.let { Sent(sender.execute(withSession(request, it)), it) } ?: full()
@@ -338,6 +336,7 @@ class IntegrityGuard(
 
         var reenrolled = false
         while (true) {
+            val epochBefore = enrollmentEpoch
             val challenge = fetchChallenge()
             val clientData = IntegrityClientData.build(challenge, method, path)
             try {
@@ -348,11 +347,14 @@ class IntegrityGuard(
                     putAll(specific)
                 }
             } catch (e: IntegrityKeyInvalidException) {
-                // La chiave locale non vale piu': se ne registra una nuova, una volta.
+                // La chiave locale non vale piu': se ne registra una nuova, una volta,
+                // e solo se nel frattempo non l'ha gia' fatto un'altra richiesta.
+                // Prima si passava l'epoca corrente: ogni richiesta fallita buttava
+                // la chiave appena registrata dall'altra e ne registrava una sua.
                 if (reenrolled) throw IntegrityUnavailableException("Chiave di attestazione non valida", e)
                 reenrolled = true
-                provider.forgetKey(user)
-                ensureKey(user, force = true, epoch = enrollmentEpoch)
+                if (enrollmentEpoch == epochBefore) provider.forgetKey(user)
+                ensureKey(user, force = true, epoch = epochBefore)
             }
         }
     }
