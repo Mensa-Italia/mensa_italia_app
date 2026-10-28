@@ -14,7 +14,17 @@ object IntegrityHeaders {
     /** iOS: l'asserzione CBOR, in base64. */
     const val ASSERTION = "X-Integrity-Assertion"
 
-    internal val ALL = listOf(PLATFORM, CHALLENGE, TOKEN, KEY_ID, ASSERTION)
+    /**
+     * Android: la sessione che il server manda dopo una prova Play Integrity
+     * riuscita, e che vale al posto di sfida + token per qualche minuto (vedi
+     * [IntegrityGuard]).
+     */
+    const val SESSION = "X-Integrity-Session"
+
+    /** In risposta, accanto a [SESSION]: i secondi di vita della sessione. */
+    const val SESSION_TTL = "X-Integrity-Session-Ttl"
+
+    internal val ALL = listOf(PLATFORM, CHALLENGE, TOKEN, KEY_ID, ASSERTION, SESSION)
 }
 
 /** La chiave App Attest appena generata e attestata, da mandare a `POST /api/integrity/ios/attest`. */

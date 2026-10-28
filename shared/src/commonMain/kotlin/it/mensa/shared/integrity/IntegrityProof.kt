@@ -60,6 +60,21 @@ object IntegrityScope {
             else -> false
         }
     }
+
+    private val SENSITIVE_COLLECTIONS = listOf("stamp", "stamp_users", "view_medals")
+
+    /**
+     * True se la richiesta tocca timbri e medaglie, o apre sottoscrizioni
+     * realtime: li' il server non accetta la sessione Android e vuole sempre
+     * la prova completa. Specchio di `SensitivePath` lato server; se i due
+     * divergono, il server risponde 428 e il guard rifa' la prova completa.
+     */
+    fun isSensitive(method: String, path: String): Boolean {
+        if (method.uppercase() == "POST" && path == "/api/realtime") return true
+        return SENSITIVE_COLLECTIONS.any { c ->
+            path == "/api/collections/$c" || path.startsWith("/api/collections/$c/")
+        }
+    }
 }
 
 /**

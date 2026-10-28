@@ -670,4 +670,141 @@ class IntegrityGuardTest {
 
         assertEquals(1, provider.keysGenerated)
     }
+
+    // ── Sessione Android ─────────────────────────────────────────────────────
+
+    /**
+     * Un server che si comporta come quello vero: senza prova 428, con la prova
+     * completa ok + una sessione nuova, con la sessione ok solo se e' l'ultima
+     * emessa e la richiesta non e' sensibile.
+     */
+    private inner class SessionServer(var ttl: Int = 600) {
+        var issued = 0
+        var valid: String? = null
+        val fullProofs = mutableListOf<String>()
+
+        fun route(scope: MockRequestHandleScope, req: HttpRequestData) = with(scope) {
+            val path = req.url.encodedPath
+            val session = req.headers[IntegrityHeaders.SESSION]
+            when {
+                session != null ->
+                    if (session == valid && !IntegrityScope.isSensitive(req.method.value, path)) null
+                    else error(PreconditionRequired, "integrity_required")
+                req.headers.contains(IntegrityHeaders.TOKEN) -> {
+                    fullProofs += path
+                    val s = "sess-${++issued}"
+                    valid = s
+                    respond(
+                        "{}", HttpStatusCode.OK,
+                        headersOf(
+                            HttpHeaders.ContentType to listOf(ContentType.Application.Json.toString()),
+                            IntegrityHeaders.SESSION to listOf(s),
+                            IntegrityHeaders.SESSION_TTL to listOf(ttl.toString()),
+                        ),
+                    )
+                }
+                else -> error(PreconditionRequired, "integrity_required")
+            }
+        }
+    }
+
+    @Test
+    fun aBurstOfRequestsCostsOneFullProof() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { fake.route(this, it) }
+        val client = guard(server, FakeProvider())
+
+        val responses = List(12) { i -> async { client.get("/api/collections/events/records?page=$i") } }.awaitAll()
+
+        assertTrue(responses.all { it.status == HttpStatusCode.OK })
+        assertEquals(1, fake.fullProofs.size)
+        assertEquals(1, server.challengeCalls)
+        // e dopo, niente piu' sfide
+        client.get("/api/cs/me")
+        assertEquals(1, server.challengeCalls)
+        assertEquals("sess-1", server.api.last().headers[IntegrityHeaders.SESSION])
+        assertNull(server.api.last().headers[IntegrityHeaders.CHALLENGE])
+    }
+
+    @Test
+    fun stampsAndMedalsAlwaysCarryTheFullProof() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { fake.route(this, it) }
+        val client = guard(server, FakeProvider())
+
+        client.get("/api/collections/events/records")
+        client.get("/api/collections/stamp_users/records")
+        client.get("/api/collections/view_medals/records")
+
+        assertEquals(
+            listOf("/api/collections/events/records", "/api/collections/stamp_users/records", "/api/collections/view_medals/records"),
+            fake.fullProofs,
+        )
+        server.api.filter { it.url.encodedPath != "/api/collections/events/records" }.forEach {
+            assertNull(it.headers[IntegrityHeaders.SESSION])
+        }
+    }
+
+    @Test
+    fun aRejectedSessionFallsBackToTheFullProof() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { fake.route(this, it) }
+        val client = guard(server, FakeProvider())
+
+        client.get("/api/collections/events/records")
+        fake.valid = null // server riavviato: la sessione non vale piu'
+
+        assertEquals(HttpStatusCode.OK, client.get("/api/collections/events/records").status)
+        assertEquals(2, fake.fullProofs.size)
+        assertEquals("sess-2", fake.valid)
+        client.get("/api/cs/me")
+        assertEquals("sess-2", server.api.last().headers[IntegrityHeaders.SESSION])
+    }
+
+    @Test
+    fun anAlmostExpiredSessionIsNotUsed() = runTest {
+        val fake = SessionServer(ttl = 20) // meno del margine: inutilizzabile da subito
+        val server = FakeServer { fake.route(this, it) }
+        val client = guard(server, FakeProvider())
+
+        client.get("/api/collections/events/records")
+        client.get("/api/cs/me")
+
+        assertEquals(2, fake.fullProofs.size)
+        assertTrue(server.api.none { it.headers.contains(IntegrityHeaders.SESSION) })
+    }
+
+    @Test
+    fun iosNeverUsesSessions() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { req ->
+            when {
+                req.headers.contains(IntegrityHeaders.ASSERTION) -> respond(
+                    "{}", HttpStatusCode.OK,
+                    headersOf(IntegrityHeaders.SESSION to listOf("sess-x"), IntegrityHeaders.SESSION_TTL to listOf("600")),
+                )
+                else -> fake.route(this, req)
+            }
+        }
+        val client = guard(server, FakeProvider(platform = "ios", requiresKeyEnrollment = true))
+
+        client.get("/api/collections/events/records")
+        client.get("/api/cs/me")
+
+        assertTrue(server.api.none { it.headers.contains(IntegrityHeaders.SESSION) })
+    }
+
+    @Test
+    fun theSessionBelongsToTheUser() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { fake.route(this, it) }
+        var user = "user-1"
+        val client = guard(server, FakeProvider(), user = { user })
+
+        client.get("/api/collections/events/records")
+        user = "user-2"
+        client.get("/api/collections/events/records")
+
+        assertNull(server.api.last().headers[IntegrityHeaders.SESSION])
+    }
 }

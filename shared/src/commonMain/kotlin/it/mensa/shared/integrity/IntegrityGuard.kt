@@ -29,6 +29,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 private val apiHost: String = ApiConfig.BASE_URL.substringAfter("://").substringBefore('/')
 
@@ -39,6 +42,11 @@ private const val CODE_ACCOUNT_BLOCKED = "account_blocked"
 private const val CODE_INTEGRITY_FAILED = "integrity_failed"
 private const val CODE_INTEGRITY_REQUIRED = "integrity_required"
 private const val CODE_ATTEST_KEY_REQUIRED = "attest_key_required"
+
+private const val PLATFORM_ANDROID = "android"
+
+/** Si smette di usare una sessione questi secondi prima che scada sul server. */
+private const val SESSION_MARGIN_SECONDS = 30L
 
 private const val PATH_CHALLENGE = "/api/integrity/challenge"
 private const val PATH_ATTEST = "/api/integrity/ios/attest"
@@ -67,6 +75,13 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
  *     raddoppiare le chiamate. Una sfida per richiesta: la sfida e' monouso, e le
  *     richieste concorrenti non la condividono mai. Si azzera da sola quando
  *     l'utente cambia o sparisce (logout).
+ *  4. **Sessione Android.** Il server limita le decode di Play Integrity, quindi
+ *     dopo una prova riuscita manda una sessione (`X-Integrity-Session`) che per
+ *     qualche minuto vale al posto di sfida + token, tranne su timbri, medaglie e
+ *     realtime ([IntegrityScope.isSensitive]). Le richieste che la vorrebbero e non
+ *     ce l'hanno si mettono in fila dietro [sessionLock]: la prima fa la prova
+ *     completa, le altre usano la sessione che ne torna, cosi' una schermata che
+ *     parte con venti richieste costa una decode e non venti.
  *
  * Il corpo viene rimandato com'e': col ContentNegotiation e' gia' un
  * `TextContent`/`ByteArrayContent`, e il multipart si riscrive. Un corpo che e'
@@ -92,6 +107,16 @@ class IntegrityGuard(
 
     private val enrollmentLock = Mutex()
 
+    private class Session(val user: String, val token: String, val usableUntil: TimeMark)
+
+    @Volatile
+    private var session: Session? = null
+
+    private val sessionLock = Mutex()
+
+    /** Una richiesta mandata, e la sessione che portava (null: prova completa o nessuna). */
+    private class Sent(val call: HttpClientCall, val session: String?)
+
     /** Registra l'interceptor sul client. */
     fun install() {
         client.plugin(HttpSend).intercept { request -> handle(this, request) }
@@ -100,6 +125,7 @@ class IntegrityGuard(
     /** Dimentica che la prova serviva (logout o cambio utente). */
     fun reset() {
         proofRequiredFor = null
+        session = null
     }
 
     internal suspend fun handle(sender: Sender, request: HttpRequestBuilder): HttpClientCall {
@@ -116,17 +142,22 @@ class IntegrityGuard(
         val proactive = eligible && user != null && proofRequiredFor == user
 
         val first = if (proactive) {
-            withProof(request, user, method, path, forceEnroll = false, epoch = epoch)
+            sendWithProof(sender, request, user, method, path, forceEnroll = false, epoch = epoch)
         } else {
-            request
+            Sent(sender.execute(request), session = null)
         }
 
-        return when (val verdict = classify(sender.execute(first), request)) {
+        return when (val verdict = classify(first.call, request)) {
             is Verdict.Fine -> verdict.call.also { noteSuccess(request, it) }
             // 428 su una richiesta esente o anonima non e' roba nostra: la si restituisce.
             is Verdict.Needs ->
                 if (!eligible) verdict.call
-                else retryWithProof(sender, request, verdict, user ?: "", method, path, epoch)
+                else {
+                    // Sessione rifiutata (scaduta, server riavviato): la si butta, a
+                    // meno che un'altra richiesta non l'abbia gia' sostituita.
+                    first.session?.let { used -> if (session?.token == used) session = null }
+                    retryWithProof(sender, request, verdict, user ?: "", method, path, epoch)
+                }
         }
     }
 
@@ -144,12 +175,12 @@ class IntegrityGuard(
         }
         proofRequiredFor = user
 
-        val retry = withProof(
-            request, user, method, path,
+        val retry = sendWithProof(
+            sender, request, user, method, path,
             forceEnroll = needed.code == CODE_ATTEST_KEY_REQUIRED,
             epoch = epoch,
         )
-        return when (val verdict = classify(sender.execute(retry), request)) {
+        return when (val verdict = classify(retry.call, request)) {
             is Verdict.Fine -> verdict.call.also { noteSuccess(request, it) }
             is Verdict.Needs -> {
                 // Il server ha rifiutato anche la prova appena costruita: un solo
@@ -225,6 +256,55 @@ class IntegrityGuard(
     private fun serverAnswered() = ServerReachability.onResponse()
 
     // ── Costruzione della prova ──────────────────────────────────────────────
+
+    /**
+     * Manda [request] con la sessione Android se ce n'e' una valida e la richiesta
+     * la ammette, altrimenti con la prova completa. Vedi il punto 4 della classe.
+     */
+    private suspend fun sendWithProof(
+        sender: Sender,
+        request: HttpRequestBuilder,
+        user: String,
+        method: String,
+        path: String,
+        forceEnroll: Boolean,
+        epoch: Int,
+    ): Sent {
+        val full: suspend () -> Sent = {
+            val call = sender.execute(withProof(request, user, method, path, forceEnroll, epoch))
+            captureSession(user, call)
+            Sent(call, session = null)
+        }
+        if (provider.platform != PLATFORM_ANDROID || IntegrityScope.isSensitive(method, path)) return full()
+
+        sessionFor(user)?.let { return Sent(sender.execute(withSession(request, it)), it) }
+        return sessionLock.withLock {
+            sessionFor(user)?.let { Sent(sender.execute(withSession(request, it)), it) } ?: full()
+        }
+    }
+
+    private fun sessionFor(user: String): String? {
+        val s = session ?: return null
+        if (s.user != user || s.usableUntil.hasPassedNow()) return null
+        return s.token
+    }
+
+    private fun captureSession(user: String, call: HttpClientCall) {
+        val headers = call.response.headers
+        val token = headers[IntegrityHeaders.SESSION]?.takeIf { it.isNotBlank() } ?: return
+        val ttl = headers[IntegrityHeaders.SESSION_TTL]?.toLongOrNull() ?: return
+        val usable = (ttl - SESSION_MARGIN_SECONDS).coerceAtLeast(0)
+        session = Session(user, token, TimeSource.Monotonic.markNow() + usable.seconds)
+    }
+
+    /** Una copia di [request] con la sola sessione al posto della prova. */
+    private fun withSession(request: HttpRequestBuilder, token: String): HttpRequestBuilder =
+        HttpRequestBuilder().apply {
+            takeFrom(request)
+            IntegrityHeaders.ALL.forEach { this.headers.remove(it) }
+            header(IntegrityHeaders.PLATFORM, provider.platform)
+            header(IntegrityHeaders.SESSION, token)
+        }
 
     /** Una copia di [request] con gli header della prova, una sfida nuova. */
     private suspend fun withProof(
