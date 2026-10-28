@@ -77,7 +77,11 @@ struct LocalOfficesListView: View {
         .cleanNavBar()
         .searchable(
             text: $query,
-            placement: .navigationBarDrawer(displayMode: .automatic),
+            // `.always`, non `.automatic`: con `.refreshable` sulla stessa lista il
+            // pull-to-refresh muove insieme rotella e cassetto della ricerca, e su
+            // iOS 26/27 a fine refresh il cassetto restava a meta': ricerca sopra il
+            // titolo grande e un buco vuoto sotto.
+            placement: .navigationBarDrawer(displayMode: .always),
             prompt: Text(tr("local_offices.search_prompt", fallback: "Cerca per regione"))
         )
         .navigationDestination(for: LocalOfficeRoute.self) { route in
