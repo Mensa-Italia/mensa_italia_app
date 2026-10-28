@@ -41,8 +41,15 @@ class PlayIntegrityProvider(
     private val cloudProjectNumber: Long,
 ) : IntegrityProvider {
 
-    private val manager: StandardIntegrityManager =
-        IntegrityManagerFactory.createStandard(context.applicationContext)
+    private val appContext = context.applicationContext
+
+    // Lazy: il provider si costruisce all'avvio insieme all'HttpClient, ma un
+    // utente "free" (o un device senza Google, tipo GrapheneOS) non deve
+    // toccare Play Integrity nemmeno per creare il manager. Si crea alla prima
+    // prova, cioe` solo dopo un 428 del server.
+    private val manager: StandardIntegrityManager by lazy {
+        IntegrityManagerFactory.createStandard(appContext)
+    }
 
     private val prepareLock = Mutex()
     private var tokenProvider: StandardIntegrityTokenProvider? = null
