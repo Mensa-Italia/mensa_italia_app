@@ -398,9 +398,11 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ANDROID_KEY_ALIAS: key
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
-          # Numero del progetto Google Cloud di Play Integrity (non e' un
-          # segreto: variabile del repo). Vuoto = 0, vedi androidApp/build.gradle.kts.
-          PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER: ${{ vars.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER }}
+          # Numero del progetto Google Cloud di Play Integrity. Non e' un
+          # segreto (finisce nell'APK), ma nel repo sta fra i secret: si legge
+          # da li', con la variabile come ripiego. Vuoto = 0, vedi
+          # androidApp/build.gradle.kts.
+          PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER: ${{ secrets.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER || vars.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER }}
         run: |
           ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease \
             -Dorg.gradle.java.home="$JAVA_HOME" \
