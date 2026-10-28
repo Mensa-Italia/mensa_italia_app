@@ -3,6 +3,9 @@ import Shared
 
 struct NotificationDetailView: View {
     let notification: NotificationModel
+    /// Account sospeso: l'unico bottone è quello delle conferme di app esterne;
+    /// gli altri porterebbero in parti dell'app che il server rifiuta.
+    var restricted: Bool = false
 
     @State private var target: NotificationTarget?
 
@@ -34,6 +37,7 @@ struct NotificationDetailView: View {
         case .quidPdf:            return tr("notifications.go_quid_pdf", fallback: "Apri PDF Quid")
         case .localOffice:        return tr("notifications.go_local_office", fallback: "Apri gruppo locale")
         case .accountConfirmation: return tr("notifications.go_account_confirmation", fallback: "Conferma identità")
+        case .dataExportConfirmation: return tr("notifications.go_data_export_confirmation", fallback: "Rispondi alla richiesta")
         case .member:              return tr("notifications.go_member", fallback: "Apri socio")
         case .developerMessage:    return tr("notifications.go_developer_message", fallback: "Leggi il messaggio")
         }
@@ -52,13 +56,8 @@ struct NotificationDetailView: View {
         case .quidArticle(let id):    QuidArticleView(articleId: Int64(id) ?? 0)
         case .quidPdf(let id):        QuidPDFDeepLinkLoader(recordId: Int64(id) ?? 0)
         case .localOffice(let slug):  LocalOfficeBySlugLoader(slug: slug)
-        case .accountConfirmation(let appId, let url, let nid):
-            AccountConfirmationSheet(
-                exAppId: appId,
-                callbackUrl: url,
-                notificationId: nid,
-                onDismiss: { target = nil }
-            )
+        case .accountConfirmation, .dataExportConfirmation:
+            ExAppConfirmationSheet(target: t, onDismiss: { target = nil })
         case .member(let id):         MemberDetailView(memberId: id)
         case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
@@ -91,7 +90,7 @@ struct NotificationDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                if let t = notificationTarget(from: notification) {
+                if let t = notificationTarget(from: notification), !restricted || t.isExAppConfirmation {
                     Button {
                         if !t.openInPlace() { target = t }
                     } label: {

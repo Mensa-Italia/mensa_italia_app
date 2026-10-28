@@ -51,6 +51,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.ktor.client.mock)
+            implementation(libs.kotlinx.coroutines.test)
         }
 
         val androidUnitTest by getting {
@@ -67,6 +68,7 @@ kotlin {
             implementation(libs.sqldelight.android.driver)
             implementation(libs.androidx.security.crypto)
             implementation(libs.koin.android.main)
+            implementation(libs.play.integrity)
         }
 
         // Darwin-common deps (iOS + watchOS). With applyDefaultHierarchyTemplate(),

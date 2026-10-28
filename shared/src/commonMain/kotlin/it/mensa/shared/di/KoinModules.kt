@@ -9,13 +9,27 @@ import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
 import it.mensa.shared.auth.oidc.TokenRefresher
+import it.mensa.shared.integrity.IntegrityGuard
+import it.mensa.shared.integrity.IntegrityProvider
 import it.mensa.shared.repository.DevicesRepository
 import it.mensa.shared.spotlight.SpotlightSyncEngine
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val sharedModule = module {
-    single { HttpClientFactory(get<ITokenStore>()).create() }
+    single {
+        val scope = this
+        HttpClientFactory(get<ITokenStore>()).create().also { client ->
+            // Account sospeso e prova di integrita' (Play Integrity / App Attest).
+            // L'utente si legge a ogni richiesta e non qui: AuthRepository nasce
+            // dopo il client, e dipende da lui.
+            IntegrityGuard(
+                client = client,
+                provider = get<IntegrityProvider>(),
+                userId = { scope.getOrNull<AuthRepository>()?.currentUser?.value?.id?.takeIf { it.isNotBlank() } },
+            ).install()
+        }
+    }
     single { Connectivity(get(), get()) }
     single { AuthApi(get()) }
     single { FileLinkApi(get()) }

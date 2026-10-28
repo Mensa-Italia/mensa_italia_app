@@ -47,6 +47,35 @@ data class NotificationTargetAccountConfirmation(
 ) : NotificationTarget()
 
 /**
+ * Che dato lascia l'app in un'esportazione verso un'app esterna. Il valore di
+ * [wire] e' quello del campo `scope` del payload della push e del backend
+ * (`ex_export_requests.scope`). Aggiungere un tipo di dato vuol dire aggiungere
+ * un caso qui e le sue stringhe nelle due UI.
+ */
+enum class DataExportScope(val wire: String) {
+    STAMPS("stamps"),
+    MEDALS("medals");
+
+    companion object {
+        fun fromWire(value: String?): DataExportScope? = entries.firstOrNull { it.wire == value }
+    }
+}
+
+/**
+ * Richiesta di esportare una sola volta i dati del socio (timbri o medaglie)
+ * verso un'app esterna, da confermare in app. Push `data_export_confirmation`:
+ * `requestId` e' il record `ex_export_requests`, `keyAppId` l'`ex_apps` che
+ * chiede, `url` il callback da avvisare dopo la decisione.
+ */
+data class NotificationTargetDataExportConfirmation(
+    val requestId: String,
+    val exAppId: String,
+    val scope: DataExportScope,
+    val callbackUrl: String,
+    val notificationId: String?,
+) : NotificationTarget()
+
+/**
  * Stateless router. Both APNs `userInfo` and stored `NotificationModel.data`
  * (a Kotlin `JsonObject`) are normalized on the platform side to a flat
  * `Map<String, String>` before being passed in.
@@ -92,6 +121,21 @@ object NotificationRouter {
                     )
                 } else null
             }
+            "data_export_confirmation" -> {
+                val requestId = str("requestId")
+                val appId = str("keyAppId")
+                val scope = DataExportScope.fromWire(str("scope"))
+                val url = str("url")
+                if (requestId != null && appId != null && scope != null && url != null) {
+                    NotificationTargetDataExportConfirmation(
+                        requestId = requestId,
+                        exAppId = appId,
+                        scope = scope,
+                        callbackUrl = url,
+                        notificationId = str("internal_id"),
+                    )
+                } else null
+            }
             else -> null
         }
     }
@@ -105,6 +149,7 @@ object NotificationRouter {
         "event" -> "star"
         "single_document", "multiple_documents" -> "doc.text"
         "account_confirmation" -> "person.badge.shield.checkmark"
+        "data_export_confirmation" -> "square.and.arrow.up"
         "deal" -> "tag"
         "ticket_purchase" -> "ticket"
         "payment_update_status" -> "creditcard"

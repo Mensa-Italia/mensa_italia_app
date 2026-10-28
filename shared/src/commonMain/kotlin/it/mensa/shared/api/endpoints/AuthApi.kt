@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
@@ -50,6 +51,22 @@ class AuthApi(private val client: HttpClient) {
      */
     @Throws(Exception::class)
     suspend fun me(): UserModel = client.get("/api/cs/me").body()
+
+    /**
+     * Una lettura leggera su una route che i `blocked` NON possono usare
+     * (`IntegrityGuard` la conosce come fuori da `BlockedAllowlist`): se il
+     * server risponde 2xx l'account non e' piu' sospeso e lo stato globale si
+     * spegne da solo; se risponde 403 `account_blocked` solleva
+     * `AccountBlockedException`. `/api/cs/me` non va bene a questo scopo, perche'
+     * il server potrebbe servirlo anche a un account sospeso.
+     */
+    @Throws(Exception::class)
+    suspend fun probeAccess() {
+        client.get("/api/collections/events/records") {
+            parameter("perPage", 1)
+            parameter("skipTotal", 1)
+        }
+    }
 }
 
 /** `/auth-with-zitadel` ha rifiutato email e password (401). */

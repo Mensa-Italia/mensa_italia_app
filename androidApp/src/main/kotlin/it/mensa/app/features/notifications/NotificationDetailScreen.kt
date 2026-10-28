@@ -55,6 +55,7 @@ import org.koin.core.parameter.parametersOf
 fun NotificationDetailScreen(
     notificationId: String,
     navController: NavController,
+    restricted: Boolean = false,
     vm: NotificationDetailViewModel = koinViewModel(parameters = { parametersOf(notificationId) }),
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -82,6 +83,7 @@ fun NotificationDetailScreen(
                 NotificationDetailContent(
                     notification = uiState.notification!!,
                     navController = navController,
+                    restricted = restricted,
                     modifier = Modifier.padding(innerPadding),
                 )
             }
@@ -98,6 +100,7 @@ fun NotificationDetailScreen(
 private fun NotificationDetailContent(
     notification: NotificationModel,
     navController: NavController,
+    restricted: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val icon = remember(notification.id) { notificationIcon(notification) }
@@ -140,7 +143,11 @@ private fun NotificationDetailContent(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        if (target != null) {
+        // Account sospeso: l'unico bottone e' quello delle conferme di app esterne;
+        // gli altri porterebbero in parti dell'app che il server rifiuta.
+        val actionable = target != null &&
+            (!restricted || AccountConfirmationController.Request.from(target) != null)
+        if (target != null && actionable) {
             val ctaLabel = ctaLabel(target)
             Button(
                 onClick = { DeepLinkHandler.handleNotificationTarget(target = target, navController = navController) },
@@ -169,5 +176,6 @@ private fun ctaLabel(target: NotificationTarget): String = when (target) {
     is NotificationTarget.QuidPdf -> tr("notifications.go_quid_pdf", fallback = "Apri PDF Quid")
     is NotificationTarget.LocalOffice -> tr("notifications.go_local_office", fallback = "Apri gruppo locale")
     is NotificationTarget.AccountConfirmation -> tr("notifications.go_account_confirmation", fallback = "Conferma identità")
+    is NotificationTarget.DataExportConfirmation -> tr("notifications.go_data_export_confirmation", fallback = "Rispondi alla richiesta")
     is NotificationTarget.DeveloperMessage -> tr("notifications.go_developer_message", fallback = "Leggi il messaggio")
 }

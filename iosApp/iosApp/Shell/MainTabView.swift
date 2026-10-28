@@ -108,6 +108,14 @@ struct MainTabView: View {
                 stampClaim = nil
             }
         }
+        .onDisappear {
+            // Se la shell sparisce con una conferma ancora aperta (l'account e'
+            // stato sospeso proprio ora), la richiesta torna in coda: la raccoglie
+            // `AccountSuspendedView`, che la rimostra.
+            if let open = pushDestination, open.isExAppConfirmation {
+                pendingDeepLink.set(open)
+            }
+        }
         .onChange(of: pendingDeepLink.target) { _, newValue in
             // Belt-and-braces: any push tap that lands a target while we're
             // already alive gets consumed even if the NotificationCenter
@@ -121,13 +129,8 @@ struct MainTabView: View {
             // AccountConfirmationSheet is self-contained (brings its own
             // NavigationStack + presentationDetents) — present it directly
             // instead of wrapping in another NavigationStack.
-            if case .accountConfirmation(let appId, let url, let nid) = target {
-                AccountConfirmationSheet(
-                    exAppId: appId,
-                    callbackUrl: url,
-                    notificationId: nid,
-                    onDismiss: { pushDestination = nil }
-                )
+            if target.isExAppConfirmation {
+                ExAppConfirmationSheet(target: target, onDismiss: { pushDestination = nil })
             } else {
                 NavigationStack {
                     pushDestinationView(for: target)
@@ -252,7 +255,8 @@ struct MainTabView: View {
         case .quidArticle(let id):    QuidArticleView(articleId: Int64(id) ?? 0)
         case .quidPdf(let id):        QuidPDFDeepLinkLoader(recordId: Int64(id) ?? 0)
         case .localOffice(let slug):  LocalOfficeBySlugLoader(slug: slug)
-        case .accountConfirmation:    EmptyView() // handled directly in .sheet
+        case .accountConfirmation, .dataExportConfirmation:
+            EmptyView() // handled directly in .sheet
         case .member(let id):         MemberDetailView(memberId: id)
         case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
@@ -302,6 +306,7 @@ extension NotificationTarget: Identifiable {
         case .quidPdf(let id):        return "quidPdf:\(id)"
         case .localOffice(let slug):  return "localOffice:\(slug)"
         case .accountConfirmation(let appId, _, _): return "accountConfirmation:\(appId)"
+        case .dataExportConfirmation(let requestId, _, _, _, _): return "dataExportConfirmation:\(requestId)"
         case .member(let id):         return "member:\(id)"
         case .developerMessage:       return "developerMessage"
         }

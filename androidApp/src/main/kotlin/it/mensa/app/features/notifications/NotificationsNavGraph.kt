@@ -32,8 +32,12 @@ object NotificationsRoutes {
  *  - notifications/manager  → NotificationManagerScreen
  *
  * Mirrors iOS NavigationStack { NotificationsListView() } with nested destinations.
+ *
+ * [restricted] e' l'elenco visto da un account sospeso: solo lista e dettaglio
+ * (niente preferenze), e nessuna navigazione verso le parti dell'app che il
+ * server rifiuta a un bloccato. Le conferme delle app esterne si aprono come sempre.
  */
-fun NavGraphBuilder.notificationsNavGraph(navController: NavController) {
+fun NavGraphBuilder.notificationsNavGraph(navController: NavController, restricted: Boolean = false) {
 
     val enterTransition = slideInHorizontally(
         initialOffsetX = { it },
@@ -62,7 +66,7 @@ fun NavGraphBuilder.notificationsNavGraph(navController: NavController) {
         popEnterTransition = { popEnterTransition },
         popExitTransition = { popExitTransition },
     ) {
-        NotificationsListScreen(navController = navController)
+        NotificationsListScreen(navController = navController, restricted = restricted)
     }
 
     composable(
@@ -80,8 +84,11 @@ fun NavGraphBuilder.notificationsNavGraph(navController: NavController) {
         NotificationDetailScreen(
             notificationId = notificationId,
             navController = navController,
+            restricted = restricted,
         )
     }
+
+    if (restricted) return
 
     composable(
         route = NotificationsRoutes.MANAGER,

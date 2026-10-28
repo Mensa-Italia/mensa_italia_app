@@ -70,4 +70,25 @@ class ExAppsRepository(
     @Throws(Exception::class)
     suspend fun postCallback(url: String, accepted: Boolean) =
         api.postCallback(url, accepted)
+
+    /**
+     * Risponde a una richiesta di esportazione dati (`data_export_confirmation`).
+     *
+     * Prima la decisione sul nostro server, poi — solo se il server l'ha
+     * registrata — l'avviso all'app esterna con `{"accepted", "request_id"}`.
+     * Se la richiesta e' scaduta o gia' decisa solleva
+     * [it.mensa.shared.api.endpoints.ExportRequestGoneException] e l'app esterna
+     * non viene avvisata di niente.
+     *
+     * La decisione e' l'atto che conta: l'app esterna estrae i dati dal
+     * server con la sua chiave, il callback e' solo un avviso. Per questo un
+     * callback che fallisce (app esterna irraggiungibile) non annulla niente e
+     * non e' un errore: torna false al posto di true. Rifare tutto non sarebbe
+     * possibile comunque, la richiesta risulterebbe gia' decisa.
+     *
+     * @return true se l'app esterna e' stata avvisata.
+     */
+    @Throws(Exception::class)
+    suspend fun answerDataExport(requestId: String, callbackUrl: String, accepted: Boolean): Boolean =
+        api.answerDataExport(requestId, callbackUrl, accepted)
 }

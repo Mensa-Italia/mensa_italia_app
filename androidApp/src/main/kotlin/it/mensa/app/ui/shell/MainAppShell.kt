@@ -55,8 +55,7 @@ import it.mensa.app.features.locations.locationsNavGraph
 import it.mensa.app.features.localoffices.localOfficesNavGraph
 import it.mensa.app.features.members.MembersRoutes
 import it.mensa.app.features.members.membersNavGraph
-import it.mensa.app.features.notifications.AccountConfirmationController
-import it.mensa.app.features.notifications.AccountConfirmationSheet
+import it.mensa.app.features.notifications.AccountConfirmationHost
 import it.mensa.app.features.notifications.NotificationsRoutes
 import it.mensa.app.features.notifications.notificationsNavGraph
 import it.mensa.app.features.notifications.notificationTarget
@@ -168,9 +167,6 @@ fun MainAppShell() {
     val audioController = koinInject<AudioPlayerController>()
     val currentTrack by audioController.currentTrack.collectAsStateWithLifecycle()
     val isPresentingFullPlayer by audioController.isPresentingFullPlayer.collectAsStateWithLifecycle()
-
-    val accountConfirmationController = koinInject<AccountConfirmationController>()
-    val accountConfirmationRequest by accountConfirmationController.current.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
 
@@ -397,13 +393,8 @@ fun MainAppShell() {
         )
     }
 
-    // ── Account-confirmation modal (third-party identity check) ───────────────
-    accountConfirmationRequest?.let { request ->
-        AccountConfirmationSheet(
-            request = request,
-            onDismiss = { accountConfirmationController.dismiss() },
-        )
-    }
+    // ── Account-confirmation modal (identity check / data export) ─────────────
+    AccountConfirmationHost()
 }
 
 // ─── Navigation helpers ───────────────────────────────────────────────────────

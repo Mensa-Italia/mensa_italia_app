@@ -37,4 +37,8 @@ enum RootPhase: Equatable {
     /// Offline da più di un giorno: per continuare serve collegarsi. Vedi
     /// `Connectivity` (:shared).
     case offlineBlocked
+
+    /// Account sospeso dal server (403 `account_blocked`). Vince su tutto il
+    /// resto. Vedi `AccountStatus` (:shared).
+    case accountSuspended
 }

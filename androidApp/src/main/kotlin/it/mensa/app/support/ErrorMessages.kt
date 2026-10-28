@@ -1,5 +1,10 @@
 package it.mensa.app.support
 
+import it.mensa.shared.api.endpoints.ExportRequestGoneException
+import it.mensa.shared.integrity.AccountBlockedException
+import it.mensa.shared.integrity.IntegrityException
+import it.mensa.shared.integrity.IntegrityFailedException
+import it.mensa.shared.integrity.IntegrityUnsupportedException
 import it.mensa.shared.net.NetworkErrors
 
 /**
@@ -13,10 +18,22 @@ val Throwable.isOffline: Boolean get() = NetworkErrors.isUnavailable(this)
 
 /** Leggibile se si e' offline, il messaggio dell'errore altrimenti. */
 val Throwable.userMessage: String
-    get() = if (isOffline) {
-        koinAccess().i18n.t("app.error.offline", "Sei offline. Riprova quando torna la connessione.")
-    } else {
-        message ?: koinAccess().i18n.t("app.error.generic", "Qualcosa e' andato storto. Riprova.")
+    get() = when {
+        isOffline ->
+            koinAccess().i18n.t("app.error.offline", "Sei offline. Riprova quando torna la connessione.")
+        this is ExportRequestGoneException ->
+            koinAccess().i18n.t("ex_app.export.error.gone", "La richiesta è scaduta o è già stata gestita. Chiedi di nuovo all'app esterna.")
+        this is AccountBlockedException ->
+            koinAccess().i18n.t("app.account.suspended.title", "Account sospeso")
+        this is IntegrityUnsupportedException || this is IntegrityFailedException ->
+            koinAccess().i18n.t(
+                "app.error.integrity",
+                "Questo dispositivo non ha superato la verifica di sicurezza dell'app. " +
+                    "Usa l'app ufficiale su un dispositivo non modificato.",
+            )
+        this is IntegrityException ->
+            koinAccess().i18n.t("app.error.integrity_retry", "Verifica di sicurezza non riuscita. Riprova fra poco.")
+        else -> message ?: koinAccess().i18n.t("app.error.generic", "Qualcosa e' andato storto. Riprova.")
     }
 
 /**

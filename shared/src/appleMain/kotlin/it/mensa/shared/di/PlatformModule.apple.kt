@@ -7,6 +7,8 @@ import it.mensa.shared.auth.ICredentialStore
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.TokenStore
 import it.mensa.shared.db.DriverFactory
+import it.mensa.shared.integrity.AppAttestProvider
+import it.mensa.shared.integrity.IntegrityProvider
 import org.koin.core.module.Module
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -51,4 +53,7 @@ actual val platformModule: Module = module {
     // Stesso store sicuro del token, chiave diversa. Vedi CredentialStore.
     single { CredentialStore(get()) } bind ICredentialStore::class
     single { DriverFactory() }
+    // App Attest. Su watchOS (e sul simulatore) `isSupported` e' false: la prova
+    // non si tenta e, se il server la chiede, l'errore e' "non supportato".
+    single<IntegrityProvider> { AppAttestProvider(get()) }
 }

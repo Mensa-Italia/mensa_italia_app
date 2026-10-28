@@ -48,6 +48,21 @@ val mapsApiKey: String = (project.findProperty("MAPS_API_KEY") as String?)
     ?: localProperties.getProperty("MAPS_API_KEY")
     ?: ""
 
+// Numero del progetto Google Cloud collegato all'app in Play Console
+// (Test e rilascio -> Integrità dell'app -> Impostazioni API). Lo vuole la
+// Standard API di Play Integrity per preparare il token provider, ed e' lo
+// stesso progetto il cui service account il server usa per decodificare i token.
+// Non e' un segreto. Si imposta con -PPLAY_INTEGRITY_CLOUD_PROJECT_NUMBER=...,
+// con la variabile d'ambiente omonima o in local.properties (stessa trafila di
+// MAPS_API_KEY). Vuoto o non numerico vale 0: l'app compila e funziona, ma chi
+// il server richiede di dimostrare l'integrita' riceve "dispositivo non
+// supportato" (vedi PlayIntegrityProvider).
+val playIntegrityProjectNumber: Long = (
+    (project.findProperty("PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER") as String?)
+        ?: System.getenv("PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER")
+        ?: localProperties.getProperty("PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER")
+    )?.trim()?.toLongOrNull() ?: 0L
+
 android {
     namespace = "it.mensa.app"
     compileSdk = 36
@@ -60,6 +75,7 @@ android {
         versionName = appVersionName
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("long", "PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER", "${playIntegrityProjectNumber}L")
     }
 
     signingConfigs {
@@ -94,6 +110,9 @@ android {
 
     buildFeatures {
         compose = true
+        // Solo per PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER. La versione si continua
+        // a leggere dal PackageManager, come prima.
+        buildConfig = true
     }
 
     packaging {

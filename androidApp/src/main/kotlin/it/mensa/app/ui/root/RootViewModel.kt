@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
  *
  * State machine:
  *   Unknown   ─init()──► Loading
+ *   Loading   ─auth.Authenticated + account sospeso──► AccountSuspended
  *   Loading   ─auth.Authenticated + tessera scaduta──► MembershipExpired
  *   Loading   ─auth.Authenticated + user + onboarding──► Onboarding | Main
  *   Loading   ─auth.Anonymous──► Anonymous
@@ -47,6 +48,12 @@ sealed class RootPhase {
      * `Connectivity` (:shared).
      */
     data object OfflineBlocked : RootPhase()
+
+    /**
+     * Account sospeso dal server (403 `account_blocked`). Vince su tutto il
+     * resto: finche' dura, nessuna schermata ha niente da mostrare.
+     */
+    data object AccountSuspended : RootPhase()
 }
 
 class RootViewModel(
@@ -138,10 +145,11 @@ class RootViewModel(
             auth.currentUser,
             auth.membershipGate,
             koinAccess().connectivity.gate,
-        ) { state, user, gate, online ->
-            PhaseInputs(state, user, gate, online)
+            auth.accountSuspended,
+        ) { state, user, gate, online, suspended ->
+            PhaseInputs(state, user, gate, online, suspended)
         }.collect { inputs ->
-            _phase.value = derivePhase(inputs.state, inputs.user, inputs.gate, inputs.online)
+            _phase.value = derivePhase(inputs.state, inputs.user, inputs.gate, inputs.online, inputs.suspended)
         }
     }
 
@@ -150,6 +158,7 @@ class RootViewModel(
         val user: it.mensa.shared.model.UserModel?,
         val gate: MembershipGate,
         val online: OnlineGate,
+        val suspended: Boolean,
     )
 
     private suspend fun derivePhase(
@@ -157,9 +166,15 @@ class RootViewModel(
         user: it.mensa.shared.model.UserModel?,
         gate: MembershipGate,
         online: OnlineGate,
+        suspended: Boolean,
     ): RootPhase = when (state) {
         is AuthState.Authenticated -> {
-            if (user == null) {
+            if (suspended) {
+                // Prima di tutto: il server rifiuta qualunque richiesta, e
+                // l'utente (anche col record ancora in caricamento) deve
+                // sapere perche'.
+                RootPhase.AccountSuspended
+            } else if (user == null) {
                 // User record not yet loaded — stay on Loading
                 RootPhase.Loading
             } else if (LaunchHarness.isActive) {

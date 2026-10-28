@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
@@ -24,6 +25,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import it.mensa.shared.auth.AccountStatus
+import it.mensa.shared.integrity.AccountBlockedException
+import it.mensa.shared.integrity.IntegrityException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -41,6 +45,8 @@ data class RealtimeEvent(
     val topic: String,        // collection o "collection/recordId"
     val message: RealtimeMessage
 )
+
+private const val INTEGRITY_RETRY_MS = 5 * 60_000L
 
 class RealtimeClient(
     private val client: HttpClient,
@@ -69,7 +75,15 @@ class RealtimeClient(
                 val clientId = result.first
                 val eventFlow = result.second
                 attempt = 0
-                registerSubscriptions(clientId, subscriptions)
+                try {
+                    registerSubscriptions(clientId, subscriptions)
+                } catch (t: Throwable) {
+                    // La sottoscrizione e' stata rifiutata (account sospeso, prova di
+                    // integrita'...): lo stream appena aperto non verra' mai letto,
+                    // quindi va chiuso qui o resterebbe connesso per niente.
+                    closeStream(eventFlow)
+                    throw t
+                }
                 eventFlow.collect { emit(it) }
                 // Arrivare qui significa che il server ha chiuso senza errore.
                 // Prima non succedeva mai — lo SharedFlow non terminava — e
@@ -79,6 +93,18 @@ class RealtimeClient(
                 delay(1_000L)
             } catch (ce: CancellationException) {
                 throw ce
+            } catch (_: AccountBlockedException) {
+                // Account sospeso: il server rifiuta anche la sottoscrizione.
+                // Riconnettere con il backoff vorrebbe dire un POST rifiutato ogni
+                // 30 secondi per tutto il tempo della sospensione; si aspetta
+                // invece che lo stato torni normale.
+                AccountStatus.suspended.first { !it }
+                attempt = 0
+            } catch (e: IntegrityException) {
+                // Prova di integrita' non producibile o rifiutata: il dispositivo
+                // non cambia in fretta, meglio non martellare il server.
+                attempt++
+                delay(INTEGRITY_RETRY_MS)
             } catch (e: Throwable) {
                 attempt++
                 val backoffMs = minOf(30_000L, 500L * (1L shl minOf(attempt, 6)))
@@ -159,6 +185,11 @@ class RealtimeClient(
 
         return clientId to events.receiveAsFlow()
             .onCompletion { job.cancel(); streamScope.cancel() }
+    }
+
+    /** Chiude uno stream mai letto: raccoglierlo e annullare subito fa scattare `onCompletion`. */
+    private suspend fun closeStream(stream: Flow<RealtimeEvent>) {
+        withTimeoutOrNull(1L) { stream.collect { } }
     }
 
     private suspend fun registerSubscriptions(clientId: String, subs: Set<String>) {

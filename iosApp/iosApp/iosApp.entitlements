@@ -28,6 +28,15 @@
 		<string>webcredentials:auth.mensa.it</string>
 		<string>webcredentials:svc.mensa.it</string>
 	</array>
+	<!-- App Attest (DCAppAttestService): la prova di integrità per-richiesta che il
+	     server chiede agli utenti "attenzionati". `production` è il valore delle
+	     build distribuite (TestFlight, App Store). Per attestare da una build di
+	     sviluppo contro un server in modalità development basta metterlo a
+	     `development`: cambia l'aaguid dell'attestazione (`appattestdevelop`).
+	     Richiede la capability "App Attest" sull'App ID it.mensa.app nel portale
+	     Apple Developer. -->
+	<key>com.apple.developer.devicecheck.appattest-environment</key>
+	<string>production</string>
 	<key>com.apple.developer.in-app-payments</key>
 	<array>
 		<string>merchant.it.mensa.app</string>

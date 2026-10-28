@@ -398,11 +398,15 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ANDROID_KEY_ALIAS: key
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          # Numero del progetto Google Cloud di Play Integrity (non e' un
+          # segreto: variabile del repo). Vuoto = 0, vedi androidApp/build.gradle.kts.
+          PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER: ${{ vars.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER }}
         run: |
           ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease \
             -Dorg.gradle.java.home="$JAVA_HOME" \
             -PandroidVersionCodeOverride="$VERSION_CODE" \
             -PMAPS_API_KEY="$MAPS_API_KEY" \
+            -PPLAY_INTEGRITY_CLOUD_PROJECT_NUMBER="$PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER" \
             --no-daemon --stacktrace
 
       - name: Rename artifacts

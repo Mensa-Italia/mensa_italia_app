@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.mensa.app.features.auth.AccountSuspendedScreen
 import it.mensa.app.features.auth.LoginScreen
 import it.mensa.app.features.auth.MembershipExpiredScreen
 import it.mensa.app.features.auth.OfflineBlockedScreen
@@ -122,6 +123,8 @@ fun RootScreen(
             // Offline da piu' di un giorno: se ne va da sola quando il server
             // risponde (il controllo gira in sottofondo).
             is RootPhase.OfflineBlocked -> OfflineBlockedScreen()
+            // Account sospeso dal server: "Riprova" rilegge il socio, "Esci" fa logout.
+            is RootPhase.AccountSuspended -> AccountSuspendedScreen()
         }
     }
 }

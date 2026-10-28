@@ -8,6 +8,7 @@ final class RootViewModel {
     private var userSub: Closeable?
     private var gateSub: Closeable?
     private var onlineSub: Closeable?
+    private var suspendedSub: Closeable?
 
     /// True when this app process was launched with NO persisted session, i.e.
     /// the user is about to (or just did) sign in interactively. Used by the
@@ -84,6 +85,14 @@ final class RootViewModel {
         // ricarica pagine e immagini quando la connessione torna.
         _ = ConnectivityStore.shared
 
+        // 4d. E quando il server sospende (o riattiva) l'account.
+        let suspendedFlow = koin.auth.accountSuspended as Kotlinx_coroutines_coreFlow
+        suspendedSub = subscribeFlow(suspendedFlow) { [weak self] (_: KotlinBoolean) in
+            Task { @MainActor [weak self] in
+                await self?.evaluatePhase()
+            }
+        } onError: { _ in }
+
         // 4b. E quando cambia il verdetto sulla tessera (arriva il server).
         let gateFlow = koin.auth.membershipGate as Kotlinx_coroutines_coreFlow
         gateSub = subscribeFlow(gateFlow) { [weak self] (_: MembershipGate) in
@@ -118,6 +127,8 @@ final class RootViewModel {
         gateSub = nil
         onlineSub?.close()
         onlineSub = nil
+        suspendedSub?.close()
+        suspendedSub = nil
     }
 
     /// Block on a single emission of `events.observeAll()` so the Today
@@ -170,6 +181,13 @@ final class RootViewModel {
     private func evaluatePhase() async {
         let state = koin.auth.authState.value
         if state is AuthStateAuthenticated {
+            // Account sospeso: prima di tutto, anche col record utente ancora in
+            // caricamento. Il server rifiuta qualunque richiesta e l'utente deve
+            // sapere perché.
+            if (koin.auth.accountSuspended.value as? KotlinBoolean)?.boolValue == true {
+                phase = .accountSuspended
+                return
+            }
             // We need the user record (currentUser) to evaluate the 24h gate.
             // If not loaded yet, stay on .loading (splash) — currentUser
             // subscription will re-call evaluatePhase when it arrives.
@@ -296,6 +314,11 @@ struct RootView: View {
                 case .offlineBlocked:
                     // Se ne va da sola quando il server risponde.
                     OfflineBlockedView()
+                        .transition(.opacity)
+                case .accountSuspended:
+                    // "Riprova" rilegge il socio; se la sospensione è tolta
+                    // la fase cambia da sola.
+                    AccountSuspendedView()
                         .transition(.opacity)
                 case .main:
                     MainTabView()

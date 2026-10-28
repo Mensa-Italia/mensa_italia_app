@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.NotificationModel
+import it.mensa.shared.notifications.DataExportScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +49,18 @@ sealed class NotificationTarget {
      */
     data class AccountConfirmation(
         val exAppId: String,
+        val callbackUrl: String,
+        val notificationId: String?,
+    ) : NotificationTarget()
+    /**
+     * Esportazione una tantum di timbri o medaglie verso un'app esterna, da
+     * confermare in app (push `data_export_confirmation`). Specchio del
+     * `NotificationTargetDataExportConfirmation` di :shared.
+     */
+    data class DataExportConfirmation(
+        val requestId: String,
+        val exAppId: String,
+        val scope: DataExportScope,
         val callbackUrl: String,
         val notificationId: String?,
     ) : NotificationTarget()
@@ -183,6 +196,21 @@ fun notificationTarget(dict: Map<String, String>): NotificationTarget? {
                 )
             } else null
         }
+        "data_export_confirmation" -> {
+            val requestId = str("requestId")
+            val appId = str("keyAppId")
+            val scope = DataExportScope.fromWire(str("scope"))
+            val url = str("url")
+            if (requestId != null && appId != null && scope != null && url != null) {
+                NotificationTarget.DataExportConfirmation(
+                    requestId = requestId,
+                    exAppId = appId,
+                    scope = scope,
+                    callbackUrl = url,
+                    notificationId = str("internal_id"),
+                )
+            } else null
+        }
         else -> null
     }
 }
@@ -197,6 +225,7 @@ fun notificationIconName(n: NotificationModel): String {
         "event" -> "event"
         "single_document", "multiple_documents" -> "description"
         "account_confirmation" -> "verified_user"
+        "data_export_confirmation" -> "upload"
         "deal" -> "local_offer"
         "ticket_purchase" -> "confirmation_number"
         "payment_update_status" -> "credit_card"

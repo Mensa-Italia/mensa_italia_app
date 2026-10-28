@@ -8,6 +8,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import it.mensa.shared.api.PocketBaseClient
+import it.mensa.shared.api.SkipAuthAttribute
 import it.mensa.shared.model.ExAppModel
 import it.mensa.shared.model.ExGrantedPermissionsModel
 import kotlinx.serialization.SerialName
@@ -25,8 +26,30 @@ internal data class ExGrantedPermissionsPatchBody(
     val permissions: List<String>,
 )
 
+/**
+ * `request_id` c'e' solo nell'esportazione dei dati (`data_export_confirmation`);
+ * per la conferma d'identita' resta null e, non essendo `encodeDefaults`, non
+ * finisce nel JSON: il corpo e' ancora `{"accepted": bool}`.
+ */
 @Serializable
-internal data class CallbackBody(val accepted: Boolean)
+internal data class CallbackBody(
+    val accepted: Boolean,
+    @SerialName("request_id") val requestId: String? = null,
+)
+
+@Serializable
+internal data class ExportDecisionBody(
+    @SerialName("request_id") val requestId: String,
+    val accepted: Boolean,
+)
+
+/**
+ * La richiesta di esportazione non c'e' piu' da decidere: scaduta, gia'
+ * decisa, o non dell'utente (`POST /api/cs/exapp/export/decide` risponde 404 o
+ * 409). Non si riprova: serve una richiesta nuova dall'app esterna.
+ */
+class ExportRequestGoneException(val status: Int) :
+    Exception("Richiesta di esportazione scaduta o gia' gestita (HTTP $status)")
 
 /**
  * Third-party app approval endpoints. Mirrors Flutter `getExApp`,
@@ -63,16 +86,56 @@ class ExAppsApi(
         pb.update("ex_granted_permissions", id, ExGrantedPermissionsPatchBody(perms))
 
     /**
-     * POSTs `{"accepted": <bool>}` to the third-party callback URL. We strip
-     * the PocketBase Authorization header here so we don't leak the user's
-     * token to an arbitrary external host.
+     * `POST /api/cs/exapp/export/decide`: il socio approva o rifiuta
+     * l'esportazione dei suoi dati. Passa dal client condiviso, quindi per un
+     * utente `watched` porta la prova di integrita' come ogni altra API; ai
+     * `blocked` e' consentita (sta nell'allowlist del server).
+     *
+     * 404 e 409 (scaduta, gia' decisa) diventano [ExportRequestGoneException]:
+     * il client non usa `expectSuccess`, quindi senza questo controllo il
+     * JSON d'errore passerebbe per una risposta riuscita.
      */
     @Throws(Exception::class)
-    suspend fun postCallback(url: String, accepted: Boolean) {
+    suspend fun decideExport(requestId: String, accepted: Boolean) {
+        val response = client.post("/api/cs/exapp/export/decide") {
+            contentType(ContentType.Application.Json)
+            setBody(ExportDecisionBody(requestId, accepted))
+        }
+        val status = response.status.value
+        if (status == 404 || status == 409) throw ExportRequestGoneException(status)
+        if (status !in 200..299) error("export/decide: HTTP $status")
+    }
+
+    /**
+     * Risponde a una richiesta di esportazione: prima la decisione sul nostro
+     * server, poi — solo se l'ha registrata — l'avviso all'app esterna con
+     * `{"accepted", "request_id"}`. Vedi `ExAppsRepository.answerDataExport`.
+     *
+     * @return true se l'app esterna e' stata avvisata.
+     */
+    @Throws(Exception::class)
+    suspend fun answerDataExport(requestId: String, callbackUrl: String, accepted: Boolean): Boolean {
+        decideExport(requestId, accepted)
+        return runCatching { postCallback(callbackUrl, accepted, requestId) }.isSuccess
+    }
+
+    /**
+     * POSTs `{"accepted": <bool>}` to the third-party callback URL, plus
+     * `request_id` when it's a data export.
+     *
+     * L'host e' di un terzo: niente `Authorization` (nemmeno quello che
+     * [it.mensa.shared.api.AuthPlugin] metterebbe a un sottodominio di
+     * mensa.it, da cui [SkipAuthAttribute]) e niente prova di integrita'
+     * (l'`IntegrityGuard` agisce solo sul nostro server). Il token non deve
+     * uscire verso un host arbitrario.
+     */
+    @Throws(Exception::class)
+    suspend fun postCallback(url: String, accepted: Boolean, requestId: String? = null) {
         client.post(url) {
+            attributes.put(SkipAuthAttribute, true)
             headers { remove(HttpHeaders.Authorization) }
             contentType(ContentType.Application.Json)
-            setBody(CallbackBody(accepted))
+            setBody(CallbackBody(accepted, requestId))
         }
     }
 }

@@ -110,13 +110,8 @@ struct TodayView: View {
             case .quidArticle(let id):    QuidArticleView(articleId: Int64(id) ?? 0)
             case .quidPdf(let id):        QuidPDFDeepLinkLoader(recordId: Int64(id) ?? 0)
             case .localOffice(let slug):  LocalOfficeBySlugLoader(slug: slug)
-            case .accountConfirmation(let appId, let url, let nid):
-                AccountConfirmationSheet(
-                    exAppId: appId,
-                    callbackUrl: url,
-                    notificationId: nid,
-                    onDismiss: { notificationRoute = nil }
-                )
+            case .accountConfirmation, .dataExportConfirmation:
+                ExAppConfirmationSheet(target: target, onDismiss: { notificationRoute = nil })
             case .member(let id):         MemberDetailView(memberId: id)
             case .developerMessage:       EmptyView() // aperto da `openInPlace()`
             }

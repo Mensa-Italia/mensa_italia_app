@@ -75,6 +75,7 @@ import it.mensa.app.support.RefreshOnReconnect
 fun NotificationsListScreen(
     navController: NavController,
     onBack: () -> Unit = { navController.popBackStack() },
+    restricted: Boolean = false,
     vm: NotificationsListViewModel = koinViewModel(),
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -118,11 +119,13 @@ fun NotificationsListScreen(
                                 enabled = uiState.unreadCount > 0,
                                 onClick = { menuExpanded = false; vm.markAllSeen() },
                             )
-                            DropdownMenuItem(
-                                text = { Text(tr("notifications.actions.preferences", fallback = "Preferenze")) },
-                                leadingIcon = { Icon(Icons.Outlined.Settings, null) },
-                                onClick = { menuExpanded = false; navController.navigate(NotificationsRoutes.MANAGER) },
-                            )
+                            if (!restricted) {
+                                DropdownMenuItem(
+                                    text = { Text(tr("notifications.actions.preferences", fallback = "Preferenze")) },
+                                    leadingIcon = { Icon(Icons.Outlined.Settings, null) },
+                                    onClick = { menuExpanded = false; navController.navigate(NotificationsRoutes.MANAGER) },
+                                )
+                            }
                         }
                     }
                 },
@@ -217,7 +220,13 @@ fun NotificationsListScreen(
                                         onTap = {
                                             vm.markSeen(notification)
                                             val target = notificationTarget(notification)
-                                            if (target != null) {
+                                            if (restricted) {
+                                                DeepLinkHandler.handleRestrictedNotificationTarget(
+                                                    target = target,
+                                                    notificationId = notification.id,
+                                                    navController = navController,
+                                                )
+                                            } else if (target != null) {
                                                 DeepLinkHandler.handleNotificationTarget(
                                                     target = target,
                                                     navController = navController,

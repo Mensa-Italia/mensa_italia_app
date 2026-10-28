@@ -64,6 +64,14 @@ class AuthRepository(
 
     private val _lastLoginMethod = MutableStateFlow<LoginMethod?>(null)
 
+    /**
+     * True quando il server ha risposto 403 `account_blocked`: l'account e'
+     * sospeso. Le due UI mostrano una schermata dedicata (con "Riprova" ed
+     * "Esci") invece di errori generici o di un logout, che con le credenziali
+     * salvate rientrerebbe subito in un ciclo. Vedi [AccountStatus].
+     */
+    val accountSuspended: StateFlow<Boolean> = AccountStatus.suspended
+
     /** Dove gira la verifica col server di un avvio dalla cache (vedi [init]). */
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var revalidation: Job? = null
@@ -190,6 +198,7 @@ class AuthRepository(
     init {
         tokenRefresher.onSessionLost = {
             AuthHolder.session = null
+            AccountStatus.clear()
             _authState.value = AuthState.Anonymous
             _currentUser.value = null
         }
@@ -357,6 +366,30 @@ class AuthRepository(
     }
 
     /**
+     * Il tasto "Riprova" della schermata di account sospeso: chiede al server
+     * se l'account e' tornato attivo e torna true se lo e'.
+     *
+     * Non basta una lettura qualunque: le route che il server serve anche ai
+     * bloccati (dispositivi, `ex_apps`, il proprio record) riescono comunque, e
+     * non provano niente. Si legge quindi una route fuori da quell'elenco
+     * ([AuthApi.probeAccess]); se risponde 2xx `IntegrityGuard` spegne
+     * [AccountStatus] da solo. Poi si rilegge il socio, per avere i dati
+     * aggiornati.
+     */
+    @Throws(Exception::class)
+    suspend fun recheckAccount(): Boolean {
+        try {
+            api.probeAccess()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Throwable) {
+            // Ancora sospeso, o rete assente: lo stato globale resta com'e'.
+        }
+        if (!AccountStatus.suspended.value) runCatching { refreshCurrentUser() }
+        return !AccountStatus.suspended.value
+    }
+
+    /**
      * Rilegge il record utente dal server e lo ripubblica su [currentUser].
      *
      * Serve perche' `/api/cs/me` e' l'unico posto da cui arrivano scadenza
@@ -495,6 +528,7 @@ class AuthRepository(
         runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
+        AccountStatus.clear()
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null
@@ -539,6 +573,9 @@ class AuthRepository(
 
         val session = buildSession(tokens)
         persist(session)
+        // Un accesso nuovo riparte da zero: se l'account e' ancora sospeso, la
+        // prima risposta del server lo dira' di nuovo.
+        AccountStatus.clear()
         _authState.value = AuthState.Authenticated(session.accessToken)
 
         // Entrambi gli endpoint di login allegano il record utente ai token OIDC;
@@ -600,6 +637,7 @@ class AuthRepository(
         runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
+        AccountStatus.clear()
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null
@@ -647,6 +685,7 @@ class AuthRepository(
         // sempre al primo avvio senza rete. Si cancellano solo con un logout
         // esplicito e in wipeAndGoAnonymous, cioe' quando e' il server a dire
         // che quell'identita' non e' piu' valida.
+        AccountStatus.clear()
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
         _lastLoginMethod.value = null

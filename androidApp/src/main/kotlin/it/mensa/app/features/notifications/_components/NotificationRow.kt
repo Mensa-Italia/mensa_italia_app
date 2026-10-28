@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.IosShare
 import androidx.compose.material.icons.outlined.LocalOffer
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.LocationCity
@@ -50,6 +51,7 @@ fun notificationIcon(n: NotificationModel): ImageVector {
         "event" -> Icons.Outlined.Event
         "single_document", "multiple_documents" -> Icons.Outlined.Description
         "account_confirmation" -> Icons.Outlined.VerifiedUser
+        "data_export_confirmation" -> Icons.Outlined.IosShare
         "deal" -> Icons.Outlined.LocalOffer
         "ticket_purchase" -> Icons.Outlined.ConfirmationNumber
         "payment_update_status" -> Icons.Outlined.CreditCard

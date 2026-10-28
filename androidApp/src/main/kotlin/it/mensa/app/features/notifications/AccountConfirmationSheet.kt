@@ -41,17 +41,27 @@ import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.shared.api.endpoints.ExportRequestGoneException
 import it.mensa.shared.model.ExAppModel
+import it.mensa.shared.notifications.DataExportScope
 import kotlinx.coroutines.launch
 
 /**
- * AccountConfirmationSheet — third-party data-access approval prompt.
+ * AccountConfirmationSheet — third-party approval prompt.
  *
  * Android equivalent of `iosApp/.../AccountConfirmationSheet.swift`.
- * Shows the requesting [ExAppModel] (name, image, description) and offers
- * Approva / Rifiuta. Approva grants the `CHECK_USER_EXISTENCE` permission,
- * then POSTs `{accepted: ...}` to the caller's callback URL. Either decision
- * marks the originating notification (when present) as seen.
+ * Shows the requesting [ExAppModel] (name, image) and offers Approva / Rifiuta,
+ * with a body that depends on the [AccountConfirmationController.Request]:
+ *
+ *  - [AccountConfirmationController.Request.Identity]: Approva grants the
+ *    request's permissions (`CHECK_USER_EXISTENCE`), then POSTs `{accepted}` to
+ *    the caller's callback URL;
+ *  - [AccountConfirmationController.Request.DataExport]: one-time export of
+ *    stamps or medals. Either answer goes to the server first
+ *    (`export/decide`), then the third party is told `{accepted, request_id}`.
+ *
+ * Either decision marks the originating notification (when present) as seen.
+ * Both work for a suspended account: the server keeps them on its allowlist.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +77,8 @@ fun AccountConfirmationSheet(
     var loading by remember { mutableStateOf(true) }
     var submitting by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    // Richiesta di esportazione scaduta o gia' decisa: riprovare darebbe lo stesso 404/409.
+    var gone by remember { mutableStateOf(false) }
 
     suspend fun load() {
         loading = true
@@ -89,34 +101,30 @@ fun AccountConfirmationSheet(
         }
     }
 
-    fun approve() {
+    /** Esegue la risposta [accepted] per il tipo di richiesta, poi chiude. */
+    fun answer(accepted: Boolean) {
         if (submitting) return
         submitting = true
         scope.launch {
             runCatching {
-                koin.exApps.addPermissions(request.exAppId, listOf("CHECK_USER_EXISTENCE"))
-                koin.exApps.postCallback(request.callbackUrl, true)
+                when (request) {
+                    is AccountConfirmationController.Request.Identity -> {
+                        if (accepted) koin.exApps.addPermissions(request.exAppId, request.permissions)
+                        koin.exApps.postCallback(request.callbackUrl, accepted)
+                    }
+                    is AccountConfirmationController.Request.DataExport ->
+                        koin.exApps.answerDataExport(request.requestId, request.callbackUrl, accepted)
+                }
                 markSeen()
             }.onFailure { e ->
                 errorMessage = e.userMessage
                 submitting = false
-                return@launch
-            }
-            submitting = false
-            onDismiss()
-        }
-    }
-
-    fun deny() {
-        if (submitting) return
-        submitting = true
-        scope.launch {
-            runCatching {
-                koin.exApps.postCallback(request.callbackUrl, false)
-                markSeen()
-            }.onFailure { e ->
-                errorMessage = e.userMessage
-                submitting = false
+                // Non c'e' piu' niente da rifare: si passa all'errore con solo
+                // "Chiudi", non al pulsante Approva.
+                if (e is ExportRequestGoneException) {
+                    gone = true
+                    exApp = null
+                }
                 return@launch
             }
             submitting = false
@@ -140,13 +148,15 @@ fun AccountConfirmationSheet(
             exApp != null -> ApprovalContent(
                 app = exApp!!,
                 submitting = submitting,
-                onApprove = ::approve,
-                onDeny = ::deny,
+                request = request,
+                onApprove = { answer(true) },
+                onDeny = { answer(false) },
             )
 
             else -> ErrorContent(
                 message = errorMessage,
-                onRetry = { scope.launch { load() } },
+                gone = gone,
+                onRetry = if (gone) null else ({ scope.launch { load() } }),
                 onDismiss = onDismiss,
             )
         }
@@ -157,6 +167,7 @@ fun AccountConfirmationSheet(
 @Composable
 private fun ApprovalContent(
     app: ExAppModel,
+    request: AccountConfirmationController.Request,
     submitting: Boolean,
     onApprove: () -> Unit,
     onDeny: () -> Unit,
@@ -169,7 +180,12 @@ private fun ApprovalContent(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Text(
-            text = tr("ex_app.confirm.title", fallback = "Conferma identità"),
+            text = when (request) {
+                is AccountConfirmationController.Request.Identity ->
+                    tr("ex_app.confirm.title", fallback = "Conferma identità")
+                is AccountConfirmationController.Request.DataExport ->
+                    tr("ex_app.export.title", fallback = "Esporta i tuoi dati")
+            },
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -197,15 +213,18 @@ private fun ApprovalContent(
             )
         }
 
-        Text(
-            text = app.description ?: tr(
-                "ex_app.confirm.description.fallback",
-                fallback = "L'app richiede di verificare la tua identità Mensa.",
-            ),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+        when (request) {
+            is AccountConfirmationController.Request.Identity -> Text(
+                text = app.description ?: tr(
+                    "ex_app.confirm.description.fallback",
+                    fallback = "L'app richiede di verificare la tua identità Mensa.",
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            is AccountConfirmationController.Request.DataExport -> DataExportBody(app, request)
+        }
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -227,7 +246,12 @@ private fun ApprovalContent(
                     )
                 } else {
                     Text(
-                        text = tr("ex_app.confirm.approve", fallback = "Approva"),
+                        text = when (request) {
+                            is AccountConfirmationController.Request.Identity ->
+                                tr("ex_app.confirm.approve", fallback = "Approva")
+                            is AccountConfirmationController.Request.DataExport ->
+                                tr("ex_app.export.approve", fallback = "Consenti l'estrazione")
+                        },
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                     )
                 }
@@ -246,10 +270,53 @@ private fun ApprovalContent(
     }
 }
 
+/**
+ * Cosa lascia l'app, detto chiaramente, e che l'estrazione e' una sola.
+ * Aggiungere un tipo di dato vuol dire aggiungere un caso a [DataExportScope] e
+ * qui la sua riga.
+ */
+@Composable
+private fun DataExportBody(
+    app: ExAppModel,
+    request: AccountConfirmationController.Request.DataExport,
+) {
+    val what = when (request.scope) {
+        DataExportScope.STAMPS -> tr("ex_app.export.scope.stamps", fallback = "i tuoi timbri")
+        DataExportScope.MEDALS -> tr("ex_app.export.scope.medals", fallback = "le tue medaglie")
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = tr(
+                "ex_app.export.description",
+                "{app} chiede di ricevere {what}.",
+                "app" to app.name.orEmpty(),
+                "what" to what,
+            ),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = tr(
+                "ex_app.export.one_time",
+                "È un'estrazione una tantum: i dati vengono consegnati una sola volta, e per ogni nuova richiesta ti chiederemo di nuovo il consenso. La richiesta scade tra pochi minuti.",
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
 @Composable
 private fun ErrorContent(
     message: String?,
-    onRetry: () -> Unit,
+    gone: Boolean,
+    onRetry: (() -> Unit)?,
     onDismiss: () -> Unit,
 ) {
     Column(
@@ -266,7 +333,11 @@ private fun ErrorContent(
             modifier = Modifier.size(40.dp),
         )
         Text(
-            text = tr("ex_app.confirm.error.title", fallback = "Impossibile caricare l'app"),
+            text = if (gone) {
+                tr("ex_app.export.error.title", fallback = "Richiesta non più valida")
+            } else {
+                tr("ex_app.confirm.error.title", fallback = "Impossibile caricare l'app")
+            },
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
         )
         Text(
@@ -275,11 +346,13 @@ private fun ErrorContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Button(
-            onClick = onRetry,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(tr("app.retry", fallback = "Riprova"))
+        if (onRetry != null) {
+            Button(
+                onClick = onRetry,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(tr("app.retry", fallback = "Riprova"))
+            }
         }
         OutlinedButton(
             onClick = onDismiss,

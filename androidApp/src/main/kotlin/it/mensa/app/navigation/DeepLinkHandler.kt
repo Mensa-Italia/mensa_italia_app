@@ -100,18 +100,34 @@ object DeepLinkHandler {
                 // che c'e' (vedi `LaunchNotices`), anche se gia' letto.
                 runCatching { koinAccess().developerMessage.requestShow() }
             }
-            is NotificationTarget.AccountConfirmation -> {
+            is NotificationTarget.AccountConfirmation,
+            is NotificationTarget.DataExportConfirmation -> {
                 // No navigation — surface the modal approval sheet instead.
                 runCatching {
-                    KoinPlatform.getKoin().get<AccountConfirmationController>().present(
-                        AccountConfirmationController.Request(
-                            exAppId = target.exAppId,
-                            callbackUrl = target.callbackUrl,
-                            notificationId = target.notificationId,
-                        ),
-                    )
+                    AccountConfirmationController.Request.from(target)?.let {
+                        KoinPlatform.getKoin().get<AccountConfirmationController>().present(it)
+                    }
                 }
             }
+        }
+    }
+
+    /**
+     * Il tocco su una notifica dall'elenco di un account sospeso. Le conferme di
+     * app esterne (identita', esportazione dati) aprono il foglio, come nella
+     * shell; ogni altra notifica apre solo il suo dettaglio, senza navigare verso
+     * parti dell'app che il server rifiuta a un bloccato.
+     */
+    fun handleRestrictedNotificationTarget(
+        target: NotificationTarget?,
+        notificationId: String,
+        navController: NavController,
+    ) {
+        val request = target?.let { AccountConfirmationController.Request.from(it) }
+        if (request != null) {
+            runCatching { KoinPlatform.getKoin().get<AccountConfirmationController>().present(request) }
+        } else {
+            navController.navigate(NotificationsRoutes.detail(notificationId))
         }
     }
 

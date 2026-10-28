@@ -1,5 +1,6 @@
 package it.mensa.app.di
 
+import it.mensa.app.BuildConfig
 import it.mensa.app.features.auth.LoginViewModel
 import it.mensa.app.features.discover.DiscoverViewModel
 import it.mensa.app.features.locations.LocationSearchService
@@ -26,6 +27,8 @@ import it.mensa.app.services.push.PushTokenStore
 import it.mensa.app.services.stripe.StripeService
 import it.mensa.app.support.LocaleManager
 import it.mensa.app.support.ThemeManager
+import it.mensa.shared.integrity.IntegrityProvider
+import it.mensa.shared.integrity.PlayIntegrityProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -45,6 +48,13 @@ import org.koin.dsl.module
  * - Locale manager (DataStore)
  */
 val appModule = module {
+
+    // Prova di integrita' (Play Integrity, Standard API). Qui e non nel modulo
+    // di :shared perche' il numero di progetto Cloud viene dal BuildConfig
+    // dell'app. Lo consuma IntegrityGuard, installato sul client HTTP.
+    single<IntegrityProvider> {
+        PlayIntegrityProvider(androidContext(), BuildConfig.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER)
+    }
 
     // Location
     single { LocationProvider(androidContext()) }

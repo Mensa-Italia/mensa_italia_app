@@ -25,6 +25,9 @@ enum NotificationTarget: Hashable {
     /// Il messaggio degli sviluppatori: nessuna pagina, rimostra la scheda.
     case developerMessage
     case accountConfirmation(exAppId: String, callbackUrl: String, notificationId: String?)
+    /// Esportazione una tantum di timbri o medaglie verso un'app esterna.
+    /// `scope` e' il valore `wire` di `DataExportScope` (`stamps` / `medals`).
+    case dataExportConfirmation(requestId: String, exAppId: String, scope: String, callbackUrl: String, notificationId: String?)
     /// Spotlight-only target: tap on a CoreSpotlight result for a member.
     /// Not produced by `NotificationRouter` (no `type=member` push exists);
     /// only by `SpotlightIndexer` via NSUserActivity continuation.
@@ -47,6 +50,14 @@ enum NotificationTarget: Hashable {
         case let t as NotificationTargetAccountConfirmation:
             self = .accountConfirmation(
                 exAppId: t.exAppId,
+                callbackUrl: t.callbackUrl,
+                notificationId: t.notificationId
+            )
+        case let t as NotificationTargetDataExportConfirmation:
+            self = .dataExportConfirmation(
+                requestId: t.requestId,
+                exAppId: t.exAppId,
+                scope: t.scope.wire,
                 callbackUrl: t.callbackUrl,
                 notificationId: t.notificationId
             )
@@ -127,11 +138,19 @@ func notificationBody(_ n: NotificationModel) -> String {
 enum NotificationsRoute: Hashable {
     case manager
     case target(NotificationTarget)
+    /// Il dettaglio di una notifica, per id: solo nell'elenco di un account sospeso.
+    case detail(String)
 }
 
 // MARK: - List
 
 struct NotificationsListView: View {
+    /// L'elenco visto da un account sospeso (`AccountSuspendedView`): niente
+    /// preferenze e nessuna navigazione verso le parti dell'app che il server
+    /// rifiuta a un bloccato. Le conferme di app esterne si aprono come sempre;
+    /// ogni altra notifica apre solo il suo dettaglio. Mirrors Android `restricted`.
+    var restricted: Bool = false
+
     @State private var vm = NotificationsListViewModel()
     @State private var route: NotificationsRoute?
     @State private var unsupportedAlert = false
@@ -246,13 +265,15 @@ struct NotificationsListView: View {
                     }
                     .disabled(vm.unreadCount == 0)
 
-                    Button {
-                        route = .manager
-                    } label: {
-                        Label(
-                            tr("notifications.actions.preferences", fallback: "Preferenze"),
-                            systemImage: "slider.horizontal.3"
-                        )
+                    if !restricted {
+                        Button {
+                            route = .manager
+                        } label: {
+                            Label(
+                                tr("notifications.actions.preferences", fallback: "Preferenze"),
+                                systemImage: "slider.horizontal.3"
+                            )
+                        }
                     }
                 } label: {
                     Label(tr("notifications.actions.more", fallback: "Altre azioni"), systemImage: "ellipsis.circle")
@@ -265,6 +286,10 @@ struct NotificationsListView: View {
                 NotificationManagerView()
             case .target(let t):
                 destinationView(for: t)
+            case .detail(let id):
+                if let n = vm.notifications.first(where: { $0.id == id }) {
+                    NotificationDetailView(notification: n, restricted: restricted)
+                }
             }
         }
         .alert(
@@ -292,13 +317,8 @@ struct NotificationsListView: View {
         case .quidArticle(let id):    QuidArticleView(articleId: Int64(id) ?? 0)
         case .quidPdf(let id):        QuidPDFDeepLinkLoader(recordId: Int64(id) ?? 0)
         case .localOffice(let slug):  LocalOfficeBySlugLoader(slug: slug)
-        case .accountConfirmation(let appId, let url, let nid):
-            AccountConfirmationSheet(
-                exAppId: appId,
-                callbackUrl: url,
-                notificationId: nid,
-                onDismiss: { route = nil }
-            )
+        case .accountConfirmation, .dataExportConfirmation:
+            ExAppConfirmationSheet(target: target, onDismiss: { route = nil })
         case .member(let id):         MemberDetailView(memberId: id)
         case .developerMessage:       EmptyView() // aperto da `openInPlace()`
         }
@@ -311,7 +331,15 @@ struct NotificationsListView: View {
         // 2) Mirror Flutter's `handleNotificationActions`: navigate directly to
         //    the referenced object. For unsupported / missing-data notifications,
         //    surface an inline alert instead of opening a detail screen.
-        if let target = notificationTarget(from: n) {
+        if restricted {
+            // Account sospeso: le conferme di app esterne si aprono, il resto
+            // mostra solo il dettaglio.
+            if let target = notificationTarget(from: n), target.isExAppConfirmation {
+                route = .target(target)
+            } else {
+                route = .detail(n.id)
+            }
+        } else if let target = notificationTarget(from: n) {
             if !target.openInPlace() { route = .target(target) }
         } else {
             unsupportedAlert = true

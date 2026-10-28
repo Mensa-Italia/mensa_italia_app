@@ -47,6 +47,10 @@ places = "4.4.1"
 # Accompanist
 accompanist = "0.36.0"
 
+# Play Integrity (Standard API): prova per-richiesta che il binario e' quello
+# ufficiale su un dispositivo genuino. Vedi PlayIntegrityProvider.
+play-integrity = "1.4.0"
+
 # Firebase
 firebase-bom-version = "33.7.0"
 google-services = "4.4.2"
@@ -157,6 +161,8 @@ places = { module = "com.google.android.libraries.places:places", version.ref = 
 
 # Accompanist
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+
+play-integrity = { module = "com.google.android.play:integrity", version.ref = "play-integrity" }
 
 # Firebase (BOM-driven)
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom-version" }

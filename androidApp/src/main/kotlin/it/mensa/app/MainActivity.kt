@@ -119,10 +119,10 @@ class MainActivity : ComponentActivity() {
             // `ensureRegistered`: quello esce subito se non c'e' un token push,
             // quindi chi ha negato le notifiche non riporterebbe mai niente.
             runCatching {
-                // `packageManager` e non `BuildConfig`: `buildConfig` non e'
-                // fra le buildFeatures, quindi quella classe non viene
-                // generata. E' anche il modo con cui la versione arriva gia'
-                // nella riga "Versione" del profilo.
+                // `packageManager` e non `BuildConfig`: quella classe esiste
+                // solo per il numero di progetto di Play Integrity, e la
+                // versione la si legge qui come gia' fa la riga "Versione"
+                // del profilo.
                 val version = packageManager
                     .getPackageInfo(packageName, 0).versionName.orEmpty()
                 koinAccess().metadata.syncAppVersion(
