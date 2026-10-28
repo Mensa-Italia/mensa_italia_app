@@ -1,7 +1,0 @@
-Tableport is on the Home screen: your stamp passport now sits above your tickets, opens like a book, and all your stamps scroll together.
-
-The medal cabinet: twenty-six medals to unlock with stamps, events and association life. Some are secret: you'll find them in the passport.
-
-The Home screen now shows today's member birthdays.
-
-Minor fixes: stamp QR codes and links open the app, startup is faster and works offline too, and notifications take you straight to the content.

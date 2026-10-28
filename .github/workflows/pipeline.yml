@@ -761,8 +761,11 @@ jobs:
                 # Connect rifiuta l'invio in revisione — v22.2.14 e v22.2.16
                 # si sono fermate li', con la build gia' caricata. Si scrivono
                 # a ogni rilascio in iosApp/release-notes/<lingua>/
-                # release_notes.txt, una cartella per lingua dello store (it,
-                # en-US). La cartella contiene solo quelle: deliver carica i
+                # release_notes.txt, una cartella per lingua dello store. Solo
+                # `it`, l'unica lingua dell'app: una cartella in piu' (c'era
+                # en-US) fa creare a deliver quella lingua sulla versione, e
+                # App Store Connect poi rifiuta l'invio perche' alla scheda
+                # inglese manca il Support URL (v22.2.18). deliver carica i
                 # file che trova e lascia com'e' il resto della scheda.
                 skip_metadata: false,
                 metadata_path: File.expand_path("../iosApp/release-notes", __dir__),

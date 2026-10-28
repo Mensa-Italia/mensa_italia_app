@@ -5,3 +5,5 @@ Il medagliere: ventisei medaglie da sbloccare con timbri, eventi e vita associat
 In Home trovi i compleanni dei soci di oggi.
 
 Risolti bug minori: i QR dei francobolli e i link aprono l'app, l'avvio è più veloce e funziona anche offline, le notifiche portano dritte al contenuto.
+
+Dopo aver aggiornato una lista trascinandola verso il basso, la ricerca non resta più sopra il titolo.
