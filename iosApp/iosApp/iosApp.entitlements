@@ -28,15 +28,14 @@
 		<string>webcredentials:auth.mensa.it</string>
 		<string>webcredentials:svc.mensa.it</string>
 	</array>
-	<!-- App Attest (DCAppAttestService): la prova di integrità per-richiesta che il
-	     server chiede agli utenti "attenzionati". `production` è il valore delle
-	     build distribuite (TestFlight, App Store). Per attestare da una build di
-	     sviluppo contro un server in modalità development basta metterlo a
-	     `development`: cambia l'aaguid dell'attestazione (`appattestdevelop`).
-	     Richiede la capability "App Attest" sull'App ID it.mensa.app nel portale
-	     Apple Developer. -->
-	<key>com.apple.developer.devicecheck.appattest-environment</key>
-	<string>production</string>
+	<!-- App Attest (DCAppAttestService) NON ha bisogno di entitlement qui: le build
+	     distribuite (TestFlight, App Store) usano sempre l'ambiente di produzione,
+	     qualunque cosa ci sia scritto ("Preparing to use the App Attest service").
+	     `com.apple.developer.devicecheck.appattest-environment` serve solo a usare
+	     la produzione da una build di sviluppo, e aggiungerlo obbliga a rigenerare
+	     il provisioning profile della CI con la capability App Attest: senza, la
+	     firma dell'archivio fallisce. Le build di sviluppo restano in sandbox, che
+	     va verificata con APP_ATTEST_ENVIRONMENT=development sul server. -->
 	<key>com.apple.developer.in-app-payments</key>
 	<array>
 		<string>merchant.it.mensa.app</string>
