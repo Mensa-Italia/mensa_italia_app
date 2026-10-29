@@ -76,6 +76,12 @@ targets:
         BGTaskSchedulerPermittedIdentifiers:
           - it.mensa.app.spotlight-refresh
         FirebaseAppDelegateProxyEnabled: false
+        # L'app usa solo la crittografia del sistema (HTTPS, App Attest): esente.
+        # Va dichiarata QUI e non solo nel file: `xcodegen generate` riscrive
+        # l'Info.plist da queste proprieta' e butta le chiavi che non ci sono, e
+        # senza questa ogni build arriva su App Store Connect come "Conformita'
+        # all'esportazione mancante" (v22.2.19 si fermo' cosi').
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
         CODE_SIGN_STYLE: Automatic
