@@ -7,3 +7,5 @@ In Home trovi i compleanni dei soci di oggi.
 Risolti bug minori: i QR dei francobolli e i link aprono l'app, l'avvio è più veloce e funziona anche offline, le notifiche portano dritte al contenuto.
 
 Dopo aver aggiornato una lista trascinandola verso il basso, la ricerca non resta più sopra il titolo.
+
+Su iPhone la verifica di sicurezza dell'app si ripristina da sola quando si blocca, e se non ci riesce il messaggio dice perché.
