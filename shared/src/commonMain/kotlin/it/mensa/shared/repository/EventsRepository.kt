@@ -244,7 +244,8 @@ class EventsRepository(
             positionJson = e.position?.let {
                 json.encodeToString(LocationModel.serializer(), it)
             },
-            updatedAt = Clock.System.now().toEpochMilliseconds()
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
+            localOffice = e.localOfficeId,
         )
     }
 

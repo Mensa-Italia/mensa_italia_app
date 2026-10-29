@@ -1,0 +1,4 @@
+-- Versione 2 -> 3: gruppo locale dell'evento. Serve a decidere se mostrare
+-- "Modifica": il server lo concede anche agli admin di quel gruppo. Le righe
+-- gia' in cache restano vuote fino al prossimo refresh della lista.
+ALTER TABLE Event ADD COLUMN localOffice TEXT NOT NULL DEFAULT '';

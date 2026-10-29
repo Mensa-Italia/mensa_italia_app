@@ -39,6 +39,7 @@ class DatabaseTest {
             bookingLink = "https://example.com/book",
             positionJson = """{"id":"loc1","name":"Rome","lat":41.9,"lon":12.5,"address":"Via Roma 1","state":"Lazio"}""",
             updatedAt = 1700000000000L,
+            localOffice = "lo1",
         )
 
         val event = queries.selectById("evt1").executeAsOneOrNull()
@@ -49,6 +50,7 @@ class DatabaseTest {
         assertEquals(1700000000000L, event.whenStart)
         assertEquals(1L, event.isNational)
         assertEquals(0L, event.isSpot)
+        assertEquals("lo1", event.localOffice)
 
         val all = queries.selectAll().executeAsList()
         assertEquals(1, all.size)

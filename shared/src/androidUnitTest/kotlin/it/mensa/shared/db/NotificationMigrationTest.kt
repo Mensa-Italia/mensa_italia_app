@@ -38,7 +38,8 @@ class NotificationMigrationTest {
             0,
         )
 
-        MensaDatabase.Schema.migrate(driver, 1, MensaDatabase.Schema.version).await()
+        // Solo 1 -> 2: le migrazioni successive toccano tabelle che qui non ci sono.
+        MensaDatabase.Schema.migrate(driver, 1, 2).await()
 
         val db = MensaDatabase(driver)
         val old = db.notificationQueries.selectById("n1").executeAsOneOrNull()

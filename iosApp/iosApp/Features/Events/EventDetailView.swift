@@ -58,18 +58,17 @@ struct EventDetailView: View {
     @State private var showBooking = false
     @State private var scrollOffset: CGFloat = 0
     @State private var showEdit = false
+    @State private var canEditEvent = false
 
-    /// Edit ha due path:
-    ///   1. Utente "super" / con power "events" / "events_helper" → autorizzato
-    ///      globalmente, deciso SINCRONO al primo frame, niente attesa di flow.
-    ///   2. Utente owner di QUESTO evento → richiede l'EventModel caricato.
-    private var canEditEvent: Bool {
+    /// "Modifica" segue la `updateRule` del server (owner, super, admin del
+    /// gruppo locale), regola in `EventPermissions`. Prima bastava il power
+    /// `events`/`events_helper` e il bottone compariva su qualsiasi evento,
+    /// anche dove il server poi rifiutava il salvataggio.
+    private func refreshCanEdit() async {
+        guard let event = vm.event else { canEditEvent = false; return }
         let user = koin.auth.currentUser.value as? UserModel
-        if hasPower("events", user: user) { return true }
-        if let u = user, let e = vm.event, !u.id.isEmpty, u.id == e.ownerId {
-            return true
-        }
-        return false
+        let allowed = (try? await koin.localOffices.canEditEvent(user: user, event: event))?.boolValue ?? false
+        canEditEvent = allowed
     }
 
     var body: some View {
@@ -95,9 +94,8 @@ struct EventDetailView: View {
                     Label(tr("app.share", fallback: "Condividi"), systemImage: "square.and.arrow.up")
                 }
             }
-            // Edit visibile dal primo frame se l'utente ha power events/super.
-            // Per gli owner di questo specifico evento il bottone compare
-            // appena `vm.event` arriva (necessario per matchare l'ownerId).
+            // Edit compare appena `vm.event` arriva: serve owner e gruppo
+            // locale dell'evento per sapere se il server accetterebbe.
             ToolbarItem(placement: .topBarTrailing) {
                 if canEditEvent {
                     Button { showEdit = true } label: {
@@ -108,6 +106,7 @@ struct EventDetailView: View {
             }
         }
         .task { vm.start(id: eventId) }
+        .task(id: vm.event) { await refreshCanEdit() }
         .onDisappear { vm.stop() }
         .sheet(isPresented: $showEdit) {
             if let e = vm.event {

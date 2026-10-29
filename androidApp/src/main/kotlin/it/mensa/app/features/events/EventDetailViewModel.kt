@@ -6,15 +6,19 @@ import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.EventScheduleModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import it.mensa.shared.auth.Powers
 
 data class EventDetailUiState(
     val event: EventModel? = null,
@@ -26,6 +30,7 @@ data class EventDetailUiState(
     val canEdit: Boolean = false,
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventDetailViewModel(private val eventId: String) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EventDetailUiState())
@@ -34,11 +39,12 @@ class EventDetailViewModel(private val eventId: String) : ViewModel() {
     private val eventsRepo get() = koinAccess().events
     private val schedulesRepo get() = koinAccess().eventSchedules
     private val auth get() = koinAccess().auth
+    private val localOffices get() = koinAccess().localOffices
 
     init {
         loadCached()
         observeSchedules()
-        observeUser()
+        observeCanEdit()
         refresh()
     }
 
@@ -58,12 +64,18 @@ class EventDetailViewModel(private val eventId: String) : ViewModel() {
             .launchIn(viewModelScope)
     }
 
-    private fun observeUser() {
-        auth.currentUser.onEach { user ->
-            val powers = user?.powers ?: emptyList()
-            val canEdit = Powers.canManageEvents(powers)
-            _uiState.update { it.copy(canEdit = canEdit) }
-        }.launchIn(viewModelScope)
+    /**
+     * "Modifica" segue la `updateRule` del server (owner, super, admin del
+     * gruppo locale): il power `events`/`events_helper` non basta, serve
+     * l'evento caricato.
+     */
+    private fun observeCanEdit() {
+        combine(auth.currentUser, _uiState.map { it.event }.distinctUntilChanged()) { user, event -> user to event }
+            .mapLatest { (user, event) ->
+                event != null && runCatching { localOffices.canEditEvent(user, event) }.getOrDefault(false)
+            }
+            .onEach { canEdit -> _uiState.update { it.copy(canEdit = canEdit) } }
+            .launchIn(viewModelScope)
     }
 
     fun refresh() {

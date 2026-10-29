@@ -53,7 +53,7 @@ class EventsRepositoryTest {
                 { "id": "e1", "name": "Evento 1", "description": "Desc 1",
                   "when_start": "2024-06-01T10:00:00Z", "when_end": "2024-06-02T18:00:00Z",
                   "owner": "u1", "is_national": true, "is_spot": false,
-                  "booking_link": "", "info_link": "" },
+                  "booking_link": "", "info_link": "", "local_office": "lo1" },
                 { "id": "e2", "name": "Evento 2", "description": "Desc 2",
                   "when_start": "2024-07-01T10:00:00Z", "when_end": "2024-07-01T18:00:00Z",
                   "owner": "u2", "is_national": false, "is_spot": true,
@@ -78,6 +78,9 @@ class EventsRepositoryTest {
         assertEquals("e1", items[1].id)
         assertEquals("Evento 1", items[1].name)
         assertEquals(true, items[1].isNational)
+        // Il gruppo locale passa dalla cache: decide chi vede "Modifica".
+        assertEquals("lo1", items[1].localOfficeId)
+        assertEquals("", items[0].localOfficeId)
     }
 
     @Test

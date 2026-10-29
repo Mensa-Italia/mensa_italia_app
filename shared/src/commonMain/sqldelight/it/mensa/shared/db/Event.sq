@@ -13,7 +13,8 @@ CREATE TABLE Event (
     isPublic INTEGER NOT NULL DEFAULT 0,
     bookingLink TEXT,
     positionJson TEXT,
-    updatedAt INTEGER NOT NULL
+    updatedAt INTEGER NOT NULL,
+    localOffice TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX event_whenStart ON Event(whenStart);
@@ -25,8 +26,8 @@ selectById:
 SELECT * FROM Event WHERE id = ?;
 
 insertOrReplace:
-INSERT OR REPLACE INTO Event(id, name, description, image, infoLink, contact, whenStart, whenEnd, owner, isNational, isSpot, isPublic, bookingLink, positionJson, updatedAt)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Event(id, name, description, image, infoLink, contact, whenStart, whenEnd, owner, isNational, isSpot, isPublic, bookingLink, positionJson, updatedAt, localOffice)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteById:
 DELETE FROM Event WHERE id = ?;

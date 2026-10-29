@@ -26,6 +26,7 @@ internal fun Event.toModel(json: Json): EventModel {
         isPublic = isPublic != 0L,
         bookingLink = bookingLink ?: "",
         positionId = location?.id,
+        localOfficeId = localOffice,
         expand = location?.let { EventExpand(position = it) },
     )
 }

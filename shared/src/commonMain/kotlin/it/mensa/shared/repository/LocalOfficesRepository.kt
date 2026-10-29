@@ -1,6 +1,7 @@
 package it.mensa.shared.repository
 
 import it.mensa.shared.api.endpoints.LocalOfficesApi
+import it.mensa.shared.auth.EventPermissions
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.LocalOfficeAdminModel
 import it.mensa.shared.model.LocalOfficeAssistantModel
@@ -10,6 +11,7 @@ import it.mensa.shared.model.LocalOfficeModel
 import it.mensa.shared.model.LocalOfficeTestDateModel
 import it.mensa.shared.model.LocalOfficeTestDateRecord
 import it.mensa.shared.model.SigModel
+import it.mensa.shared.model.UserModel
 import it.mensa.shared.net.ExternalUrl
 import kotlinx.serialization.json.JsonObject
 import kotlinx.coroutines.async
@@ -117,6 +119,22 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
     suspend fun refreshAdmins(officeId: String) {
         val items = api.adminsByOffice(officeId)
         _admins.value = _admins.value + (officeId to items)
+    }
+
+    /**
+     * [EventPermissions.canEdit] con gli admin del gruppo locale dell'evento,
+     * scaricati solo se servono (non owner, non super) e poi tenuti in cache.
+     * Senza rete vale la regola senza admin: meglio un bottone in meno che uno
+     * che il server rifiuta.
+     */
+    @Throws(Exception::class)
+    suspend fun canEditEvent(user: UserModel?, event: EventModel): Boolean {
+        if (EventPermissions.canEdit(user, event, officeAdminIds = emptyList())) return true
+        val officeId = event.localOfficeId.takeIf { it.isNotEmpty() } ?: return false
+        val admins = _admins.value[officeId]
+            ?: runCatching { refreshAdmins(officeId) }.map { _admins.value[officeId] }.getOrNull()
+            ?: return false
+        return EventPermissions.canEdit(user, event, admins.map { it.user })
     }
 
     fun observeAssistants(officeId: String): Flow<List<LocalOfficeAssistantModel>> =

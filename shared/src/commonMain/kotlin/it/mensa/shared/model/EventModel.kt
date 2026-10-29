@@ -38,6 +38,9 @@ data class EventModel(
     val ownerId: String = "",
     @SerialName("position")
     val positionId: String? = null,
+    /** Gruppo locale dell'evento: i suoi admin possono modificarlo (vedi `EventPermissions`). */
+    @SerialName("local_office")
+    val localOfficeId: String = "",
     val expand: EventExpand? = null,
 ) {
     val position: LocationModel? get() = expand?.position
