@@ -5,7 +5,9 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import it.mensa.shared.api.SkipAuthAttribute
+import it.mensa.shared.api.endpoints.LoginUnavailableException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -20,16 +22,30 @@ class OidcDiscoveryCache(private val client: HttpClient) {
     private val cache = mutableMapOf<String, OidcDiscovery>()
     private val mutex = Mutex()
 
+    /**
+     * Una risposta non 2xx o senza `token_endpoint` solleva
+     * [LoginUnavailableException] e non entra in cache: il client non usa
+     * `expectSuccess`, quindi senza il controllo un errore momentaneo
+     * dell'issuer diventava una discovery vuota, tenuta fino al riavvio, e ogni
+     * login successivo falliva.
+     */
     @Throws(Exception::class)
     suspend fun get(issuer: String): OidcDiscovery = mutex.withLock {
         cache[issuer]?.let { return@withLock it }
         val url = issuer.trimEnd('/') + "/.well-known/openid-configuration"
-        val discovery: OidcDiscovery = client.get(url) {
+        val response = client.get(url) {
             // Bypass the auth plugin: discovery is an unauthenticated request
             // against the issuer (auth.mensa.it), not against svc.mensa.it.
             attributes.put(SkipAuthAttribute, true)
             header(HttpHeaders.Authorization, null)
-        }.body()
+        }
+        if (!response.status.isSuccess()) {
+            throw LoginUnavailableException(response.status.value, "OIDC discovery for $issuer")
+        }
+        val discovery: OidcDiscovery = response.body()
+        if (discovery.token_endpoint.isBlank()) {
+            throw LoginUnavailableException(detail = "OIDC discovery for $issuer returned empty token_endpoint")
+        }
         cache[issuer] = discovery
         discovery
     }

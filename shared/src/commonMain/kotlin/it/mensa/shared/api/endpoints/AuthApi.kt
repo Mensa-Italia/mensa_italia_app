@@ -11,6 +11,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
+import io.ktor.http.isSuccess
 import it.mensa.shared.api.SkipAuthAttribute
 import it.mensa.shared.auth.oidc.OidcTokenResponse
 import it.mensa.shared.model.UserModel
@@ -36,10 +37,12 @@ class AuthApi(private val client: HttpClient) {
                 )
             )
         }
-        // Il client non usa `expectSuccess`: senza questo controllo il JSON
-        // d'errore del 401 veniva letto come una risposta di token vuota, e
-        // chi sbagliava password si vedeva "Empty access_token…".
+        // Il client non usa `expectSuccess`: senza questi controlli il JSON
+        // d'errore veniva letto come una risposta di token vuota, e chi
+        // sbagliava password (o trovava il server giu') si vedeva
+        // "Empty access_token…".
         if (response.status == HttpStatusCode.Unauthorized) throw InvalidCredentialsException()
+        if (!response.status.isSuccess()) throw LoginUnavailableException(response.status.value)
         return response.body()
     }
 
@@ -71,3 +74,23 @@ class AuthApi(private val client: HttpClient) {
 
 /** `/auth-with-zitadel` ha rifiutato email e password (401). */
 class InvalidCredentialsException : Exception("Email o password non corrette")
+
+/**
+ * Il login non si puo' completare per un motivo che non dipende dalla password:
+ * troppi tentativi (429), area soci o Zitadel irraggiungibili (5xx), oppure una
+ * risposta riuscita ma inservibile (senza token o senza record utente).
+ *
+ * Il messaggio e' gia' quello da mostrare, come per [InvalidCredentialsException];
+ * cosa mancava di preciso sta in [detail], per i log.
+ */
+class LoginUnavailableException(
+    /** Lo stato HTTP; null se il server ha risposto 2xx senza i dati del login. */
+    val status: Int? = null,
+    val detail: String? = null,
+) : Exception(
+    when (status) {
+        HttpStatusCode.TooManyRequests.value -> "Troppi tentativi di accesso. Riprova fra qualche minuto."
+        null -> "Accesso non disponibile in questo momento. Riprova fra poco."
+        else -> "Accesso non disponibile in questo momento (HTTP $status). Riprova fra poco."
+    },
+)

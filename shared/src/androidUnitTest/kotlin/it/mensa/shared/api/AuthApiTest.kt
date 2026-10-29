@@ -11,11 +11,13 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import it.mensa.shared.api.endpoints.AuthApi
 import it.mensa.shared.api.endpoints.InvalidCredentialsException
+import it.mensa.shared.api.endpoints.LoginUnavailableException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class AuthApiTest {
 
@@ -30,6 +32,18 @@ class AuthApiTest {
     fun wrongPasswordIsInvalidCredentials() = runTest {
         val api = api(HttpStatusCode.Unauthorized, """{"status":401,"message":"Invalid credentials","data":{}}""")
         assertFailsWith<InvalidCredentialsException> { api.loginWithZitadel("socio@example.org", "sbagliata") }
+    }
+
+    /** Server giu' o troppi tentativi: un errore con lo stato, non un token vuoto. */
+    @Test
+    fun otherErrorsAreLoginUnavailable() = runTest {
+        for (status in listOf(HttpStatusCode.TooManyRequests, HttpStatusCode.InternalServerError, HttpStatusCode.ServiceUnavailable)) {
+            val api = api(status, """{"status":${status.value},"message":"Unable to connect to area32","data":{}}""")
+            val e = assertFailsWith<LoginUnavailableException> { api.loginWithZitadel("socio@example.org", "giusta") }
+            assertEquals(status.value, e.status)
+            val expected = if (status == HttpStatusCode.TooManyRequests) "Troppi tentativi" else "(HTTP ${status.value})"
+            assertTrue(e.message.orEmpty().contains(expected), e.message)
+        }
     }
 
     @Test

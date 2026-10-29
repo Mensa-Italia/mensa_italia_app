@@ -119,11 +119,8 @@ class RootViewModel(
         if (auth.authState.value !is AuthState.Authenticated) {
             LaunchHarness.autologin?.let { (email, password) ->
                 Logger.i("RootVM", "harness", "auto-login for $email")
-                val result = runCatching { auth.login(email, password) }
-                    .getOrElse { Result.failure(it) }
-                if (result.isFailure) {
-                    Logger.w("RootVM", "harness", "auto-login failed", result.exceptionOrNull())
-                }
+                runCatching { auth.login(email, password) }
+                    .onFailure { Logger.w("RootVM", "harness", "auto-login failed", it) }
             }
         }
 

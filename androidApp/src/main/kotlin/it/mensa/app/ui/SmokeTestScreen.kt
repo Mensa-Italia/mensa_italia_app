@@ -42,7 +42,8 @@ fun SmokeTestScreen(
             when (val s = authState) {
                 AuthState.Unknown -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 AuthState.Anonymous -> LoginForm(onLogin = { email, pwd ->
-                    scope.launch { auth.login(email, pwd) }
+                    // Un login fallito lascia il form com'e': niente da mostrare qui.
+                    scope.launch { runCatching { auth.login(email, pwd) } }
                 })
                 is AuthState.Authenticated -> AuthedView(eventsRepo, notifRepo, searchRepo, onLogout = {
                     scope.launch { auth.logout() }

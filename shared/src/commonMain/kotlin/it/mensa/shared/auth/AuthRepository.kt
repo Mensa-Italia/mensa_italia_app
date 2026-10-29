@@ -5,6 +5,7 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
 import it.mensa.shared.api.endpoints.AuthApi
 import it.mensa.shared.api.endpoints.InvalidCredentialsException
+import it.mensa.shared.api.endpoints.LoginUnavailableException
 import it.mensa.shared.auth.oidc.JwtDecoder
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
 import it.mensa.shared.auth.oidc.OidcSession
@@ -184,7 +185,7 @@ class AuthRepository(
                 ?.takeIf { it.isNotBlank() }
             ?: return MembershipRecheck.UNREACHABLE
         val user = try {
-            login(email, password).getOrThrow()
+            login(email, password)
         } catch (_: InvalidCredentialsException) {
             return MembershipRecheck.WRONG_PASSWORD
         } catch (e: CancellationException) {
@@ -536,19 +537,31 @@ class AuthRepository(
         _syncedAt.value = null
     }
 
+    /**
+     * Accesso con email e password. Un fallimento si lancia, non si ritorna:
+     * [InvalidCredentialsException] per la password sbagliata,
+     * [it.mensa.shared.api.endpoints.LoginUnavailableException] per il server
+     * che non risponde come deve, gli errori di rete cosi' come arrivano.
+     *
+     * Non un `Result`: attraverso il bridge di Kotlin/Native un `Result` arriva
+     * a Swift come un `id` qualunque, il `try await` non lancia mai e il
+     * `catch` della schermata di login non scattava (password sbagliata,
+     * nessun messaggio). Stesso motivo per cui [it.mensa.shared.auth.passkey.PasskeyRepository]
+     * ritorna uno stato e non un `Result`.
+     */
     @Throws(Exception::class)
-    suspend fun login(email: String, password: String): Result<UserModel> = runCatching {
+    suspend fun login(email: String, password: String): UserModel {
         // Un login esplicito vince sulla verifica di un avvio dalla cache.
         revalidation?.cancel()
-        adoptTokens(
+        val user = adoptTokens(
             tokens = api.loginWithZitadel(email, password),
             method = LoginMethod.PASSWORD,
             source = "/auth-with-zitadel",
-        ).also {
-            // Da qui in poi l'app sa rifare questo stesso login da sola.
-            // Vedi [CredentialStore] per dove finiscono e perche'.
-            runCatching { credentials.save(email, password) }
-        }
+        )
+        // Da qui in poi l'app sa rifare questo stesso login da sola.
+        // Vedi [CredentialStore] per dove finiscono e perche'.
+        runCatching { credentials.save(email, password) }
+        return user
     }
 
     /**
@@ -568,8 +581,16 @@ class AuthRepository(
         method: LoginMethod?,
         source: String,
     ): UserModel {
-        require(tokens.access_token.isNotBlank()) { "Empty access_token in $source response" }
-        require(!tokens.refresh_token.isNullOrBlank()) { "Empty refresh_token in $source response" }
+        // Una risposta riuscita ma incompleta e' un accesso non disponibile, non
+        // un errore da sviluppatori sulla schermata di login. Entrambi gli
+        // endpoint di login allegano il record utente ai token OIDC (solo la
+        // risposta di refresh lo omette, gestito in init); il server lo omette
+        // se l'area soci non risponde al primo accesso di un socio. Tutto si
+        // controlla prima di toccare lo stato: una risposta incompleta non deve
+        // lasciare l'app "autenticata" con un errore che nessuno vede.
+        if (tokens.access_token.isBlank()) throw LoginUnavailableException(detail = "Empty access_token in $source response")
+        if (tokens.refresh_token.isNullOrBlank()) throw LoginUnavailableException(detail = "Empty refresh_token in $source response")
+        val user = tokens.record ?: throw LoginUnavailableException(detail = "$source response missing user record")
 
         val session = buildSession(tokens)
         persist(session)
@@ -578,9 +599,6 @@ class AuthRepository(
         AccountStatus.clear()
         _authState.value = AuthState.Authenticated(session.accessToken)
 
-        // Entrambi gli endpoint di login allegano il record utente ai token OIDC;
-        // solo la risposta di refresh lo omette (gestito in init).
-        val user = requireNotNull(tokens.record) { "$source response missing user record" }
         storeServerUser(user)
         // Il record vero e' gia' su DB: da qui in poi si espone solo cio' che
         // la UI deve mostrare, che in modalita' screenshot e' un segnaposto.
@@ -649,11 +667,11 @@ class AuthRepository(
     private suspend fun buildSession(tokens: OidcTokenResponse): OidcSession {
         val payload: JsonObject = JwtDecoder.payload(tokens.access_token)
         val issuer = JwtDecoder.string(payload, "iss")
-            ?: error("access_token missing iss claim")
+            ?: throw LoginUnavailableException(detail = "access_token missing iss claim")
         val clientId = JwtDecoder.string(payload, "client_id")
-            ?: error("access_token missing client_id claim")
+            ?: throw LoginUnavailableException(detail = "access_token missing client_id claim")
+        // Una discovery inservibile la solleva gia' [OidcDiscoveryCache.get].
         val discovered = discovery.get(issuer)
-        require(discovered.token_endpoint.isNotBlank()) { "OIDC discovery for $issuer returned empty token_endpoint" }
 
         return OidcSession(
             accessToken = tokens.access_token,

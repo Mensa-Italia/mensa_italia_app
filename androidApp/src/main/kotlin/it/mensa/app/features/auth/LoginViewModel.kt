@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.api.endpoints.LoginUnavailableException
 import it.mensa.shared.auth.passkey.PasskeyLoginStatus
 import it.mensa.shared.auth.passkey.PasskeyStartStatus
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,36 +56,30 @@ class LoginViewModel : ViewModel() {
 
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true, error = null, passkeyNotice = null) }
-            val result = runCatching {
+            try {
                 auth.login(state.email.trim(), state.password)
+                Logger.i("LoginVM", "login", "successful")
+                // Auth state flow in RootViewModel will trigger phase → Main/Onboarding.
+                // Il ViewModel vive quanto l'Activity: senza questo, dopo un logout
+                // la schermata di accesso ricompariva con lo spinner ancora acceso
+                // e la password di prima nel campo.
+                _uiState.update { it.copy(loading = false, password = "") }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (err: Throwable) {
+                onLoginFailed(err)
             }
-            result.fold(
-                onSuccess = { loginResult ->
-                    loginResult.fold(
-                        onSuccess = {
-                            Logger.i("LoginVM", "login", "successful")
-                            // Auth state flow in RootViewModel will trigger phase → Main/Onboarding
-                        },
-                        onFailure = { err ->
-                            Logger.e("LoginVM", "login", "failed: ${err.message}")
-                            _uiState.update {
-                                it.copy(
-                                    loading = false,
-                                    error = err.userMessage,
-                                )
-                            }
-                        },
-                    )
-                },
-                onFailure = { err ->
-                    Logger.e("LoginVM", "login", "exception: ${err.message}")
-                    _uiState.update {
-                        it.copy(
-                            loading = false,
-                            error = err.userMessage,
-                        )
-                    }
-                },
+        }
+    }
+
+    private fun onLoginFailed(err: Throwable) {
+        // Il messaggio e' per l'utente; cosa mancava nella risposta sta in `detail`.
+        val detail = (err as? LoginUnavailableException)?.detail?.let { " [$it]" }.orEmpty()
+        Logger.e("LoginVM", "login", "failed: ${err.message}$detail")
+        _uiState.update {
+            it.copy(
+                loading = false,
+                error = err.userMessage,
             )
         }
     }

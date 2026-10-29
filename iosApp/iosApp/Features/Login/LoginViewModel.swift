@@ -42,9 +42,6 @@ final class LoginViewModel {
         _ = await login()
     }
 
-    /// Returns true on success. On failure sets `error`.
-    /// AuthRepository.login(email:password:) returns Result<UserModel> in Kotlin.
-    /// In Swift/ObjC bridging it throws on failure and returns UserModel on success.
     /// Accesso con passkey. Ritorna true solo in caso di successo.
     ///
     /// Ogni esito negativo riporta l'utente alla password senza errori rossi:
@@ -150,6 +147,12 @@ final class LoginViewModel {
         )
     }
 
+    /// Accesso con password. Ritorna true se riesce; altrimenti mette in `error`
+    /// il messaggio da mostrare.
+    ///
+    /// `AuthRepository.login` lancia: e' questo che fa arrivare il fallimento al
+    /// `catch`. Finche' tornava un `Result` Kotlin, Swift riceveva un oggetto
+    /// opaco anche per la password sbagliata e la schermata non diceva niente.
     func login() async -> Bool {
         guard !email.isEmpty, !password.isEmpty else { return false }
         loading = true
@@ -162,7 +165,9 @@ final class LoginViewModel {
             Log.auth.info("Login successful")
             return true
         } catch {
-            Log.auth.error("Login failed: \(error.localizedDescription)")
+            // Il messaggio è per l'utente; cosa mancava nella risposta sta in `detail`.
+            let detail = ((error as NSError).userInfo["KotlinException"] as? LoginUnavailableException)?.detail
+            Log.auth.error("Login failed: \(error.localizedDescription)\(detail.map { " [\($0)]" } ?? "")")
             self.error = error.userMessage
             return false
         }
