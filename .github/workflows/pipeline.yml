@@ -744,6 +744,29 @@ jobs:
                 skip_submission: true,
                 changelog: "Build automatica #{ENV['VERSION']} (production)"
               )
+              # Una versione ancora in revisione (o respinta con l'invio aperto)
+              # blocca quella nuova, e `reject_if_possible` di deliver non basta:
+              # deliver rinomina la versione modificabile PRIMA di guardare
+              # l'invio in corso (in fastlane 2.232 verify_version precede
+              # reject_version_if_possible) e poi rifiuta comunque di inviare,
+              # "A review submission is already in progress". La versione nuova
+              # sostituisce quella in coda (v22.2.21 sulla 22.2.20): l'invio si
+              # annulla qui, prima di deliver, e si aspetta che Apple lo chiuda.
+              asc_platform = Spaceship::ConnectAPI::Platform::IOS
+              app = Spaceship::ConnectAPI::App.find(FastlaneCore::IpaFileAnalyser.fetch_app_identifier(ENV['IPA_PATH']))
+              submission = app.get_in_progress_review_submission(platform: asc_platform)
+              if submission
+                UI.important("Invio in revisione aperto (#{submission.state}): lo annullo, la #{ENV['VERSION']} lo sostituisce")
+                submission.cancel_submission
+                40.times do
+                  break if app.get_in_progress_review_submission(platform: asc_platform).nil?
+                  UI.message("Aspetto che Apple chiuda l'invio annullato...")
+                  sleep(15)
+                end
+                if app.get_in_progress_review_submission(platform: asc_platform)
+                  UI.user_error!("L'invio precedente e' ancora aperto dopo 10 minuti")
+                end
+              end
               deliver(
                 # Il binario l'ha gia' caricato `upload_to_testflight` qui
                 # sopra. Senza questo, `deliver` prova a ricaricare lo stesso
