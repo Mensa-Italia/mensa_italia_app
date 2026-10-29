@@ -48,9 +48,7 @@ class DealsRepository(
     @Throws(Exception::class)
     suspend fun getById(id: String): DealModel? {
         db.dealQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
-        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
-        // si decodifica comunque in un modello vuoto, con tutti i default.
-        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        val remote = runCatching { api.get(id) }.getOrNull() ?: return null
         insertRow(remote)
         return remote
     }
@@ -135,10 +133,15 @@ class DealsRepository(
     @Throws(Exception::class)
     suspend fun create(draft: DealDraft, contact: ContactDraft?): DealModel {
         val created = api.createDeal(draft.toBody())
-        if (contact != null) {
-            api.createContact(contact.toBody(dealId = created.id))
+        try {
+            if (contact != null) {
+                api.createContact(contact.toBody(dealId = created.id))
+            }
+        } finally {
+            // Anche col contatto rifiutato la convenzione esiste gia': deve
+            // comparire in lista, o chi riprova la crea una seconda volta.
+            runCatching { refresh() }
         }
-        runCatching { refresh() }
         return created
     }
 
@@ -150,14 +153,18 @@ class DealsRepository(
     @Throws(Exception::class)
     suspend fun update(id: String, draft: DealDraft, contact: ContactDraft?): DealModel {
         val updated = api.updateDeal(id, draft.toBody())
-        if (contact != null) {
-            if (contact.id.isNullOrEmpty()) {
-                api.createContact(contact.toBody(dealId = updated.id))
-            } else {
-                api.updateContact(contact.id, contact.toBody(dealId = updated.id))
+        try {
+            if (contact != null) {
+                if (contact.id.isNullOrEmpty()) {
+                    api.createContact(contact.toBody(dealId = updated.id))
+                } else {
+                    api.updateContact(contact.id, contact.toBody(dealId = updated.id))
+                }
             }
+        } finally {
+            // La convenzione e' gia' aggiornata anche se il contatto no.
+            runCatching { refresh() }
         }
-        runCatching { refresh() }
         return updated
     }
 

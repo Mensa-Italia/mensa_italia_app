@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestData
@@ -54,6 +55,8 @@ class ExAppsApiTest {
                 else -> respond("{}", HttpStatusCode.OK, jsonHeaders)
             }
         }) {
+            // Come il client di produzione (`mensaDefaults`).
+            expectSuccess = true
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
             defaultRequest {
                 url(ApiConfig.BASE_URL)
@@ -142,6 +145,8 @@ class ExAppsApiTest {
             if (request.url.host == "bot.example.org") throw RuntimeException("connection refused")
             respond("""{"status":"approved"}""", HttpStatusCode.OK, jsonHeaders)
         }) {
+            // Come il client di produzione (`mensaDefaults`).
+            expectSuccess = true
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
             defaultRequest { url(ApiConfig.BASE_URL) }
         }
@@ -175,12 +180,18 @@ class ExAppsApiTest {
                 else -> respond("{}", HttpStatusCode.OK, jsonHeaders)
             }
         }) {
+            // Come il client di produzione (`mensaDefaults`).
+            expectSuccess = true
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
             defaultRequest { url(ApiConfig.BASE_URL) }
         }
         IntegrityGuard(client, UnsupportedIntegrityProvider(), { "user-1" }).install()
 
-        ExAppsApi(PocketBaseClient(client), client).postCallback(callbackUrl, true, "req1")
+        // Il 428 di un terzo non e' una sfida nostra: arriva a chi chiama come
+        // un rifiuto qualunque.
+        assertFailsWith<ClientRequestException> {
+            ExAppsApi(PocketBaseClient(client), client).postCallback(callbackUrl, true, "req1")
+        }
 
         val sent = rec.requests.single()
         assertEquals("bot.example.org", sent.url.host)

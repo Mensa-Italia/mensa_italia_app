@@ -142,8 +142,8 @@ class TranslationLoader(
 
     /**
      * GET the catalog with the auth header suppressed (third-party CDN must
-     * never see the user's Bearer token) and the HTTP status validated —
-     * without `expectSuccess`, a CDN error page would reach [parse] as XML.
+     * never see the user's Bearer token). A non-2xx (a CDN error page) is an
+     * exception from the client, so it never reaches [parse] as XML.
      * The Tolgee CDN occasionally serves a 403 on origin pulls and caches it
      * for ~5s, so retry with a backoff whose last attempt lands past that TTL.
      */
@@ -152,9 +152,7 @@ class TranslationLoader(
         for (delayMs in listOf(0L, 2_000L, 6_000L)) {
             if (delayMs > 0) delay(delayMs)
             try {
-                val response = client.get(url) { attributes.put(SkipAuthAttribute, true) }
-                if (response.status.value in 200..299) return response.body()
-                lastError = IllegalStateException("HTTP ${response.status.value} fetching $url")
+                return client.get(url) { attributes.put(SkipAuthAttribute, true) }.body()
             } catch (t: Throwable) {
                 lastError = t
             }

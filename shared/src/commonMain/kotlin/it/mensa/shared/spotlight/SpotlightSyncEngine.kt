@@ -4,9 +4,6 @@ import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.RegSociModel
 import it.mensa.shared.repository.RegSociRepository
@@ -214,10 +211,7 @@ class SpotlightSyncEngine(
         // tutto, questa sarebbe la prima chiamata a rompersi in silenzio: il
         // `runCatching` qui sotto inghiotte l'errore e i soci finiscono
         // nell'indice Spotlight senza foto, senza una riga di log.
-        return runCatching {
-            val resp: HttpResponse = httpClient.get(url)
-            if (resp.status == HttpStatusCode.OK || resp.status.isSuccess()) resp.body<ByteArray>() else null
-        }.getOrNull()
+        return runCatching { httpClient.get(url).body<ByteArray>() }.getOrNull()
     }
 
     private fun decide(

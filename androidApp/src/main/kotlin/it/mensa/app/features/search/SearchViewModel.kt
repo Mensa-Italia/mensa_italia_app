@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.Logger
 import it.mensa.app.support.koinAccess
+import it.mensa.app.support.userMessage
 import it.mensa.shared.model.AddonModel
 import it.mensa.shared.model.DealModel
 import it.mensa.shared.model.DocumentModel
@@ -239,7 +240,7 @@ class SearchViewModel(private val context: Context) : ViewModel() {
                     is SearchRepository.State.Error -> {
                         Logger.e("SearchViewModel", "search error: ${state.cause.message}")
                         _uiState.update {
-                            it.copy(phase = SearchPhase.Error(state.cause.message ?: "Errore"))
+                            it.copy(phase = SearchPhase.Error(state.cause.userMessage))
                         }
                     }
                 }

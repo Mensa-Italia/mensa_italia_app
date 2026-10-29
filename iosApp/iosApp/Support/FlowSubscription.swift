@@ -22,12 +22,7 @@ func subscribeFlow<T: AnyObject>(
             }
         },
         onError: { throwable in
-            let err = NSError(
-                domain: "KotlinThrowable",
-                code: 0,
-                userInfo: [NSLocalizedDescriptionKey: throwable.message ?? "unknown Kotlin error"]
-            )
-            onError(err)
+            onError(NSError.kotlin(throwable))
         }
     )
 }
@@ -50,12 +45,7 @@ func subscribeOptionalFlow<T: AnyObject>(
             onEach(value as? T)
         },
         onError: { throwable in
-            let err = NSError(
-                domain: "KotlinThrowable",
-                code: 0,
-                userInfo: [NSLocalizedDescriptionKey: throwable.message ?? "unknown Kotlin error"]
-            )
-            onError(err)
+            onError(NSError.kotlin(throwable))
         }
     )
 }

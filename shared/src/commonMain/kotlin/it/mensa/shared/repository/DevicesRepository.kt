@@ -148,7 +148,8 @@ class DevicesRepository(
     private suspend fun evictOtherUsers(userId: String, token: String) {
         api.findAnyUserByFirebaseId(token).items
             .filter { it.user != userId && it.firebaseId == token }
-            .forEach { api.deleteByToken(it.id, token) }
+            // Una per una: una riga gia' tolta (404) non deve fermare le altre.
+            .forEach { runCatching { api.deleteByToken(it.id, token) } }
     }
 
     @Throws(Exception::class)

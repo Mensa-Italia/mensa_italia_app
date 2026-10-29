@@ -105,6 +105,7 @@ fun AccountConfirmationSheet(
     fun answer(accepted: Boolean) {
         if (submitting) return
         submitting = true
+        errorMessage = null
         scope.launch {
             runCatching {
                 when (request) {
@@ -148,6 +149,7 @@ fun AccountConfirmationSheet(
             exApp != null -> ApprovalContent(
                 app = exApp!!,
                 submitting = submitting,
+                error = errorMessage,
                 request = request,
                 onApprove = { answer(true) },
                 onDeny = { answer(false) },
@@ -169,6 +171,7 @@ private fun ApprovalContent(
     app: ExAppModel,
     request: AccountConfirmationController.Request,
     submitting: Boolean,
+    error: String?,
     onApprove: () -> Unit,
     onDeny: () -> Unit,
 ) {
@@ -224,6 +227,17 @@ private fun ApprovalContent(
                 textAlign = TextAlign.Center,
             )
             is AccountConfirmationController.Request.DataExport -> DataExportBody(app, request)
+        }
+
+        // Una risposta non andata a buon fine: si resta qui, con i pulsanti per
+        // riprovare. Prima l'errore finiva in uno stato che questa vista non mostra.
+        if (error != null) {
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center,
+            )
         }
 
         Column(

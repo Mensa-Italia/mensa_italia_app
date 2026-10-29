@@ -4,13 +4,13 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.serialization.kotlinx.json.json
 import it.mensa.shared.api.endpoints.AuthApi
+import it.mensa.shared.api.installMensaInterceptors
+import it.mensa.shared.api.mensaDefaults
 import it.mensa.shared.api.endpoints.InvalidCredentialsException
 import it.mensa.shared.api.endpoints.LoginUnavailableException
 import it.mensa.shared.auth.oidc.OidcDiscovery
@@ -87,9 +87,7 @@ class AuthRepositoryLoginTest {
             } else {
                 respond(body, status, jsonHeaders)
             }
-        }) {
-            install(ContentNegotiation) { json(json) }
-        }
+        }) { mensaDefaults() }.apply { installMensaInterceptors() }
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         MensaDatabase.Schema.create(driver).await()
         val cache = OidcDiscoveryCache(client).apply {

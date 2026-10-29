@@ -68,9 +68,7 @@ class DocumentsRepository(
     @Throws(Exception::class)
     suspend fun getById(id: String): DocumentModel? {
         db.documentQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel() }
-        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
-        // si decodifica comunque in un modello vuoto, con tutti i default.
-        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        val remote = runCatching { api.get(id) }.getOrNull() ?: return null
         db.documentQueries.insertOrReplace(
             id = remote.id,
             name = remote.name,

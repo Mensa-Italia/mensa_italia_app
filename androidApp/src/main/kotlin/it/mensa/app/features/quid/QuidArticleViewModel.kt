@@ -7,6 +7,7 @@ import it.mensa.app.support.koinAccess
 import it.mensa.shared.model.QuidArticle
 import it.mensa.shared.model.QuidArticleAudio
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,14 +43,18 @@ class QuidArticleViewModel(private val articleId: Long) : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(loading = true, error = null) }
             try {
-                // Fetch article + audio concurrently
-                val articleDeferred = async { repo.getArticle(articleId) }
-                val audioDeferred = async {
-                    try { repo.getAudioForArticle(articleId) } catch (_: Exception) { null }
+                // Fetch article + audio concurrently. Dentro `coroutineScope`, un
+                // errore dell'articolo arriva al catch qui sotto: con gli async
+                // figli diretti del launch lo stesso errore cancellava anche il
+                // launch, finiva al gestore delle eccezioni non catturate e l'app
+                // si chiudeva (offline, o con un post rimosso).
+                val (article, audio) = coroutineScope {
+                    val articleDeferred = async { repo.getArticle(articleId) }
+                    val audioDeferred = async {
+                        try { repo.getAudioForArticle(articleId) } catch (_: Exception) { null }
+                    }
+                    articleDeferred.await() to audioDeferred.await()
                 }
-
-                val article = articleDeferred.await()
-                val audio = audioDeferred.await()
 
                 _state.update {
                     it.copy(

@@ -2,6 +2,7 @@ package it.mensa.shared.auth.oidc
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
@@ -24,10 +25,8 @@ class OidcDiscoveryCache(private val client: HttpClient) {
 
     /**
      * Una risposta non 2xx o senza `token_endpoint` solleva
-     * [LoginUnavailableException] e non entra in cache: il client non usa
-     * `expectSuccess`, quindi senza il controllo un errore momentaneo
-     * dell'issuer diventava una discovery vuota, tenuta fino al riavvio, e ogni
-     * login successivo falliva.
+     * [LoginUnavailableException] e non entra in cache: un errore momentaneo
+     * dell'issuer, tenuto fino al riavvio, faceva fallire ogni login successivo.
      */
     @Throws(Exception::class)
     suspend fun get(issuer: String): OidcDiscovery = mutex.withLock {
@@ -38,6 +37,8 @@ class OidcDiscoveryCache(private val client: HttpClient) {
             // against the issuer (auth.mensa.it), not against svc.mensa.it.
             attributes.put(SkipAuthAttribute, true)
             header(HttpHeaders.Authorization, null)
+            // Lo stato lo traduce qui sotto, nell'errore che il login sa mostrare.
+            expectSuccess = false
         }
         if (!response.status.isSuccess()) {
             throw LoginUnavailableException(response.status.value, "OIDC discovery for $issuer")

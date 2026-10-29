@@ -10,6 +10,7 @@ import it.mensa.shared.auth.oidc.JwtDecoder
 import it.mensa.shared.auth.oidc.OidcDiscoveryCache
 import it.mensa.shared.auth.oidc.OidcSession
 import it.mensa.shared.auth.oidc.OidcTokenResponse
+import it.mensa.shared.auth.oidc.SessionLostException
 import it.mensa.shared.auth.oidc.TokenRefresher
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.di.wipeAllUserData
@@ -197,11 +198,45 @@ class AuthRepository(
     }
 
     init {
-        tokenRefresher.onSessionLost = {
-            AuthHolder.session = null
-            AccountStatus.clear()
-            _authState.value = AuthState.Anonymous
-            _currentUser.value = null
+        tokenRefresher.onSessionLost = { recoverLostSession() }
+    }
+
+    /**
+     * Il refresh_token non vale piu' ([TokenRefresher] lo chiama sotto il suo
+     * lock). Non vuol dire che la password sia sbagliata: con le credenziali
+     * salvate si rifa' il login, come a ogni avvio, e la sessione nuova
+     * sostituisce quella persa senza che l'utente se ne accorga. Login e
+     * discovery viaggiano con [it.mensa.shared.api.SkipAuthAttribute], quindi
+     * non rientrano nel rinnovo.
+     *
+     * Altrimenti si esce, dati locali compresi, perche' chi accede dopo su
+     * questo telefono puo' essere un altro socio (prima si tornava al login
+     * lasciando nel database ricevute, biglietti e cache dell'utente uscito).
+     * Le credenziali si cancellano solo se non c'erano o se il server le ha
+     * rifiutate: un login fallito per la rete o per l'area soci giu' non dice
+     * niente sulla password, e il prossimo avvio ci riprova.
+     */
+    private suspend fun recoverLostSession(): OidcSession? {
+        val stored = runCatching { credentials.read() }.getOrNull()
+        if (stored == null) {
+            wipeAndGoAnonymous()
+            return null
+        }
+        return try {
+            adoptTokens(
+                tokens = api.loginWithZitadel(stored.email, stored.password),
+                method = null,
+                source = "/auth-with-zitadel (session lost)",
+            )
+            AuthHolder.session
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: InvalidCredentialsException) {
+            wipeAndGoAnonymous()
+            null
+        } catch (_: Throwable) {
+            wipeAndGoAnonymous(keepCredentials = true)
+            null
         }
     }
 
@@ -322,18 +357,13 @@ class AuthRepository(
         val sessionAfterMaybeRefresh: OidcSession = if (AuthHolder.isExpiringSoon()) {
             try {
                 tokenRefresher.refresh()
-            } catch (e: ResponseException) {
-                if (e.isAuthRejected() || e.response.status == HttpStatusCode.BadRequest) {
-                    // 400 invalid_grant / 401 / 403 from the auth server →
-                    // the refresh_token is dead. Session is irrecoverable.
-                    wipeAndGoAnonymous()
-                    return
-                }
-                // 5xx or other oddity: auth server hiccup, not our fault.
-                // Keep the stale session and let /api/cs/me drive the retry.
-                stored
+            } catch (_: SessionLostException) {
+                // The refresh_token is dead, and TokenRefresher already closed
+                // the session.
+                return
             } catch (_: Throwable) {
-                // Offline / transport: keep the cached session.
+                // 5xx from the auth server, offline: keep the stale session and
+                // let /api/cs/me drive the retry.
                 stored
             }
         } else stored
@@ -357,9 +387,11 @@ class AuthRepository(
         }
         _currentUser.value = DemoIdentity.redact(cachedUser)
         when (val outcome = fetchMeOrWipe()) {
-            is MeOutcome.Ok -> {
-                storeServerUser(outcome.user)
-                _currentUser.value = DemoIdentity.redact(outcome.user)
+            // Stessa regola di [refreshCurrentUser]: un record senza id non
+            // sostituisce quello in cache.
+            is MeOutcome.Ok -> outcome.user.takeIfUsable()?.let { user ->
+                storeServerUser(user)
+                _currentUser.value = DemoIdentity.redact(user)
             }
             MeOutcome.Offline -> Unit   // keep cached UI, will retry next init/login
             MeOutcome.Wiped -> Unit     // wipeAndGoAnonymous already nuked state
@@ -471,9 +503,10 @@ class AuthRepository(
      *      - retry 200          → use it
      *      - retry 401/403      → wipe (account is dead)
      *      - retry anything else→ Offline (don't punish for a hiccup)
-     *      - forceRefresh dies on a ResponseException → wipe (refresh_token revoked)
-     *      - forceRefresh dies on anything else (e.g. token endpoint unreachable)
-     *                          → Offline
+     *      - forceRefresh dies on SessionLostException → Wiped (refresh_token
+     *                            revoked; TokenRefresher already closed the session)
+     *      - forceRefresh dies on anything else (e.g. token endpoint down or
+     *                            unreachable) → Offline
      *  - Other ResponseException (4xx ≠ 401/403, 5xx) → Offline
      *  - Throwable (IO, timeout, cancellation)        → Offline
      */
@@ -489,12 +522,11 @@ class AuthRepository(
         // /me returned 401/403: force a fresh access token and try once more.
         val refreshed = try {
             tokenRefresher.forceRefresh()
-        } catch (_: ResponseException) {
-            // The auth server itself rejected the refresh — refresh_token is dead.
-            wipeAndGoAnonymous()
+        } catch (_: SessionLostException) {
+            // The auth server rejected the refresh — refresh_token is dead.
             return MeOutcome.Wiped
         } catch (_: Throwable) {
-            // Network failure reaching the auth server — don't punish, retry later.
+            // Auth server down or unreachable — don't punish, retry later.
             return MeOutcome.Offline
         }
         _authState.value = AuthState.Authenticated(refreshed.accessToken)
@@ -524,10 +556,11 @@ class AuthRepository(
         data object Wiped : MeOutcome
     }
 
-    private suspend fun wipeAndGoAnonymous() {
+    /** [keepCredentials]: vedi [recoverLostSession]. */
+    private suspend fun wipeAndGoAnonymous(keepCredentials: Boolean = false) {
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
-        runCatching { credentials.clear() }
+        if (!keepCredentials) runCatching { credentials.clear() }
         runCatching { wipeAllUserData() }
         AccountStatus.clear()
         _authState.value = AuthState.Anonymous

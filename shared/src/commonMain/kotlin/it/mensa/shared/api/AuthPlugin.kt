@@ -11,6 +11,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
 import it.mensa.shared.auth.AuthHolder
+import it.mensa.shared.auth.oidc.SessionLostException
 import it.mensa.shared.auth.oidc.TokenRefresher
 import kotlin.concurrent.Volatile
 
@@ -84,8 +85,17 @@ fun HttpClient.installAuthRetry() {
         val refresher = AuthRefresherHolder.refresher ?: return@intercept call
         val session = AuthHolder.session ?: return@intercept call
         if (session.refreshToken.isBlank()) return@intercept call
+        val rejected = request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ") ?: return@intercept call
 
-        val refreshed = runCatching { refresher.refresh() }.getOrNull() ?: return@intercept call
+        val refreshed = try {
+            refresher.refreshRejected(rejected)
+        } catch (_: SessionLostException) {
+            // Sessione chiusa (e gia' ripulita): il 401 resta quello che e'.
+            return@intercept call
+        }
+        // Ogni altro fallimento del rinnovo (issuer giu', rete) arriva a chi ha
+        // fatto la richiesta cosi' com'e'. Convertito nel 401 originale, la UI
+        // diceva "sessione non valida" a un socio con la sessione buona.
 
         val retry = HttpRequestBuilder().apply {
             takeFrom(request)

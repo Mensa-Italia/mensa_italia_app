@@ -5,6 +5,7 @@ import io.ktor.client.call.HttpClientCall
 import io.ktor.client.call.body
 import io.ktor.client.call.save
 import io.ktor.client.plugins.HttpSend
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.plugins.Sender
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
@@ -554,6 +555,8 @@ class IntegrityGuard(
         override suspend fun register(keyId: String, attestation: String, challenge: String) {
             val response = try {
                 client.post(PATH_ATTEST) {
+                    // Lo stato lo legge qui sotto: diventa un fallimento REGISTER.
+                    expectSuccess = false
                     contentType(ContentType.Application.Json)
                     setBody(AttestRequest(keyId, attestation, challenge))
                 }
@@ -589,7 +592,8 @@ class IntegrityGuard(
     }
 
     private suspend fun fetchChallenge(): String {
-        val response = client.post(PATH_CHALLENGE)
+        // Lo stato lo legge qui sotto: diventa un fallimento CHALLENGE.
+        val response = client.post(PATH_CHALLENGE) { expectSuccess = false }
         val status = response.status.value
         if (status !in 200..299) {
             throw IntegrityUnavailableException(

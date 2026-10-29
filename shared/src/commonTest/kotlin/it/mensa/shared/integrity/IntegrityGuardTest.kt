@@ -5,6 +5,7 @@ import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -222,7 +223,7 @@ class IntegrityGuardTest {
         }
         val client = guard(server, FakeProvider())
 
-        val response = client.get("/api/collections/events/records")
+        val response = client.get("/api/collections/events/records") { expectSuccess = false }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
         assertEquals("""{"status":403,"message":"nope","data":{}}""", response.bodyAsText())
@@ -302,7 +303,7 @@ class IntegrityGuardTest {
 
         // Logout (nessun utente) e rientro dello stesso utente: ancora da zero.
         user = null
-        client.get("/api/health")
+        client.get("/api/health") { expectSuccess = false }
         user = "user-2"
         server.clearRequests()
         client.get("/api/cs/me")
@@ -332,7 +333,7 @@ class IntegrityGuardTest {
         val server = FakeServer { error(PreconditionRequired, "integrity_required") }
         val client = guard(server, FakeProvider())
 
-        val response = client.get("/api/health")
+        val response = client.get("/api/health") { expectSuccess = false }
 
         assertEquals(PreconditionRequired, response.status)
         assertEquals(1, server.requests.size)
@@ -346,7 +347,7 @@ class IntegrityGuardTest {
         }
         val client = guard(server, FakeProvider(), authenticated = false)
 
-        val response = client.get("/api/collections/sigs/records")
+        val response = client.get("/api/collections/sigs/records") { expectSuccess = false }
 
         assertTrue(asked)
         assertEquals(PreconditionRequired, response.status)
@@ -358,7 +359,7 @@ class IntegrityGuardTest {
         val server = FakeServer { error(HttpStatusCode.Forbidden, "account_blocked") }
         val client = guard(server, FakeProvider())
 
-        val response = client.get("https://auth.mensa.it/oauth/v2/token")
+        val response = client.get("https://auth.mensa.it/oauth/v2/token") { expectSuccess = false }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
         assertFalse(AccountStatus.suspended.value)
@@ -376,7 +377,7 @@ class IntegrityGuardTest {
         client.get("/api/cs/me") // attiva il modo proattivo
         val challengesBefore = server.challengeCalls
 
-        val response = client.post("https://bot.example.org/telegram/callback") { setBody("""{"accepted":true}""") }
+        val response = client.post("https://bot.example.org/telegram/callback") { expectSuccess = false; setBody("""{"accepted":true}""") }
 
         assertEquals(PreconditionRequired, response.status, "la risposta del terzo e' restituita com'e'")
         val sent = server.requests.last()
@@ -391,8 +392,8 @@ class IntegrityGuardTest {
         val server = FakeServer { error(PreconditionRequired, "integrity_required") }
         val client = guard(server, FakeProvider())
 
-        client.get("https://svc.mensa.it.evil.example/api/cs/me")
-        client.get("https://evil-svc.mensa.it/api/cs/me")
+        client.get("https://svc.mensa.it.evil.example/api/cs/me") { expectSuccess = false }
+        client.get("https://evil-svc.mensa.it/api/cs/me") { expectSuccess = false }
 
         assertEquals(2, server.requests.size)
         assertEquals(0, server.challengeCalls)
@@ -998,7 +999,7 @@ class IntegrityGuardTest {
 
         // Logout e rientro dello stesso utente: ancora da zero.
         user = null
-        client.get("/api/health")
+        client.get("/api/health") { expectSuccess = false }
         user = "user-2"
         assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
         assertEquals(3, provider.enrollAttempts)

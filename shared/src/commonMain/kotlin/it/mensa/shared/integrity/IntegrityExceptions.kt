@@ -3,9 +3,9 @@ package it.mensa.shared.integrity
 /**
  * Gli errori del livello di accesso "attenzionato" (`watched`) e dell'account
  * sospeso (`blocked`). Sono eccezioni tipizzate e non `ResponseException`
- * perche' il client non usa `expectSuccess`: senza, un 403 o un 428 arriverebbe
- * al chiamante come una risposta qualunque, e il decode del JSON d'errore
- * produrrebbe in silenzio un modello vuoto.
+ * perche' la UI deve distinguerle da un errore HTTP qualunque: le solleva
+ * l'interceptor, prima che la validazione del client trasformi il 403 o il
+ * 428 in una `ClientRequestException` senza nome.
  *
  * Nessuna di queste e' una `IOException` di proposito: `NetworkErrors` le
  * leggerebbe come "offline", e la UI direbbe "Sei offline" a chi invece e'

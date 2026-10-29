@@ -3,6 +3,8 @@ package it.mensa.shared.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import it.mensa.shared.api.endpoints.StampsApi
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.db.MensaDatabase
@@ -91,12 +93,24 @@ class StampsRepository(
     suspend fun verify(id: String, code: String): StampModel? =
         api.getStamp(id = id, code = code)
 
-    /** Claim a stamp for the current user (after a successful QR verify). */
+    /**
+     * Claim a stamp for the current user (after a successful QR verify).
+     *
+     * Un 400 e' la regola del server che dice di no: codice sbagliato o timbro
+     * gia' ottenuto. Diventa [StampClaimRejectedException], che lo dice cosi'.
+     */
     @Throws(Exception::class)
     suspend fun claim(stampId: String, code: String) {
         val userId = auth.currentUser.value?.id ?: error("Not authenticated")
-        api.addStamp(stampId = stampId, code = code, userId = userId)
-        refresh()
+        try {
+            api.addStamp(stampId = stampId, code = code, userId = userId)
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.BadRequest) throw StampClaimRejectedException(e)
+            throw e
+        }
+        // Il timbro e' gia' assegnato: una lista che non si riaggiorna adesso
+        // non fa del riscatto un fallimento, e si rilegge al prossimo refresh.
+        runCatching { refresh() }
     }
 
     private fun StampUser.toModel(): StampUserModel {
@@ -115,3 +129,6 @@ class StampsRepository(
         )
     }
 }
+
+/** Il server ha rifiutato il riscatto: codice sbagliato, o timbro gia' ottenuto. */
+class StampClaimRejectedException(cause: Throwable) : Exception("Codice non valido, oppure hai già questo timbro.", cause)

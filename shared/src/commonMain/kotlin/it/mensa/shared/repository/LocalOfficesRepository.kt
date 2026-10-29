@@ -159,6 +159,15 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         _sigs.value = _sigs.value + (officeId to items)
     }
 
+    /**
+     * Il refresh che segue una scrittura riuscita. Se fallisce, la scrittura
+     * resta fatta: lanciare da qui la faceva sembrare rifiutata, e chi riprovava
+     * la duplicava. La lista si riallinea al prossimo refresh.
+     */
+    private suspend fun refreshAfterWrite(refresh: suspend () -> Unit) {
+        runCatching { refresh() }
+    }
+
     // ── Test-date writes ──────────────────────────────────────────────────────
 
     /// Throws on failure. Refreshes the upcoming-test-dates cache for the office
@@ -169,7 +178,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         record: LocalOfficeTestDateRecord,
     ): LocalOfficeTestDateRecord {
         val created = api.createTestDate(record.copy(localOffice = officeId))
-        refreshUpcomingTestDates(officeId)
+        refreshAfterWrite { refreshUpcomingTestDates(officeId) }
         return created
     }
 
@@ -180,14 +189,14 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         patch: JsonObject,
     ): LocalOfficeTestDateRecord {
         val updated = api.updateTestDate(id, patch)
-        refreshUpcomingTestDates(officeId)
+        refreshAfterWrite { refreshUpcomingTestDates(officeId) }
         return updated
     }
 
     @Throws(Exception::class)
     suspend fun deleteTestDate(officeId: String, id: String) {
         api.deleteTestDate(id)
-        refreshUpcomingTestDates(officeId)
+        refreshAfterWrite { refreshUpcomingTestDates(officeId) }
     }
 
     // ── Linktree-entry writes ─────────────────────────────────────────────────
@@ -206,7 +215,7 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
             url = ExternalUrl.normalize(record.url) ?: record.url,
         )
         val created = api.createLink(normalized)
-        refreshLinktreeByOffice(officeId)
+        refreshAfterWrite { refreshLinktreeByOffice(officeId) }
         return created
     }
 
@@ -217,14 +226,14 @@ class LocalOfficesRepository(private val api: LocalOfficesApi) {
         patch: JsonObject,
     ): LocalOfficeLinkRecord {
         val updated = api.updateLink(id, patch)
-        refreshLinktreeByOffice(officeId)
+        refreshAfterWrite { refreshLinktreeByOffice(officeId) }
         return updated
     }
 
     @Throws(Exception::class)
     suspend fun deleteLink(officeId: String, id: String) {
         api.deleteLink(id)
-        refreshLinktreeByOffice(officeId)
+        refreshAfterWrite { refreshLinktreeByOffice(officeId) }
     }
 
     // ── Swift-friendly typed update wrappers ──────────────────────────────────

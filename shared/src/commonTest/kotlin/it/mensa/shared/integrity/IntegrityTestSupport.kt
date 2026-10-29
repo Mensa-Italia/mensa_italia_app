@@ -345,6 +345,9 @@ internal class FakeServer(private val route: MockRequestHandleScope.(HttpRequest
             }
         })
         return HttpClient(engine) {
+            // Come il client di produzione (`mensaDefaults`): una risposta non
+            // 2xx che arriva a chi chiama e' un'eccezione.
+            expectSuccess = true
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
             defaultRequest {
                 url(ApiConfig.BASE_URL)

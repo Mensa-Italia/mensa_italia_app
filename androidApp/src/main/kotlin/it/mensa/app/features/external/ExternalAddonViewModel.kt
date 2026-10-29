@@ -3,6 +3,7 @@ package it.mensa.app.features.external
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
+import it.mensa.app.support.userMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,7 +51,7 @@ class ExternalAddonViewModel(private val addonId: String) : ViewModel() {
                     _state.update { ExternalAddonLoadState.Failed("Indirizzo non valido") }
                 }
             } catch (e: Exception) {
-                _state.update { ExternalAddonLoadState.Failed(e.message ?: "Errore sconosciuto") }
+                _state.update { ExternalAddonLoadState.Failed(e.userMessage) }
             }
         }
     }

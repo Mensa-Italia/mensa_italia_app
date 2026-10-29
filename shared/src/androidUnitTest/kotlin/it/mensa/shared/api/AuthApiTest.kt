@@ -3,17 +3,14 @@ package it.mensa.shared.api
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.serialization.kotlinx.json.json
 import it.mensa.shared.api.endpoints.AuthApi
 import it.mensa.shared.api.endpoints.InvalidCredentialsException
 import it.mensa.shared.api.endpoints.LoginUnavailableException
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,7 +20,7 @@ class AuthApiTest {
 
     private fun api(status: HttpStatusCode, body: String) = AuthApi(
         HttpClient(MockEngine { respond(body, status, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())) }) {
-            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }) }
+            mensaDefaults()
         },
     )
 

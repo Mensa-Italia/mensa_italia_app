@@ -240,7 +240,7 @@ final class SearchViewModel {
             lastSuccess = (s.query, s.response)
             phase = .results(buildSections(query: s.query, response: s.response))
         } else if let e = state as? SearchRepositoryStateError {
-            phase = .error(e.cause.message ?? tr("app.search.error", fallback: "Errore"))
+            phase = .error(NSError.kotlin(e.cause).userMessage)
         } else {
             phase = .idle
         }

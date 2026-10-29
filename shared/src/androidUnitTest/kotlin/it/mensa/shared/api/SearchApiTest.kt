@@ -117,12 +117,8 @@ class SearchApiTest {
                 )
             }
         }
-        // Use expectSuccess=false so MockEngine delivers 429 as a response (not exception).
-        // SearchApi handles both modes (with or without expectSuccess).
-        val client = HttpClient(engine) {
-            install(ContentNegotiation) { json(json) }
-            expectSuccess = false
-        }
+        // Il client di produzione: il 429 arriva come ClientRequestException.
+        val client = HttpClient(engine) { mensaDefaults() }
         // Use maxRetries=1 so we only retry once; runTest skips the delay()
         val api = SearchApi(client)
 

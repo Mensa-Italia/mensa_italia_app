@@ -4,13 +4,12 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.serialization.kotlinx.json.json
 import it.mensa.shared.api.PocketBaseClient
+import it.mensa.shared.api.mensaDefaults
 import it.mensa.shared.api.endpoints.EventsApi
 import it.mensa.shared.db.MensaDatabase
 import kotlinx.coroutines.flow.first
@@ -33,16 +32,16 @@ class EventsRepositoryTest {
     }
 
     private fun buildMockClient(responseBody: String): HttpClient {
-        val engine = MockEngine { _ ->
-            respond(
-                content = responseBody,
-                status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            )
+        val headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        val engine = MockEngine { req ->
+            // Un record singolo: la lista finta non ce l'ha, e il server risponde 404.
+            if (req.url.encodedPath.endsWith("/records")) {
+                respond(content = responseBody, status = HttpStatusCode.OK, headers = headers)
+            } else {
+                respond("""{"status":404,"message":"The requested resource wasn't found.","data":{}}""", HttpStatusCode.NotFound, headers)
+            }
         }
-        return HttpClient(engine) {
-            install(ContentNegotiation) { json(json) }
-        }
+        return HttpClient(engine) { mensaDefaults() }
     }
 
     @Test

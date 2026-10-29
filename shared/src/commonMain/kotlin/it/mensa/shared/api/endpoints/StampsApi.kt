@@ -1,5 +1,7 @@
 package it.mensa.shared.api.endpoints
 
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import it.mensa.shared.api.PocketBaseClient
 import it.mensa.shared.model.StampModel
 import it.mensa.shared.model.StampUserModel
@@ -89,7 +91,13 @@ class StampsApi(private val pb: PocketBaseClient) {
      */
     @Throws(Exception::class)
     suspend fun getStamp(id: String, @Suppress("UNUSED_PARAMETER") code: String): StampModel? =
-        runCatching { pb.getOne<StampModel>(COLLECTION, id) }.getOrNull()
+        try {
+            pb.getOne<StampModel>(COLLECTION, id)
+        } catch (e: ClientRequestException) {
+            // Solo il 404 e' "non esiste". Rete, integrita' e il resto arrivano a
+            // chi chiama: inghiottiti, diventavano anche loro "timbro non trovato".
+            if (e.response.status == HttpStatusCode.NotFound) null else throw e
+        }
 
     /**
      * Shorthand for [addUserStamp] — the user id comes from the caller context.

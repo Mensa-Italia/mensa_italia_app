@@ -77,6 +77,9 @@ fun StampConfirmSheet(
     var loading by remember { mutableStateOf(true) }
     var saving by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    // Un riscatto rifiutato porta allo stato di errore senza toccare `stamp`:
+    // il contenuto Ready in uscita (la dissolvenza lo tiene composto) lo rilegge.
+    var claimFailed by remember { mutableStateOf(false) }
 
     LaunchedEffect(stampId, code) {
         loading = true
@@ -105,7 +108,7 @@ fun StampConfirmSheet(
         AnimatedContent(
             targetState = when {
                 loading -> SheetState.Loading
-                stamp != null -> SheetState.Ready
+                stamp != null && !claimFailed -> SheetState.Ready
                 else -> SheetState.Error
             },
             transitionSpec = { MensaMotion.heroTransform() },
@@ -126,11 +129,13 @@ fun StampConfirmSheet(
                         onConfirm = {
                             scope.launch {
                                 saving = true
-                                runCatching {
+                                val claimed = runCatching {
                                     repo.claim(stampId = stampId, code = code)
-                                }.onFailure { errorMessage = it.userMessage }
+                                }.onFailure { errorMessage = it.userMessage }.isSuccess
                                 saving = false
-                                onDone()
+                                // Un riscatto rifiutato resta a schermo, nello stato di
+                                // errore: chiudere il foglio lo faceva sembrare riuscito.
+                                if (claimed) onDone() else claimFailed = true
                             }
                         },
                         onCancel = onDone,

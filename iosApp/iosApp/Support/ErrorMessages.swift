@@ -47,6 +47,10 @@ extension Error {
                 return tr("app.error.integrity_retry", fallback: "Verifica di sicurezza non riuscita. Riprova fra poco.")
                     + Self.integrityTagSuffix(kotlin)
             }
+            // Una risposta non 2xx: la descrizione di Ktor è la richiesta intera.
+            if let http = HttpErrors.shared.text(t: kotlin) {
+                return tr(http.key, fallback: http.fallback) + " (HTTP \(http.status))"
+            }
         }
         return (self as NSError).localizedDescription
     }
@@ -77,5 +81,23 @@ extension Error {
             NSURLErrorDataNotAllowed,
             NSURLErrorInternationalRoamingOff,
         ]
+    }
+}
+
+extension NSError {
+    /// Un'eccezione Kotlin arrivata come valore (il `cause` di uno stato, l'errore
+    /// di un flow) invece che lanciata, nella stessa forma che le dà il bridge:
+    /// l'originale in `KotlinException`. Senza, `isOffline` e `userMessage` non
+    /// la riconoscevano e mostravano il messaggio grezzo.
+    static func kotlin(_ throwable: KotlinThrowable) -> NSError {
+        NSError(
+            domain: "KotlinThrowable",
+            code: 0,
+            userInfo: [
+                NSLocalizedDescriptionKey: throwable.message
+                    ?? tr("app.error.generic", fallback: "Qualcosa è andato storto. Riprova."),
+                "KotlinException": throwable,
+            ]
+        )
     }
 }

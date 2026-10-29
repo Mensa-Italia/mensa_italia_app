@@ -74,7 +74,6 @@ class RealtimeClient(
                 val result = connect()
                 val clientId = result.first
                 val eventFlow = result.second
-                attempt = 0
                 try {
                     registerSubscriptions(clientId, subscriptions)
                 } catch (t: Throwable) {
@@ -84,12 +83,16 @@ class RealtimeClient(
                     closeStream(eventFlow)
                     throw t
                 }
+                // Solo ora la connessione e' riuscita davvero. Azzerato prima, un
+                // POST rifiutato a ogni giro riapriva lo stream ogni secondo, senza
+                // mai far crescere il backoff.
+                attempt = 0
                 eventFlow.collect { emit(it) }
                 // Arrivare qui significa che il server ha chiuso senza errore.
                 // Prima non succedeva mai — lo SharedFlow non terminava — e
                 // senza questa pausa il `while` riaprirebbe la connessione
                 // all'istante, in un ciclo stretto: `attempt` viene azzerato a
-                // ogni connect riuscito, quindi il backoff non entrerebbe mai.
+                // ogni sottoscrizione riuscita, quindi il backoff non entrerebbe mai.
                 delay(1_000L)
             } catch (ce: CancellationException) {
                 throw ce

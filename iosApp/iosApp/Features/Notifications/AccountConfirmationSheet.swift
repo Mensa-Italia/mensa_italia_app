@@ -83,6 +83,16 @@ struct AccountConfirmationSheet: View {
 
                     bodyContent(for: app)
 
+                    // Una risposta non andata a buon fine: si resta qui, con i
+                    // pulsanti per riprovare. Prima l'errore finiva in uno stato
+                    // che questa vista non mostra.
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                            .multilineTextAlignment(.center)
+                    }
+
                     VStack(spacing: 12) {
                         Button {
                             Task { await approve() }
@@ -162,6 +172,7 @@ struct AccountConfirmationSheet: View {
 
     private func answer(accepted: Bool) async {
         submitting = true
+        errorMessage = nil
         defer { submitting = false }
         do {
             switch kind {

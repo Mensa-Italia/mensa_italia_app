@@ -145,9 +145,7 @@ class EventsRepository(
     @Throws(Exception::class)
     suspend fun getById(id: String): EventModel? {
         db.eventQueries.selectById(id).awaitAsOneOrNull()?.let { return it.toModel(json) }
-        // Solo se e' davvero quel record: un JSON diverso (un errore, una lista)
-        // si decodifica comunque in un modello vuoto, con tutti i default.
-        val remote = runCatching { api.get(id) }.getOrNull()?.takeIf { it.id == id } ?: return null
+        val remote = runCatching { api.get(id) }.getOrNull() ?: return null
         upsertRow(remote)
         return remote
     }
@@ -158,14 +156,15 @@ class EventsRepository(
         val fields = baseFields(draft, includeOwner = true)
         val files = imageFiles(draft)
         val created: EventModel = api.pb.createMultipart("events", fields, files)
+        // In cache subito: se poi una sessione non passa l'evento esiste
+        // comunque, e deve comparire in lista.
+        upsertRow(created)
 
         schedulesApi?.let { sApi ->
             draft.schedules.forEach { s ->
                 sApi.create(s.toModel(eventId = created.id))
             }
         }
-
-        upsertRow(created)
         return created
     }
 
@@ -175,6 +174,8 @@ class EventsRepository(
         val fields = baseFields(draft, includeOwner = false)
         val files = imageFiles(draft)
         val updated: EventModel = api.pb.updateMultipart("events", id, fields, files)
+        // Come in [create]: l'evento e' aggiornato anche se una sessione non passa.
+        upsertRow(updated)
 
         schedulesApi?.let { sApi ->
             draft.schedules.forEach { s ->
@@ -191,8 +192,6 @@ class EventsRepository(
                 }
             }
         }
-
-        upsertRow(updated)
         return updated
     }
 

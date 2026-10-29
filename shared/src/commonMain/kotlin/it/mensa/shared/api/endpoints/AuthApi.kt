@@ -2,6 +2,7 @@ package it.mensa.shared.api.endpoints
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -26,6 +27,9 @@ class AuthApi(private val client: HttpClient) {
     @Throws(Exception::class)
     suspend fun loginWithZitadel(email: String, password: String): OidcTokenResponse {
         val response = client.post("/api/cs/auth-with-zitadel") {
+            // Lo stato lo traduce questa funzione: un'eccezione per ogni esito
+            // che la schermata di login sa spiegare.
+            expectSuccess = false
             attributes.put(SkipAuthAttribute, true)
             header(HttpHeaders.Authorization, null)
             setBody(
@@ -37,10 +41,6 @@ class AuthApi(private val client: HttpClient) {
                 )
             )
         }
-        // Il client non usa `expectSuccess`: senza questi controlli il JSON
-        // d'errore veniva letto come una risposta di token vuota, e chi
-        // sbagliava password (o trovava il server giu') si vedeva
-        // "Empty access_token…".
         if (response.status == HttpStatusCode.Unauthorized) throw InvalidCredentialsException()
         if (!response.status.isSuccess()) throw LoginUnavailableException(response.status.value)
         return response.body()

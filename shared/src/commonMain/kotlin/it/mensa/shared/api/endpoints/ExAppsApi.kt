@@ -1,6 +1,7 @@
 package it.mensa.shared.api.endpoints
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -91,19 +92,22 @@ class ExAppsApi(
      * utente `watched` porta la prova di integrita' come ogni altra API; ai
      * `blocked` e' consentita (sta nell'allowlist del server).
      *
-     * 404 e 409 (scaduta, gia' decisa) diventano [ExportRequestGoneException]:
-     * il client non usa `expectSuccess`, quindi senza questo controllo il
-     * JSON d'errore passerebbe per una risposta riuscita.
+     * 404 e 409 (scaduta, gia' decisa) diventano [ExportRequestGoneException],
+     * che la UI sa spiegare; gli altri errori arrivano come sono, e la UI li
+     * traduce come ogni altra risposta d'errore.
      */
     @Throws(Exception::class)
     suspend fun decideExport(requestId: String, accepted: Boolean) {
-        val response = client.post("/api/cs/exapp/export/decide") {
-            contentType(ContentType.Application.Json)
-            setBody(ExportDecisionBody(requestId, accepted))
+        try {
+            client.post("/api/cs/exapp/export/decide") {
+                contentType(ContentType.Application.Json)
+                setBody(ExportDecisionBody(requestId, accepted))
+            }
+        } catch (e: ClientRequestException) {
+            val status = e.response.status.value
+            if (status == 404 || status == 409) throw ExportRequestGoneException(status)
+            throw e
         }
-        val status = response.status.value
-        if (status == 404 || status == 409) throw ExportRequestGoneException(status)
-        if (status !in 200..299) error("export/decide: HTTP $status")
     }
 
     /**
