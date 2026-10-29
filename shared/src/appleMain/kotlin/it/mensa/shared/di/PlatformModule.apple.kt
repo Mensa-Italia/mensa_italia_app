@@ -1,17 +1,24 @@
 package it.mensa.shared.di
 
+import com.russhwolf.settings.ExperimentalSettingsImplementation
 import com.russhwolf.settings.KeychainSettings
+import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.Settings
 import it.mensa.shared.auth.CredentialStore
 import it.mensa.shared.auth.ICredentialStore
 import it.mensa.shared.auth.ITokenStore
 import it.mensa.shared.auth.TokenStore
 import it.mensa.shared.db.DriverFactory
+import it.mensa.shared.integrity.AppAttestLifecycle
 import it.mensa.shared.integrity.AppAttestProvider
+import it.mensa.shared.integrity.DcAppAttestApi
 import it.mensa.shared.integrity.IntegrityProvider
+import it.mensa.shared.integrity.KeyRecordStore
+import it.mensa.shared.integrity.appleDeviceEnvironment
 import org.koin.core.module.Module
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import platform.Foundation.NSUserDefaults
 
 /**
  * Apple auth-storage uses the Keychain via `multiplatform-settings`'
@@ -47,6 +54,7 @@ import org.koin.dsl.module
  *   3) keep iOS and Watch on separate Keychain entries and bootstrap the
  *      Watch session via `WCSession` on first launch.
  */
+@OptIn(ExperimentalSettingsImplementation::class)
 actual val platformModule: Module = module {
     single<Settings> { KeychainSettings(service = "it.mensa.app.auth") }
     single { TokenStore(get()) } bind ITokenStore::class
@@ -55,5 +63,22 @@ actual val platformModule: Module = module {
     single { DriverFactory() }
     // App Attest. Su watchOS (e sul simulatore) `isSupported` e' false: la prova
     // non si tenta e, se il server la chiede, l'errore e' "non supportato".
-    single<IntegrityProvider> { AppAttestProvider(get()) }
+    //
+    // Il record della chiave sta in NSUserDefaults, nel container dell'app, e NON
+    // nel Keychain di sopra: la chiave App Attest vive nel Secure Enclave e muore
+    // con l'installazione, il Keychain invece sopravvive alla cancellazione
+    // dell'app, e un key id che sopravvive alla sua chiave e' un puntatore
+    // stantio (era il guaio del telefono del titolare). Il Keychain entra solo
+    // come `legacy`: da li' si adotta, una volta, la chiave delle versioni
+    // fino alla 22.2.20.
+    single<IntegrityProvider> {
+        AppAttestProvider(
+            lifecycle = AppAttestLifecycle(
+                api = DcAppAttestApi(),
+                store = KeyRecordStore(NSUserDefaultsSettings(NSUserDefaults.standardUserDefaults)),
+                legacy = get<Settings>(),
+            ),
+            environment = appleDeviceEnvironment(),
+        )
+    }
 }

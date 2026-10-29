@@ -1,36 +1,36 @@
 package it.mensa.shared.integrity
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.http.headersOf
 import io.ktor.http.content.TextContent
-import io.ktor.client.engine.mock.MockEngineConfig
-import io.ktor.serialization.kotlinx.json.json
-import it.mensa.shared.api.ApiConfig
 import it.mensa.shared.auth.AccountStatus
 import it.mensa.shared.net.ServerReachability
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.testTimeSource
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -40,6 +40,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class IntegrityGuardTest {
 
     @BeforeTest
@@ -49,113 +50,24 @@ class IntegrityGuardTest {
     fun cleanAccountStatus() = AccountStatus.clear()
 
     // ── Doppioni di test ─────────────────────────────────────────────────────
-
-    private class FakeProvider(
-        override val platform: String = "android",
-        override val requiresKeyEnrollment: Boolean = false,
-        var supported: Boolean = true,
-        var key: String? = null,
-    ) : IntegrityProvider {
-        var keysGenerated = 0
-        val forgotten = mutableListOf<String>()
-
-        /** Fa fallire la prossima `prove` come se la chiave fosse invalida. */
-        var invalidateKeyOnNextProve = false
-
-        /** Chiavi che `prove` rifiuta come invalide (app reinstallata). */
-        val staleKeys = mutableSetOf<String>()
-
-        /** Quante `prove` sono in corso adesso, e il massimo visto. */
-        private var proving = 0
-        var maxConcurrentProofs = 0
-
-        override suspend fun isSupported() = supported
-        override suspend fun hasKey(userId: String) = key != null
-
-        override suspend fun attest(challenge: String) =
-            KeyAttestation(keyId = "key-${++keysGenerated}", attestation = "att($challenge)")
-
-        override suspend fun saveKey(userId: String, keyId: String) {
-            key = keyId
-        }
-
-        override suspend fun forgetKey(userId: String) {
-            key = null
-            forgotten += userId
-        }
-
-        override suspend fun prove(userId: String, challenge: String, clientData: String): Map<String, String> {
-            if (invalidateKeyOnNextProve) {
-                invalidateKeyOnNextProve = false
-                throw IntegrityKeyInvalidException("chiave invalida")
-            }
-            if (key in staleKeys) throw IntegrityKeyInvalidException("chiave invalida")
-            proving++
-            maxConcurrentProofs = maxOf(maxConcurrentProofs, proving)
-            try {
-                delay(10) // come generateAssertion: lascia correre le altre coroutine
-            } finally {
-                proving--
-            }
-            return if (requiresKeyEnrollment) {
-                mapOf(IntegrityHeaders.KEY_ID to key!!, IntegrityHeaders.ASSERTION to "asr($clientData)")
-            } else {
-                mapOf(IntegrityHeaders.TOKEN to "tok($clientData)")
-            }
-        }
-    }
-
-    /** Un server finto: registra ogni richiesta e risponde alla sfida da solo. */
-    private class FakeServer(private val route: MockRequestHandleScope.(HttpRequestData) -> io.ktor.client.request.HttpResponseData?) {
-        val requests = mutableListOf<HttpRequestData>()
-        var challenges = 0
-        var attestStatus = HttpStatusCode.OK
-
-        val api: List<HttpRequestData> get() = requests.filter { it.url.encodedPath != CHALLENGE && it.url.encodedPath != ATTEST }
-        val challengeCalls: Int get() = requests.count { it.url.encodedPath == CHALLENGE }
-
-        fun client(authenticated: Boolean = true): HttpClient {
-            val engine = MockEngine(MockEngineConfig().apply {
-                addHandler { request ->
-                    requests += request
-                    when (request.url.encodedPath) {
-                        CHALLENGE -> respond(
-                            """{"challenge":"chal-${++challenges}","expires_in":120}""",
-                            HttpStatusCode.OK, jsonHeaders,
-                        )
-                        ATTEST -> respond("""{"ok":true}""", attestStatus, jsonHeaders)
-                        else -> route(request) ?: respond("{}", HttpStatusCode.OK, jsonHeaders)
-                    }
-                }
-            })
-            return HttpClient(engine) {
-                install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
-                defaultRequest {
-                    url(ApiConfig.BASE_URL)
-                    contentType(ContentType.Application.Json)
-                    if (authenticated) header(HttpHeaders.Authorization, "Bearer test-token")
-                }
-            }
-        }
-    }
+    //
+    // FakeProvider, FakeServer e gli altri stanno in IntegrityTestSupport.kt:
+    // li usano anche i test del ciclo di vita e del report.
 
     private companion object {
-        const val CHALLENGE = "/api/integrity/challenge"
-        const val ATTEST = "/api/integrity/ios/attest"
-        val jsonHeaders = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        const val CHALLENGE = FakeServer.CHALLENGE
+        const val ATTEST = FakeServer.ATTEST
     }
 
-    private fun MockRequestHandleScope.error(status: HttpStatusCode, code: String) =
-        respond("""{"status":${status.value},"message":"msg $code","code":"$code"}""", status, jsonHeaders)
-
-    private fun guard(
+    /** Il guard con l'orologio del test (i backoff corrono in tempo virtuale) e i report in tempo reale. */
+    private fun TestScope.guard(
         server: FakeServer,
         provider: IntegrityProvider,
         user: () -> String? = { "user-1" },
         authenticated: Boolean = true,
-    ): HttpClient = server.client(authenticated).also { IntegrityGuard(it, provider, user).install() }
-
-    private fun HttpRequestData.hasProof() = headers.contains(IntegrityHeaders.CHALLENGE)
+    ): HttpClient = server.client(authenticated).also {
+        IntegrityGuard(it, provider, user, clock = testTimeSource, scope = realTimeScope()).install()
+    }
 
     // ── Flusso base ──────────────────────────────────────────────────────────
 
@@ -384,7 +296,7 @@ class IntegrityGuardTest {
 
         // Altro utente: si riparte da una richiesta nuda (e dal suo 428).
         user = "user-2"
-        server.requests.clear()
+        server.clearRequests()
         client.get("/api/cs/me")
         assertFalse(server.api.first().hasProof())
 
@@ -392,7 +304,7 @@ class IntegrityGuardTest {
         user = null
         client.get("/api/health")
         user = "user-2"
-        server.requests.clear()
+        server.clearRequests()
         client.get("/api/cs/me")
         assertFalse(server.api.first().hasProof())
     }
@@ -405,7 +317,7 @@ class IntegrityGuardTest {
         val client = guard(server, FakeProvider())
         client.get("/api/cs/me")
 
-        server.requests.clear()
+        server.clearRequests()
         client.get("/api/health")
         client.get("/api/files/stamp/abc/img.png")
         client.get("/api/realtime")
@@ -567,23 +479,55 @@ class IntegrityGuardTest {
     }
 
     @Test
-    fun challengeFailureIsUnavailable() = runTest {
-        // Sfida che risponde male: il guard lo trasforma in un errore tipizzato.
-        val client = HttpClient(MockEngine { request ->
-            when (request.url.encodedPath) {
-                CHALLENGE -> respond("boom", HttpStatusCode.InternalServerError)
-                else -> error(PreconditionRequired, "integrity_required")
-            }
-        }) {
-            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
-            defaultRequest {
-                url(ApiConfig.BASE_URL)
-                header(HttpHeaders.Authorization, "Bearer t")
-            }
-        }
-        IntegrityGuard(client, FakeProvider(), { "user-1" }).install()
+    fun unsupportedDeviceCarriesATagAndIsRememberedForever() = runTest {
+        val provider = FakeProvider(platform = "ios", supported = false)
+        val server = FakeServer { error(PreconditionRequired, "integrity_required") }
+        val client = guard(server, provider)
 
-        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        val first = assertFailsWith<IntegrityUnsupportedException> { client.get("/api/cs/me") }
+        assertEquals("generate_key/1", first.failure?.tag)
+        assertEquals(Disposition.UNSUPPORTED, first.failure?.disposition)
+
+        // Senza scadenza: neanche dopo ore si riprova (e' il dispositivo, non il momento).
+        delay(3.hours)
+        val again = assertFailsWith<IntegrityUnsupportedException> { client.get("/api/cs/me") }
+
+        assertEquals(first.failure, again.failure)
+        assertEquals(0, server.challengeCalls)
+        // Le due richieste sono andate nude, a decidere e' il server.
+        assertEquals(2, server.api.size)
+        assertTrue(server.api.none { it.hasProof() })
+    }
+
+    /** `generate_key` e' uno stage di App Attest: su Android sarebbe una bugia nel messaggio e nel log del server. */
+    @Test
+    fun anUnsupportedDeviceThatIsNotIosHasNoAppAttestTagAndReportsNothing() = runTest {
+        for (platform in listOf("android", "unsupported")) {
+            val server = watchedServer()
+            val client = guard(server, FakeProvider(platform = platform, supported = false))
+
+            val first = assertFailsWith<IntegrityUnsupportedException> { client.get("/api/cs/me") }
+            val again = assertFailsWith<IntegrityUnsupportedException> { client.get("/api/cs/me") }
+
+            assertNull(first.failure, platform)
+            assertNull(again.failure, platform)
+            assertEquals(0, server.challengeCalls, platform)
+            awaitReports(server, 0)
+            assertTrue(server.reports.isEmpty(), "$platform: niente report con uno stage che non e' suo")
+        }
+    }
+
+    @Test
+    fun challengeFailureIsUnavailable() = runTest {
+        // Sfida che risponde male: il guard lo trasforma in un errore tipizzato, con la sua causa.
+        val server = FakeServer { error(PreconditionRequired, "integrity_required") }
+        server.challengeStatus = HttpStatusCode.InternalServerError
+        val client = guard(server, FakeProvider())
+
+        val e = assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+
+        assertEquals("challenge/500", e.failure?.tag)
+        assertEquals("http", e.failure?.domain)
     }
 
     // ── iOS: chiavi App Attest ───────────────────────────────────────────────
@@ -615,9 +559,63 @@ class IntegrityGuardTest {
         assertEquals("key-1", provider.key)
     }
 
+    /**
+     * Il server perde la chiave: la richiesta (proattiva, con la prova) viene
+     * rifiutata con `attest_key_required`. Si butta la chiave che QUELLA richiesta
+     * ha mandato, se ne registra una nuova e si riprova, tutto dentro la stessa richiesta.
+     */
     @Test
-    fun iosAttestKeyRequiredReEnrollsOnceAndRetries() = runTest {
+    fun iosAttestKeyRequiredDiscardsTheKeyTheRequestSentAndReEnrollsOnce() = runTest {
         val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "old-key")
+        var serverKnowsOldKey = true
+        val server = FakeServer { req ->
+            when {
+                !req.hasProof() -> error(PreconditionRequired, "integrity_required")
+                req.headers[IntegrityHeaders.KEY_ID] == "old-key" && !serverKnowsOldKey ->
+                    error(PreconditionRequired, "attest_key_required")
+                else -> null
+            }
+        }
+        val client = guard(server, provider)
+        client.get("/api/cs/me") // 428 nuda, prova con old-key: il server la conosce
+
+        serverKnowsOldKey = false
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+
+        assertEquals(1, provider.keysGenerated)
+        assertEquals(listOf<String?>("old-key"), provider.discarded)
+        assertEquals("key-1", server.api.last().headers[IntegrityHeaders.KEY_ID])
+    }
+
+    @Test
+    fun iosServerStillNotKnowingTheKeyForgetsItAndFailsWithoutLooping() = runTest {
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "old-key")
+        val server = FakeServer { req ->
+            if (req.hasProof()) error(PreconditionRequired, "attest_key_required")
+            else error(PreconditionRequired, "integrity_required")
+        }
+        val client = guard(server, provider)
+
+        val e = assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+
+        // La richiesta nuda e un solo retry con la prova: niente terzo giro.
+        assertEquals(2, server.api.size)
+        assertEquals("server/428", e.failure?.tag)
+        // La chiave che il server ha rifiutato e' quella che la SECONDA richiesta ha mandato.
+        assertNull(provider.key)
+        assertEquals(listOf<String?>("old-key"), provider.discarded)
+        assertEquals(1, server.challengeCalls)
+
+        // Il rifiuto e' ricordato: la richiesta dopo non rifa' nessuna prova.
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, server.challengeCalls)
+        assertEquals(3, server.api.size, "solo la richiesta nuda")
+    }
+
+    @Test
+    fun iosAttestKeyRequiredOnANakedRequestDiscardsNothing() = runTest {
+        // La richiesta rifiutata non ha mandato nessuna chiave: non c'e' niente da buttare.
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "good-key")
         var calls = 0
         val server = FakeServer { req ->
             if (req.url.encodedPath == "/api/cs/me" && ++calls == 1) error(PreconditionRequired, "attest_key_required") else null
@@ -626,22 +624,9 @@ class IntegrityGuardTest {
 
         assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
 
-        assertEquals(1, provider.keysGenerated)
-        assertEquals("key-1", server.api.last().headers[IntegrityHeaders.KEY_ID])
-    }
-
-    @Test
-    fun iosServerStillNotKnowingTheKeyForgetsItAndFailsWithoutLooping() = runTest {
-        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "old-key")
-        val server = FakeServer { error(PreconditionRequired, "attest_key_required") }
-        val client = guard(server, provider)
-
-        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
-
-        assertEquals(2, server.api.size)
-        assertEquals(1, provider.keysGenerated)
-        assertNull(provider.key)
-        assertEquals(listOf("user-1"), provider.forgotten)
+        assertTrue(provider.discarded.isEmpty())
+        assertEquals(0, provider.keysGenerated)
+        assertEquals("good-key", server.api.last().headers[IntegrityHeaders.KEY_ID])
     }
 
     @Test
@@ -658,6 +643,26 @@ class IntegrityGuardTest {
 
         assertEquals(1, provider.keysGenerated)
         assertEquals("key-1", provider.key)
+        assertEquals(listOf<String?>("stale"), provider.discarded)
+    }
+
+    @Test
+    fun aSecondInvalidKeyRightAfterTheRotationIsAFailureNotALap() = runTest {
+        // Anche la chiave appena registrata non firma: il guard non gira in tondo.
+        val failure = ProofFailure(AttestStage.ASSERT, DC_DOMAIN, 2, "boh", null, Disposition.DISCARD_KEY)
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true, key = "stale")
+        provider.invalidKeyFailure = failure
+        provider.staleKeys += listOf("stale", "key-1")
+        val server = FakeServer { req -> if (req.hasProof()) null else error(PreconditionRequired, "integrity_required") }
+        val client = guard(server, provider)
+
+        val e = assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+
+        assertEquals(failure, e.failure)
+        assertEquals(1, provider.keysGenerated, "una sola rotazione")
+        // E il fallimento e' ricordato: la richiesta dopo non ricomincia.
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.keysGenerated)
     }
 
     @Test
@@ -670,10 +675,11 @@ class IntegrityGuardTest {
         // Il fake risponde 403 senza codice: il guard non puo' registrare la chiave.
         val client = guard(server, provider)
 
-        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        val e = assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
 
         assertNull(provider.key)
         assertEquals(1, provider.keysGenerated)
+        assertEquals("register/403", e.failure?.tag)
     }
 
     @Test
@@ -843,5 +849,337 @@ class IntegrityGuardTest {
         client.get("/api/collections/events/records")
 
         assertNull(server.api.last().headers[IntegrityHeaders.SESSION])
+    }
+
+    // ── Memoria del fallimento ───────────────────────────────────────────────
+
+    private fun attestFailure(code: Int = 2) =
+        ProofFailure(AttestStage.ATTEST_KEY, DC_DOMAIN, code, "errore $code", "NSPOSIXErrorDomain/1: boh", Disposition.DISCARD_KEY, "pending", 0)
+
+    /** Un dispositivo iOS la cui registrazione cade sempre all'`attestKey`. */
+    private fun failingProvider(code: Int = 2) = FakeProvider(
+        platform = "ios", requiresKeyEnrollment = true, env = TEST_ENVIRONMENT,
+    ).also {
+        it.enrollmentFailure = IntegrityUnavailableException("App Attest (attest_key/$code)", failure = attestFailure(code))
+    }
+
+    /** Un server `watched`: senza la prova 428, con la prova ok. */
+    private fun watchedServer() = FakeServer { req -> if (!req.hasProof()) error(PreconditionRequired, "integrity_required") else null }
+
+    @Test
+    fun aBurstWithAFailingEnrollmentCostsOneChallengeAndOneReport() = runTest {
+        val provider = failingProvider()
+        val server = watchedServer()
+        val client = guard(server, provider)
+
+        val results = List(20) { i -> async { runCatching { client.get("/api/collections/events/records?page=$i") } } }.awaitAll()
+        awaitReports(server, 1)
+
+        val errors = results.map { it.exceptionOrNull() }
+        assertTrue(errors.all { it is IntegrityUnavailableException }, "venti errori")
+        assertEquals(1, errors.map { it?.message }.toSet().size, "identici")
+        assertEquals("attest_key/2", (errors.first() as IntegrityUnavailableException).failure?.tag)
+        // Una sola sfida, un solo tentativo, un solo report: gli altri 19 hanno preso l'errore noto.
+        assertEquals(1, server.challengeCalls)
+        assertEquals(1, provider.enrollAttempts)
+        assertEquals(1, server.reports.size)
+    }
+
+    @Test
+    fun aSecondWaveInsideTheWindowTouchesNeitherTheProviderNorTheChallenge() = runTest {
+        val provider = failingProvider()
+        val server = watchedServer()
+        val client = guard(server, provider)
+        List(5) { async { runCatching { client.get("/api/cs/me") } } }.awaitAll()
+        val challenges = server.challengeCalls
+        val attempts = provider.enrollAttempts
+
+        delay(10.seconds)
+        val wave = List(20) { i -> async { runCatching { client.get("/api/collections/events/records?page=$i") } } }.awaitAll()
+        awaitReports(server, 1)
+
+        assertTrue(wave.all { it.exceptionOrNull() is IntegrityUnavailableException })
+        assertEquals(challenges, server.challengeCalls, "nessuna sfida")
+        assertEquals(attempts, provider.enrollAttempts, "nessuna chiamata al provider")
+        assertEquals(1, server.reports.size, "un errore servito dalla memoria non si riporta")
+        // Le richieste sono partite NUDE: nessuna prova, ognuna ha preso il suo 428.
+        assertTrue(server.api.none { it.hasProof() })
+        assertEquals(25, server.api.size)
+    }
+
+    @Test
+    fun backoffIs30sThen2minThen8minThenCapsAtTenMinutes() = runTest {
+        val provider = failingProvider()
+        val client = guard(watchedServer(), provider)
+
+        suspend fun request() = assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        suspend fun noNewAttemptAfter(wait: kotlin.time.Duration) {
+            val before = provider.enrollAttempts
+            delay(wait)
+            request()
+            assertEquals(before, provider.enrollAttempts, "ancora dentro la finestra dopo $wait")
+        }
+        suspend fun newAttemptAfter(wait: kotlin.time.Duration) {
+            val before = provider.enrollAttempts
+            delay(wait)
+            request()
+            assertEquals(before + 1, provider.enrollAttempts, "finestra scaduta dopo $wait")
+        }
+
+        request()                                  // t = 0, tentativo 1 -> 30 s
+        assertEquals(1, provider.enrollAttempts)
+        noNewAttemptAfter(29.seconds); newAttemptAfter(1.seconds)      // t = 30 s, tentativo 2 -> 2 min
+        noNewAttemptAfter(119.seconds); newAttemptAfter(1.seconds)     // t = 150 s, tentativo 3 -> 8 min
+        noNewAttemptAfter(479.seconds); newAttemptAfter(1.seconds)     // t = 630 s, tentativo 4 -> tetto 10 min
+        noNewAttemptAfter(599.seconds); newAttemptAfter(1.seconds)     // tentativo 5 -> ancora 10 min
+        noNewAttemptAfter(599.seconds); newAttemptAfter(1.seconds)
+    }
+
+    @Test
+    fun aSuccessResetsTheAttemptsSoTheNextFailureStartsAgainAt30s() = runTest {
+        val fake = SessionServer()
+        val server = FakeServer { fake.route(this, it) }
+        val provider = failingProvider()
+        val client = guard(server, provider)
+        suspend fun request() = runCatching { client.get("/api/cs/me") }
+
+        request()                                   // tentativo 1, finestra 30 s
+        delay(30.seconds); request()                // tentativo 2, finestra 2 min
+        assertEquals(2, provider.enrollAttempts)
+
+        provider.enrollmentFailure = null           // il guasto passa
+        delay(120.seconds)
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+        assertEquals(3, provider.enrollAttempts)
+
+        // Nuovo guasto, questa volta alla firma: riparte da 30 s, non da 8 minuti.
+        provider.proveFailure = IntegrityUnavailableException("firma", failure = attestFailure(0))
+        fake.valid = null; delay(1.seconds)
+        assertTrue(request().isFailure)
+        val calls = provider.proveCalls
+        delay(29.seconds); assertTrue(request().isFailure)
+        assertEquals(calls, provider.proveCalls, "dentro i 30 s")
+        delay(1.seconds); assertTrue(request().isFailure)
+        assertEquals(calls + 1, provider.proveCalls, "scaduti i 30 s si riprova")
+    }
+
+    @Test
+    fun aRememberedFailureDoesNotKeepTheAppLockedIfTheAccountIsFreeAgain() = runTest {
+        var watched = true
+        val server = FakeServer { req -> if (watched && !req.hasProof()) error(PreconditionRequired, "integrity_required") else null }
+        val provider = failingProvider()
+        val client = guard(server, provider)
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.enrollAttempts)
+
+        // Il titolare riporta l'account a free mentre l'app e' aperta: la richiesta nuda passa.
+        watched = false
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+
+        // E scaduta la finestra NON si ritenta una prova: l'app non chiede piu' di provare.
+        delay(31.seconds)
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+        assertEquals(1, provider.enrollAttempts)
+        assertTrue(server.api.none { it.hasProof() })
+    }
+
+    @Test
+    fun changingOrLosingTheUserForgetsTheFailureEvenWithoutAReset() = runTest {
+        var user: String? = "user-1"
+        val provider = failingProvider()
+        val client = guard(watchedServer(), provider, user = { user })
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.enrollAttempts)
+
+        // Altro utente: il suo primo tentativo parte subito, senza aspettare i 30 s di un altro.
+        user = "user-2"
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(2, provider.enrollAttempts)
+
+        // Logout e rientro dello stesso utente: ancora da zero.
+        user = null
+        client.get("/api/health")
+        user = "user-2"
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(3, provider.enrollAttempts)
+    }
+
+    /** `reset()` e' quello che l'app chiama al logout: il fallimento dell'utente di prima non deve sopravvivergli. */
+    @Test
+    fun resetForgetsTheRememberedFailureAndTheAttemptCount() = runTest {
+        val provider = failingProvider()
+        val server = watchedServer()
+        val client = server.client()
+        val guard = IntegrityGuard(client, provider, { "user-1" }, clock = testTimeSource, scope = realTimeScope())
+        guard.install()
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.enrollAttempts)
+
+        // Dentro i 30 s la richiesta dopo non ritenta...
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.enrollAttempts)
+
+        // ...ma dopo un reset si riparte da zero, subito, e dal primo tentativo (30 s, non 2 minuti).
+        guard.reset()
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(2, provider.enrollAttempts)
+        awaitReports(server, 2)
+        val attempts = server.reports.map {
+            Json.parseToJsonElement(it.body.toByteArray().decodeToString()).jsonObject["attempt"]!!.jsonPrimitive.content.toInt()
+        }
+        assertEquals(listOf(1, 1), attempts)
+    }
+
+    /**
+     * Play Integrity non allega un `ProofFailure`, ma il suo guasto passeggero (troppe
+     * richieste, rete, errore di Google) non deve ripetere sfida + chiamata a Google a
+     * ogni richiesta: ha il suo backoff come App Attest. Non si riporta, non c'e' uno stage da descrivere.
+     */
+    @Test
+    fun aFailureWithoutACauseIsRememberedWithTheBackoffButNeverReported() = runTest {
+        val server = watchedServer()
+        val provider = FakeProvider()
+        provider.proveFailure = IntegrityUnavailableException("Play Integrity non ha risposto (codice -8)")
+        val client = guard(server, provider)
+
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.proveCalls)
+        assertEquals(1, server.challengeCalls)
+
+        // Dentro i 30 s: nessuna sfida, nessuna chiamata a Play Integrity, le richieste partono nude.
+        delay(10.seconds)
+        val wave = List(5) { async { runCatching { client.get("/api/cs/me") } } }.awaitAll()
+        assertTrue(wave.all { it.exceptionOrNull() is IntegrityUnavailableException })
+        assertEquals(1, provider.proveCalls)
+        assertEquals(1, server.challengeCalls)
+        assertTrue(server.api.none { it.hasProof() })
+
+        // Scaduti i 30 s si riprova, e a guasto passato si entra.
+        provider.proveFailure = null
+        delay(21.seconds)
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+        assertEquals(2, provider.proveCalls)
+
+        awaitReports(server, 0)
+        assertTrue(server.reports.isEmpty(), "niente stage da descrivere: niente report")
+    }
+
+    @Test
+    fun anOfflineChallengeIsNotRememberedAndRecoversAsSoonAsTheNetworkReturns() = runTest {
+        val server = watchedServer()
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
+        server.challengeError = kotlinx.io.IOException("offline")
+
+        assertFailsWith<kotlinx.io.IOException> { client.get("/api/cs/me") }
+        assertFailsWith<kotlinx.io.IOException> { client.get("/api/cs/me") }
+        // Nessuna memoria: ogni richiesta ha riprovato la sfida.
+        assertEquals(2, server.requests.count { it.url.encodedPath == CHALLENGE })
+
+        server.challengeError = null
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+        awaitReports(server, 0)
+        assertTrue(server.reports.isEmpty(), "offline non e' un guasto di integrita': nessun report")
+    }
+
+    @Test
+    fun aServerErrorOnTheChallengeIsRememberedButAClientErrorIsNot() = runTest {
+        val server = watchedServer()
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
+
+        server.challengeStatus = HttpStatusCode.ServiceUnavailable
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, server.requests.count { it.url.encodedPath == CHALLENGE }, "il secondo 503 viene dalla memoria")
+
+        // Un 4xx sulla sfida (un 401 con un token da rinfrescare, per dire) non e' un guasto di integrita'.
+        val other = watchedServer()
+        other.challengeStatus = HttpStatusCode.Unauthorized
+        val client2 = guard(other, FakeProvider(platform = "ios", requiresKeyEnrollment = true))
+        assertFailsWith<IntegrityUnavailableException> { client2.get("/api/cs/me") }
+        assertFailsWith<IntegrityUnavailableException> { client2.get("/api/cs/me") }
+        assertEquals(2, other.requests.count { it.url.encodedPath == CHALLENGE }, "ogni richiesta riprova")
+        awaitReports(server, 1)
+        awaitReports(other, 0)
+        assertEquals(1, server.reports.size)
+        assertEquals(0, other.reports.size)
+    }
+
+    @Test
+    fun serverVerdictsOnAUserRequestAreNeverRemembered() = runTest {
+        // 403 integrity_failed su una richiesta dell'utente che porta la prova: un
+        // verdetto del server, non un guasto di costruzione.
+        val server = FakeServer { req -> if (req.hasProof()) error(HttpStatusCode.Forbidden, "integrity_failed") else error(PreconditionRequired, "integrity_required") }
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
+
+        assertFailsWith<IntegrityFailedException> { client.get("/api/cs/me") }
+        assertFailsWith<IntegrityFailedException> { client.get("/api/cs/me") }
+
+        // Ogni richiesta rifa la sua prova (sfida + asserzione, nessuna chiave nuova): nessuna memoria.
+        assertEquals(1, provider.keysGenerated)
+        assertEquals(2, provider.proveCalls)
+        awaitReports(server, 0)
+        assertTrue(server.reports.isEmpty())
+    }
+
+    /**
+     * Il server che rifiuta l'attestazione risponde 403 `integrity_failed` (e' la
+     * `reject` di `iosAttestHandler`). L'interceptor lo trasforma in
+     * [IntegrityFailedException] prima che `register` veda lo status: se restasse
+     * cosi' non sarebbe ricordato, e ogni richiesta in coda conierebbe un'altra chiave.
+     */
+    @Test
+    fun aRegistrationTheServerRefusesWithIntegrityFailedIsARememberedRegisterFailure() = runTest {
+        val server = watchedServer()
+        server.attestStatus = HttpStatusCode.Forbidden
+        server.attestBody = """{"status":403,"message":"no","code":"integrity_failed"}"""
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
+
+        val results = List(20) { i -> async { runCatching { client.get("/api/collections/events/records?page=$i") } } }.awaitAll()
+        awaitReports(server, 1)
+
+        val errors = results.map { it.exceptionOrNull() }
+        assertTrue(errors.all { it is IntegrityUnavailableException }, "venti errori della stessa causa, non verdetti sulla richiesta")
+        assertEquals(setOf("register/403"), errors.map { (it as IntegrityUnavailableException).failure?.tag }.toSet())
+        assertEquals(1, provider.enrollAttempts, "una sola registrazione, non una per richiesta")
+        assertEquals(1, provider.keysGenerated)
+        assertEquals(1, server.requests.count { it.url.encodedPath == ATTEST })
+        assertEquals(1, server.challengeCalls)
+        assertEquals(1, server.reports.size)
+        val body = server.reports.single().body.toByteArray().decodeToString()
+        assertTrue("\"stage\":\"register\"" in body && "\"code\":403" in body, body)
+
+        // Una seconda ondata prima della scadenza: zero registrazioni, zero sfide.
+        delay(10.seconds)
+        assertFailsWith<IntegrityUnavailableException> { client.get("/api/cs/me") }
+        assertEquals(1, provider.enrollAttempts)
+        assertEquals(1, server.requests.count { it.url.encodedPath == ATTEST })
+        assertEquals(1, server.challengeCalls)
+
+        // Passato il backoff si riprova, con una chiave nuova (la prima e' consumata).
+        delay(30.seconds)
+        server.attestStatus = HttpStatusCode.OK
+        server.attestBody = """{"ok":true}"""
+        assertEquals(HttpStatusCode.OK, client.get("/api/cs/me").status)
+        assertEquals(2, provider.keysGenerated)
+    }
+
+    @Test
+    fun anAccountBlockedOnTheRegistrationIsNotRemembered() = runTest {
+        val server = watchedServer()
+        server.attestStatus = HttpStatusCode.Forbidden
+        server.attestBody = """{"status":403,"message":"no","code":"account_blocked"}"""
+        val provider = FakeProvider(platform = "ios", requiresKeyEnrollment = true)
+        val client = guard(server, provider)
+
+        assertFailsWith<AccountBlockedException> { client.get("/api/cs/me") }
+        assertFailsWith<AccountBlockedException> { client.get("/api/cs/me") }
+
+        assertEquals(2, provider.enrollAttempts, "un account sospeso non e' un guasto: nessuna memoria")
+        awaitReports(server, 0)
+        assertTrue(server.reports.isEmpty())
     }
 }

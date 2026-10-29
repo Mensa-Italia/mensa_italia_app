@@ -35,12 +35,17 @@ extension Error {
             if kotlin is AccountBlockedException {
                 return tr("app.account.suspended.title", fallback: "Account sospeso")
             }
+            // Il tag (`attest_key/2`) porta con sé la causa: uno screenshot di un
+            // socio o di un revisore la mostra anche se il report al server non
+            // fosse mai arrivato.
             if kotlin is IntegrityUnsupportedException || kotlin is IntegrityFailedException {
                 return tr("app.error.integrity",
                           fallback: "Questo dispositivo non ha superato la verifica di sicurezza dell'app. Usa l'app ufficiale su un dispositivo non modificato.")
+                    + Self.integrityTagSuffix(kotlin)
             }
             if kotlin is IntegrityException {
                 return tr("app.error.integrity_retry", fallback: "Verifica di sicurezza non riuscita. Riprova fra poco.")
+                    + Self.integrityTagSuffix(kotlin)
             }
         }
         return (self as NSError).localizedDescription
@@ -49,6 +54,17 @@ extension Error {
     /// Per l'aggiornamento di dati già a schermo (liste, dettagli dalla cache):
     /// offline non c'è niente da segnalare, restano quelli salvati.
     var refreshMessage: String? { isOffline ? nil : userMessage }
+
+    /// " (attest_key/2)" se l'errore di integrità conosce la sua causa, altrimenti
+    /// niente. Non scrive nel log: una vista rilegge `userMessage` a ogni
+    /// ridisegno. La riga di log la scrive una volta sola `IntegrityGuard`, dove
+    /// il fallimento nasce.
+    private static func integrityTagSuffix(_ kotlin: KotlinThrowable) -> String {
+        let failure = (kotlin as? IntegrityUnavailableException)?.failure
+            ?? (kotlin as? IntegrityUnsupportedException)?.failure
+        guard let tag = failure?.tag else { return "" }
+        return " (\(tag))"
+    }
 
     private static var offlineCodes: Set<Int> {
         [

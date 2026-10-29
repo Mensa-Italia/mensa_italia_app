@@ -4,6 +4,7 @@ import it.mensa.shared.api.endpoints.ExportRequestGoneException
 import it.mensa.shared.integrity.AccountBlockedException
 import it.mensa.shared.integrity.IntegrityException
 import it.mensa.shared.integrity.IntegrityFailedException
+import it.mensa.shared.integrity.IntegrityUnavailableException
 import it.mensa.shared.integrity.IntegrityUnsupportedException
 import it.mensa.shared.net.NetworkErrors
 
@@ -25,16 +26,32 @@ val Throwable.userMessage: String
             koinAccess().i18n.t("ex_app.export.error.gone", "La richiesta è scaduta o è già stata gestita. Chiedi di nuovo all'app esterna.")
         this is AccountBlockedException ->
             koinAccess().i18n.t("app.account.suspended.title", "Account sospeso")
+        // Il tag (`attest_key/2`) porta con se' la causa: uno screenshot di un socio
+        // la mostra anche se il report al server non fosse mai arrivato.
         this is IntegrityUnsupportedException || this is IntegrityFailedException ->
             koinAccess().i18n.t(
                 "app.error.integrity",
                 "Questo dispositivo non ha superato la verifica di sicurezza dell'app. " +
                     "Usa l'app ufficiale su un dispositivo non modificato.",
-            )
+            ) + integrityTagSuffix()
         this is IntegrityException ->
-            koinAccess().i18n.t("app.error.integrity_retry", "Verifica di sicurezza non riuscita. Riprova fra poco.")
+            koinAccess().i18n.t("app.error.integrity_retry", "Verifica di sicurezza non riuscita. Riprova fra poco.") +
+                integrityTagSuffix()
         else -> message ?: koinAccess().i18n.t("app.error.generic", "Qualcosa e' andato storto. Riprova.")
     }
+
+/**
+ * " (attest_key/2)" se l'errore di integrita' conosce la sua causa, altrimenti
+ * niente. Non scrive nel log: una schermata rilegge `userMessage` a ogni
+ * ricomposizione. La riga di log la scrive una volta sola `IntegrityGuard`, dove
+ * il fallimento nasce.
+ */
+private fun Throwable.integrityTagSuffix(): String {
+    val failure = (this as? IntegrityUnavailableException)?.failure
+        ?: (this as? IntegrityUnsupportedException)?.failure
+    val tag = failure?.tag ?: return ""
+    return " ($tag)"
+}
 
 /**
  * Per l'aggiornamento di dati gia' a schermo: offline non c'e' niente da

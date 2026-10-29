@@ -38,9 +38,9 @@ object IntegrityClientData {
  * Dalla revisione 2 del contratto vale per *tutte* le richieste autenticate al
  * nostro server sotto `/api/`, non piu' solo per timbri e medaglie: quel che
  * resta qui e' l'elenco delle esenzioni, che sono quelle senza le quali il
- * flusso non funzionerebbe (la sfida e l'attestazione) o che non passano da
- * Ktor (i file, scaricati dai loader nativi) o che non sono autenticate
- * (apertura dell'SSE, health).
+ * flusso non funzionerebbe (la sfida, l'attestazione e il report del suo
+ * fallimento) o che non passano da Ktor (i file, scaricati dai loader nativi)
+ * o che non sono autenticate (apertura dell'SSE, health).
  */
 object IntegrityScope {
 
@@ -53,6 +53,10 @@ object IntegrityScope {
         return when {
             path == "/api/integrity/challenge" -> true
             path == "/api/integrity/ios/attest" -> true
+            // Il report di un fallimento della prova: senza l'esenzione, quello di
+            // un utente `watched` che la prova non riesce a darla riceverebbe a
+            // sua volta un 428. Specchio di `Exempt()` lato server.
+            path == "/api/integrity/report" && m == "POST" -> true
             path.startsWith("/api/files/") -> true
             // Aprire lo stream e' esente; le sottoscrizioni (POST) no.
             path == "/api/realtime" && m == "GET" -> true

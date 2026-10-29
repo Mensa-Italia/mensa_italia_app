@@ -34,20 +34,39 @@ class IntegrityFailedException(message: String = "Verifica di integrita' non sup
  * Store o Play Services assenti, progetto Cloud non configurato) o niente App
  * Attest (simulatore, watchOS, dispositivo non supportato). Non e' un guasto
  * transitorio, quindi non si riprova.
+ *
+ * [failure] e' la causa nativa quando la conosciamo (stage, dominio, codice):
+ * la UI ne mostra il [ProofFailure.tag].
  */
-class IntegrityUnsupportedException(message: String, cause: Throwable? = null) : IntegrityException(message, cause)
+class IntegrityUnsupportedException(
+    message: String,
+    cause: Throwable? = null,
+    val failure: ProofFailure? = null,
+) : IntegrityException(message, cause)
 
 /**
  * La prova non si e' potuta ottenere *adesso*: rete caduta durante la sfida,
- * troppe richieste a Play Integrity, il server che rifiuta di nuovo dopo
- * l'unico retry concesso. Riprovando piu' tardi puo' andare.
+ * troppe richieste a Play Integrity, Apple che non risponde, il server che
+ * rifiuta di nuovo dopo l'unico retry concesso. Riprovando piu' tardi puo'
+ * andare: [IntegrityGuard] la ricorda e non riprova prima del backoff.
+ *
+ * [failure] come in [IntegrityUnsupportedException].
  */
-class IntegrityUnavailableException(message: String, cause: Throwable? = null) : IntegrityException(message, cause)
+class IntegrityUnavailableException(
+    message: String,
+    cause: Throwable? = null,
+    val failure: ProofFailure? = null,
+) : IntegrityException(message, cause)
 
 /**
- * Solo App Attest: la chiave salvata non esiste piu' o non e' piu' valida
- * (`DCError.invalidKey`: app reinstallata, restore su un altro telefono).
- * Lo gestisce [IntegrityGuard] registrando una chiave nuova, una volta sola;
- * non arriva mai ai chiamanti.
+ * Solo App Attest: la chiave [keyId] non vale piu' (un'asserzione e' fallita su
+ * una chiave abbastanza vecchia da non poter essere il dispositivo il problema).
+ * [failure] e' l'errore ORIGINALE di Apple. La gestisce [IntegrityGuard]
+ * scartando [keyId] e registrandone una nuova, una volta sola; non arriva mai
+ * ai chiamanti.
  */
-class IntegrityKeyInvalidException(message: String, cause: Throwable? = null) : IntegrityException(message, cause)
+class IntegrityKeyInvalidException(
+    val keyId: String,
+    val failure: ProofFailure?,
+    cause: Throwable? = null,
+) : IntegrityException("App Attest: chiave non valida", cause)

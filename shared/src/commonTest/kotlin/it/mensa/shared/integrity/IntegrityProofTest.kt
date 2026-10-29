@@ -92,6 +92,8 @@ class IntegrityProofTest {
     fun exemptionsAreExactlyTheContractList() {
         assertTrue(IntegrityScope.isExempt("POST", "/api/integrity/challenge"))
         assertTrue(IntegrityScope.isExempt("POST", "/api/integrity/ios/attest"))
+        // Il report del fallimento della prova: senza, quello di chi la prova non la sa dare prenderebbe un 428.
+        assertTrue(IntegrityScope.isExempt("POST", "/api/integrity/report"))
         assertTrue(IntegrityScope.isExempt("GET", "/api/files/stamp/abc/img.png"))
         assertTrue(IntegrityScope.isExempt("GET", "/api/realtime"))
         assertTrue(IntegrityScope.isExempt("GET", "/api/health"))
@@ -103,6 +105,12 @@ class IntegrityProofTest {
         assertFalse(IntegrityScope.isExempt("POST", "/api/realtime"))
         // Prefissi simili ma diversi.
         assertFalse(IntegrityScope.isExempt("POST", "/api/integrity/other"))
+        // Il report e' solo un POST, e solo quel path: niente varianti.
+        assertFalse(IntegrityScope.isExempt("GET", "/api/integrity/report"))
+        assertFalse(IntegrityScope.isExempt("POST", "/api/integrity/report/"))
+        assertFalse(IntegrityScope.isExempt("POST", "/api/integrity/report/../x"))
+        assertFalse(IntegrityScope.isExempt("POST", "/api/integrity//report"))
+        assertFalse(IntegrityScope.isExempt("POST", "/api/integrity/reports"))
         assertFalse(IntegrityScope.isExempt("GET", "/api/filesystem"))
         assertFalse(IntegrityScope.isExempt("GET", "/api/collections/files/records"))
     }

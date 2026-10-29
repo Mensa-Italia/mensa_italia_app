@@ -22,6 +22,9 @@ import io.ktor.http.encodedPath
 import it.mensa.shared.api.ApiConfig
 import it.mensa.shared.auth.AccountStatus
 import it.mensa.shared.net.ServerReachability
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
@@ -43,7 +46,6 @@ private const val CODE_INTEGRITY_FAILED = "integrity_failed"
 private const val CODE_INTEGRITY_REQUIRED = "integrity_required"
 private const val CODE_ATTEST_KEY_REQUIRED = "attest_key_required"
 
-
 /** Si smette di usare una sessione questi secondi prima che scada sul server. */
 private const val SESSION_MARGIN_SECONDS = 30L
 
@@ -58,7 +60,7 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
 
 /**
  * Il lato client del livello di accesso `watched` / `blocked`: un interceptor di
- * [HttpSend], come `installAuthRetry`, che fa tre cose per ogni richiesta al
+ * [HttpSend], come `installAuthRetry`, che fa queste cose per ogni richiesta al
  * nostro server.
  *
  *  1. **Account sospeso.** Un 403 `account_blocked` da *qualunque* risposta
@@ -73,7 +75,9 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
  *     successiva *non esente* ([IntegrityScope]) parte gia' con la prova, per non
  *     raddoppiare le chiamate. Una sfida per richiesta: la sfida e' monouso, e le
  *     richieste concorrenti non la condividono mai. Si azzera da sola quando
- *     l'utente cambia o sparisce (logout).
+ *     l'utente cambia o sparisce (logout) e quando una richiesta nuda, durante un
+ *     fallimento (punto 5), riceve una risposta buona: l'account e' tornato
+ *     libero e l'app non resta chiusa fino al riavvio.
  *  4. **Sessione.** Dopo una prova completa riuscita il server manda una
  *     sessione (`X-Integrity-Session`) che per qualche minuto vale al posto di
  *     sfida + prova, su tutto. Le richieste che non ce l'hanno si mettono in fila
@@ -81,7 +85,34 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
  *     sessione che ne torna. Su Android cosi' una schermata che parte con venti
  *     richieste costa una decode di Play Integrity e non venti; su iOS le
  *     asserzioni App Attest non partono mai in parallelo con la stessa chiave,
- *     che e' quello che nella 22.2.18 le faceva fallire a catena.
+ *     che e' quello che nella 22.2.18 le faceva fallire a catena. E' anche la
+ *     ragione per cui il ciclo di vita della chiave ([AppAttestLifecycle]) non
+ *     ha un mutex suo: gli arriva solo roba da qui sotto, una alla volta.
+ *  5. **Memoria del fallimento.** Se la prova non si riesce a costruire
+ *     ([IntegrityUnsupportedException], [IntegrityUnavailableException] con la
+ *     loro causa, un 5xx sulla sfida, o un server che rifiuta anche il retry) lo
+ *     si ricorda, per utente e in RAM: [IntegrityUnavailableException] fino a
+ *     `30 s x 4^(n-1)` (tetto 10 minuti), [IntegrityUnsupportedException] senza
+ *     scadenza nel processo. Finche' vale, nessuna chiamata ad Apple, nessuna
+ *     sfida, nessun [sessionLock]: le richieste partono NUDE, decide il server, e
+ *     su un 428 l'errore si rilancia dalla memoria. Chi era in coda dietro il
+ *     tentativo fallito prende l'errore gia' noto invece di rifarlo. Vale anche
+ *     per Android: un [IntegrityUnavailableException] senza [ProofFailure]
+ *     (Play Integrity non ne allega) si ricorda col suo backoff, ma non si riporta
+ *     al server perche' non c'e' uno stage da descrivere. Non si
+ *     ricordano `account_blocked`, un `integrity_failed` su una richiesta
+ *     dell'utente (verdetti del server) e le `IOException`: offline non e' un
+ *     guasto di integrita' e deve riprendersi appena torna la rete. Un
+ *     `integrity_failed` sulla registrazione della chiave (`/ios/attest`) invece
+ *     SI ricorda: e' il server che non accetta l'attestazione, la chiave e'
+ *     consumata, e senza memoria ogni richiesta ne conierebbe un'altra. Un
+ *     successo (la sessione, o una risposta buona a una richiesta con la prova
+ *     completa) azzera tutto. Un nuovo avvio e' un tentativo nuovo, di proposito:
+ *     un cooldown persistito potrebbe chiudere fuori un socio per ore.
+ *
+ * Ogni fallimento FRESCO (non quello servito dalla memoria) va al server con
+ * [IntegrityReporter], che lo descrive e basta: la decisione del server non
+ * dipende mai da cio' che il client dichiara.
  *
  * Il corpo viene rimandato com'e': col ContentNegotiation e' gia' un
  * `TextContent`/`ByteArrayContent`, e il multipart si riscrive. Un corpo che e'
@@ -90,22 +121,21 @@ private data class AttestRequest(val key_id: String, val attestation: String, va
  *
  * [userId] e' una funzione perche' l'`AuthRepository` nasce dopo il client:
  * si legge al momento della richiesta.
+ *
+ * [clock] misura sessioni e backoff (i test ne iniettano uno a mano); [scope] e'
+ * dove girano i report, che non devono mai stare sul percorso della richiesta.
  */
 class IntegrityGuard(
     private val client: HttpClient,
     private val provider: IntegrityProvider,
     private val userId: () -> String?,
     private val json: Json = Json { ignoreUnknownKeys = true; isLenient = true },
+    private val clock: TimeSource = TimeSource.Monotonic,
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
     /** L'utente per cui il server ha gia' chiesto la prova in questa sessione. */
     @Volatile
     private var proofRequiredFor: String? = null
-
-    /** Cresce a ogni chiave App Attest registrata: evita che due richieste concorrenti la registrino due volte. */
-    @Volatile
-    private var enrollmentEpoch: Int = 0
-
-    private val enrollmentLock = Mutex()
 
     private class Session(val user: String, val token: String, val usableUntil: TimeMark)
 
@@ -114,8 +144,16 @@ class IntegrityGuard(
 
     private val sessionLock = Mutex()
 
-    /** Una richiesta mandata, e la sessione che portava (null: prova completa o nessuna). */
-    private class Sent(val call: HttpClientCall, val session: String?)
+    /** Il fallimento ricordato (vedi il punto 5 della classe); vedi [FailureMemory] per come si modifica. */
+    private val memory = FailureMemory(clock)
+
+    private val reporter = IntegrityReporter(client, scope)
+
+    /**
+     * Una richiesta mandata, la sessione che portava (null: prova completa o
+     * nessuna) e se portava la prova completa ([full]).
+     */
+    private class Sent(val call: HttpClientCall, val session: String?, val full: Boolean = false)
 
     /** Registra l'interceptor sul client. */
     fun install() {
@@ -126,6 +164,7 @@ class IntegrityGuard(
     fun reset() {
         proofRequiredFor = null
         session = null
+        memory.clear()
     }
 
     internal suspend fun handle(sender: Sender, request: HttpRequestBuilder): HttpClientCall {
@@ -138,17 +177,30 @@ class IntegrityGuard(
 
         val user = userId()
         if (user == null) proofRequiredFor = null
-        val epoch = enrollmentEpoch
-        val proactive = eligible && user != null && proofRequiredFor == user
+        // Il fallimento ricordato e' di un utente: se cambia o sparisce, si dimentica.
+        memory.forgetNotOf(user)
+
+        val wanted = eligible && user != null && proofRequiredFor == user
+        // Durante un fallimento la richiesta parte NUDA e decide il server.
+        val failing = wanted && memory.known(user) != null
+        val proactive = wanted && !failing
 
         val first = if (proactive) {
-            sendWithProof(sender, request, user, method, path, forceEnroll = false, epoch = epoch)
+            sendWithProof(sender, request, user, method, path, rejectedKeyId = null)
         } else {
             Sent(sender.execute(request), session = null)
         }
 
         return when (val verdict = classify(first.call, request)) {
-            is Verdict.Fine -> verdict.call.also { noteSuccess(request, it) }
+            is Verdict.Fine -> verdict.call.also {
+                noteSuccess(request, it)
+                if (first.full && user != null) memory.forgetOf(user)
+                // Una risposta buona a una richiesta nuda mentre il fallimento e' ricordato:
+                // il server non chiede piu' la prova (l'account e' tornato free). Il
+                // fallimento non si tocca, cosi' il backoff non si perde se il server
+                // se lo ricorda ancora.
+                if (failing && it.response.status.value < 400) proofRequiredFor = null
+            }
             // 428 su una richiesta esente o anonima non e' roba nostra: la si restituisce.
             is Verdict.Needs ->
                 if (!eligible) verdict.call
@@ -156,7 +208,7 @@ class IntegrityGuard(
                     // Sessione rifiutata (scaduta, server riavviato): la si butta, a
                     // meno che un'altra richiesta non l'abbia gia' sostituita.
                     first.session?.let { used -> if (session?.token == used) session = null }
-                    retryWithProof(sender, request, verdict, user ?: "", method, path, epoch)
+                    retryWithProof(sender, request, verdict, first, user ?: "", method, path)
                 }
         }
     }
@@ -165,30 +217,57 @@ class IntegrityGuard(
         sender: Sender,
         request: HttpRequestBuilder,
         needed: Verdict.Needs,
+        first: Sent,
         user: String,
         method: String,
         path: String,
-        epoch: Int,
     ): HttpClientCall {
         if (request.body is OutgoingContent.ReadChannelContent) {
             throw IntegrityUnavailableException("La richiesta non si puo' ripetere con la prova di integrita'")
         }
         proofRequiredFor = user
+        // Un fallimento ricordato: nessuna sfida, nessuna chiamata ad Apple, nessun lock.
+        memory.known(user)?.let { throw it.error }
 
-        val retry = sendWithProof(
-            sender, request, user, method, path,
-            forceEnroll = needed.code == CODE_ATTEST_KEY_REQUIRED,
-            epoch = epoch,
-        )
+        val started = clock.markNow()
+        // La chiave da buttare e' quella che la richiesta rifiutata ha davvero
+        // mandato, non "quella che abbiamo adesso": nel frattempo un'altra
+        // richiesta potrebbe averla gia' sostituita.
+        val rejectedKeyId = if (needed.code == CODE_ATTEST_KEY_REQUIRED) {
+            first.call.request.headers[IntegrityHeaders.KEY_ID]
+        } else null
+
+        val retry = sendWithProof(sender, request, user, method, path, rejectedKeyId)
         return when (val verdict = classify(retry.call, request)) {
-            is Verdict.Fine -> verdict.call.also { noteSuccess(request, it) }
+            is Verdict.Fine -> verdict.call.also {
+                noteSuccess(request, it)
+                if (retry.full) memory.forgetOf(user)
+            }
             is Verdict.Needs -> {
                 // Il server ha rifiutato anche la prova appena costruita: un solo
-                // retry, poi errore. Se non riconosce la chiave, la si butta, cosi'
-                // alla prossima richiesta se ne registra una nuova.
-                if (verdict.code == CODE_ATTEST_KEY_REQUIRED) runCatching { provider.forgetKey(user) }
+                // retry, poi errore. Se non riconosce la chiave, la si butta (quella
+                // che questa seconda richiesta ha mandato), cosi' alla prossima se ne
+                // registra una nuova; e il rifiuto si ricorda, cosi' un server che
+                // rifiuta non viene martellato con due prove per richiesta.
+                if (verdict.code == CODE_ATTEST_KEY_REQUIRED) {
+                    retry.call.request.headers[IntegrityHeaders.KEY_ID]?.let { provider.discardKey(user, it) }
+                }
                 serverAnswered()
-                throw IntegrityUnavailableException("Il server ha rifiutato la prova di integrita' (${verdict.code})")
+                val cause = ProofFailure(
+                    stage = AttestStage.SERVER,
+                    domain = HTTP_DOMAIN,
+                    code = PreconditionRequired.value,
+                    detail = "Il server ha rifiutato la prova di integrita' (${verdict.code})",
+                    underlying = null,
+                    disposition = Disposition.TRANSIENT,
+                )
+                throw remember(
+                    user,
+                    IntegrityUnavailableException(
+                        "Il server ha rifiutato la prova di integrita' (${verdict.code})", failure = cause,
+                    ),
+                    started,
+                )
             }
         }
     }
@@ -255,11 +334,60 @@ class IntegrityGuard(
      */
     private fun serverAnswered() = ServerReachability.onResponse()
 
+    // ── Memoria del fallimento ───────────────────────────────────────────────
+
+    /**
+     * Ricorda [e] per [user] se e' un fallimento della prova e, se ne conosce la
+     * causa, lo manda al server. Torna [e], da rilanciare. Non tocca
+     * `account_blocked` e un `integrity_failed` su una richiesta dell'utente
+     * (verdetti del server, non guasti di costruzione della prova). Una sfida che
+     * risponde male si ricorda solo se e' un 5xx.
+     *
+     * Senza [ProofFailure] (Play Integrity non ne allega; un dispositivo non
+     * supportato che non e' iOS) un [IntegrityUnavailableException] si ricorda
+     * comunque, col suo backoff: e' il guasto passeggero di Google (troppe
+     * richieste, rete, errore interno) che altrimenti ripeterebbe sfida +
+     * chiamata a Play Integrity a ogni richiesta. Non si riporta, perche' non c'e'
+     * uno stage da descrivere, e un [IntegrityUnsupportedException] senza causa
+     * non si ricorda: non chiama nessuno e a ogni richiesta costa zero.
+     *
+     * Si chiama una volta sola per fallimento, dove nasce: chi lo riceve dalla
+     * memoria non passa di qui, quindi non riporta e non allunga il backoff.
+     */
+    private fun remember(user: String, e: IntegrityException, started: TimeMark): IntegrityException {
+        val cause = when (e) {
+            is IntegrityUnsupportedException -> e.failure
+            is IntegrityUnavailableException -> e.failure
+            else -> null
+        }
+        if (cause == null) {
+            if (e is IntegrityUnavailableException) memory.remember(user, e, expires = true)
+            return e
+        }
+        if (cause.stage == AttestStage.CHALLENGE && (cause.code ?: 0) !in 500..599) return e
+
+        val attempts = memory.remember(user, e, expires = e !is IntegrityUnsupportedException)
+        // Una riga nel log per ogni fallimento fresco, qui dove nasce: leggere
+        // `userMessage` non scrive niente, perche' una schermata lo rilegge a ogni
+        // ridisegno. Solo il tag (`attest_key/2`): nessun carattere che un
+        // `println` di Kotlin/Native possa scambiare per un formato.
+        println("MENSA_INTEGRITY_FAILURE: ${cause.tag} attempt=$attempts")
+        reporter.report(
+            platform = provider.platform,
+            environment = provider.environment(),
+            failure = cause,
+            outcome = ReportOutcome.FAILED,
+            attempt = attempts,
+            elapsedMs = started.elapsedNow().inWholeMilliseconds,
+        )
+        return e
+    }
+
     // ── Costruzione della prova ──────────────────────────────────────────────
 
     /**
      * Manda [request] con la sessione se ce n'e' una valida, altrimenti con la
-     * prova completa, una alla volta. Vedi il punto 4 della classe.
+     * prova completa, una alla volta. Vedi i punti 4 e 5 della classe.
      */
     private suspend fun sendWithProof(
         sender: Sender,
@@ -267,17 +395,22 @@ class IntegrityGuard(
         user: String,
         method: String,
         path: String,
-        forceEnroll: Boolean,
-        epoch: Int,
+        rejectedKeyId: String?,
     ): Sent {
         val full: suspend () -> Sent = {
-            val call = sender.execute(withProof(request, user, method, path, forceEnroll, epoch))
+            val call = sender.execute(withProof(request, user, method, path, rejectedKeyId))
             captureSession(user, call)
-            Sent(call, session = null)
+            Sent(call, session = null, full = true)
         }
         sessionFor(user)?.let { return Sent(sender.execute(withSession(request, it)), it) }
+        // Un fallimento gia' noto, prima di mettersi in coda...
+        memory.known(user)?.let { throw it.error }
         return sessionLock.withLock {
-            sessionFor(user)?.let { Sent(sender.execute(withSession(request, it)), it) } ?: full()
+            sessionFor(user)?.let { return@withLock Sent(sender.execute(withSession(request, it)), it) }
+            // ...e di nuovo dentro: chi era in coda dietro un tentativo fallito prende
+            // l'errore che c'e' gia', invece di rifare sfida + chiave + attestazione.
+            memory.known(user)?.let { throw it.error }
+            full()
         }
     }
 
@@ -292,7 +425,7 @@ class IntegrityGuard(
         val token = headers[IntegrityHeaders.SESSION]?.takeIf { it.isNotBlank() } ?: return
         val ttl = headers[IntegrityHeaders.SESSION_TTL]?.toLongOrNull() ?: return
         val usable = (ttl - SESSION_MARGIN_SECONDS).coerceAtLeast(0)
-        session = Session(user, token, TimeSource.Monotonic.markNow() + usable.seconds)
+        session = Session(user, token, clock.markNow() + usable.seconds)
     }
 
     /** Una copia di [request] con la sola sessione al posto della prova. */
@@ -310,10 +443,9 @@ class IntegrityGuard(
         user: String,
         method: String,
         path: String,
-        forceEnroll: Boolean,
-        epoch: Int,
+        rejectedKeyId: String?,
     ): HttpRequestBuilder {
-        val headers = proofHeaders(user, method, path, forceEnroll, epoch)
+        val headers = proofHeaders(user, method, path, rejectedKeyId)
         return HttpRequestBuilder().apply {
             takeFrom(request)
             IntegrityHeaders.ALL.forEach { this.headers.remove(it) }
@@ -321,22 +453,44 @@ class IntegrityGuard(
         }
     }
 
-    /** Gli header completi della prova per ([method], [path]); lancia le eccezioni tipizzate. */
+    /**
+     * Gli header completi della prova per ([method], [path]); lancia le eccezioni
+     * tipizzate. [rejectedKeyId] e' la chiave che il server ha appena rifiutato
+     * (`attest_key_required`): si butta prima di ogni altra cosa.
+     *
+     * Un fallimento della prova si ricorda qui ([remember]), una volta, nel punto
+     * in cui nasce.
+     */
     internal suspend fun proofHeaders(
         user: String,
         method: String,
         path: String,
-        forceEnroll: Boolean,
-        epoch: Int,
+        rejectedKeyId: String?,
+    ): Map<String, String> {
+        val started = clock.markNow()
+        try {
+            return buildProof(user, method, path, rejectedKeyId, started)
+        } catch (e: IntegrityException) {
+            throw remember(user, e, started)
+        }
+    }
+
+    private suspend fun buildProof(
+        user: String,
+        method: String,
+        path: String,
+        rejectedKeyId: String?,
+        started: TimeMark,
     ): Map<String, String> {
         if (!provider.isSupported()) {
-            throw IntegrityUnsupportedException("Questo dispositivo non puo' dimostrare la propria integrita'")
+            val detail = "Questo dispositivo non puo' dimostrare la propria integrita'"
+            throw IntegrityUnsupportedException(detail, failure = unsupportedFailure(detail))
         }
-        if (provider.requiresKeyEnrollment) ensureKey(user, forceEnroll, epoch)
+        if (rejectedKeyId != null) provider.discardKey(user, rejectedKeyId)
+        provider.ensureEnrolled(user, enrollmentServer)
 
-        var reenrolled = false
+        var rotated = false
         while (true) {
-            val epochBefore = enrollmentEpoch
             val challenge = fetchChallenge()
             val clientData = IntegrityClientData.build(challenge, method, path)
             try {
@@ -347,53 +501,118 @@ class IntegrityGuard(
                     putAll(specific)
                 }
             } catch (e: IntegrityKeyInvalidException) {
-                // La chiave locale non vale piu': se ne registra una nuova, una volta,
-                // e solo se nel frattempo non l'ha gia' fatto un'altra richiesta.
-                // Prima si passava l'epoca corrente: ogni richiesta fallita buttava
-                // la chiave appena registrata dall'altra e ne registrava una sua.
-                if (reenrolled) throw IntegrityUnavailableException("Chiave di attestazione non valida", e)
-                reenrolled = true
-                if (enrollmentEpoch == epochBefore) provider.forgetKey(user)
-                ensureKey(user, force = true, epoch = epochBefore)
+                // La chiave locale non vale piu': se ne registra una nuova, una volta.
+                // Il compare-and-set sul key id fa il lavoro dell'epoca di prima: se
+                // un'altra richiesta l'ha gia' sostituita, qui non si butta niente.
+                if (rotated) {
+                    throw IntegrityUnavailableException("Chiave di attestazione non valida", e, e.failure)
+                }
+                rotated = true
+                // L'errore ORIGINALE della chiave scartata va al server anche se poi
+                // tutto riesce: e' cosi' che il DCError di una chiave stantia si vede.
+                e.failure?.let {
+                    reporter.report(
+                        platform = provider.platform,
+                        environment = provider.environment(),
+                        failure = it,
+                        outcome = ReportOutcome.ROTATED,
+                        attempt = memory.attemptsOf(user) + 1,
+                        elapsedMs = started.elapsedNow().inWholeMilliseconds,
+                    )
+                }
+                provider.discardKey(user, e.keyId)
+                provider.ensureEnrolled(user, enrollmentServer)
             }
         }
     }
 
     /**
-     * Garantisce che esista una chiave registrata per [user]. Sotto lock: due
-     * richieste che scoprono insieme di non averla ne registrano una sola. Con
-     * [force] (il server non riconosce la chiave) si registra di nuovo, a meno
-     * che qualcun altro non l'abbia gia' fatto dopo che la richiesta e' partita.
+     * La causa di un dispositivo che dichiara di non poter dimostrare nulla,
+     * prima ancora di interpellare Apple: per App Attest e' `generate_key/1`
+     * (la stessa di un `DCError` 1 vero, che e' quello che `isSupported` falso
+     * vuol dire). Per le altre piattaforme null: gli stage sono quelli di App
+     * Attest e un `generate_key` su Android o su watchOS sarebbe una bugia nel
+     * messaggio e nel log del server. L'errore resta quello di sempre, senza
+     * tag e senza memoria ne' report: non chiama nessuno, costa zero a ogni richiesta.
      */
-    private suspend fun ensureKey(user: String, force: Boolean, epoch: Int) {
-        enrollmentLock.withLock {
-            val alreadyRefreshed = force && enrollmentEpoch != epoch
-            if (alreadyRefreshed) return
-            if (!force && provider.hasKey(user)) return
+    private fun unsupportedFailure(detail: String): ProofFailure? {
+        if (provider.platform != PLATFORM_IOS) return null
+        return ProofFailure(
+            stage = AttestStage.GENERATE_KEY,
+            domain = UNSUPPORTED_DOMAIN,
+            code = 1,
+            detail = detail,
+            underlying = null,
+            disposition = Disposition.UNSUPPORTED,
+        )
+    }
 
-            val challenge = fetchChallenge()
-            val attestation = provider.attest(challenge)
-            val response = client.post(PATH_ATTEST) {
-                contentType(ContentType.Application.Json)
-                setBody(AttestRequest(attestation.keyId, attestation.attestation, challenge))
+    /** Le due chiamate al server che la registrazione di una chiave usa; vedi [IntegrityProvider.ensureEnrolled]. */
+    private val enrollmentServer = object : EnrollmentServer {
+        override suspend fun challenge(): String = fetchChallenge()
+
+        override suspend fun register(keyId: String, attestation: String, challenge: String) {
+            val response = try {
+                client.post(PATH_ATTEST) {
+                    contentType(ContentType.Application.Json)
+                    setBody(AttestRequest(keyId, attestation, challenge))
+                }
+            } catch (e: IntegrityFailedException) {
+                // Un 403 `integrity_failed` su QUESTA route non e' il verdetto su una
+                // richiesta dell'utente (che si rilancia cosi' com'e'): e' il server
+                // che non accetta l'attestazione (ambiente App Attest sbagliato, catena
+                // di certificati, sfida scaduta, key id gia' registrato). L'interceptor
+                // lo trasforma prima che arrivi qui sotto come status, quindi senza
+                // questa conversione non sarebbe un fallimento REGISTER: nessuna
+                // memoria, nessun backoff, nessun report, e ogni richiesta in coda
+                // conierebbe un'altra chiave, la cascata che si vuole fermare.
+                throw registrationRefused(HttpStatusCode.Forbidden.value, CODE_INTEGRITY_FAILED, e)
             }
-            // Gli errori del server (403 integrity_failed, account_blocked) li
-            // solleva gia' l'interceptor; qui resta solo cio' che non e' un 2xx.
-            if (response.status.value !in 200..299) {
-                throw IntegrityUnavailableException("Registrazione della chiave rifiutata: HTTP ${response.status.value}")
-            }
-            provider.saveKey(user, attestation.keyId)
-            enrollmentEpoch++
+            // Gli altri errori del server (account_blocked) li solleva gia'
+            // l'interceptor; qui resta solo cio' che non e' un 2xx.
+            val status = response.status.value
+            if (status !in 200..299) throw registrationRefused(status, null, null)
+        }
+
+        private fun registrationRefused(status: Int, code: String?, cause: Throwable?): IntegrityUnavailableException {
+            val detail = "Registrazione della chiave rifiutata: HTTP $status" + (code?.let { " ($it)" } ?: "")
+            val failure = ProofFailure(
+                stage = AttestStage.REGISTER,
+                domain = HTTP_DOMAIN,
+                code = status,
+                detail = detail,
+                underlying = null,
+                disposition = classify(AttestStage.REGISTER, HTTP_DOMAIN, status),
+            )
+            return IntegrityUnavailableException(detail, cause, failure)
         }
     }
 
     private suspend fun fetchChallenge(): String {
         val response = client.post(PATH_CHALLENGE)
-        if (response.status.value !in 200..299) {
-            throw IntegrityUnavailableException("Sfida di integrita' non disponibile: HTTP ${response.status.value}")
+        val status = response.status.value
+        if (status !in 200..299) {
+            throw IntegrityUnavailableException(
+                "Sfida di integrita' non disponibile: HTTP $status",
+                failure = challengeFailure(status, "Sfida di integrita' non disponibile: HTTP $status"),
+            )
         }
         val challenge = response.body<ChallengeResponse>().challenge
-        if (challenge.isBlank()) throw IntegrityUnavailableException("Sfida di integrita' vuota")
+        if (challenge.isBlank()) {
+            throw IntegrityUnavailableException(
+                "Sfida di integrita' vuota",
+                failure = challengeFailure(status, "Sfida di integrita' vuota"),
+            )
+        }
         return challenge
     }
+
+    private fun challengeFailure(status: Int, detail: String) = ProofFailure(
+        stage = AttestStage.CHALLENGE,
+        domain = HTTP_DOMAIN,
+        code = status,
+        detail = detail,
+        underlying = null,
+        disposition = Disposition.TRANSIENT,
+    )
 }

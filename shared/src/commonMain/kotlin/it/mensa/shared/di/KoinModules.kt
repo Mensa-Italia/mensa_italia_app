@@ -13,6 +13,9 @@ import it.mensa.shared.integrity.IntegrityGuard
 import it.mensa.shared.integrity.IntegrityProvider
 import it.mensa.shared.repository.DevicesRepository
 import it.mensa.shared.spotlight.SpotlightSyncEngine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -27,6 +30,9 @@ val sharedModule = module {
                 client = client,
                 provider = get<IntegrityProvider>(),
                 userId = { scope.getOrNull<AuthRepository>()?.currentUser?.value?.id?.takeIf { it.isNotBlank() } },
+                // Dove girano i report di un fallimento della prova: fuori dal
+                // percorso della richiesta, e un report che fallisce non ferma gli altri.
+                scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
             ).install()
         }
     }
