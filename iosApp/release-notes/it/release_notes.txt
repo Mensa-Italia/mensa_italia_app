@@ -11,3 +11,5 @@ Dopo aver aggiornato una lista trascinandola verso il basso, la ricerca non rest
 Su iPhone la verifica di sicurezza dell'app si ripristina da sola quando si blocca, e se non ci riesce il messaggio dice perché.
 
 Su iPhone, se l'accesso non riesce, la schermata dice perché: password sbagliata, troppi tentativi o servizio non raggiungibile.
+
+Quando il server non risponde come deve, l'app lo dice invece di mostrare schermate vuote, e se la sessione scade rientra da sola con la password salvata.
