@@ -13,3 +13,5 @@ Su iPhone la verifica di sicurezza dell'app si ripristina da sola quando si bloc
 Su iPhone, se l'accesso non riesce, la schermata dice perché: password sbagliata, troppi tentativi o servizio non raggiungibile.
 
 Quando il server non risponde come deve, l'app lo dice invece di mostrare schermate vuote, e se la sessione scade rientra da sola con la password salvata.
+
+Il tasto "Modifica" di un evento compare solo a chi può davvero modificarlo: chi l'ha creato e i referenti del gruppo locale.
