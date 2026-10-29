@@ -1,6 +1,7 @@
 package it.mensa.shared.repository
 
 import it.mensa.shared.api.endpoints.QuidApi
+import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.model.QuidArticle
 import it.mensa.shared.model.QuidArticleAudio
 import it.mensa.shared.model.QuidIssue
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.map
 
 class QuidRepository(
     private val api: QuidApi,
+    private val flags: FeatureFlags,
 ) {
     private val _issues = MutableStateFlow<List<QuidIssue>>(emptyList())
     private val _issueArticles = MutableStateFlow<Map<Long, List<QuidArticle>>>(emptyMap())
@@ -37,6 +39,13 @@ class QuidRepository(
     @Throws(Exception::class)
     suspend fun getArticle(id: Long): QuidArticle = api.getPost(id)
 
+    /**
+     * Null anche con `quid_audio_enabled` spento, senza chiedere niente al
+     * server: l'audio si accende da configurazione, come l'organigramma. La
+     * lista di un numero lo chiede per ogni articolo, e con la lettura chiusa
+     * sul server erano altrettanti 403.
+     */
     @Throws(Exception::class)
-    suspend fun getAudioForArticle(wpId: Long): QuidArticleAudio? = api.getAudioForArticle(wpId)
+    suspend fun getAudioForArticle(wpId: Long): QuidArticleAudio? =
+        if (flags.quidAudioEnabled) api.getAudioForArticle(wpId) else null
 }

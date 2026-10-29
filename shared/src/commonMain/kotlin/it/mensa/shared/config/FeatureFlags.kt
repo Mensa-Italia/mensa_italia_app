@@ -35,6 +35,7 @@ class FeatureFlags(
         val donationLinkOnIos: Boolean = false,
         val donationLinkOnAndroid: Boolean = false,
         val donationStripeLink: String = "",
+        val quidAudio: Boolean = false,
     ) {
         /**
          * Link esterno da aprire al posto della pagina di donazione nativa,
@@ -78,6 +79,7 @@ class FeatureFlags(
     val orgChartEnabled: Boolean get() = _flags.value.orgChart
     val localGroupsEnabled: Boolean get() = _flags.value.localGroups
     val passkeysEnabled: Boolean get() = _flags.value.passkeys
+    val quidAudioEnabled: Boolean get() = _flags.value.quidAudio
 
     /** Vedi [Flags.donationLinkIos]. */
     val donationLinkIos: String? get() = _flags.value.donationLinkIos
@@ -126,6 +128,7 @@ class FeatureFlags(
                 donationLinkOnIos = configs[KEY_DONATION_LINK_IOS].toFlag(),
                 donationLinkOnAndroid = configs[KEY_DONATION_LINK_ANDROID].toFlag(),
                 donationStripeLink = configs[KEY_DONATION_STRIPE_LINK]?.trim().orEmpty(),
+                quidAudio = configs[KEY_QUID_AUDIO].toFlag(),
             )
             _flags.value = fresh
             writeCached(fresh)
@@ -139,7 +142,7 @@ class FeatureFlags(
         val parts = raw.split(',')
         // Length check doubles as a version guard: a cache written by an older
         // build with fewer flags is discarded rather than read short.
-        if (parts.size != 6) return null
+        if (parts.size != 7) return null
         return Flags(
             publicArea = parts[0] == "1",
             orgChart = parts[1] == "1",
@@ -147,6 +150,7 @@ class FeatureFlags(
             passkeys = parts[3] == "1",
             donationLinkOnIos = parts[4] == "1",
             donationLinkOnAndroid = parts[5] == "1",
+            quidAudio = parts[6] == "1",
             donationStripeLink = db.keyValueQueries
                 .selectById(CACHE_KEY_DONATION_LINK).awaitAsOneOrNull()?.value_.orEmpty(),
         )
@@ -160,6 +164,7 @@ class FeatureFlags(
             flags.passkeys,
             flags.donationLinkOnIos,
             flags.donationLinkOnAndroid,
+            flags.quidAudio,
         ).joinToString(",") { if (it) "1" else "0" }
         try {
             db.keyValueQueries.insertOrReplace(key = CACHE_KEY, value_ = encoded)
@@ -187,6 +192,7 @@ class FeatureFlags(
         const val KEY_DONATION_LINK_IOS = "donation_link_on_ios"
         const val KEY_DONATION_LINK_ANDROID = "donation_link_on_android"
         const val KEY_DONATION_STRIPE_LINK = "donation_stripe_link"
+        const val KEY_QUID_AUDIO = "quid_audio_enabled"
         const val CACHE_KEY = "config.feature_flags"
         // Il link sta per conto suo e non nella lista separata da virgole:
         // un URL puo' contenerne una, e la spezzerebbe in due campi.

@@ -89,9 +89,9 @@ val extrasModule = module {
     single { CalendarLinksRepository(get(), get(), get()) }
     single { PaymentMethodsRepository(get(), get()) }
     single { MetadataRepository(get()) }
-    single { OrgChartRepository(get()) }
+    single { OrgChartRepository(get(), get()) }
     single { MedalsRepository(get(), get()) }
-    single { QuidRepository(get()) }
+    single { QuidRepository(get(), get()) }
     single { PodcastsRepository(get()) }
     single { LocalOfficesRepository(get()) }
     single { ExAppsRepository(get(), get()) }
