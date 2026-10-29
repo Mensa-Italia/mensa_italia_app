@@ -9,3 +9,5 @@ Risolti bug minori: i QR dei francobolli e i link aprono l'app, l'avvio è più 
 Dopo aver aggiornato una lista trascinandola verso il basso, la ricerca non resta più sopra il titolo.
 
 Su iPhone la verifica di sicurezza dell'app si ripristina da sola quando si blocca, e se non ci riesce il messaggio dice perché.
+
+Su iPhone, se l'accesso non riesce, la schermata dice perché: password sbagliata, troppi tentativi o servizio non raggiungibile.
