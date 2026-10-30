@@ -152,6 +152,7 @@ struct DebugLaunchSelector: View {
                     case "leaderboard_preview": LeaderboardView()
                     case "medals_preview": MedalCabinetView()
                     case "leaderboard_preview_card": DebugLeaderboardCardPreview()
+                    case "changelog_preview": ChangelogSheet(items: koin.changelog.items) {}
                     default: Text("Unknown screen: \(target)")
                     }
                 }

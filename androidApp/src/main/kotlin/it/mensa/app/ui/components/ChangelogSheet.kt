@@ -108,28 +108,37 @@ fun LaunchNotices() {
  * `Changelog` (:shared); qui solo la presentazione. Mirrors iOS
  * `ChangelogSheet`.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChangelogOnLaunch() {
     val changelog = remember { koinAccess().changelog }
     var show by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         show = runCatching { changelog.shouldShow() }.getOrDefault(false)
     }
 
     if (!show) return
-    val close: () -> Unit = {
+    ChangelogSheet(items = changelog.items) {
         changelog.markSeen()
-        scope.launch { sheetState.hide() }.invokeOnCompletion { show = false }
+        show = false
+    }
+}
+
+/**
+ * The "Novita'" sheet itself; [onDone] once it has slid away or been
+ * dismissed. Apart from launch, the debug harness mounts it
+ * (`--es mensa_screen changelog_preview`) to proof a release's texts.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ChangelogSheet(items: List<ChangelogItem>, onDone: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+    val close: () -> Unit = {
+        scope.launch { sheetState.hide() }.invokeOnCompletion { onDone() }
     }
     ModalBottomSheet(
-        onDismissRequest = {
-            changelog.markSeen()
-            show = false
-        },
+        onDismissRequest = onDone,
         sheetState = sheetState,
     ) {
         Column(
@@ -148,7 +157,7 @@ private fun ChangelogOnLaunch() {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
-            changelog.items.forEach { ChangelogRow(it) }
+            items.forEach { ChangelogRow(it) }
             Spacer(Modifier.height(4.dp))
             PrimaryButton(
                 text = tr("changelog.done", "Continua"),

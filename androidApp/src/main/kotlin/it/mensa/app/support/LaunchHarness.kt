@@ -52,7 +52,7 @@ object LaunchHarness {
      * [MedalFixtures].
      */
     val standalonePreview: String?
-        get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" }
+        get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" || it == "changelog_preview" }
 
     /** True when this process was launched by the screenshot/automation harness. */
     val isActive: Boolean
