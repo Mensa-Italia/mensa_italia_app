@@ -58,31 +58,31 @@ class Changelog internal constructor(
 
     companion object {
         /** Cambialo, con [ITEMS], per far ricomparire il changelog in un rilascio. */
-        const val ID = "2026-11-classifica"
+        const val ID = "2026-11-medaglie-regione"
 
         private const val KEY_SEEN = "changelog.seen"
 
         private val ITEMS = listOf(
             ChangelogItem(
-                icon = "trophy",
-                titleKey = "changelog.2026_11.leaderboard.title",
-                titleFallback = "La classifica",
-                bodyKey = "changelog.2026_11.leaderboard.body",
-                bodyFallback = "Soci, regioni e segretari sugli ultimi 12 mesi. Un timbro vale di più dove hanno timbrato in tanti rispetto ai soci della regione; come si calcola tutto è scritto nella ⓘ, formula compresa.",
-            ),
-            ChangelogItem(
                 icon = "medal",
-                titleKey = "changelog.2026_11.medals.title",
-                titleFallback = "Medagliere più chiaro",
-                bodyKey = "changelog.2026_11.medals.body",
-                bodyFallback = "Filtra le medaglie per metallo e, in ogni medaglia sui timbri, leggi quali timbri contano e perché.",
+                titleKey = "changelog.2026_11b.region_medals.title",
+                titleFallback = "Le medaglie della tua regione",
+                bodyKey = "changelog.2026_11b.region_medals.body",
+                bodyFallback = "Nel medagliere, accanto alle tue, le medaglie che la tua regione conquista tutta insieme: dieci traguardi all'anno, tre metalli, e il segno di chi c'era quando sono arrivate.",
             ),
             ChangelogItem(
-                icon = "shield",
-                titleKey = "changelog.2026_11.privacy.title",
-                titleFallback = "Se preferisci non esserci",
-                bodyKey = "changelog.2026_11.privacy.body",
-                bodyFallback = "Dalle impostazioni della classifica puoi uscirne quando vuoi: la tua riga sparisce per tutti, i tuoi timbri restano.",
+                icon = "trophy",
+                titleKey = "changelog.2026_11b.trend.title",
+                titleFallback = "Su o giù da ieri",
+                bodyKey = "changelog.2026_11b.trend.body",
+                bodyFallback = "In classifica ogni riga dice se rispetto a ieri è salita o scesa.",
+            ),
+            ChangelogItem(
+                icon = "fixes",
+                titleKey = "changelog.2026_11b.screens.title",
+                titleFallback = "Schermi grandi e pieghevoli",
+                bodyKey = "changelog.2026_11b.screens.body",
+                bodyFallback = "Layout a due colonne sui pieghevoli aperti e sui tablet, animazioni più leggere, batteria più contenta.",
             ),
         )
     }
