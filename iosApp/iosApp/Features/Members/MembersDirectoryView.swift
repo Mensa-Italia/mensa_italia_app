@@ -5,6 +5,10 @@ import Shared
 final class MembersDirectoryViewModel {
     var members: [RegSociModel] = []
     var query: String = ""
+    /// La regione scelta nel filtro, nil = tutte. Si cambia con `selectRegion`.
+    private(set) var region: String?
+    /// La provincia scelta nel sottofiltro, nil = tutte; solo con una regione.
+    var province: String?
     var loading = false
     var error: String?
 
@@ -55,15 +59,31 @@ final class MembersDirectoryViewModel {
         }
     }
 
-    /// Client-side filter — instant feedback while debounced remote search runs.
+    /// Cambiare o togliere la regione azzera la provincia, che era di quella regione.
+    func selectRegion(_ newValue: String?) {
+        guard newValue != region else { return }
+        region = newValue
+        province = nil
+    }
+
+    /// Ricerca, regione e provincia insieme, sul registro in locale: subito,
+    /// mentre la ricerca sul server aspetta il debounce. Vedi `MemberDirectory.filter`.
     var filtered: [RegSociModel] {
-        let trimmed = query.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !trimmed.isEmpty else { return members }
-        return members.filter {
-            $0.name.lowercased().contains(trimmed) ||
-            $0.city.lowercased().contains(trimmed) ||
-            $0.id.lowercased().contains(trimmed)
-        }
+        MemberDirectory.shared.filter(members: members, query: query, region: region, province: province)
+    }
+
+    /// Le 20 regioni del menu del filtro, coi soci gia' caricati di ognuna.
+    var regions: [MemberPlace] {
+        MemberDirectory.shared.regions(members: members)
+    }
+
+    /// Le province della regione scelta, fisse: ci sono prima che i soci arrivino.
+    var provinces: [MemberPlace] {
+        MemberDirectory.shared.provinces(members: members, region: region)
+    }
+
+    var isFiltering: Bool {
+        !query.trimmingCharacters(in: .whitespaces).isEmpty || region != nil
     }
 }
 
@@ -77,13 +97,11 @@ struct MembersDirectoryView: View {
                     LoadingDots()
                 } else if vm.filtered.isEmpty {
                     ContentUnavailableView(
-                        vm.query.isEmpty
-                            ? tr("members.empty", fallback: "Directory vuota")
-                            : tr("members.no_results", fallback: "Nessun socio trovato"),
+                        vm.isFiltering
+                            ? tr("members.no_results", fallback: "Nessun socio trovato")
+                            : tr("members.empty", fallback: "Directory vuota"),
                         systemImage: "person.2.slash",
-                        description: Text(vm.query.isEmpty
-                            ? tr("members.empty_description", fallback: "Trascina giù per aggiornare la directory.")
-                            : tr("members.no_results_description", fallback: "Prova con un altro nome o città."))
+                        description: Text(emptyDescription)
                     )
                 }
             }
@@ -100,6 +118,33 @@ struct MembersDirectoryView: View {
                 prompt: tr("members.search_placeholder", fallback: "Cerca un socio…")
             )
             .navigationTitle(tr("members.registry.title", fallback: "Registro Soci"))
+            .modifier(PlaceSubtitle(places: [vm.region, vm.province].compactMap { $0 }))
+            .toolbar {
+                // Sempre, anche mentre il registro carica: regioni e province sono fisse.
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if !vm.provinces.isEmpty {
+                        placeMenu(
+                            title: tr("members.filter.province", fallback: "Provincia"),
+                            allTitle: tr("members.filter.province.all", fallback: "Tutte le province"),
+                            places: vm.provinces,
+                            selected: vm.province,
+                            symbol: "mappin.circle",
+                            select: { province in withAnimation { vm.province = province } }
+                        )
+                    }
+                    placeMenu(
+                        title: tr("members.filter.region", fallback: "Regione"),
+                        allTitle: tr("members.filter.region.all", fallback: "Tutte le regioni"),
+                        places: vm.regions,
+                        selected: vm.region,
+                        symbol: "line.3.horizontal.decrease.circle",
+                        // Animato: il pulsante della provincia entra ed esce dal
+                        // gruppo della toolbar, e il vetro si allarga e si
+                        // stringe con lui solo dentro una transazione animata.
+                        select: { region in withAnimation { vm.selectRegion(region) } }
+                    )
+                }
+            }
             .cleanNavBar()
             .navigationDestination(for: RegSociRoute.self) { route in
                 MemberDetailView(memberId: route.id)
@@ -114,6 +159,70 @@ struct MembersDirectoryView: View {
             } message: {
                 Text(vm.error ?? "")
             }
+    }
+
+    private var emptyDescription: String {
+        if !vm.isFiltering {
+            return tr("members.empty_description", fallback: "Trascina giù per aggiornare la directory.")
+        }
+        if vm.region != nil {
+            return tr("members.no_results_region_description", fallback: "Prova con un altro nome, regione o provincia.")
+        }
+        return tr("members.no_results_description", fallback: "Prova con un altro nome o città.")
+    }
+
+    // MARK: - Region and province filters
+
+    /// Un filtro per regione o provincia: i `places`, ognuno col suo numero di
+    /// soci a registro caricato. Il glifo si riempie quando uno e' scelto.
+    ///
+    /// Le voci sono Toggle e non un Picker perche' solo loro mostrano il
+    /// sottotitolo. Scelta singola come in un Picker: la voce gia' spuntata
+    /// resta scelta.
+    private func placeMenu(
+        title: String,
+        allTitle: String,
+        places: [MemberPlace],
+        selected: String?,
+        symbol: String,
+        select: @escaping (String?) -> Void
+    ) -> some View {
+        Menu {
+            Section {
+                Toggle(isOn: Binding(get: { selected == nil }, set: { _ in select(nil) })) {
+                    Text(allTitle)
+                }
+            }
+            Section {
+                ForEach(places, id: \.name) { place in
+                    // Due testi: il menu li mostra come titolo e sottotitolo.
+                    Toggle(isOn: Binding(get: { selected == place.name }, set: { _ in select(place.name) })) {
+                        Text(place.name)
+                        // Il numero solo a registro caricato: prima sarebbe 0 ovunque.
+                        if !vm.members.isEmpty {
+                            Text(membersCount(Int(place.count)))
+                        }
+                    }
+                }
+            }
+        } label: {
+            // Con una scelta il pulsante dice quale: il filtro attivo resta
+            // visibile senza riaprire il menu (su iOS 26 lo dice il sottotitolo).
+            if let selected {
+                Label(selected, systemImage: symbol + ".fill")
+                    .labelStyle(.titleAndIcon)
+            } else {
+                Label(title, systemImage: symbol)
+            }
+        }
+        .accessibilityLabel(title)
+        .accessibilityValue(selected ?? allTitle)
+    }
+
+    private func membersCount(_ count: Int) -> String {
+        count == 1
+            ? tr("members.filter.region.count_one", fallback: "1 socio")
+            : String(format: tr("members.filter.region.count_other", fallback: "%d soci"), count)
     }
 
     // MARK: - Sectioned list (Contacts-style)
@@ -231,6 +340,20 @@ private struct AlphabetIndex: View {
             UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.55)
             lastLetter = l
             onSelect(l)
+        }
+    }
+}
+
+/// Regione e provincia scelte sotto il titolo, da iOS 26: li' la barra mostra
+/// i pulsanti dei filtri solo come icona. Prima resta il testo dei pulsanti.
+private struct PlaceSubtitle: ViewModifier {
+    let places: [String]
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.navigationSubtitle(places.joined(separator: " · "))
+        } else {
+            content
         }
     }
 }

@@ -1,0 +1,4 @@
+-- Versione 3 -> 4: regione del socio, per il filtro del registro. Le righe
+-- gia' in cache restano senza regione fino al prossimo refresh, che il
+-- registro fa ogni volta che si apre.
+ALTER TABLE RegSoci ADD COLUMN area TEXT NOT NULL DEFAULT '';

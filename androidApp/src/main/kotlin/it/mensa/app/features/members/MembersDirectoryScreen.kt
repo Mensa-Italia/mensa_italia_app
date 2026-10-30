@@ -1,6 +1,14 @@
 package it.mensa.app.features.members
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -11,7 +19,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -29,10 +40,12 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
 import it.mensa.app.ui.theme.EasingEmphasizedDecelerate
 import it.mensa.app.ui.theme.MensaMotion
+import it.mensa.shared.members.MemberDirectory
+import it.mensa.shared.members.MemberPlace
 import org.koin.androidx.compose.koinViewModel
 import it.mensa.app.support.RefreshOnReconnect
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun MembersDirectoryScreen(
     onMemberClick: (String) -> Unit = {},
@@ -42,6 +55,9 @@ fun MembersDirectoryScreen(
     val state by vm.uiState.collectAsStateWithLifecycle()
     val filtered = remember(state) { vm.filtered(state) }
     val sectioned = remember(filtered) { vm.sectioned(filtered) }
+    val regions = remember(state.members) { MemberDirectory.regions(state.members) }
+    val provinces = remember(state.members, state.region) { MemberDirectory.provinces(state.members, state.region) }
+    val filtering = state.query.isNotBlank() || state.region != null
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -61,6 +77,45 @@ fun MembersDirectoryScreen(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            // Fuori dal contenuto animato: c'e' gia' mentre il registro carica
+            // (le regioni sono fisse) e resta quando la regione non ha nessun
+            // socio che corrisponde alla ricerca, per poterla togliere.
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                PlaceFilterChip(
+                    label = tr("members.filter.region", fallback = "Regione"),
+                    allLabel = tr("members.filter.region.all", fallback = "Tutte le regioni"),
+                    places = regions,
+                    selected = state.region,
+                    onSelect = vm::onRegionChange,
+                    showCounts = state.members.isNotEmpty(),
+                )
+                // Il sottofiltro c'e' appena c'e' una regione: le sue province
+                // sono fisse, non aspettano i soci. Entra ed esce con lo
+                // spring spaziale del tema (expressive), allargandosi dalla
+                // chip della regione.
+                val motion = MaterialTheme.motionScheme
+                AnimatedVisibility(
+                    visible = provinces.isNotEmpty(),
+                    enter = expandHorizontally(motion.fastSpatialSpec(), expandFrom = Alignment.Start) +
+                        scaleIn(motion.fastSpatialSpec(), initialScale = 0.8f) +
+                        fadeIn(motion.fastEffectsSpec()),
+                    exit = shrinkHorizontally(motion.fastSpatialSpec(), shrinkTowards = Alignment.Start) +
+                        scaleOut(motion.fastSpatialSpec(), targetScale = 0.8f) +
+                        fadeOut(motion.fastEffectsSpec()),
+                ) {
+                    PlaceFilterChip(
+                        label = tr("members.filter.province", fallback = "Provincia"),
+                        allLabel = tr("members.filter.province.all", fallback = "Tutte le province"),
+                        places = provinces,
+                        selected = state.province,
+                        onSelect = vm::onProvinceChange,
+                        showCounts = state.members.isNotEmpty(),
+                    )
+                }
+            }
             AnimatedContent(
                 targetState = when {
                     state.loading && state.members.isEmpty() -> "loading"
@@ -96,7 +151,7 @@ fun MembersDirectoryScreen(
                         }
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            if (state.query.isEmpty())
+                            if (!filtering)
                                 tr("members.empty", fallback = "Directory vuota")
                             else
                                 tr("members.no_results", fallback = "Nessun socio trovato"),
@@ -104,10 +159,14 @@ fun MembersDirectoryScreen(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            if (state.query.isEmpty())
-                                tr("members.empty_description", fallback = "Trascina giù per aggiornare la directory.")
-                            else
-                                tr("members.no_results_description", fallback = "Prova con un altro nome o città."),
+                            when {
+                                !filtering ->
+                                    tr("members.empty_description", fallback = "Trascina giù per aggiornare la directory.")
+                                state.region != null ->
+                                    tr("members.no_results_region_description", fallback = "Prova con un altro nome, regione o provincia.")
+                                else ->
+                                    tr("members.no_results_description", fallback = "Prova con un altro nome o città.")
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -193,5 +252,86 @@ fun MembersDirectoryScreen(
             text = { Text(err) },
             confirmButton = { TextButton(onClick = vm::clearError) { Text("OK") } },
         )
+    }
+}
+
+/**
+ * Il filtro per regione o provincia: una chip che apre il menu dei [places],
+ * ognuno col suo numero di soci quando il registro e' caricato ([showCounts]).
+ * Selezionata mostra il luogo scelto; [allLabel] lo toglie.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun PlaceFilterChip(
+    label: String,
+    allLabel: String,
+    places: List<MemberPlace>,
+    selected: String?,
+    onSelect: (String?) -> Unit,
+    showCounts: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val choose: (String?) -> Unit = { place ->
+        expanded = false
+        onSelect(place)
+    }
+    Box(modifier) {
+        FilterChip(
+            // "Regione" -> "Friuli-Venezia Giulia": la larghezza segue il testo.
+            modifier = Modifier.animateContentSize(MaterialTheme.motionScheme.fastSpatialSpec()),
+            selected = selected != null,
+            onClick = { expanded = true },
+            label = { Text(selected ?: label) },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Place,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                )
+            },
+            trailingIcon = {
+                Icon(
+                    Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                )
+            },
+        )
+        DropdownMenuPopup(expanded = expanded, onDismissRequest = { expanded = false }) {
+            val check: @Composable () -> Unit = { Icon(Icons.Filled.Check, contentDescription = null) }
+            DropdownMenuGroup(shapes = MenuDefaults.groupShape(0, 2)) {
+                DropdownMenuItem(
+                    selected = selected == null,
+                    onClick = { choose(null) },
+                    text = { Text(allLabel) },
+                    shapes = MenuDefaults.itemShape(0, 1),
+                    selectedLeadingIcon = check,
+                )
+            }
+            Spacer(Modifier.height(2.dp))
+            DropdownMenuGroup(shapes = MenuDefaults.groupShape(1, 2)) {
+                places.forEachIndexed { index, place ->
+                    DropdownMenuItem(
+                        selected = selected == place.name,
+                        onClick = { choose(place.name) },
+                        text = { Text(place.name) },
+                        shapes = MenuDefaults.itemShape(index, places.size),
+                        selectedLeadingIcon = check,
+                        trailingIcon = if (showCounts) {
+                            {
+                                Text(
+                                    place.count.toString(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                    )
+                }
+            }
+        }
     }
 }

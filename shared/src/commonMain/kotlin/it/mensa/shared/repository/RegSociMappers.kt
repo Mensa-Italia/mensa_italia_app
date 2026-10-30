@@ -18,6 +18,7 @@ internal fun RegSoci.toModel(json: Json): RegSociModel {
         city = city,
         birthdate = birthdate?.let { Instant.fromEpochMilliseconds(it) },
         state = state,
+        area = area,
         fullData = data,
         fullProfileLink = fullProfileLink,
         dataHash = dataHash,

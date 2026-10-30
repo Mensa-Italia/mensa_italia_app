@@ -135,19 +135,21 @@ class DatabaseTest {
             image = "https://example.com/img.jpg",
             city = "Roma",
             birthdate = null,
-            state = "Lazio",
+            state = "Roma",
             fullDataJson = "{}",
             fullProfileLink = null,
             nameToSearch = "Mario Rossi . Rossi Mario",
             updatedAt = 1700000000000L,
             dataHash = null,
             imageHash = null,
+            area = "Lazio",
         )
 
         val result = queries.selectById("1001").executeAsOneOrNull()
         assertNotNull(result)
         assertEquals("Mario Rossi", result.name)
         assertEquals("Roma", result.city)
+        assertEquals("Lazio", result.area)
 
         val searchResults = queries.searchByName("%Mario%").executeAsList()
         assertEquals(1, searchResults.size)

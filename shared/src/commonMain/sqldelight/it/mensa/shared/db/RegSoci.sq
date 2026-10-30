@@ -15,7 +15,11 @@ CREATE TABLE RegSoci (
     -- `imageHash` covers the avatar file — change ⇒ re-download thumbnail.
     -- Not indexed: never used as a query key, only compared 1:1 by id.
     dataHash TEXT,
-    imageHash TEXT
+    imageHash TEXT,
+    -- Regione del socio come la scrive il server (`members_registry.area`).
+    -- In fondo come la aggiunge la migrazione 3.sqm: `SELECT *` legge le
+    -- colonne per posizione.
+    area TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX reg_soci_name ON RegSoci(name);
@@ -31,8 +35,8 @@ selectById:
 SELECT * FROM RegSoci WHERE id = ?;
 
 insertOrReplace:
-INSERT OR REPLACE INTO RegSoci(id, uid, name, image, city, birthdate, state, fullDataJson, fullProfileLink, nameToSearch, updatedAt, dataHash, imageHash)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO RegSoci(id, uid, name, image, city, birthdate, state, fullDataJson, fullProfileLink, nameToSearch, updatedAt, dataHash, imageHash, area)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteById:
 DELETE FROM RegSoci WHERE id = ?;

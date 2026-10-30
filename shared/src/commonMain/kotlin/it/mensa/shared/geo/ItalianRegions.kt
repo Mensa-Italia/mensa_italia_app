@@ -2,7 +2,7 @@ package it.mensa.shared.geo
 
 /**
  * Le 20 regioni italiane come le scrive il backend, e il confronto per il
- * filtro "Regione" della lista eventi.
+ * filtro "Regione" della lista eventi e del registro soci.
  *
  * Qui NON si deduce niente. La regione di una posizione la calcola il server e
  * la scrive in `positions.state`: `GET /api/position/state?lat=&lon=` risponde
@@ -42,9 +42,20 @@ object ItalianRegions {
         "Veneto",
     )
 
+    /**
+     * I nomi ufficiali bilingui. Il registro soci li riceve cosi':
+     * `members_registry.area` la scrive il server da `tools/spatial/province.json`
+     * (dati ISTAT), che per il Trentino dice "Trentino-Alto Adige/Südtirol".
+     */
+    private val officialNames: Map<String, String> = mapOf(
+        "Trentino-Alto Adige/Südtirol" to "Trentino-Alto Adige",
+        "Valle d'Aosta/Vallée d'Aoste" to "Valle d'Aosta",
+    )
+
     /** Nome normalizzato -> nome canonico, cosi' "Emilia Romagna" trova "Emilia-Romagna". */
     private val byNormalizedName: Map<String, String> =
-        all.associateBy { TextNormalizer.normalize(it) }
+        all.associateBy { TextNormalizer.normalize(it) } +
+            officialNames.mapKeys { (name, _) -> TextNormalizer.normalize(name) }
 
     /**
      * Nome canonico di [raw], null se non e' una regione italiana. Il `NaN` del

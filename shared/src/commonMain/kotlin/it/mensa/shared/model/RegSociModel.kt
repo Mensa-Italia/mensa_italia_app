@@ -15,7 +15,14 @@ data class RegSociModel(
     val name: String = "",
     val city: String = "",
     val birthdate: Instant? = null,
+    /** Provincia, come la scrive il registro di cloud32 ("Torino"). */
     val state: String = "",
+    /**
+     * Regione, calcolata dal server dalla provincia: uno dei nomi di
+     * [it.mensa.shared.geo.ItalianRegions] (o il nome ufficiale bilingue),
+     * `NaN` per chi risiede all'estero.
+     */
+    val area: String = "",
     @SerialName("full_data")
     val fullData: JsonObject = JsonObject(emptyMap()),
     @SerialName("full_profile_link")

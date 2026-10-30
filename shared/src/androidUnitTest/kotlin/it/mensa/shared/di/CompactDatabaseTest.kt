@@ -42,13 +42,14 @@ class CompactDatabaseTest {
                     image = "",
                     city = "Roma",
                     birthdate = null,
-                    state = "Lazio",
+                    state = "Roma",
                     fullDataJson = "{}",
                     fullProfileLink = null,
                     nameToSearch = "$secret$i",
                     updatedAt = 0L,
                     dataHash = null,
                     imageHash = null,
+                    area = "Lazio",
                 )
             }
             // Il file deve avere davvero i dati dentro prima di poter dire che

@@ -5,6 +5,7 @@ import it.mensa.app.support.userMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.members.MemberDirectory
 import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,6 +21,10 @@ import kotlinx.coroutines.launch
 data class MembersDirectoryUiState(
     val members: List<RegSociModel> = emptyList(),
     val query: String = "",
+    /** La regione scelta nel filtro, null = tutte. */
+    val region: String? = null,
+    /** La provincia scelta nel sottofiltro, null = tutte; solo con una regione. */
+    val province: String? = null,
     val loading: Boolean = false,
     val error: String? = null,
 )
@@ -77,16 +82,16 @@ class MembersDirectoryViewModel : ViewModel() {
         }
     }
 
-    /** Client-side filtered list */
-    fun filtered(state: MembersDirectoryUiState): List<RegSociModel> {
-        val q = state.query.trim().lowercase()
-        if (q.isEmpty()) return state.members
-        return state.members.filter {
-            it.name.lowercase().contains(q) ||
-                it.city.lowercase().contains(q) ||
-                it.id.lowercase().contains(q)
-        }
+    /** Cambiare o togliere la regione azzera la provincia, che era di quella regione. */
+    fun onRegionChange(region: String?) = _uiState.update {
+        if (it.region == region) it else it.copy(region = region, province = null)
     }
+
+    fun onProvinceChange(province: String?) = _uiState.update { it.copy(province = province) }
+
+    /** Ricerca, regione e provincia insieme, sul registro in locale: vedi [MemberDirectory.filter]. */
+    fun filtered(state: MembersDirectoryUiState): List<RegSociModel> =
+        MemberDirectory.filter(state.members, state.query, state.region, state.province)
 
     /**
      * Groups members by first letter (A-Z), non-alpha → "#".

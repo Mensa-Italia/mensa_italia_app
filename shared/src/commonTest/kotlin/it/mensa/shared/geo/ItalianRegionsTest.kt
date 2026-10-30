@@ -33,6 +33,13 @@ class ItalianRegionsTest {
     }
 
     @Test
+    fun officialBilingualNamesAreTheirRegion() {
+        // Come arrivano in `members_registry.area` (province.json, dati ISTAT).
+        assertEquals("Trentino-Alto Adige", ItalianRegions.canonical("Trentino-Alto Adige/Südtirol"))
+        assertEquals("Valle d'Aosta", ItalianRegions.canonical("Valle d'Aosta/Vallée d'Aoste"))
+    }
+
+    @Test
     fun nonRegionsAreNotRegions() {
         // "NaN" e' cio' che /api/position/state restituisce fuori dall'Italia.
         assertNull(ItalianRegions.canonical("NaN"))

@@ -9,6 +9,7 @@ import it.mensa.shared.api.endpoints.RegSociApi
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.members.Birthday
 import it.mensa.shared.members.Birthdays
+import it.mensa.shared.members.RegSociFixtures
 import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -47,7 +48,7 @@ class RegSociRepository(
      */
     @Throws(Exception::class)
     suspend fun refreshAndReturn(): List<RegSociModel> {
-        val items = api.list()
+        val items = download()
         db.transaction {
             db.regSociQueries.deleteAll()
             items.forEach { upsertNoTx(it) }
@@ -63,7 +64,7 @@ class RegSociRepository(
      */
     @Throws(Exception::class)
     suspend fun refreshAndDiff(): RegSociRefreshResult {
-        val items = api.list()
+        val items = download()
         // Snapshot OUTSIDE the transaction so we can suspend on awaitAsList;
         // the brief window between snapshot and upsert is harmless here
         // (RegSoci is single-writer: the only mutator is this method).
@@ -90,7 +91,11 @@ class RegSociRepository(
     suspend fun searchByName(query: String): List<RegSociModel> {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
-        val items = api.searchByName(trimmed)
+        val items = if (RegSociFixtures.enabled) {
+            RegSociFixtures.members.filter { it.name.contains(trimmed, ignoreCase = true) }
+        } else {
+            api.searchByName(trimmed)
+        }
         db.transaction {
             items.forEach { upsertNoTx(it) }
         }
@@ -119,9 +124,15 @@ class RegSociRepository(
 
     @Throws(Exception::class)
     suspend fun getById(id: String): RegSociModel? {
-        runCatching { val r = api.get(id); upsertIfChanged(r); return r }
+        if (!RegSociFixtures.enabled) {
+            runCatching { val r = api.get(id); upsertIfChanged(r); return r }
+        }
         return db.regSociQueries.selectById(id).awaitAsOneOrNull()?.toModel(json)
     }
+
+    /** L'intero registro dal server, o quello inventato di [RegSociFixtures]. */
+    private suspend fun download(): List<RegSociModel> =
+        if (RegSociFixtures.enabled) RegSociFixtures.members else api.list()
 
     /**
      * Scrive solo se la riga è davvero cambiata.
@@ -146,6 +157,7 @@ class RegSociRepository(
             stored.city == m.city &&
             stored.birthdate == m.birthdate?.toEpochMilliseconds() &&
             stored.state == m.state &&
+            stored.area == m.area &&
             stored.fullProfileLink == m.fullProfileLink &&
             stored.dataHash == m.dataHash &&
             stored.imageHash == m.imageHash &&
@@ -166,6 +178,7 @@ class RegSociRepository(
             city = m.city,
             birthdate = m.birthdate?.toEpochMilliseconds(),
             state = m.state,
+            area = m.area,
             fullDataJson = fullDataJson,
             fullProfileLink = m.fullProfileLink,
             nameToSearch = m.name.lowercase(),

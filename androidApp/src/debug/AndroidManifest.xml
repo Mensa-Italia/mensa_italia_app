@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Solo nella build debug: il registro soci sui dati inventati, senza
+             login. Esportata perche' la apre `adb shell am start`. -->
+        <activity
+            android:name="it.mensa.app.debug.RegistryPreviewActivity"
+            android:exported="true" />
+    </application>
+</manifest>
