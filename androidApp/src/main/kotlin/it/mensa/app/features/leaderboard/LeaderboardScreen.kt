@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +48,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,12 +61,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
+import it.mensa.app.ui.components.ColumnSplitBox
 import it.mensa.app.ui.theme.DarkStage
 import it.mensa.app.ui.theme.StageSurface
 import it.mensa.shared.leaderboard.LeaderboardBoard
@@ -109,11 +116,43 @@ fun LeaderboardScreen(
         }
     }
 
+    // A screen this wide (a foldable open, a tablet): two columns, the
+    // podium and the member's place on the left, sized so it never scrolls,
+    // the switch and the rankings on the right; on a foldable they meet at
+    // the hinge. Mirrors iOS `columnSplit`.
+    ColumnSplitBox(Modifier.fillMaxSize()) { columns ->
+    val split = columns?.takeIf { LeaderboardKind.MEMBERS in kinds }
+    val wide = split != null
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onNavigateBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = tr("app.back", "Indietro"))
+        }
+    }
+    val actions: @Composable RowScope.() -> Unit = {
+        IconButton(onClick = { showInfo = true }) {
+            Icon(Icons.Outlined.Info, contentDescription = tr("leaderboard.how_it_works", "Come funziona"))
+        }
+        // Leaving the ranking only concerns the members' one.
+        if (LeaderboardKind.MEMBERS in kinds) {
+            IconButton(onClick = { showSettings = true }) {
+                Icon(Icons.Outlined.Settings, contentDescription = tr("leaderboard.settings", "Impostazioni"))
+            }
+        }
+    }
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        // Over two columns the bar neither collapses, which moved the column
+        // that wasn't scrolling, nor has a title, which belongs to neither.
+        modifier = if (wide) Modifier else Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         topBar = {
-            LargeFlexibleTopAppBar(
+            if (wide) {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = navigationIcon,
+                    actions = actions,
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                )
+            } else LargeFlexibleTopAppBar(
                 title = { Text(tr("leaderboard.home.section", "Classifica")) },
                 subtitle = {
                     Text(
@@ -128,22 +167,8 @@ fun LeaderboardScreen(
                         },
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = tr("app.back", "Indietro"))
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showInfo = true }) {
-                        Icon(Icons.Outlined.Info, contentDescription = tr("leaderboard.how_it_works", "Come funziona"))
-                    }
-                    // Leaving the ranking only concerns the members' one.
-                    if (LeaderboardKind.MEMBERS in kinds) {
-                        IconButton(onClick = { showSettings = true }) {
-                            Icon(Icons.Outlined.Settings, contentDescription = tr("leaderboard.settings", "Impostazioni"))
-                        }
-                    }
-                },
+                navigationIcon = navigationIcon,
+                actions = actions,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = StageSurface,
@@ -173,62 +198,55 @@ fun LeaderboardScreen(
                 }
             }
         }
+        val rankings: @Composable (PaddingValues, Boolean) -> Unit = { listPadding, withSummary ->
+            when {
+                kind == LeaderboardKind.REGIONS -> RegionsList(regionBoards, listPadding, switch) { detail = it }
+                kind == LeaderboardKind.SECRETARIES -> SecretariesList(regionBoards, listPadding, switch) { detail = it }
+                board != null -> MembersList(board, listPadding, switch, withSummary, onMemberClick)
+                state.failed -> Text(
+                    text = tr("leaderboard.load_error", "Non riesco a leggere la classifica. Riprova più tardi."),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxSize().padding(listPadding).padding(32.dp),
+                )
+                else -> Box(Modifier.fillMaxSize().padding(listPadding), contentAlignment = Alignment.Center) {
+                    LoadingIndicator()
+                }
+            }
+        }
         when {
+            split != null -> Row(Modifier.fillMaxSize()) {
+                PodiumColumn(
+                    board = board,
+                    // The spotlights hang from the top of the screen; the
+                    // podium itself starts under the bar.
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding() + 16.dp,
+                    onMemberClick = onMemberClick,
+                    modifier = Modifier.width(split.leftWidth).fillMaxHeight(),
+                )
+                Spacer(Modifier.width(split.gap))
+                Box(Modifier.weight(1f)) {
+                    rankings(
+                        PaddingValues(
+                            start = 0.dp,
+                            end = 16.dp,
+                            top = contentPadding.calculateTopPadding(),
+                            bottom = contentPadding.calculateBottomPadding(),
+                        ),
+                        false,
+                    )
+                }
+            }
             kind == null -> Text(
                 text = tr("leaderboard.disabled", "La classifica non è attiva."),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxSize().padding(padding).padding(32.dp),
             )
-            kind == LeaderboardKind.REGIONS -> RegionsList(regionBoards, contentPadding, switch) { detail = it }
-            kind == LeaderboardKind.SECRETARIES -> SecretariesList(regionBoards, contentPadding, switch) { detail = it }
-            board != null -> LazyColumn(
-                contentPadding = contentPadding,
-                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                item(key = "switch") { switch() }
-                item(key = "me") { MyPlace(board) }
-                item(key = "label") {
-                    SectionTitle(tr("leaderboard.top_label", "I primi {count}", "count" to LeaderboardBoard.TOP_SIZE))
-                }
-                // The first three on the podium, the rest of the ten below.
-                val top = board.top
-                item(key = "podium") {
-                    LeaderboardPodium(
-                        rows = top.take(PODIUM_SIZE),
-                        onMemberClick = onMemberClick,
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
-                }
-                val rest = top.drop(PODIUM_SIZE)
-                itemsIndexed(rest, key = { _, row -> row.id }) { index, row ->
-                    RankItem(row, index, rest.size, onMemberClick)
-                }
-                // Below the first ten only the member's own row, after a gap
-                // that says places are skipped.
-                board.meBelowTop?.let { me ->
-                    item(key = "gap") {
-                        Icon(
-                            Icons.Outlined.MoreHoriz,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        )
-                    }
-                    item(key = "me_row") { RankItem(me, 0, 1, onMemberClick) }
-                }
-            }
-            state.failed -> Text(
-                text = tr("leaderboard.load_error", "Non riesco a leggere la classifica. Riprova più tardi."),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxSize().padding(padding).padding(32.dp),
-            )
-            else -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                LoadingIndicator()
-            }
+            else -> rankings(contentPadding, true)
         }
+    }
     }
 
     if (showInfo) LeaderboardInfoSheet(kinds = kinds, onDismiss = { showInfo = false })
@@ -247,6 +265,119 @@ fun LeaderboardScreen(
 }
 
 private const val PODIUM_SIZE = 3
+
+/**
+ * The members' ranking: on a phone the member's place and the podium first
+ * ([withSummary]), then the rest of the ten and the member's own row.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun MembersList(
+    board: LeaderboardBoard,
+    contentPadding: PaddingValues,
+    switch: @Composable () -> Unit,
+    withSummary: Boolean,
+    onMemberClick: (String) -> Unit,
+) {
+    LazyColumn(
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        item(key = "switch") { switch() }
+        val top = board.top
+        if (withSummary) {
+            item(key = "me") { MyPlace(board) }
+            item(key = "label") {
+                SectionTitle(tr("leaderboard.top_label", "I primi {count}", "count" to LeaderboardBoard.TOP_SIZE))
+            }
+            // The first three on the podium, the rest of the ten below.
+            item(key = "podium") {
+                LeaderboardPodium(
+                    rows = top.take(PODIUM_SIZE),
+                    onMemberClick = onMemberClick,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+            }
+        }
+        val rest = top.drop(PODIUM_SIZE)
+        itemsIndexed(rest, key = { _, row -> row.id }) { index, row ->
+            RankItem(row, index, rest.size, onMemberClick)
+        }
+        // Below the first ten only the member's own row, after a gap
+        // that says places are skipped.
+        board.meBelowTop?.let { me ->
+            item(key = "gap") {
+                Icon(
+                    Icons.Outlined.MoreHoriz,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                )
+            }
+            item(key = "me_row") { RankItem(me, 0, 1, onMemberClick) }
+        }
+        item(key = "footer") {
+            Text(
+                text = tr("leaderboard.footer", "Ultimi 12 mesi. A pari punti, pari posizione."),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 4.dp, top = 12.dp),
+            )
+        }
+    }
+}
+
+/**
+ * The left column on a wide screen: the podium on top, scaled to the height
+ * the member's place leaves it, and the member's place under it. It never
+ * scrolls. Mirrors iOS `podiumColumn`.
+ */
+@Composable
+private fun PodiumColumn(
+    board: LeaderboardBoard?,
+    top: Dp,
+    bottom: Dp,
+    onMemberClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (board == null) {
+        Box(modifier)
+        return
+    }
+    Column(modifier.padding(start = 16.dp, bottom = bottom), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        FitHeight(Modifier.weight(1f).fillMaxWidth()) {
+            LeaderboardPodium(
+                rows = board.top.take(PODIUM_SIZE),
+                onMemberClick = onMemberClick,
+                spotlightReach = top,
+            )
+        }
+        MyPlaceCard(board)
+    }
+}
+
+/**
+ * Lays its content out at its own height, then scales it to the height it
+ * is offered (up to [maxScale]), keeping it on top and as wide as itself.
+ */
+@Composable
+private fun FitHeight(modifier: Modifier = Modifier, maxScale: Float = 1.3f, content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val child = measurables.first()
+        val width = constraints.maxWidth
+        val natural = child.maxIntrinsicHeight(width).coerceAtLeast(1)
+        val scale = (constraints.maxHeight.toFloat() / natural).coerceAtMost(maxScale)
+        val placeable = child.measure(Constraints.fixed((width / scale).toInt(), natural))
+        layout(width, constraints.maxHeight) {
+            placeable.placeWithLayer((width - placeable.width) / 2, 0) {
+                scaleX = scale
+                scaleY = scale
+                transformOrigin = TransformOrigin(0.5f, 0f)
+            }
+        }
+    }
+}
 
 // ── Regions and secretaries ──────────────────────────────────────────────────
 
@@ -356,20 +487,25 @@ private fun SectionTitle(text: String) {
 private fun MyPlace(board: LeaderboardBoard) {
     Column {
         SectionTitle(tr("leaderboard.my_place", "La tua posizione"))
-        val me = board.me
-        Card(Modifier.fillMaxWidth()) {
-            if (me == null) {
-                ListItem(
-                    leadingContent = { Icon(Icons.Outlined.EmojiEvents, contentDescription = null) },
-                    headlineContent = { Text(tr("leaderboard.unranked.title", "Non sei ancora in classifica")) },
-                    supportingContent = {
-                        Text(tr("leaderboard.unranked.detail", "Raccogli il primo timbro a un evento: da lì inizi a fare punti."))
-                    },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                )
-            } else {
-                RankedPlace(board, me)
-            }
+        MyPlaceCard(board)
+    }
+}
+
+@Composable
+private fun MyPlaceCard(board: LeaderboardBoard) {
+    val me = board.me
+    Card(Modifier.fillMaxWidth()) {
+        if (me == null) {
+            ListItem(
+                leadingContent = { Icon(Icons.Outlined.EmojiEvents, contentDescription = null) },
+                headlineContent = { Text(tr("leaderboard.unranked.title", "Non sei ancora in classifica")) },
+                supportingContent = {
+                    Text(tr("leaderboard.unranked.detail", "Raccogli il primo timbro a un evento: da lì inizi a fare punti."))
+                },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
+        } else {
+            RankedPlace(board, me)
         }
     }
 }

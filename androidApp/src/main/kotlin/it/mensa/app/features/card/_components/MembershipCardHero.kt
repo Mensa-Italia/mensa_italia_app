@@ -5,13 +5,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.provider.Settings
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -38,7 +34,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -68,7 +63,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import it.mensa.app.R
+import kotlin.math.abs
 import it.mensa.app.features.leaderboard.PodiumStampOverlay
 import it.mensa.app.ui.theme.GothamBold
 import it.mensa.app.ui.theme.MensaBlue
@@ -95,42 +92,11 @@ fun MembershipCardHero(
         scaleAnim.animateTo(1f, animationSpec = MensaMotion.springHeroOvershoot)
     }
 
-    // Subtle floating effect — always on, low amplitude so the card looks alive
-    // even without a working gyroscope.
-    val floatTransition = rememberInfiniteTransition(label = "tessera_float")
-    val floatX by floatTransition.animateFloat(
-        initialValue = -3.5f,
-        targetValue = 3.5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4200, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "tessera_float_rotX",
-    )
-    val floatY by floatTransition.animateFloat(
-        initialValue = -4.5f,
-        targetValue = 4.5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 5600, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "tessera_float_rotY",
-    )
-    // Vertical drift — the "lift" component of the float.
-    val floatLift by floatTransition.animateFloat(
-        initialValue = -1f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3800, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "tessera_float_lift",
-    )
-
-    // Optional gyroscope-driven tilt. No-op if sensor unavailable or fails.
-    val tilt by rememberDeviceTilt()
-    val tiltX = tilt.y * 8f // pitch → rotationX degrees
-    val tiltY = tilt.x * 10f // roll → rotationY degrees
+    // Gyroscope-driven tilt, as on iOS. Read only inside the graphicsLayer
+    // below, so a tilt redraws the card's layer and recomposes nothing. No
+    // other motion: a card that floats forever kept the Home drawing every
+    // frame, phone untouched.
+    val tilt = rememberDeviceTilt()
 
     BoxWithConstraints(
         modifier = modifier
@@ -152,9 +118,9 @@ fun MembershipCardHero(
                     val s = scaleAnim.value
                     scaleX = s
                     scaleY = s
-                    rotationY = flipRotation.value + tiltY + floatY
-                    rotationX = tiltX + floatX
-                    translationY = (floatLift * 6f).dp.toPx()
+                    val t = tilt.value
+                    rotationY = flipRotation.value + t.x * 10f // roll
+                    rotationX = t.y * 8f // pitch
                     cameraDistance = 16f * density
                     shape = cardShape
                     clip = true
@@ -426,19 +392,25 @@ private fun rememberDeviceTilt(): State<Offset> {
     val context = LocalContext.current
     val tilt = remember { mutableStateOf(Offset.Zero) }
 
-    DisposableEffect(Unit) {
+    // Listening only while the app is in front: the sensor kept running, and
+    // the card kept redrawing, with the app in the background.
+    LifecycleResumeEffect(Unit) {
         val sm = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
         val sensor = sm?.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
             ?: sm?.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+        // Animations off in the system settings: no tilt, as iOS with Reduce Motion.
+        val reduceMotion = Settings.Global.getFloat(
+            context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f,
+        ) == 0f
 
-        if (sm == null || sensor == null) {
-            return@DisposableEffect onDispose {}
+        if (sm == null || sensor == null || reduceMotion) {
+            return@LifecycleResumeEffect onPauseOrDispose {}
         }
 
         val rotationMatrix = FloatArray(9)
         val orientation = FloatArray(3)
-        var smoothedX = 0f
-        var smoothedY = 0f
+        var smoothedX = tilt.value.x
+        var smoothedY = tilt.value.y
         val alpha = 0.15f // low-pass smoothing — avoids jitter
 
         val listener = object : SensorEventListener {
@@ -451,7 +423,13 @@ private fun rememberDeviceTilt(): State<Offset> {
                     val rollNorm = (orientation[2] / 0.6f).coerceIn(-1f, 1f)
                     smoothedX = smoothedX + alpha * (rollNorm - smoothedX)
                     smoothedY = smoothedY + alpha * (pitchNorm - smoothedY)
-                    tilt.value = Offset(smoothedX, smoothedY)
+                    // The sensor reports ~50 times a second even with the phone
+                    // still: publish only a change you could see (a tenth of a
+                    // degree), so a phone at rest draws nothing.
+                    val current = tilt.value
+                    if (abs(smoothedX - current.x) > TILT_STEP || abs(smoothedY - current.y) > TILT_STEP) {
+                        tilt.value = Offset(smoothedX, smoothedY)
+                    }
                 } catch (_: Throwable) {
                     // Gracefully ignore — sensor may report bad data on some devices.
                 }
@@ -466,10 +444,13 @@ private fun rememberDeviceTilt(): State<Offset> {
             // Some OEMs throw on registerListener — fall back silently.
         }
 
-        onDispose {
+        onPauseOrDispose {
             try { sm.unregisterListener(listener) } catch (_: Throwable) {}
         }
     }
 
     return tilt
 }
+
+/** A tenth of a degree of the card's tilt (10° over the full range). */
+private const val TILT_STEP = 0.01f

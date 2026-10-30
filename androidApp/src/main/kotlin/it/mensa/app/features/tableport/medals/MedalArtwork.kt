@@ -1,10 +1,7 @@
 package it.mensa.app.features.tableport.medals
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +19,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -175,17 +174,18 @@ private val Rainbow = listOf(
 )
 
 /**
- * The medal button's icon, its colours cycling through the rainbow: it's
- * meant to be noticed. Mirrors iOS `RainbowMedalIcon`.
+ * The medal button's icon, its colours cycling through the rainbow when the
+ * page opens: it's meant to be noticed. Then it stays still, rainbow and
+ * all; turning forever kept the whole page redrawing every frame. Mirrors
+ * iOS `RainbowMedalIcon`.
  */
 @Composable
 fun RainbowMedalIcon(contentDescription: String?, modifier: Modifier = Modifier) {
-    val turn by rememberInfiniteTransition(label = "rainbow").animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(5_000, easing = LinearEasing), RepeatMode.Restart),
-        label = "rainbowTurn",
-    )
+    val turnAnim = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        turnAnim.animateTo(360f * RAINBOW_TURNS, tween(5_000 * RAINBOW_TURNS, easing = LinearEasing))
+    }
+    val turn by turnAnim.asState()
     Icon(
         imageVector = Icons.Filled.MilitaryTech,
         contentDescription = contentDescription,
@@ -205,3 +205,6 @@ fun RainbowMedalIcon(contentDescription: String?, modifier: Modifier = Modifier)
             },
     )
 }
+
+/** How many times the rainbow goes round before it stops. */
+private const val RAINBOW_TURNS = 2

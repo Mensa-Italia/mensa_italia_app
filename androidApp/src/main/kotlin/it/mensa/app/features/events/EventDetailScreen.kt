@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,6 +65,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
@@ -79,6 +81,7 @@ import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.rememberAppLocale
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.app.ui.components.ColumnSplitBox
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.features.events.util.label
@@ -92,6 +95,9 @@ import it.mensa.shared.model.LocationModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+
+/** Narrower than this the page is one column, as on a phone. Mirrors iOS `twoColumnMinWidth`. */
+private val EventDetailTwoColumnMinWidth = 720.dp
 
 /**
  * EventDetailScreen — M3 canonico.
@@ -127,18 +133,36 @@ fun EventDetailScreen(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    // The sections that read as text rather than as the event's card: beside
+    // it when there is room, below it otherwise.
+    val loaded = state.event
+    val hasDescription = loaded != null && loaded.description.isNotBlank()
+    val hasContacts = loaded != null && (loaded.contact.contains("@") || ExternalLinks.canOpen(loaded.infoLink))
+    val hasSchedule = state.schedules.isNotEmpty()
+    val hasSide = hasDescription || hasContacts || hasSchedule
+
+    // A screen this wide (a foldable open, a tablet) with text to put beside
+    // the card: the card - poster, title, dates, actions, map - on the left,
+    // the text on the right, each scrolling on its own; on a foldable they
+    // meet at the hinge. Full width, the poster alone filled the screen.
+    // Mirrors iOS `eventDetail(_:)`.
+    ColumnSplitBox(Modifier.fillMaxSize(), minWidth = EventDetailTwoColumnMinWidth) { columns ->
+    val split = columns?.takeIf { hasSide }
+    val wide = split != null
     MensaScaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        // Over two columns the bar doesn't change on scroll, which moved the
+        // column that wasn't scrolling, and has no title: it is in the card.
+        modifier = if (wide) Modifier else Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHostState = snackbarHostState,
         topBar = {
             TopAppBar(
-                title = { Text(state.event?.name ?: "") },
+                title = { if (!wide) Text(state.event?.name ?: "") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = tr("app.back", fallback = "Indietro"))
                     }
                 },
-                scrollBehavior = scrollBehavior,
+                scrollBehavior = if (wide) null else scrollBehavior,
                 actions = {
                     val event = state.event
                     if (event != null) {
@@ -168,7 +192,11 @@ fun EventDetailScreen(
             }
             else -> {
                 val event = state.event!!
-                Column(modifier = Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState())) {
+
+                // The page's pieces, so the one column and the two of a wide
+                // screen are made of the same ones. [top] is the air above a
+                // section: the first of a column needs less than the rest.
+                val hero: @Composable () -> Unit = {
                     // Hero image 16:9
                     Box(modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).scale(heroScale).alpha(heroAlpha)) {
                         val imageUrl = buildImageUrl(event)
@@ -193,149 +221,199 @@ fun EventDetailScreen(
                             }
                         }
                     }
+                }
 
-                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Spacer(Modifier.height(16.dp))
-
-                        // Info card: data + sede
-                        Card {
-                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Info card: data + sede
+                val infoCard: @Composable () -> Unit = {
+                    Card {
+                        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Surface(shape = CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(40.dp)) {
+                                    Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.CalendarMonth, null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(20.dp)) }
+                                }
+                                Column {
+                                    Text(tr("events.detail.start", fallback = "Inizio"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(EventDateFormatter.formatFull(event.whenStart, locale), style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Surface(shape = CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(40.dp)) {
+                                    Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.CalendarMonth, null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(20.dp)) }
+                                }
+                                Column {
+                                    Text(tr("events.detail.end", fallback = "Fine"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(EventDateFormatter.formatFull(event.whenEnd, locale), style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                            event.position?.let { pos ->
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(40.dp)) {
-                                        Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.CalendarMonth, null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(20.dp)) }
+                                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(40.dp)) {
+                                        Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp)) }
                                     }
                                     Column {
-                                        Text(tr("events.detail.start", fallback = "Inizio"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text(EventDateFormatter.formatFull(event.whenStart, locale), style = MaterialTheme.typography.bodyMedium)
-                                    }
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(40.dp)) {
-                                        Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.CalendarMonth, null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(20.dp)) }
-                                    }
-                                    Column {
-                                        Text(tr("events.detail.end", fallback = "Fine"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text(EventDateFormatter.formatFull(event.whenEnd, locale), style = MaterialTheme.typography.bodyMedium)
-                                    }
-                                }
-                                event.position?.let { pos ->
-                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(40.dp)) {
-                                            Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Place, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp)) }
-                                        }
-                                        Column {
-                                            Text(tr("events.detail.venue", fallback = "Sede"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                            Text(if (pos.address.isBlank()) pos.name else "${pos.name} – ${pos.address}", style = MaterialTheme.typography.bodyMedium)
-                                        }
+                                        Text(tr("events.detail.venue", fallback = "Sede"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(if (pos.address.isBlank()) pos.name else "${pos.name} – ${pos.address}", style = MaterialTheme.typography.bodyMedium)
                                     }
                                 }
                             }
                         }
+                    }
+                }
 
-                        Spacer(Modifier.height(16.dp))
+                val actions: @Composable () -> Unit = {
+                    // Aggiungi al calendario
+                    Button(
+                        onClick = {
+                            val cal = CalendarHelper.CalendarEvent(
+                                title = event.name,
+                                description = event.description.ifBlank { null },
+                                location = event.position?.let { p -> if (p.address.isBlank()) p.name else "${p.name}, ${p.address}" },
+                                startTimeMillis = event.whenStart.toEpochMilliseconds(),
+                                endTimeMillis = event.whenEnd.toEpochMilliseconds(),
+                            )
+                            val ok = calendarHelper.openCalendarIntent(cal)
+                            if (ok) vm.onCalendarSuccess() else vm.onCalendarError(calendarErrorMsg)
+                        },
+                        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(tr("events.cta.calendar", fallback = "Aggiungi al calendario"))
+                    }
 
-                        // Aggiungi al calendario
-                        Button(
+                    if (ExternalLinks.canOpen(event.bookingLink)) {
+                        Spacer(Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = { ExternalLinks.open(context, event.bookingLink) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(tr("events.cta.book", fallback = "Prenota")) }
+                    }
+
+                    if (event.position != null) {
+                        Spacer(Modifier.height(10.dp))
+                        TextButton(
                             onClick = {
-                                val cal = CalendarHelper.CalendarEvent(
-                                    title = event.name,
-                                    description = event.description.ifBlank { null },
-                                    location = event.position?.let { p -> if (p.address.isBlank()) p.name else "${p.name}, ${p.address}" },
-                                    startTimeMillis = event.whenStart.toEpochMilliseconds(),
-                                    endTimeMillis = event.whenEnd.toEpochMilliseconds(),
-                                )
-                                val ok = calendarHelper.openCalendarIntent(cal)
-                                if (ok) vm.onCalendarSuccess() else vm.onCalendarError(calendarErrorMsg)
+                                event.position?.let { pos ->
+                                    val uri = Uri.parse("geo:${pos.lat},${pos.lon}?q=${Uri.encode(event.name)}")
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                                }
                             },
-                            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Icon(Icons.Default.CalendarMonth, null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Map, null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(tr("events.cta.calendar", fallback = "Aggiungi al calendario"))
+                            Text(tr("events.cta.maps", fallback = "Apri in Mappe"))
                         }
+                    }
+                }
 
-                        if (ExternalLinks.canOpen(event.bookingLink)) {
-                            Spacer(Modifier.height(10.dp))
-                            OutlinedButton(
-                                onClick = { ExternalLinks.open(context, event.bookingLink) },
-                                modifier = Modifier.fillMaxWidth(),
-                            ) { Text(tr("events.cta.book", fallback = "Prenota")) }
-                        }
+                val descriptionSection: @Composable (Dp) -> Unit = { top ->
+                    SectionTitle(tr("events.section.desc", fallback = "Descrizione"), top)
+                    Card { Column(Modifier.padding(16.dp)) { Text(event.description, style = MaterialTheme.typography.bodyMedium) } }
+                }
 
-                        if (event.position != null) {
-                            Spacer(Modifier.height(10.dp))
-                            TextButton(
-                                onClick = {
-                                    event.position?.let { pos ->
-                                        val uri = Uri.parse("geo:${pos.lat},${pos.lon}?q=${Uri.encode(event.name)}")
-                                        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                val contactsSection: @Composable (Dp) -> Unit = { top ->
+                    SectionTitle(tr("events.section.contacts", fallback = "Contatti"), top)
+                    Card {
+                        Column(Modifier.padding(16.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                if (event.contact.contains("@")) {
+                                    OutlinedButton(onClick = { ExternalLinks.sendEmail(context, event.contact) }) {
+                                        Icon(Icons.Outlined.Email, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.email", fallback = "Email"))
                                     }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Icon(Icons.Default.Map, null, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(8.dp))
-                                Text(tr("events.cta.maps", fallback = "Apri in Mappe"))
-                            }
-                        }
-
-                        // Descrizione
-                        if (event.description.isNotBlank()) {
-                            Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(tr("events.section.desc", fallback = "Descrizione"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                            }
-                            Card { Column(Modifier.padding(16.dp)) { Text(event.description, style = MaterialTheme.typography.bodyMedium) } }
-                        }
-
-                        // Contatti
-                        val hasMail = event.contact.contains("@")
-                        val hasLink = ExternalLinks.canOpen(event.infoLink)
-                        if (hasMail || hasLink) {
-                            Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(tr("events.section.contacts", fallback = "Contatti"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                            }
-                            Card {
-                                Column(Modifier.padding(16.dp)) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        if (hasMail) {
-                                            OutlinedButton(onClick = { ExternalLinks.sendEmail(context, event.contact) }) {
-                                                Icon(Icons.Outlined.Email, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.email", fallback = "Email"))
-                                            }
-                                        }
-                                        if (hasLink) {
-                                            OutlinedButton(onClick = { ExternalLinks.open(context, event.infoLink) }) {
-                                                Icon(Icons.Outlined.Language, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.site", fallback = "Sito"))
-                                            }
-                                        }
+                                }
+                                if (ExternalLinks.canOpen(event.infoLink)) {
+                                    OutlinedButton(onClick = { ExternalLinks.open(context, event.infoLink) }) {
+                                        Icon(Icons.Outlined.Language, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(tr("events.contact.site", fallback = "Sito"))
                                     }
                                 }
                             }
                         }
+                    }
+                }
 
-                        // Programma
-                        if (state.schedules.isNotEmpty()) {
-                            Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(tr("events.section.schedule", fallback = "Programma"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
+                val scheduleSection: @Composable (Dp) -> Unit = { top ->
+                    SectionTitle(tr("events.section.schedule", fallback = "Programma"), top)
+                    ScheduleStack(schedules = state.schedules)
+                }
+
+                val mapSection: @Composable (Dp) -> Unit = { top ->
+                    // Embedded map
+                    event.position?.let { pos ->
+                        SectionTitle(tr("events.section.map", fallback = "Dove"), top)
+                        EmbeddedMap(pos = pos, name = event.name, onOpenMaps = {
+                            val uri = Uri.parse("geo:${pos.lat},${pos.lon}?q=${Uri.encode(event.name)}")
+                            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                        })
+                    }
+                }
+
+                if (split != null) {
+                    Row(Modifier.fillMaxSize().padding(innerPadding)) {
+                        Column(Modifier.width(split.leftWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                            hero()
+                            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                Spacer(Modifier.height(16.dp))
+                                Text(event.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(12.dp))
+                                infoCard()
+                                Spacer(Modifier.height(16.dp))
+                                actions()
+                                mapSection(24.dp)
+                                Spacer(Modifier.height(32.dp))
                             }
-                            ScheduleStack(schedules = state.schedules)
                         }
-
-                        // Embedded map
-                        event.position?.let { pos ->
-                            Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(tr("events.section.map", fallback = "Dove"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                            }
-                            EmbeddedMap(pos = pos, name = event.name, onOpenMaps = {
-                                val uri = Uri.parse("geo:${pos.lat},${pos.lon}?q=${Uri.encode(event.name)}")
-                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
-                            })
+                        Spacer(Modifier.width(split.gap))
+                        Column(
+                            Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+                        ) {
+                            // The first section sits closer to the top.
+                            var top = 8.dp
+                            if (hasDescription) { descriptionSection(top); top = 24.dp }
+                            if (hasContacts) { contactsSection(top); top = 24.dp }
+                            if (hasSchedule) { scheduleSection(top) }
+                            Spacer(Modifier.height(32.dp))
                         }
+                    }
+                } else {
+                    Column(modifier = Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState())) {
+                        hero()
 
-                        Spacer(Modifier.height(32.dp))
+                        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            Spacer(Modifier.height(16.dp))
+
+                            infoCard()
+
+                            Spacer(Modifier.height(16.dp))
+
+                            actions()
+
+                            // Descrizione
+                            if (hasDescription) descriptionSection(24.dp)
+
+                            // Contatti
+                            if (hasContacts) contactsSection(24.dp)
+
+                            // Programma
+                            if (hasSchedule) scheduleSection(24.dp)
+
+                            mapSection(24.dp)
+
+                            Spacer(Modifier.height(32.dp))
+                        }
                     }
                 }
             }
         }
+    }
+    }
+}
+
+/** A section's title, [top] below whatever is above it. */
+@Composable
+private fun SectionTitle(text: String, top: Dp) {
+    Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = top, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
     }
 }
 

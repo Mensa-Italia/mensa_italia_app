@@ -150,6 +150,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3.window.size)
+    implementation(libs.androidx.window)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     // Activity

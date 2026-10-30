@@ -57,11 +57,18 @@ struct MedalCase: View {
         let metal = medal.tier.metal
         VStack(spacing: 0) {
             ZStack {
-                LinearGradient(colors: [Color(red: 0.10, green: 0.12, blue: 0.18), Color(red: 0.05, green: 0.063, blue: 0.094)],
-                               startPoint: .top, endPoint: .bottom)
-                CaseLight(tint: medal.isEarned ? metal.hi : nil)
+                // What never moves is drawn once into a single image: the
+                // back wall with its light, and the glass. Only the medal
+                // between them moves.
+                ZStack {
+                    LinearGradient(colors: [Color(red: 0.10, green: 0.12, blue: 0.18), Color(red: 0.05, green: 0.063, blue: 0.094)],
+                                   startPoint: .top, endPoint: .bottom)
+                    CaseLight(tint: medal.isEarned ? metal.hi : nil)
+                }
+                .drawingGroup()
                 FloatingMedal(medal: medal, size: 86)
                 GlassFront(shape: caseShape)
+                    .drawingGroup()
             }
             .frame(height: Self.caseHeight)
             .clipShape(caseShape)
@@ -117,7 +124,14 @@ struct MedalCase: View {
                            startPoint: .top, endPoint: .bottom),
             in: UnevenRoundedRectangle(topLeadingRadius: 4, bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 4, style: .continuous)
         )
-        .shadow(color: .black.opacity(0.5), radius: 8, y: 6)
+        // Its shadow on the floor, drawn: a `.shadow` here was rendered
+        // again off screen on every frame of a scroll.
+        .background(alignment: .bottom) {
+            Ellipse()
+                .fill(RadialGradient(colors: [.black.opacity(0.45), .clear], center: .center, startRadius: 0, endRadius: 90))
+                .frame(height: 28)
+                .offset(y: 10)
+        }
     }
 }
 
@@ -167,8 +181,14 @@ private struct FloatingMedal: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 0)
+            // The medal and its shadow drawn once into a single image (room
+            // left round it for the shadow): the bobbing then only moves it,
+            // instead of redrawing a dozen layers and a shadow every frame.
             MedalArtwork(tier: medal.tier, symbol: medal.symbol, size: size, locked: !medal.isEarned)
                 .shadow(color: .black.opacity(0.5), radius: 8, y: 6)
+                .padding(16)
+                .drawingGroup()
+                .padding(-16)
                 .offset(y: up ? -6 : 0)
             Spacer(minLength: 0)
             Ellipse()

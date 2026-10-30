@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.MembershipCardHero
@@ -56,6 +60,7 @@ import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.RefreshOnReconnect
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.CachedAsyncImage
+import it.mensa.app.ui.components.ColumnSplitBox
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchAppBar
@@ -211,18 +216,21 @@ private fun TodayContent(
     onNotificationTap: (NotificationModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 96.dp),
-    ) {
+    // The sections, each as the items it adds to a column, so the one column
+    // and the two of a wide screen are made of the same pieces.
+    val greeting: LazyListScope.() -> Unit = {
         item(key = "greeting") {
             TodayGreeting(user = uiState.user)
         }
+    }
 
+    val offline: LazyListScope.() -> Unit = {
         item(key = "offline") {
             OfflineBanner(modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 4.dp))
         }
+    }
 
+    val membershipCard: LazyListScope.() -> Unit = {
         item(key = "membership_card") {
             val user = uiState.user
             if (user != null) {
@@ -247,7 +255,9 @@ private fun TodayContent(
                 }
             }
         }
+    }
 
+    val membership: LazyListScope.() -> Unit = {
         item(key = "membership") {
             val user = uiState.user
             if (user != null) {
@@ -261,7 +271,9 @@ private fun TodayContent(
                 )
             }
         }
+    }
 
+    val birthdaysSection: LazyListScope.() -> Unit = {
         if (birthdays.isNotEmpty()) {
             item(key = "birthdays") {
                 Spacer(Modifier.height(20.dp))
@@ -277,9 +289,13 @@ private fun TodayContent(
                 }
             }
         }
+    }
 
+    // [topSpacing] is the air above the section: a column that opens with it
+    // needs less than one that continues.
+    fun nextEvent(topSpacing: Dp): LazyListScope.() -> Unit = {
         item(key = "next_event") {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(topSpacing))
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -299,7 +315,9 @@ private fun TodayContent(
                 }
             }
         }
+    }
 
+    val notifications: LazyListScope.() -> Unit = {
         if (uiState.notifications.isNotEmpty()) {
             item(key = "notifications") {
                 Spacer(Modifier.height(24.dp))
@@ -312,8 +330,50 @@ private fun TodayContent(
                 }
             }
         }
+    }
 
-        item(key = "spacer_end") { Spacer(Modifier.height(40.dp)) }
+    // A screen this wide (a foldable open, a tablet): one column per half,
+    // each scrolling on its own. Left what's going on, right the member:
+    // card, membership, birthdays. Mirrors iOS `TodayView.foldLayout`.
+    ColumnSplitBox(modifier.fillMaxSize()) { split ->
+        if (split != null) {
+            Row(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier.width(split.leftWidth).fillMaxHeight(),
+                    contentPadding = PaddingValues(bottom = 96.dp),
+                ) {
+                    nextEvent(8.dp)()
+                    notifications()
+                    item(key = "spacer_end") { Spacer(Modifier.height(40.dp)) }
+                }
+                Spacer(Modifier.width(split.gap))
+                LazyColumn(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    contentPadding = PaddingValues(bottom = 96.dp),
+                ) {
+                    greeting()
+                    offline()
+                    membershipCard()
+                    membership()
+                    birthdaysSection()
+                    item(key = "spacer_end") { Spacer(Modifier.height(40.dp)) }
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 96.dp),
+            ) {
+                greeting()
+                offline()
+                membershipCard()
+                membership()
+                birthdaysSection()
+                nextEvent(20.dp)()
+                notifications()
+                item(key = "spacer_end") { Spacer(Modifier.height(40.dp)) }
+            }
+        }
     }
 }
 

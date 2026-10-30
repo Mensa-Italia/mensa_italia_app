@@ -10,20 +10,28 @@ struct PassportStampDecal: View {
 
     var body: some View {
         ZStack {
-            // Perforated (toothed) backing — drawn via Canvas as a circle of arcs cut out.
-            PerforatedTile(toothCount: 22, toothRadius: 3)
-                .fill(PassportPalette.parchment)
-                .shadow(color: .black.opacity(0.25), radius: 3, x: 1, y: 2)
+            // The paper, drawn once into a single image (room left round it
+            // for the shadow): 88 teeth cut out twice and a shadow, redrawn
+            // on every frame of a scroll, made the book stutter.
+            ZStack {
+                // Perforated (toothed) backing — drawn via Canvas as a circle of arcs cut out.
+                PerforatedTile(toothCount: 22, toothRadius: 3)
+                    .fill(PassportPalette.parchment)
+                    .shadow(color: .black.opacity(0.25), radius: 3, x: 1, y: 2)
 
-            // Inner ivory plate
-            PerforatedTile(toothCount: 22, toothRadius: 3)
-                .fill(PassportPalette.parchment)
-                .padding(2)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4, style: .continuous)
-                        .stroke(PassportPalette.gold.opacity(0.5), lineWidth: 0.6)
-                        .padding(8)
-                )
+                // Inner ivory plate
+                PerforatedTile(toothCount: 22, toothRadius: 3)
+                    .fill(PassportPalette.parchment)
+                    .padding(2)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .stroke(PassportPalette.gold.opacity(0.5), lineWidth: 0.6)
+                            .padding(8)
+                    )
+            }
+            .padding(8)
+            .drawingGroup()
+            .padding(-8)
 
             // The stamp PNG (black on transparent — looks great on ivory).
             Group {

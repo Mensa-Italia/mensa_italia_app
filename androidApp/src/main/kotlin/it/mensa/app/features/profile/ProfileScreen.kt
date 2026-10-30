@@ -62,6 +62,7 @@ import it.mensa.app.features.profile._components.ProfileRow
 import it.mensa.app.features.profile._components.ProfileSectionGroup
 import it.mensa.app.features.profile._components.ProfileSectionTone
 import it.mensa.app.features.profile._components.ProfileToggleRow
+import it.mensa.app.features.receipts.ReceiptsRoutes
 import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.FilesUrl
 import it.mensa.app.support.koinAccess
@@ -72,6 +73,11 @@ import it.mensa.app.ui.components.MensaSearchAppBar
 import it.mensa.shared.model.UserModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * The profile list. Also the index of the wide layout (`ProfileNavGraph`):
+ * [selectedRoute] is the route of the page open beside it (a [ProfileRoute]
+ * route, or the receipts list), highlighted in the list.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -79,6 +85,7 @@ fun ProfileScreen(
     onSearchTap: () -> Unit = {},
     /** Receipts are a root drill route, outside this nested graph. */
     onReceiptsClick: () -> Unit = {},
+    selectedRoute: String? = null,
     vm: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -123,27 +130,32 @@ fun ProfileScreen(
                             icon = Icons.Outlined.Refresh,
                             title = tr("app.profile.membership", fallback = "Iscrizione"),
                             onClick = { onNavigate(ProfileRoute.RenewMembership) },
+                            selected = selectedRoute == ProfileRoute.RenewMembership.route,
                         )
                         ProfileRow(
                             icon = Icons.Outlined.CreditCard,
                             title = tr("app.profile.payments", fallback = "Pagamenti"),
                             onClick = { onNavigate(ProfileRoute.PaymentMethods) },
+                            selected = selectedRoute == ProfileRoute.PaymentMethods.route,
                         )
                         ProfileRow(
                             icon = Icons.Outlined.Receipt,
                             title = tr("card.nav_receipts", fallback = "Le mie ricevute"),
                             onClick = onReceiptsClick,
+                            selected = selectedRoute == ReceiptsRoutes.LIST,
                         )
                         ProfileRow(
                             icon = Icons.Outlined.Devices,
                             title = tr("views.devices.title", fallback = "Dispositivi"),
                             onClick = { onNavigate(ProfileRoute.Devices) },
+                            selected = selectedRoute == ProfileRoute.Devices.route,
                         )
                         if (koinAccess().featureFlags.passkeysEnabled) {
                             ProfileRow(
                                 icon = Icons.Outlined.Fingerprint,
                                 title = tr("views.passkeys.title", fallback = "Passkey"),
                                 onClick = { onNavigate(ProfileRoute.Passkeys) },
+                                selected = selectedRoute == ProfileRoute.Passkeys.route,
                             )
                         }
                     }
@@ -173,11 +185,13 @@ fun ProfileScreen(
                                 if (ExternalLinks.canOpen(link)) ExternalLinks.open(context, link)
                                 else onNavigate(ProfileRoute.MakeDonation)
                             },
+                            selected = selectedRoute == ProfileRoute.MakeDonation.route,
                         )
                         ProfileRow(
                             icon = Icons.Outlined.CalendarMonth,
                             title = tr("app.calendar_link.title", fallback = "Calendario"),
                             onClick = { onNavigate(ProfileRoute.CalendarLinker) },
+                            selected = selectedRoute == ProfileRoute.CalendarLinker.route,
                         )
                     }
                 }
@@ -200,6 +214,7 @@ fun ProfileScreen(
                                 icon = Icons.Outlined.AccountTree,
                                 title = tr("app.org_chart.title", fallback = "Organigramma"),
                                 onClick = { onNavigate(ProfileRoute.OrgChart) },
+                                selected = selectedRoute == ProfileRoute.OrgChart.route,
                             )
                         }
                     }
@@ -220,6 +235,7 @@ fun ProfileScreen(
                             title = tr("app.profile.language", fallback = "Lingua"),
                             trailing = uiState.localeName.ifBlank { null },
                             onClick = { onNavigate(ProfileRoute.LanguagePicker) },
+                            selected = selectedRoute == ProfileRoute.LanguagePicker.route,
                         )
                         ProfileDropdownRow(
                             icon = Icons.Outlined.DarkMode,
@@ -268,6 +284,7 @@ fun ProfileScreen(
                             icon = Icons.Outlined.AutoAwesome,
                             title = tr("app.profile.credits", fallback = "Crediti"),
                             onClick = { onNavigate(ProfileRoute.Credits) },
+                            selected = selectedRoute == ProfileRoute.Credits.route,
                         )
                     }
                 }

@@ -170,7 +170,9 @@ struct TodayView: View {
             isFullScreen: false,
             avatarSize: 54,
             podiumPlace: koin.featureFlags.enabledLeaderboards().contains(.members)
-                ? leaderboardStore.board?.myPodiumPlace.map { Int($0.int32Value) } : nil
+                ? leaderboardStore.board?.myPodiumPlace.map { Int($0.int32Value) } : nil,
+            // Under the passport the card is out of sight but still on screen.
+            motionActive: !showPassport
         )
         .frame(maxWidth: 420)
         .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 8)

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -81,7 +83,8 @@ import kotlin.math.min
 /**
  * NowPlayingFullScreenView — full-screen now-playing modal.
  *
- * Replica of iOS NowPlayingFullScreenView.swift:
+ * Replica of iOS NowPlayingFullScreenView.swift (wide screens: artwork and
+ * controls side by side, split at the hinge or halfway, see `ColumnSplitBox`):
  * - Black backdrop + blurred artwork background + gradient overlay
  * - Pull indicator capsule
  * - Top bar: dismiss + subtitle + options menu
@@ -161,123 +164,148 @@ private fun NowPlayingContent(
                 ),
         )
 
-        // Main content column
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .padding(horizontal = 0.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Pull indicator / drag handle
-            Box(
-                modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp)
-                    .size(width = 36.dp, height = 5.dp)
-                    .background(
-                        Color.White.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(50),
-                    ),
-            )
+        // Wide (an unfolded foldable, a tablet turned sideways): artwork on
+        // one side, controls on the other, parted at the hinge or halfway.
+        // Mirrors iOS `wideLayout`; its condition (landscape, >= 640) is kept.
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val landscape = maxWidth > maxHeight
+            ColumnSplitBox(Modifier.fillMaxSize(), minWidth = NowPlayingWideMinWidth) { split ->
+                if (split != null && landscape) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .navigationBarsPadding(),
+                    ) {
+                        // Left: the artwork, centred, clear of the hinge.
+                        BoxWithConstraints(
+                            modifier = Modifier
+                                .width(split.leftWidth)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            PlayingArtwork(
+                                track = track,
+                                isPlaying = isPlaying,
+                                maxSide = min(maxWidth - 64.dp, maxHeight - 64.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(split.gap))
+                        // Right: handle, top bar and controls, centred.
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 8.dp, bottom = 8.dp)
+                                    .size(width = 36.dp, height = 5.dp)
+                                    .background(
+                                        Color.White.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(50),
+                                    ),
+                            )
+                            TopBar(
+                                track = track,
+                                onDismiss = onDismiss,
+                                onStop = {
+                                    controller.clear()
+                                    onDismiss()
+                                },
+                                showOptionsMenu = showOptionsMenu,
+                                onToggleMenu = { showOptionsMenu = !showOptionsMenu },
+                                onDismissMenu = { showOptionsMenu = false },
+                            )
+                            Spacer(Modifier.weight(1f))
+                            NowPlayingControls(
+                                track = track,
+                                controller = controller,
+                                isPlaying = isPlaying,
+                                currentTime = currentTime,
+                                duration = duration,
+                                queueCount = queue.size,
+                                hasPrevious = hasPrevious,
+                                hasNext = hasNext,
+                                onQueueTap = { showQueue = true },
+                                modifier = Modifier
+                                    .widthIn(max = 440.dp)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                            )
+                            Spacer(Modifier.weight(1f))
+                        }
+                    }
+                } else {
+                    // Phone: unchanged.
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .navigationBarsPadding()
+                            .padding(horizontal = 0.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        // Pull indicator / drag handle
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 8.dp, bottom = 8.dp)
+                                .size(width = 36.dp, height = 5.dp)
+                                .background(
+                                    Color.White.copy(alpha = 0.4f),
+                                    shape = RoundedCornerShape(50),
+                                ),
+                        )
 
-            // Top bar
-            TopBar(
-                track = track,
-                onDismiss = onDismiss,
-                onStop = {
-                    controller.clear()
-                    onDismiss()
-                },
-                showOptionsMenu = showOptionsMenu,
-                onToggleMenu = { showOptionsMenu = !showOptionsMenu },
-                onDismissMenu = { showOptionsMenu = false },
-            )
+                        // Top bar
+                        TopBar(
+                            track = track,
+                            onDismiss = onDismiss,
+                            onStop = {
+                                controller.clear()
+                                onDismiss()
+                            },
+                            showOptionsMenu = showOptionsMenu,
+                            onToggleMenu = { showOptionsMenu = !showOptionsMenu },
+                            onDismissMenu = { showOptionsMenu = false },
+                        )
 
-            Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.weight(1f))
 
-            // Artwork
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                val artworkSize = min(maxWidth, maxHeight * 0.42f)
-                val artworkScale by animateFloatAsState(
-                    targetValue = if (isPlaying) 1f else 0.92f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMediumLow,
-                    ),
-                    label = "artwork_scale",
-                )
-                ArtworkView(
-                    track = track,
-                    maxSide = artworkSize,
-                    modifier = Modifier.scale(artworkScale),
-                )
+                        // Artwork
+                        BoxWithConstraints(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 32.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            PlayingArtwork(
+                                track = track,
+                                isPlaying = isPlaying,
+                                maxSide = min(maxWidth, maxHeight * 0.42f),
+                            )
+                        }
+
+                        Spacer(Modifier.weight(1f))
+
+                        NowPlayingControls(
+                            track = track,
+                            controller = controller,
+                            isPlaying = isPlaying,
+                            currentTime = currentTime,
+                            duration = duration,
+                            queueCount = queue.size,
+                            hasPrevious = hasPrevious,
+                            hasNext = hasNext,
+                            onQueueTap = { showQueue = true },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
             }
-
-            Spacer(Modifier.weight(1f))
-
-            // Title block
-            TitleBlock(
-                track = track,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // Custom scrubber
-            AudioScrubber(
-                duration = max(duration.toDouble(), 0.01),
-                currentTime = currentTime.toDouble(),
-                onSeek = { newSecs -> controller.seek(newSecs.toFloat()) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            // Timestamps
-            TimestampsRow(
-                currentTime = currentTime,
-                duration = duration,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 4.dp),
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // Transport controls
-            TransportControls(
-                isPlaying = isPlaying,
-                hasPrevious = hasPrevious,
-                hasNext = hasNext,
-                isMultiTrack = queue.size > 1,
-                onPrev = { controller.previous() },
-                onTogglePlay = { controller.togglePlayPause() },
-                onNext = { controller.next() },
-                onSkipBack = { controller.seekBy(-15f) },
-                onSkipForward = { controller.seekBy(15f) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            // Secondary actions
-            SecondaryActions(
-                queueCount = queue.size,
-                onQueueTap = { showQueue = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 48.dp),
-            )
-
-            Spacer(Modifier.height(16.dp))
         }
     }
 
@@ -285,6 +313,111 @@ private fun NowPlayingContent(
         NowPlayingQueueSheet(
             controller = controller,
             onDismiss = { showQueue = false },
+        )
+    }
+}
+
+/** Width from which the player lays artwork and controls side by side (iOS: 640pt). */
+private val NowPlayingWideMinWidth = 640.dp
+
+/**
+ * The artwork with the play/pause spring (0.92 paused → 1.0 playing), shared
+ * by the phone and the wide layout.
+ */
+@Composable
+private fun PlayingArtwork(
+    track: AudioTrack,
+    isPlaying: Boolean,
+    maxSide: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
+    val artworkScale by animateFloatAsState(
+        targetValue = if (isPlaying) 1f else 0.92f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "artwork_scale",
+    )
+    ArtworkView(
+        track = track,
+        maxSide = maxSide,
+        modifier = modifier.scale(artworkScale),
+    )
+}
+
+/**
+ * Title, scrubber, timestamps, transport and secondary actions: the part of
+ * the player under (or, wide, beside) the artwork.
+ */
+@Composable
+private fun NowPlayingControls(
+    track: AudioTrack,
+    controller: AudioPlayerController,
+    isPlaying: Boolean,
+    currentTime: Float,
+    duration: Float,
+    queueCount: Int,
+    hasPrevious: Boolean,
+    hasNext: Boolean,
+    onQueueTap: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        // Title block
+        TitleBlock(
+            track = track,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // Custom scrubber
+        AudioScrubber(
+            duration = max(duration.toDouble(), 0.01),
+            currentTime = currentTime.toDouble(),
+            onSeek = { newSecs -> controller.seek(newSecs.toFloat()) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        // Timestamps
+        TimestampsRow(
+            currentTime = currentTime,
+            duration = duration,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 4.dp),
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // Transport controls
+        TransportControls(
+            isPlaying = isPlaying,
+            hasPrevious = hasPrevious,
+            hasNext = hasNext,
+            isMultiTrack = queueCount > 1,
+            onPrev = { controller.previous() },
+            onTogglePlay = { controller.togglePlayPause() },
+            onNext = { controller.next() },
+            onSkipBack = { controller.seekBy(-15f) },
+            onSkipForward = { controller.seekBy(15f) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // Secondary actions
+        SecondaryActions(
+            queueCount = queueCount,
+            onQueueTap = onQueueTap,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 48.dp),
         )
     }
 }

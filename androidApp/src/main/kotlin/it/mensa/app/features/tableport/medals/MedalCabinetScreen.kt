@@ -234,6 +234,8 @@ private fun Summary(medals: List<Medal>) {
                 progress = { earned.toFloat() / medals.size.coerceAtLeast(1) },
                 color = gold.mid,
                 trackColor = Color.White.copy(alpha = 0.10f),
+                // A still wave: a moving one redraws the page every frame, forever.
+                waveSpeed = 0.dp,
                 modifier = Modifier.size(84.dp),
             )
             Text(
@@ -532,6 +534,8 @@ private fun TierLadder(medal: Medal, modifier: Modifier = Modifier) {
                             progress = { medal.progress },
                             color = tier.metal.mid,
                             trackColor = Color.White.copy(alpha = 0.12f),
+                            // A still wave: a moving one redraws the page every frame, forever.
+                            waveSpeed = 0.dp,
                             modifier = Modifier.size(56.dp),
                         )
                     }
@@ -573,6 +577,8 @@ private fun Status(medal: Medal, modifier: Modifier = Modifier) {
                 progress = { medal.progress },
                 color = nextTier.metal.mid,
                 trackColor = Color.White.copy(alpha = 0.12f),
+                // A still wave: a moving one redraws the page every frame, forever.
+                waveSpeed = 0.dp,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(6.dp))

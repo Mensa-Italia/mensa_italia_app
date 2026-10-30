@@ -5,25 +5,29 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,48 +42,29 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.mensa.app.features.addonshub.AddonsHubRoutes
-import it.mensa.app.features.addonshub.addonsHubNavGraph
 import it.mensa.app.features.contacts.ContactsRoutes
-import it.mensa.app.features.contacts.contactsNavGraph
 import it.mensa.app.features.deals.DealsRoute
-import it.mensa.app.features.deals.dealsNavGraph
-import it.mensa.app.features.discover.DiscoverScreen
+import it.mensa.app.features.discover.DiscoverTab
 import it.mensa.app.features.documents.DocumentsRoutes
-import it.mensa.app.features.documents.documentsNavGraph
 import it.mensa.app.features.events.EventRoutes
-import it.mensa.app.features.events.eventsNavGraph
-import it.mensa.app.features.external.ExternalRoutes
-import it.mensa.app.features.external.externalNavGraph
 import it.mensa.app.features.localoffices.LocalOfficesRoutes
-import it.mensa.app.features.locations.locationsNavGraph
-import it.mensa.app.features.localoffices.localOfficesNavGraph
 import it.mensa.app.features.leaderboard.LeaderboardRoutes
-import it.mensa.app.features.leaderboard.leaderboardNavGraph
 import it.mensa.app.features.members.MembersRoutes
-import it.mensa.app.features.members.membersNavGraph
 import it.mensa.app.features.notifications.AccountConfirmationHost
 import it.mensa.app.features.notifications.NotificationsRoutes
-import it.mensa.app.features.notifications.notificationsNavGraph
 import it.mensa.app.features.notifications.notificationTarget
 import it.mensa.app.navigation.DeepLinkHandler
 import it.mensa.app.navigation.PendingAppLink
+import it.mensa.app.navigation.drillNavGraphs
 import it.mensa.app.features.podcasts.PodcastsRoutes
-import it.mensa.app.features.podcasts.podcastsNavGraph
 import it.mensa.app.features.profile.ProfileNavGraph
 import it.mensa.app.features.quid.QuidRoute
-import it.mensa.app.features.quid.quidNavGraph
 import it.mensa.app.features.receipts.ReceiptsRoutes
-import it.mensa.app.features.receipts.receiptsNavGraph
-import it.mensa.app.features.search.SearchScreen
+import it.mensa.app.features.search.SearchTab
 import it.mensa.app.features.search.toDetailRoute
 import it.mensa.app.features.sigs.SigsRoutes
-import it.mensa.app.features.sigs.sigsNavGraph
 import it.mensa.app.features.tableport.TableportRoutes
-import it.mensa.app.features.tableport.tableportNavGraph
-import it.mensa.app.features.testassistant.TestAssistantRoutes
-import it.mensa.app.features.testassistant.testAssistantNavGraph
 import it.mensa.app.features.tickets.TicketsRoutes
-import it.mensa.app.features.tickets.ticketsNavGraph
 import it.mensa.app.features.today.TodayScreen
 import it.mensa.app.navigation.toRoute
 import it.mensa.app.services.audio.AudioPlayerController
@@ -90,6 +75,8 @@ import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaNavItem
 import it.mensa.app.ui.components.MensaNavigationBar
+import it.mensa.app.ui.components.MensaNavigationRail
+import it.mensa.app.ui.components.TwoColumnMinWidth
 import it.mensa.app.ui.components.MiniAudioPlayer
 import it.mensa.app.ui.components.NowPlayingFullScreenView
 import org.koin.compose.koinInject
@@ -235,157 +222,169 @@ fun MainAppShell() {
     val shouldShowBottomBar = currentDestination?.route in tabRoutes &&
         (currentDestination?.route != MainTab.Profile.route || profileAtRoot)
 
-    Scaffold(
-        bottomBar = {
-            AnimatedVisibility(
-                visible = shouldShowBottomBar,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
-                ),
-            ) {
-                val activeTabRoute = currentDestination?.hierarchy
-                    ?.mapNotNull { dest -> tabRoutes.firstOrNull { it == dest.route } }
-                    ?.firstOrNull()
-                val navItems = remember {
-                    MainTab.values().map { tab ->
-                        MensaNavItem(
-                            route = tab.route,
-                            icon = tab.icon,
-                            label = tab.labelFallback,
+    val activeTabRoute = currentDestination?.hierarchy
+        ?.mapNotNull { dest -> tabRoutes.firstOrNull { it == dest.route } }
+        ?.firstOrNull()
+    // A drill pushed from a tab belongs to that tab: the rail, which stays on
+    // screen over it, keeps the tab lit.
+    var lastTabRoute by remember { mutableStateOf(MainTab.Today.route) }
+    LaunchedEffect(activeTabRoute) { activeTabRoute?.let { lastTabRoute = it } }
+
+    val navItems = MainTab.values().map { tab ->
+        MensaNavItem(
+            route = tab.route,
+            icon = tab.icon,
+            label = tr(tab.labelKey, tab.labelFallback),
+        )
+    }
+    val onTabSelect: (MensaNavItem) -> Unit = { navItem ->
+        // The tab already lit, over a drill pushed from it: back to its root.
+        // (Restoring the tab's saved state would bring the drill back.)
+        val backToRoot = activeTabRoute == null && navItem.route == lastTabRoute &&
+            navController.popBackStack(navItem.route, inclusive = false)
+        if (!backToRoot) {
+            navController.navigate(navItem.route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
+    // Phone: bottom navigation bar, slid away over drill destinations.
+    val bottomBar: @Composable () -> Unit = {
+        AnimatedVisibility(
+            visible = shouldShowBottomBar,
+            enter = slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it },
+                animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
+            ),
+        ) {
+            MensaNavigationBar(
+                items = navItems,
+                selectedRoute = activeTabRoute,
+                onItemSelect = onTabSelect,
+            )
+        }
+    }
+
+    // A window at least TwoColumnMinWidth wide (iPhone Duo unfolded, iPad on
+    // iOS: the system moves the tab bar to the side) swaps the bottom bar for
+    // a navigation rail. Unlike the bar the rail takes no height from the
+    // content, so it stays over drill destinations too.
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val useRail = maxWidth >= TwoColumnMinWidth
+        Row(Modifier.fillMaxSize()) {
+            if (useRail) {
+                MensaNavigationRail(
+                    items = navItems,
+                    selectedRoute = activeTabRoute ?: lastTabRoute,
+                    onItemSelect = onTabSelect,
+                )
+            }
+            Scaffold(
+                modifier = Modifier.weight(1f),
+                bottomBar = { if (!useRail) bottomBar() },
+                contentWindowInsets = WindowInsets(0),
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        // La bottom bar copre gia' la navigation bar di sistema quando e'
+                        // visibile: senza consumare l'inset, le schermate interne
+                        // (MensaScaffold consuma navigationBars) lo pagherebbero due volte.
+                        // Sulle destinazioni drill la bar non c'e', l'inset resta intero e
+                        // la schermata se lo prende — cosi' il FAB non finisce sotto la
+                        // barra di sistema.
+                        .consumeWindowInsets(innerPadding)
+                        // The rail already pads for the system bars and a cutout on
+                        // its side; the screens beside it must not pay it again.
+                        .consumeWindowInsets(
+                            WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Start),
+                        ),
+                ) {
+                    // ── Master NavHost ────────────────────────────────────────────────
+                    NavHost(
+                        navController = navController,
+                        startDestination = startDestination,
+                    ) {
+                        // ── Tab roots ─────────────────────────────────────────────────
+
+                        composable(MainTab.Today.route) {
+                            TodayScreen(
+                                onNavigateToTab = { tab -> navController.navigateToTab(tab) },
+                                onEventClick = { id -> navController.navigate(EventRoutes.detail(id)) },
+                                onDealClick = { id -> navController.navigate(DealsRoute.detail(id)) },
+                                onSigClick = { id -> navController.navigate(SigsRoutes.detail(id)) },
+                                onNotificationsClick = { navController.navigate(NotificationsRoutes.LIST) },
+                                onNotificationTap = { notif ->
+                                    val target = notificationTarget(notif)
+                                    if (target != null) {
+                                        DeepLinkHandler.handleNotificationTarget(target, navController)
+                                    } else {
+                                        navController.navigate(NotificationsRoutes.detail(notif.id))
+                                    }
+                                },
+                                onTableportClick = { navController.navigate(TableportRoutes.PASSPORT) },
+                                onLeaderboardClick = { navController.navigate(LeaderboardRoutes.BOARD) },
+                                onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
+                                onMemberClick = { id -> navController.navigate(MembersRoutes.detail(id)) },
+                                onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
+                            )
+                        }
+
+                        composable(MainTab.Discover.route) {
+                            DiscoverTab(
+                                onCategoryClick = { category ->
+                                    category.toRoute()?.let { navController.navigate(it) }
+                                },
+                                onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
+                            )
+                        }
+
+                        composable(SearchRoute.ROUTE) {
+                            SearchTab(
+                                onItemClick = { hit ->
+                                    hit.toDetailRoute()?.let { navController.navigate(it) }
+                                },
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+
+                        composable(MainTab.Profile.route) {
+                            ProfileNavGraph(
+                                onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
+                                onReceiptsClick = { navController.navigate(ReceiptsRoutes.LIST) },
+                                onAtRootChange = { profileAtRoot = it },
+                            )
+                        }
+
+                        // ── Drill nav graphs ──────────────────────────────────────────
+
+                        drillNavGraphs(navController)
+                    }
+
+                    // ── MiniAudioPlayer — floats above NavigationBar ──────────────────
+                    if (currentTrack != null) {
+                        MiniAudioPlayer(
+                            controller = audioController,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                // Zero quando la bottom bar e' visibile (inset gia'
+                                // consumato sopra), altezza piena della navigation bar
+                                // sulle destinazioni drill.
+                                .navigationBarsPadding()
+                                .padding(bottom = 8.dp, start = 12.dp, end = 12.dp),
                         )
                     }
                 }
-                val localizedItems = navItems.map { item ->
-                    val tab = MainTab.values().first { it.route == item.route }
-                    item.copy(label = tr(tab.labelKey, tab.labelFallback))
-                }
-                MensaNavigationBar(
-                    items = localizedItems,
-                    selectedRoute = activeTabRoute,
-                    onItemSelect = { navItem ->
-                        navController.navigate(navItem.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets(0),
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                // La bottom bar copre gia' la navigation bar di sistema quando e'
-                // visibile: senza consumare l'inset, le schermate interne
-                // (MensaScaffold consuma navigationBars) lo pagherebbero due volte.
-                // Sulle destinazioni drill la bar non c'e', l'inset resta intero e
-                // la schermata se lo prende — cosi' il FAB non finisce sotto la
-                // barra di sistema.
-                .consumeWindowInsets(innerPadding),
-        ) {
-            // ── Master NavHost ────────────────────────────────────────────────
-            NavHost(
-                navController = navController,
-                startDestination = startDestination,
-            ) {
-                // ── Tab roots ─────────────────────────────────────────────────
-
-                composable(MainTab.Today.route) {
-                    TodayScreen(
-                        onNavigateToTab = { tab -> navController.navigateToTab(tab) },
-                        onEventClick = { id -> navController.navigate(EventRoutes.detail(id)) },
-                        onDealClick = { id -> navController.navigate(DealsRoute.detail(id)) },
-                        onSigClick = { id -> navController.navigate(SigsRoutes.detail(id)) },
-                        onNotificationsClick = { navController.navigate(NotificationsRoutes.LIST) },
-                        onNotificationTap = { notif ->
-                            val target = notificationTarget(notif)
-                            if (target != null) {
-                                DeepLinkHandler.handleNotificationTarget(target, navController)
-                            } else {
-                                navController.navigate(NotificationsRoutes.detail(notif.id))
-                            }
-                        },
-                        onTableportClick = { navController.navigate(TableportRoutes.PASSPORT) },
-                        onLeaderboardClick = { navController.navigate(LeaderboardRoutes.BOARD) },
-                        onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
-                        onMemberClick = { id -> navController.navigate(MembersRoutes.detail(id)) },
-                        onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
-                    )
-                }
-
-                composable(MainTab.Discover.route) {
-                    DiscoverScreen(
-                        onCategoryClick = { category ->
-                            category.toRoute()?.let { navController.navigate(it) }
-                        },
-                        onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
-                    )
-                }
-
-                composable(SearchRoute.ROUTE) {
-                    SearchScreen(
-                        onItemClick = { hit ->
-                            hit.toDetailRoute()?.let { navController.navigate(it) }
-                        },
-                        onBack = { navController.popBackStack() },
-                    )
-                }
-
-                composable(MainTab.Profile.route) {
-                    ProfileNavGraph(
-                        onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
-                        onReceiptsClick = { navController.navigate(ReceiptsRoutes.LIST) },
-                        onAtRootChange = { profileAtRoot = it },
-                    )
-                }
-
-                // ── Drill nav graphs ──────────────────────────────────────────
-
-                eventsNavGraph(navController)
-                locationsNavGraph(navController)
-                dealsNavGraph(navController)
-                ticketsNavGraph(navController)
-                receiptsNavGraph(navController)
-                sigsNavGraph(navController)
-                membersNavGraph(navController)
-                localOfficesNavGraph(navController)
-                notificationsNavGraph(navController)
-                quidNavGraph(navController)
-                podcastsNavGraph(navController)
-                documentsNavGraph(navController)
-                contactsNavGraph(navController)
-                externalNavGraph(navController)
-                tableportNavGraph(navController)
-                leaderboardNavGraph(navController)
-                testAssistantNavGraph(navController)
-                addonsHubNavGraph(
-                    navController = navController,
-                    onAddonClick = { addonId -> navController.navigateAddon(addonId) },
-                )
-            }
-
-            // ── MiniAudioPlayer — floats above NavigationBar ──────────────────
-            if (currentTrack != null) {
-                MiniAudioPlayer(
-                    controller = audioController,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        // Zero quando la bottom bar e' visibile (inset gia'
-                        // consumato sopra), altezza piena della navigation bar
-                        // sulle destinazioni drill.
-                        .navigationBarsPadding()
-                        .padding(bottom = 8.dp, start = 12.dp, end = 12.dp),
-                )
             }
         }
     }
@@ -410,21 +409,4 @@ private fun NavController.navigateToTab(tab: MainTab) {
         launchSingleTop = true
         restoreState = true
     }
-}
-
-/**
- * Maps AddonsHub [addonId] strings to the correct drill destination.
- * Convention: addonId equals the feature slug returned by the backend AddonModel.id.
- */
-private fun NavController.navigateAddon(addonId: String) {
-    val route = when (addonId.lowercase()) {
-        "tableport", "stamp"        -> TableportRoutes.PASSPORT
-        "podcasts", "podcast"       -> PodcastsRoutes.LIST
-        "contacts"                  -> ContactsRoutes.LIST
-        "quid"                      -> QuidRoute.ISSUES
-        "documents", "docs"         -> DocumentsRoutes.LIST
-        "testassistant", "test"     -> TestAssistantRoutes.DASHBOARD
-        else -> ExternalRoutes.addon(addonId)  // fallback: open as external addon
-    }
-    navigate(route)
 }

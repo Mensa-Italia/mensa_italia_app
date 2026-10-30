@@ -70,18 +70,46 @@ struct MedalCabinetView: View {
         .task { await store.refresh() }
     }
 
-    /// iPhone Duo unfolded: the summary in the left half and the cases in
-    /// the right one, so none is creased by the hinge.
+    /// iPhone Duo unfolded: the summary over the left half, then the cases in
+    /// rows across both halves, as many per half as fit, so none is creased
+    /// by the hinge and neither half is left empty.
     private func foldedOpen(width: CGFloat, hinge: CGRect) -> some View {
-        HStack(alignment: .top, spacing: 0) {
-            summary
-                .padding(20)
-                .frame(width: hinge.minX)
-            Color.clear.frame(width: hinge.width)
-            grid
-                .padding(20)
-                .frame(width: width - hinge.maxX)
+        let margin: CGFloat = 20
+        let spacing: CGFloat = 16
+        let leftWidth = hinge.minX - margin * 2
+        let rightWidth = width - hinge.maxX - margin * 2
+        let perSide = max(1, Int((min(leftWidth, rightWidth) + spacing) / (150 + spacing)))
+        let rows = stride(from: 0, to: shown.count, by: perSide * 2).map {
+            Array(shown[$0..<min($0 + perSide * 2, shown.count)])
         }
+        // One size for every case, from the narrower half (the right one
+        // gives up room to the vertical bar).
+        let caseWidth = (min(leftWidth, rightWidth) - spacing * CGFloat(perSide - 1)) / CGFloat(perSide)
+        func side(_ items: ArraySlice<Medal>, width: CGFloat) -> some View {
+            HStack(alignment: .top, spacing: spacing) {
+                ForEach(Array(items)) { caseButton($0).frame(width: caseWidth) }
+            }
+            .frame(width: width)
+        }
+        return VStack(spacing: 24) {
+            summary
+                .frame(width: leftWidth, alignment: .leading)
+                .padding(.horizontal, margin)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if rows.isEmpty {
+                grid
+            }
+            ForEach(rows.indices, id: \.self) { index in
+                let row = rows[index]
+                HStack(alignment: .top, spacing: 0) {
+                    side(row.prefix(perSide), width: leftWidth).padding(.horizontal, margin)
+                    Color.clear.frame(width: hinge.width)
+                    side(row.dropFirst(perSide), width: rightWidth).padding(.horizontal, margin)
+                }
+            }
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 32)
     }
 
     /// The cases that pass the filter; a line when none does.

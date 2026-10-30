@@ -121,6 +121,9 @@ class ColumnScopeProvider internal constructor(
  *
  * Shape morphs from 22dp → 14dp on press, mirroring the Today screen's
  * shape-morph lever. Icon badge picks up the section's accent tint.
+ *
+ * [selected] marks the row whose page is open beside the index on a wide
+ * window (secondary container, like the iOS sidebar selection).
  */
 @Composable
 fun ColumnScopeProvider.ProfileRow(
@@ -132,6 +135,7 @@ fun ColumnScopeProvider.ProfileRow(
     trailing: String? = null,
     accentOverride: Color? = null,
     isDestructive: Boolean = false,
+    selected: Boolean = false,
 ) {
     ProfileRowScaffold(
         icon = icon,
@@ -141,6 +145,7 @@ fun ColumnScopeProvider.ProfileRow(
         subtitle = subtitle,
         accentOverride = accentOverride,
         isDestructive = isDestructive,
+        selected = selected,
         trailingContent = {
             if (!trailing.isNullOrBlank()) {
                 Text(
@@ -187,6 +192,7 @@ fun ColumnScopeProvider.ProfileToggleRow(
         subtitle = subtitle,
         accentOverride = null,
         isDestructive = false,
+        selected = false,
         trailingContent = {
             Switch(
                 checked = checked,
@@ -222,6 +228,7 @@ fun <T> ColumnScopeProvider.ProfileDropdownRow(
             subtitle = null,
             accentOverride = null,
             isDestructive = false,
+            selected = false,
             trailingContent = {
                 Text(
                     text = labelFor(value),
@@ -269,6 +276,7 @@ private fun ColumnScopeProvider.ProfileRowScaffold(
     subtitle: String?,
     accentOverride: Color?,
     isDestructive: Boolean,
+    selected: Boolean,
     trailingContent: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -346,6 +354,7 @@ private fun ColumnScopeProvider.ProfileRowScaffold(
         }
     }
 
+    val rowColor = if (selected) MaterialTheme.colorScheme.secondaryContainer else palette.rowContainer
     val rowModifier = modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp, vertical = 4.dp)
@@ -355,7 +364,7 @@ private fun ColumnScopeProvider.ProfileRowScaffold(
             onClick = onClick,
             modifier = rowModifier,
             shape = shape,
-            color = palette.rowContainer,
+            color = rowColor,
             tonalElevation = 0.dp,
             interactionSource = interactionSource,
         ) { rowContent() }
@@ -363,7 +372,7 @@ private fun ColumnScopeProvider.ProfileRowScaffold(
         Surface(
             modifier = rowModifier,
             shape = shape,
-            color = palette.rowContainer,
+            color = rowColor,
             tonalElevation = 0.dp,
         ) { rowContent() }
     }

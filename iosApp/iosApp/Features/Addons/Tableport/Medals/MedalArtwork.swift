@@ -97,8 +97,9 @@ struct MedalArtwork: View {
     }
 }
 
-/// The medal button's icon, its colours cycling through the rainbow: it's
-/// meant to be noticed. Still for Reduce Motion.
+/// The medal button's icon, its colours cycling through the rainbow when the
+/// page opens: it's meant to be noticed. Then still, and still throughout
+/// for Reduce Motion. Mirrors Android `RainbowMedalIcon`.
 ///
 /// Toolbars only treat an `Image` as an icon (anything else they show as the
 /// title, and iPhone Duo's vertical bar drops it), and repaint a template
@@ -106,18 +107,28 @@ struct MedalArtwork: View {
 /// of original-colour images, swapped a dozen times a second.
 struct RainbowMedalIcon: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// Turning for the first rounds after the page opens, then still: a
+    /// rainbow turning forever kept the page redrawing.
+    @State private var turning = true
+    @State private var start = Date.now
 
     var body: some View {
         let frames = Self.frames
-        TimelineView(.periodic(from: .now, by: 1.0 / 12)) { context in
-            let index = reduceMotion
+        TimelineView(.animation(minimumInterval: 1.0 / 12, paused: reduceMotion || !turning)) { context in
+            let index = reduceMotion || !turning
                 ? 0
-                : Int(context.date.timeIntervalSinceReferenceDate * 12) % max(frames.count, 1)
+                : Int(context.date.timeIntervalSince(start) * 12) % max(frames.count, 1)
             if frames.indices.contains(index) {
                 Image(uiImage: frames[index])
             } else {
                 Image(systemName: "medal.fill")
             }
+        }
+        .task {
+            start = .now
+            // Two rounds of the 30-frame cycle at 12 frames a second.
+            try? await Task.sleep(for: .seconds(Double(frames.count) / 12 * 2))
+            turning = false
         }
     }
 

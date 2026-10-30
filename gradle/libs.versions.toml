@@ -18,6 +18,8 @@ compose-bom = "2026.03.00"
 # vogliono Compose 1.11+, che chiede AGP 9 e compileSdk 37.
 material3 = "1.5.0-alpha14"
 androidx-activity = "1.9.3"
+# Jetpack WindowManager: la cerniera dei pieghevoli (FoldingFeature).
+androidx-window = "1.4.0"
 koin-android = "4.0.4"
 
 # Navigation & Lifecycle
@@ -150,6 +152,7 @@ markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation" }
 androidx-compose-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class" }
+androidx-window = { module = "androidx.window:window", version.ref = "androidx-window" }
 
 # Media3
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }

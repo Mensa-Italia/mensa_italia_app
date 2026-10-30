@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +53,14 @@ private const val STAMPS_PER_PAGE = 6
  * Visual identity: warm parchment surface, gold rule inset, a giant
  * watermark "M", classic serif typography for the header/footer marginalia.
  * Stamps animate in with stagger using springHeroOvershoot.
+ *
+ * A page of an open two-page spread (`PassportSpread`) is the same leaf with
+ * its binding on the other side ([spineAtEnd], for the left page), its paper
+ * running under the hinge, bars and button while the contents keep clear of
+ * them ([insets]), and no corners ([cornerRadius] 0) where it fills the
+ * screen. Upright it lays its six stamps two across and three down, as iOS
+ * `SinglePassportPage`; lying on its side, three across and two down.
+ * [blank] is the page after the last stamps: paper and nothing else.
  */
 @Composable
 fun PassportPage(
@@ -63,16 +73,32 @@ fun PassportPage(
     height: Dp,
     onTapStamp: (StampUserModel) -> Unit,
     modifier: Modifier = Modifier,
+    spineAtEnd: Boolean = false,
+    blank: Boolean = false,
+    insets: PaddingValues = PaddingValues(),
+    cornerRadius: Dp = 22.dp,
 ) {
     val chunk = stamps
         .drop(pageIndex * STAMPS_PER_PAGE)
         .take(STAMPS_PER_PAGE)
+    val insetStart = insets.calculateLeftPadding(LayoutDirection.Ltr)
+    val insetEnd = insets.calculateRightPadding(LayoutDirection.Ltr)
+    val insetTop = insets.calculateTopPadding()
+    val insetBottom = insets.calculateBottomPadding()
+    // Two across on an upright page, three on one lying on its side. Sized to
+    // fit both ways: by width alone, three rows outgrow a tall, narrow page.
+    val columns = if (width > height * 1.15f) 3 else 2
+    val rows = STAMPS_PER_PAGE / columns
+    val stampSize = minOf(
+        (width - insetStart - insetEnd - 52.dp - 10.dp * (columns - 1)) / columns,
+        (height - insetTop - insetBottom - 108.dp - 12.dp * (rows - 1)) / rows,
+    ).coerceAtLeast(0.dp)
 
     Box(
         modifier = modifier
             .width(width)
             .height(height)
-            .clip(RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(cornerRadius))
             .drawBehind {
                 // Parchment base with subtle 3-stop gradient (centre lighter than edges)
                 drawRect(
@@ -116,8 +142,11 @@ fun PassportPage(
             // Gold rule inset
             drawRoundRect(
                 color = PassportPalette.gold.copy(alpha = 0.55f),
-                topLeft = Offset(12.dp.toPx(), 12.dp.toPx()),
-                size = Size(size.width - 24.dp.toPx(), size.height - 24.dp.toPx()),
+                topLeft = Offset((12.dp + insetStart).toPx(), (12.dp + insetTop).toPx()),
+                size = Size(
+                    size.width - (24.dp + insetStart + insetEnd).toPx(),
+                    size.height - (24.dp + insetTop + insetBottom).toPx(),
+                ),
                 cornerRadius = CornerRadius(14.dp.toPx()),
                 style = Stroke(width = 0.9f),
             )
@@ -126,8 +155,8 @@ fun PassportPage(
             drawRect(
                 brush = Brush.horizontalGradient(
                     colors = listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent),
-                    startX = 0f,
-                    endX = 22.dp.toPx(),
+                    startX = if (spineAtEnd) size.width else 0f,
+                    endX = if (spineAtEnd) size.width - 22.dp.toPx() else 22.dp.toPx(),
                 ),
             )
         }
@@ -137,15 +166,16 @@ fun PassportPage(
             text = "M",
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Black,
-            fontSize = (width.value * 0.75f).sp,
+            fontSize = (minOf(width.value, height.value) * 0.75f).sp,
             color = PassportPalette.coverDeep.copy(alpha = 0.04f),
             modifier = Modifier.align(Alignment.Center),
         )
 
         // Header + footer marginalia
-        Column(
+        if (!blank) Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(insets)
                 .padding(horizontal = 26.dp),
         ) {
             Row(
@@ -188,10 +218,13 @@ fun PassportPage(
             )
         }
 
-        if (chunk.isEmpty()) {
+        if (blank) {
+            // Paper only.
+        } else if (chunk.isEmpty()) {
             EmptyPageState(
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .padding(insets)
                     .padding(horizontal = 32.dp),
             )
         } else {
@@ -199,10 +232,12 @@ fun PassportPage(
                 stamps = chunk,
                 stampsRevealed = stampsRevealed,
                 pageIndex = pageIndex,
-                width = width,
+                columns = columns,
+                stampSize = stampSize,
                 onTapStamp = onTapStamp,
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .padding(insets)
                     .padding(horizontal = 26.dp, vertical = 54.dp),
             )
         }
@@ -265,23 +300,22 @@ private fun StampGrid(
     stamps: List<StampUserModel>,
     stampsRevealed: Boolean,
     pageIndex: Int,
-    width: Dp,
+    columns: Int,
+    stampSize: Dp,
     onTapStamp: (StampUserModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val stampSize = ((width.value - 80f) / 3f).dp
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        stamps.chunked(3).forEachIndexed { rowIdx, row ->
+        stamps.chunked(columns).forEachIndexed { rowIdx, row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 row.forEachIndexed { colIdx, stamp ->
-                    val idx = rowIdx * 3 + colIdx
+                    val idx = rowIdx * columns + colIdx
                     val seed = deterministicSeed(stamp.id)
                     val rotation = ((seed.angle - 0.5) * 10).toFloat()
                     val showCancel = (pageIndex + idx) % 4 == 0
@@ -319,7 +353,7 @@ private fun StampGrid(
                     )
                 }
                 // Fill empty cells so the row remains aligned
-                repeat(3 - row.size) {
+                repeat(columns - row.size) {
                     EmptyStampSlot(size = stampSize)
                 }
             }

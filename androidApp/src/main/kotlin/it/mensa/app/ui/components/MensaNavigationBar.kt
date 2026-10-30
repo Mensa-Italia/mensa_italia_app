@@ -1,5 +1,7 @@
 package it.mensa.app.ui.components
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -7,6 +9,10 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailItem
+import androidx.compose.material3.WideNavigationRailValue
+import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,6 +61,49 @@ fun MensaNavigationBar(
                 },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(),
+            )
+        }
+    }
+}
+
+/**
+ * MensaNavigationRail — the side counterpart of [MensaNavigationBar], for a
+ * window at least [TwoColumnMinWidth] wide (iPhone Duo unfolded, iPad on iOS,
+ * where the system turns the tab bar into a vertical bar on the side).
+ *
+ * Collapsed M3 Expressive [WideNavigationRail]: same items, icon above the
+ * label, same selection indicator as the bar. The rail pads itself for the
+ * status bar, the system bars and a display cutout on its side.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun MensaNavigationRail(
+    items: List<MensaNavItem>,
+    selectedRoute: String?,
+    onItemSelect: (MensaNavItem) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    WideNavigationRail(
+        modifier = modifier.fillMaxHeight(),
+        state = rememberWideNavigationRailState(WideNavigationRailValue.Collapsed),
+    ) {
+        items.forEach { item ->
+            WideNavigationRailItem(
+                selected = item.route == selectedRoute,
+                onClick = { onItemSelect(item) },
+                icon = {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = item.label,
+                    )
+                },
+                label = {
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                },
+                railExpanded = false,
             )
         }
     }

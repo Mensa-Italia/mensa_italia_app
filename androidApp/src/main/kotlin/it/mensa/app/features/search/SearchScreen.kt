@@ -152,6 +152,8 @@ fun SearchScreen(
     vm: SearchViewModel = koinViewModel(),
     onItemClick: (HydratedHit) -> Unit = {},
     onBack: () -> Unit = {},
+    /** Id of the result open beside the list on a wide window, highlighted in it. */
+    selectedHitId: String? = null,
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
@@ -201,6 +203,7 @@ fun SearchScreen(
                                     ResultsContent(
                                         sections = phase.sections,
                                         selectedType = uiState.selectedType,
+                                        selectedHitId = selectedHitId,
                                         showPastEvents = showPastEvents,
                                         onShowPastEventsToggle = { showPastEvents = !showPastEvents },
                                         onShowAll = { vm.pickType(it) },
@@ -795,6 +798,7 @@ private fun ErrorContent(message: String, onRetry: () -> Unit) {
 private fun ResultsContent(
     sections: List<HydratedSection>,
     selectedType: String?,
+    selectedHitId: String?,
     showPastEvents: Boolean,
     onShowPastEventsToggle: () -> Unit,
     onShowAll: (String) -> Unit,
@@ -893,6 +897,7 @@ private fun ResultsContent(
                         ExpressiveResultRow(
                             hit = hit,
                             type = section.type,
+                            selected = hit.id == selectedHitId,
                             onClick = { onItemClick(hit) },
                         )
                     }
@@ -1004,6 +1009,7 @@ private fun sectionTitle(type: String): String = when (type) {
 private fun ExpressiveResultRow(
     hit: HydratedHit,
     type: String,
+    selected: Boolean,
     onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -1016,7 +1022,8 @@ private fun ExpressiveResultRow(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(corner),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        color = if (selected) MaterialTheme.colorScheme.secondaryContainer
+        else MaterialTheme.colorScheme.surfaceContainerLow,
         tonalElevation = 1.dp,
         interactionSource = interactionSource,
         modifier = Modifier

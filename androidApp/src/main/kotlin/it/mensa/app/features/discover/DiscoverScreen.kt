@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.profile._components.ProfileRow
 import it.mensa.app.features.profile._components.ProfileSectionGroup
 import it.mensa.app.features.profile._components.ProfileSectionTone
+import it.mensa.app.navigation.toRoute
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchAppBar
@@ -35,11 +36,15 @@ import org.koin.androidx.compose.koinViewModel
  * (Primary / Tertiary / Neutral), each row a `ProfileRow` with circular
  * `IconBadge` + shape morph on press. Mirrors the Profile screen idiom
  * so the two tabs share the same Expressive vocabulary.
+ *
+ * Also the index of the wide layout ([DiscoverTab]): [selectedRoute] is the
+ * route of the section open beside it, highlighted in the list.
  */
 @Composable
 fun DiscoverScreen(
     onCategoryClick: (DiscoverCategory) -> Unit = {},
     onSearchTap: () -> Unit = {},
+    selectedRoute: String? = null,
     vm: DiscoverViewModel = koinViewModel(),
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -82,6 +87,7 @@ fun DiscoverScreen(
                                         icon = category.icon,
                                         title = tr(category.labelKey, fallback = category.labelFallback),
                                         onClick = { onCategoryClick(category) },
+                                        selected = selectedRoute != null && category.toRoute() == selectedRoute,
                                     )
                                 }
                             }

@@ -8,6 +8,8 @@ import SwiftUI
 /// `LeaderboardScreen`.
 struct LeaderboardView: View {
     private static let podiumSize = 3
+    /// Without a hinge, narrower than this the page is one column, as on a phone.
+    private static let twoColumnMinWidth: CGFloat = 600
     /// Soci, regioni, segretari: one page, one switch at the top.
     private enum Board: Hashable { case members, regions, secretaries }
 
@@ -44,26 +46,30 @@ struct LeaderboardView: View {
     }
 
     var body: some View {
-        List {
-            if boards.count > 1 {
-                Section {
-                    Picker(tr("leaderboard.home.section", fallback: "Classifica"), selection: $board) {
-                        ForEach(boards, id: \.self) { b in Text(label(b)).tag(b) }
+        GeometryReader { geo in
+            if boards.contains(.members), let split = columnSplit(in: geo) {
+                // Unfolded iPhone Duo, or a screen this wide: on the left the
+                // podium and the member's place, sized to the column so it
+                // never scrolls; on the right the switch and the rankings.
+                // On a foldable the columns meet at the hinge, else halfway.
+                HStack(alignment: .top, spacing: 0) {
+                    podiumColumn
+                        .frame(width: split.minX)
+                        // The spotlights hang from the top of the screen.
+                        .ignoresSafeArea(.container, edges: .top)
+                    Color.clear.frame(width: split.width)
+                    List {
+                        picker
+                        rankings
                     }
-                    .pickerStyle(.segmented)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets())
                 }
-            }
-            switch current {
-            case .members: members
-            case .regions: regions
-            case .secretaries: secretaries
-            case nil:
-                Text(tr("leaderboard.disabled", fallback: "La classifica non è attiva."))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .listRowBackground(Color.clear)
+                .modifier(SplitBar())
+            } else {
+                List {
+                    picker
+                    if current == .members { memberSummary }
+                    rankings
+                }
             }
         }
         .navigationTitle(tr("leaderboard.home.section", fallback: "Classifica"))
@@ -120,6 +126,43 @@ struct LeaderboardView: View {
         }
         .refreshable { await store.refresh() }
         .task { await store.refresh() }
+    }
+
+    /// Where the two columns part: the hinge of an unfolded foldable, a
+    /// gutter down the middle of a wide screen, nil for one column.
+    private func columnSplit(in geo: GeometryProxy) -> CGRect? {
+        if let hinge = geo.verticalHinge { return hinge }
+        guard geo.size.width >= Self.twoColumnMinWidth else { return nil }
+        let gutter: CGFloat = 16
+        return CGRect(x: (geo.size.width - gutter) / 2, y: 0, width: gutter, height: geo.size.height)
+    }
+
+    @ViewBuilder
+    private var picker: some View {
+        if boards.count > 1 {
+            Section {
+                Picker(tr("leaderboard.home.section", fallback: "Classifica"), selection: $board) {
+                    ForEach(boards, id: \.self) { b in Text(label(b)).tag(b) }
+                }
+                .pickerStyle(.segmented)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var rankings: some View {
+        switch current {
+        case .members: memberRanks
+        case .regions: regions
+        case .secretaries: secretaries
+        case nil:
+            Text(tr("leaderboard.disabled", fallback: "La classifica non è attiva."))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.clear)
+        }
     }
 
     // MARK: - Regions and secretaries
@@ -197,23 +240,16 @@ struct LeaderboardView: View {
 
     // MARK: - Members
 
+    /// The member's place and the podium: on top of the members' ranking on a
+    /// phone, the whole left column on a wide screen.
     @ViewBuilder
-    private var members: some View {
+    private var memberSummary: some View {
             if let board = store.board {
                 Section(tr("leaderboard.my_place", fallback: "La tua posizione")) {
                     if let me = board.me {
                         MyPlace(board: board, me: me)
                     } else {
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(tr("leaderboard.unranked.title", fallback: "Non sei ancora in classifica"))
-                                Text(tr("leaderboard.unranked.detail", fallback: "Raccogli il primo timbro a un evento: da lì inizi a fare punti."))
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "trophy")
-                        }
+                        unranked
                     }
                 }
 
@@ -226,7 +262,51 @@ struct LeaderboardView: View {
                     Text(tr("leaderboard.top_label", fallback: "I primi {count}",
                             ["count": "\(LeaderboardBoard.companion.TOP_SIZE)"]))
                 }
+            }
+    }
 
+    /// The left column on a wide screen: the podium on top, scaled to the
+    /// height the member's place leaves it, and the member's place under it.
+    @ViewBuilder
+    private var podiumColumn: some View {
+        if let board = store.board {
+            VStack(spacing: 16) {
+                FitHeight {
+                    LeaderboardPodium(rows: Array(board.top.prefix(Self.podiumSize))) { openMember = $0 }
+                }
+                VStack(alignment: .leading, spacing: 12) {
+                    if let me = board.me {
+                        MyPlace(board: board, me: me, stacked: true)
+                    } else {
+                        unranked
+                    }
+                }
+                .padding(16)
+                .background(Color(.secondarySystemGroupedBackground),
+                            in: .rect(cornerRadius: 26, style: .continuous))
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+    }
+
+    private var unranked: some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tr("leaderboard.unranked.title", fallback: "Non sei ancora in classifica"))
+                Text(tr("leaderboard.unranked.detail", fallback: "Raccogli il primo timbro a un evento: da lì inizi a fare punti."))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        } icon: {
+            Image(systemName: "trophy")
+        }
+    }
+
+    /// The rest of the ten after the podium, and the member's own row.
+    @ViewBuilder
+    private var memberRanks: some View {
+            if let board = store.board {
                 Section {
                     ForEach(board.top.dropFirst(Self.podiumSize), id: \.id) { RankRow(row: $0) { openMember = $0 } }
                     // Below the first ten only the member's own row, after a
@@ -490,8 +570,24 @@ private struct SecretaryAvatar: View {
 private struct MyPlace: View {
     let board: LeaderboardBoard
     let me: LeaderboardRow
+    /// In a card of its own rather than as list rows: dividers between parts.
+    var stacked = false
 
     var body: some View {
+        if stacked {
+            header
+            Divider()
+            toNext
+            Divider()
+            Breakdown(row: me)
+        } else {
+            header
+            toNext
+            Breakdown(row: me)
+        }
+    }
+
+    private var header: some View {
         HStack(spacing: 14) {
             RankAvatar(row: me, size: 48)
             VStack(alignment: .leading, spacing: 0) {
@@ -510,7 +606,10 @@ private struct MyPlace: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
 
+    @ViewBuilder
+    private var toNext: some View {
         if let gap = board.pointsToNext?.int32Value, let next = board.nextPosition?.int32Value {
             Label(tr("leaderboard.to_next", fallback: "Ti mancano {points} punti per salire al {position}° posto",
                      ["points": "\(gap)", "position": "\(next)"]),
@@ -518,8 +617,45 @@ private struct MyPlace: View {
         } else {
             Label(tr("leaderboard.leading", fallback: "Sei in testa alla classifica"), systemImage: "trophy")
         }
+    }
+}
 
-        Breakdown(row: me)
+/// Lays its content out at the given width and its own height, then scales
+/// it to the height it is offered (up to `maxScale`), keeping it on top.
+private struct FitHeight<Content: View>: View {
+    var maxScale: CGFloat = 1.3
+    @ViewBuilder let content: Content
+    @State private var natural: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { geo in
+            let scale = natural > 0 ? min(geo.size.height / natural, maxScale) : 1
+            content
+                .frame(width: geo.size.width / scale)
+                .fixedSize(horizontal: false, vertical: true)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { natural = $0 }
+                .scaleEffect(scale, anchor: .top)
+                .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
+        }
+    }
+}
+
+/// The bar over two columns: no title, which belongs to neither, and no
+/// minimizing on scroll, which moved the column that wasn't scrolling.
+private struct SplitBar: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 27.0, *) {
+            content
+                .toolbar(removing: .title)
+                .toolbarMinimizationBehavior(.never, for: .navigationBar)
+                .navigationBarTitleDisplayMode(.inline)
+        } else if #available(iOS 18.0, *) {
+            content
+                .toolbar(removing: .title)
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content.navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 

@@ -11,6 +11,11 @@ private let mensaBlue = Color(red: 24/255, green: 66/255, blue: 149/255)
 
 /// Small wrapper around CMMotionManager publishing low-pass filtered pitch/roll
 /// for driving subtle 3D parallax and shine on the tessera card.
+///
+/// It publishes only a change the card would show (`step`): the sensor
+/// reports 60 times a second even with the phone still, and every publish
+/// re-rendered the card, keeping the whole app busy. Mirrors Android
+/// `rememberDeviceTilt`.
 @MainActor
 final class TesseraMotionManager: ObservableObject {
     @Published var pitch: Double = 0   // rotation around X axis (top/bottom)
@@ -21,7 +26,11 @@ final class TesseraMotionManager: ObservableObject {
     private let queue = OperationQueue()
     #endif
     private let alpha: Double = 0.15   // low-pass smoothing
-    private var refCount = 0
+    /// A tenth of a degree, in radians.
+    private let step: Double = .pi / 1800
+    private var smoothedPitch: Double = 0
+    private var smoothedRoll: Double = 0
+    private var running = false
 
     init() {
         #if os(iOS)
@@ -30,30 +39,30 @@ final class TesseraMotionManager: ObservableObject {
         #endif
     }
 
-    func start() {
-        refCount += 1
-        guard refCount == 1 else { return }
+    /// Starts or stops the sensor; calling it again with the same value does nothing.
+    func setRunning(_ on: Bool) {
+        guard on != running else { return }
+        running = on
         #if os(iOS)
-        guard manager.isDeviceMotionAvailable else { return }
-        manager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
-            guard let self, let m = motion else { return }
-            let newPitch = m.attitude.pitch
-            let newRoll = m.attitude.roll
-            Task { @MainActor in
-                self.pitch += (newPitch - self.pitch) * self.alpha
-                self.roll += (newRoll - self.roll) * self.alpha
+        if on {
+            guard manager.isDeviceMotionAvailable else { return }
+            manager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
+                guard let self, let m = motion else { return }
+                let newPitch = m.attitude.pitch
+                let newRoll = m.attitude.roll
+                Task { @MainActor in self.receive(pitch: newPitch, roll: newRoll) }
             }
+        } else {
+            manager.stopDeviceMotionUpdates()
         }
         #endif
     }
 
-    func stop() {
-        refCount = max(0, refCount - 1)
-        if refCount == 0 {
-            #if os(iOS)
-            manager.stopDeviceMotionUpdates()
-            #endif
-        }
+    private func receive(pitch newPitch: Double, roll newRoll: Double) {
+        smoothedPitch += (newPitch - smoothedPitch) * alpha
+        smoothedRoll += (newRoll - smoothedRoll) * alpha
+        if abs(smoothedPitch - pitch) > step { pitch = smoothedPitch }
+        if abs(smoothedRoll - roll) > step { roll = smoothedRoll }
     }
 }
 
@@ -72,7 +81,13 @@ struct MembershipCardHero: View {
     /// 1 to 3 when the member is on the ranking's podium: a stamp on the front.
     var podiumPlace: Int? = nil
 
+    /// False while something covers the card (the passport opened over
+    /// Today, say): no `onDisappear` comes then, so the owner says so.
+    var motionActive: Bool = true
+
     @StateObject private var motion = TesseraMotionManager()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var onScreen = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flipped: Bool = false
     /// Set once the card is on screen, so the stamp comes down with a thump.
@@ -156,10 +171,15 @@ struct MembershipCardHero: View {
         }
         .aspectRatio(aspect, contentMode: .fit)
         .onAppear {
-            motion.start()
+            onScreen = true
             stampDown = true
         }
-        .onDisappear { motion.stop() }
+        .onDisappear { onScreen = false }
+        // The sensor runs only while the card can be seen: on screen, not
+        // covered, the app in front, and motion allowed.
+        .onChange(of: onScreen && motionActive && scenePhase == .active && !reduceMotion, initial: true) { _, on in
+            motion.setRunning(on)
+        }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text(tr(
             "card.accessibility.label",

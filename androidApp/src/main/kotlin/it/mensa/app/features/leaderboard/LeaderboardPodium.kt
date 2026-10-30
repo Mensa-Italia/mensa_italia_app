@@ -63,7 +63,14 @@ private val StepShape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bot
  * one opens their profile. Mirrors iOS `LeaderboardPodium`.
  */
 @Composable
-internal fun LeaderboardPodium(rows: List<LeaderboardRow>, onMemberClick: (String) -> Unit, modifier: Modifier = Modifier) {
+internal fun LeaderboardPodium(
+    rows: List<LeaderboardRow>,
+    onMemberClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    // How far above the podium the spotlights start: up to the top of the
+    // screen, when the podium sits under the bar.
+    spotlightReach: Dp = 0.dp,
+) {
     // Left to right: second, first, third.
     val places = listOf(1, 0, 2).mapNotNull { index -> rows.getOrNull(index)?.let { index to it } }
     val rise = remember { List(3) { Animatable(0f) } }
@@ -78,7 +85,7 @@ internal fun LeaderboardPodium(rows: List<LeaderboardRow>, onMemberClick: (Strin
     Box(modifier.fillMaxWidth()) {
         Spotlights(rise = rise, modifier = Modifier.matchParentSize())
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 28.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = spotlightReach + 28.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
@@ -167,7 +174,7 @@ private fun PodiumColumn(
                         .border(3.dp, Brush.sweepGradient(listOf(metal.hi, metal.mid, metal.lo, metal.mid, metal.hi)), CircleShape)
                         .padding(6.dp),
                 ) {
-                    RankAvatar(row = row, size = avatarSize)
+                    RankAvatar(row = row, size = avatarSize, hiRes = true)
                 }
                 MedalArtwork(
                     tier = tier,

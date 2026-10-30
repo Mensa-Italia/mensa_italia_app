@@ -148,6 +148,8 @@ internal fun MedalCase(medal: Medal, onClick: () -> Unit, modifier: Modifier = M
                     progress = { medal.progress },
                     color = metal.mid,
                     trackColor = Color.White.copy(alpha = 0.12f),
+                    // A still wave: a moving one redraws the page every frame, forever.
+                    waveSpeed = 0.dp,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
                 )
                 else -> Text(
@@ -199,7 +201,8 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.caseLight(light: Co
 
 /**
  * The medal hovering in its case, bobbing slowly, its shadow on the floor
- * shrinking as it rises. No two medals bob in step.
+ * shrinking as it rises. No two medals bob in step. Mirrors iOS
+ * `FloatingMedal`.
  */
 @Composable
 private fun FloatingMedal(medal: Medal, size: Dp, modifier: Modifier = Modifier) {

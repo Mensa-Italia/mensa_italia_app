@@ -47,7 +47,7 @@ struct LeaderboardPodium: View {
             VStack(spacing: 0) {
                 // The member lands on the step once it's up.
                 VStack(spacing: 2) {
-                    RankAvatar(row: row, size: avatar)
+                    RankAvatar(row: row, size: avatar, hiRes: true)
                         .padding(6)
                         .overlay(
                             Circle().strokeBorder(

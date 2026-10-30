@@ -10,6 +10,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import it.mensa.app.features.tableport._components.PassportCover
 import it.mensa.app.features.tableport._components.PassportPage
+import it.mensa.app.features.tableport._components.PassportSpread
+import it.mensa.app.features.tableport._components.PassportSpreadMinPageWidth
 import it.mensa.app.features.tableport._components.PassportPalette
 import it.mensa.app.features.tableport._components.PassportStampScroll
 import it.mensa.app.features.tableport._components.StampConfirmSheet
@@ -62,7 +65,9 @@ import it.mensa.app.features.tableport._components.StampDetailSheet
 import it.mensa.app.features.tableport.medals.RainbowMedalIcon
 import it.mensa.app.features.tableport.util.StampImagePrefetcher
 import it.mensa.app.support.tr
+import it.mensa.app.ui.components.ColumnSplitBox
 import it.mensa.app.ui.components.MensaScaffold
+import it.mensa.app.ui.components.rememberVerticalHinge
 import it.mensa.app.ui.components.mensaImageLoader
 import it.mensa.app.ui.theme.MensaMotion
 import it.mensa.shared.model.StampUserModel
@@ -77,6 +82,9 @@ private const val STAMPS_PER_PAGE = 6
  * Layout: velluto scuro a tutta altezza — lo stesso fondo di
  * `PassportView.swift` — con il libro del passaporto in un HorizontalPager,
  * la striscia di indicatori e l'ExtendedFAB ("Scansiona QR") in basso.
+ *
+ * Wide screens (an unfolded foldable, a tablet) open the book as a two-page
+ * spread, one page of stamps each side of the hinge (`PassportSpread`).
  *
  * Niente contatore "N / 30" in testa: il totale era una costante scritta a
  * mano, non un dato, e trasformava una collezione in una barra di
@@ -144,162 +152,205 @@ fun PassportScreen(
         }
     }
 
-    MensaScaffold(
-        topBar = {
-            TopAppBar(
-                // No title, as on iOS: the cover says what it is, and over the
-                // stamps it would sit on the parchment.
-                title = {},
-                navigationIcon = {
-                    if (onNavigateBack != null) {
-                        IconButton(
-                            onClick = onNavigateBack,
-                            // Over the stamps scrolling under it, on a disc of
-                            // paper so it stays readable (iOS: the glass X).
-                            modifier = if (isOpen) {
-                                Modifier
-                                    .padding(start = 4.dp)
-                                    .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
-                            } else {
-                                Modifier
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = tr("app.back", "Indietro"),
-                                tint = if (isOpen) PassportPalette.coverDeep else Color.White,
-                            )
+    // Wide (an unfolded foldable, a tablet): the passport lies open, a page of
+    // stamps each side of the hinge or of the halfway gutter, as on an
+    // unfolded iPhone Duo. Mirrors iOS `spreadLayout(in:)`, which also wants
+    // `PassportSpreadMinPageWidth` on both sides.
+    val hinge = rememberVerticalHinge()
+    ColumnSplitBox(Modifier.fillMaxSize()) { columns ->
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val spread = columns?.takeIf {
+                it.leftWidth >= PassportSpreadMinPageWidth &&
+                    maxWidth - it.leftWidth - it.gap >= PassportSpreadMinPageWidth
+            }
+            // Unfolding the phone is what opens its passport (iOS `setSpread`);
+            // without a hinge the cover is still swiped open.
+            val showOpen = isOpen || (hinge != null && spread != null)
+            MensaScaffold(
+                topBar = {
+                    TopAppBar(
+                        // No title, as on iOS: the cover says what it is, and over the
+                        // stamps it would sit on the parchment.
+                        title = {},
+                        navigationIcon = {
+                            if (onNavigateBack != null) {
+                                IconButton(
+                                    onClick = onNavigateBack,
+                                    // Over the stamps scrolling under it, on a disc of
+                                    // paper so it stays readable (iOS: the glass X).
+                                    modifier = if (showOpen) {
+                                        Modifier
+                                            .padding(start = 4.dp)
+                                            .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
+                                    } else {
+                                        Modifier
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = tr("app.back", "Indietro"),
+                                        tint = if (showOpen) PassportPalette.coverDeep else Color.White,
+                                    )
+                                }
+                            }
+                        },
+                        actions = {
+                            // The medal collection, its icon cycling through the
+                            // rainbow so it gets noticed.
+                            IconButton(
+                                onClick = onNavigateToMedals,
+                                modifier = if (showOpen) {
+                                    Modifier
+                                        .padding(end = 4.dp)
+                                        .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
+                                } else {
+                                    Modifier
+                                },
+                            ) {
+                                RainbowMedalIcon(contentDescription = tr("medals.title", "Medagliere"))
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            titleContentColor = Color.White,
+                            navigationIconContentColor = Color.White,
+                        ),
+                    )
+                },
+                floatingActionButton = {
+                    // The ENTRY stamp, as on iOS, once the passport is open.
+                    AnimatedVisibility(
+                        visible = showOpen,
+                        enter = fadeIn(animationSpec = MensaMotion.tweenEnter),
+                        exit = fadeOut(animationSpec = MensaMotion.tweenExit),
+                    ) {
+                        if (spread != null) {
+                            // Centred on the right-hand page (iOS `entryButtonX`),
+                            // not on the hinge.
+                            val rightPage = maxWidth - spread.leftWidth - spread.gap / 2
+                            Box(Modifier.width(rightPage - 32.dp), contentAlignment = Alignment.Center) {
+                                EntryScanButton(onClick = onNavigateToScanner)
+                            }
+                        } else {
+                            EntryScanButton(onClick = onNavigateToScanner)
                         }
                     }
                 },
-                actions = {
-                    // The medal collection, its icon cycling through the
-                    // rainbow so it gets noticed.
-                    IconButton(
-                        onClick = onNavigateToMedals,
-                        modifier = if (isOpen) {
-                            Modifier
-                                .padding(end = 4.dp)
-                                .background(PassportPalette.parchment.copy(alpha = 0.92f), CircleShape)
-                        } else {
-                            Modifier
-                        },
-                    ) {
-                        RainbowMedalIcon(contentDescription = tr("medals.title", "Medagliere"))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                ),
-            )
-        },
-        floatingActionButton = {
-            // The ENTRY stamp, as on iOS, once the passport is open.
-            AnimatedVisibility(
-                visible = isOpen,
-                enter = fadeIn(animationSpec = MensaMotion.tweenEnter),
-                exit = fadeOut(animationSpec = MensaMotion.tweenExit),
-            ) {
-                EntryScanButton(onClick = onNavigateToScanner)
-            }
-        },
-        floatingActionButtonPosition = FabPosition.Center,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colorScheme.background),
-        ) {
-            // ── Velluto a tutta altezza, come su iOS ────────────────────────
-            // Prima qui c'era una fascia di brand alta 360dp fisse. Non aveva
-            // relazione con il contenuto: su schermi diversi il taglio fra blu
-            // e sfondo cadeva in un punto qualsiasi, e nella maggior parte dei
-            // casi in mezzo al passaporto, tranciandolo in due.
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(velvet),
-            )
-
-            // ── Passport — the one hero of the screen ───────────────────────
-            // Closed, the cover; open, every stamp in one floating scroll
-            // (`PassportStampScroll`) instead of a pager of six-stamp pages,
-            // running the full height of the screen under the bars.
-            val pages: @Composable () -> Unit = {
-                if (stamps.isEmpty()) {
+                floatingActionButtonPosition = if (spread != null) FabPosition.End else FabPosition.Center,
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorScheme.background),
+                ) {
+                    // ── Velluto a tutta altezza, come su iOS ────────────────────────
+                    // Prima qui c'era una fascia di brand alta 360dp fisse. Non aveva
+                    // relazione con il contenuto: su schermi diversi il taglio fra blu
+                    // e sfondo cadeva in un punto qualsiasi, e nella maggior parte dei
+                    // casi in mezzo al passaporto, tranciandolo in due.
                     Box(
-                        Modifier
+                        modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = innerPadding.calculateTopPadding())
-                            .padding(bottom = 96.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        val passportWidth = 300.dp
-                        PassportPage(
-                            stamps = stamps,
-                            pageIndex = 0,
-                            totalPages = 1,
-                            totalStamps = 0,
-                            stampsRevealed = true,
-                            width = passportWidth,
-                            height = passportWidth * (125f / 88f),
-                            onTapStamp = { selectedStamp = it },
+                            .background(velvet),
+                    )
+
+                    // ── Passport — the one hero of the screen ───────────────────────
+                    // Closed, the cover; open, every stamp in one floating scroll
+                    // (`PassportStampScroll`) instead of a pager of six-stamp pages,
+                    // running the full height of the screen under the bars.
+                    //
+                    // Wide, the book lies open instead (`PassportSpread`): two pages
+                    // of six stamps, one each side of the hinge.
+                    val pages: @Composable () -> Unit = {
+                        if (spread != null) {
+                            PassportSpread(
+                                stamps = stamps,
+                                stampsRevealed = true,
+                                onTapStamp = { selectedStamp = it },
+                                split = spread,
+                                // Pages clear the top bar and the scan button.
+                                contentInsets = PaddingValues(
+                                    top = innerPadding.calculateTopPadding(),
+                                    bottom = innerPadding.calculateBottomPadding() + 84.dp,
+                                ),
+                                // A spread is two six-stamp pages.
+                                onSpreadChange = { scrollPage = it * 2 },
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        } else if (stamps.isEmpty()) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(top = innerPadding.calculateTopPadding())
+                                    .padding(bottom = 96.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                val passportWidth = 300.dp
+                                PassportPage(
+                                    stamps = stamps,
+                                    pageIndex = 0,
+                                    totalPages = 1,
+                                    totalStamps = 0,
+                                    stampsRevealed = true,
+                                    width = passportWidth,
+                                    height = passportWidth * (125f / 88f),
+                                    onTapStamp = { selectedStamp = it },
+                                )
+                            }
+                        } else {
+                            PassportStampScroll(
+                                stamps = stamps,
+                                stampsRevealed = true,
+                                onTapStamp = { selectedStamp = it },
+                                onPageChange = { scrollPage = it },
+                                // Starts below the top bar, ends above the scan
+                                // button; in between the stamps pass under both.
+                                contentPadding = PaddingValues(
+                                    top = innerPadding.calculateTopPadding(),
+                                    bottom = innerPadding.calculateBottomPadding() + 72.dp,
+                                ),
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                    // The cover fills the screen, as on iOS, and is swiped (or
+                    // tapped) open like a book's, the stamps already underneath.
+                    if (showOpen) {
+                        pages()
+                    } else {
+                        PassportCoverTurn(
+                            onOpened = { isOpen = true },
+                            pages = pages,
+                            cover = {
+                                PassportCover(
+                                    contentPadding = PaddingValues(
+                                        top = innerPadding.calculateTopPadding(),
+                                        bottom = innerPadding.calculateBottomPadding(),
+                                    ),
+                                )
+                            },
+                            lining = { PassportCoverLining() },
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
-                } else {
-                    PassportStampScroll(
-                        stamps = stamps,
-                        stampsRevealed = true,
-                        onTapStamp = { selectedStamp = it },
-                        onPageChange = { scrollPage = it },
-                        // Starts below the top bar, ends above the scan
-                        // button; in between the stamps pass under both.
-                        contentPadding = PaddingValues(
-                            top = innerPadding.calculateTopPadding(),
-                            bottom = innerPadding.calculateBottomPadding() + 72.dp,
-                        ),
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-            }
-            // The cover fills the screen, as on iOS, and is swiped (or
-            // tapped) open like a book's, the stamps already underneath.
-            if (isOpen) {
-                pages()
-            } else {
-                PassportCoverTurn(
-                    onOpened = { isOpen = true },
-                    pages = pages,
-                    cover = {
-                        PassportCover(
-                            contentPadding = PaddingValues(
-                                top = innerPadding.calculateTopPadding(),
-                                bottom = innerPadding.calculateBottomPadding(),
-                            ),
+
+                    // ── Dettaglio del timbro ────────────────────────────────────────
+                    selectedStamp?.let { stamp ->
+                        StampDetailSheet(
+                            stamp = stamp,
+                            onDismiss = { selectedStamp = null },
                         )
-                    },
-                    lining = { PassportCoverLining() },
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+                    }
 
-            // ── Dettaglio del timbro ────────────────────────────────────────
-            selectedStamp?.let { stamp ->
-                StampDetailSheet(
-                    stamp = stamp,
-                    onDismiss = { selectedStamp = null },
-                )
-            }
-
-            // ── Stamp confirmation sheet ────────────────────────────────────
-            uiState.pendingVerification?.let { pending ->
-                StampConfirmSheet(
-                    stampId = pending.stampId,
-                    code = pending.code,
-                    onDone = { vm.clearPendingVerification() },
-                )
+                    // ── Stamp confirmation sheet ────────────────────────────────────
+                    uiState.pendingVerification?.let { pending ->
+                        StampConfirmSheet(
+                            stampId = pending.stampId,
+                            code = pending.code,
+                            onDone = { vm.clearPendingVerification() },
+                        )
+                    }
+                }
             }
         }
     }

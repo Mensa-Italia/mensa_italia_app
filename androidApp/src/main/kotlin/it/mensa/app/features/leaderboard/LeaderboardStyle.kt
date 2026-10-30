@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import it.mensa.app.features.members._components.MemberAvatar
+import it.mensa.app.features.members._components.MemberHeroAvatar
 import it.mensa.app.features.tableport.medals.MedalTier
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.leaderboard.LeaderboardBoard
@@ -63,12 +64,18 @@ internal fun rememberRegionBoards(): RegionBoardsState {
 
 /**
  * A member's face, as in the directory: the photo, or their initials when
- * there is none or the directory isn't cached yet.
+ * there is none or the directory isn't cached yet. [hiRes] when it is large
+ * on screen (the podium): the photo at full size over the list's thumbnail,
+ * which looked grainy there.
  */
 @Composable
-internal fun RankAvatar(row: LeaderboardRow, size: Dp, modifier: Modifier = Modifier) {
+internal fun RankAvatar(row: LeaderboardRow, size: Dp, modifier: Modifier = Modifier, hiRes: Boolean = false) {
     val member = row.member ?: remember(row.id) { RegSociModel(id = row.id, name = row.displayName) }
-    MemberAvatar(member = member, size = size, modifier = modifier)
+    if (hiRes) {
+        MemberHeroAvatar(member = member, size = size, modifier = modifier)
+    } else {
+        MemberAvatar(member = member, size = size, modifier = modifier)
+    }
 }
 
 @Composable

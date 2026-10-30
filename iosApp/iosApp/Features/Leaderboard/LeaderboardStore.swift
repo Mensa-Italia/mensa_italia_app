@@ -89,10 +89,17 @@ extension LeaderboardRow {
 struct RankAvatar: View {
     let row: LeaderboardRow
     let size: CGFloat
+    /// Large on screen (the podium): the photo at full size over the list's
+    /// thumbnail, which looked grainy there.
+    var hiRes = false
 
     var body: some View {
         if let member = row.member {
-            MemberAvatar(member: member, size: size)
+            if hiRes {
+                MemberHeroAvatar(member: member, size: size)
+            } else {
+                MemberAvatar(member: member, size: size)
+            }
         } else {
             Text(row.initials)
                 .font(.system(size: size * 0.4, weight: .bold, design: .rounded))
