@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
@@ -40,6 +42,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -62,6 +65,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,12 +110,22 @@ import kotlin.math.sin
 fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
     val state = rememberMedals()
     val medals = state.medals
+    val region = rememberRegionMedals()
+    // "Le mie" / "La mia regione": the switch exists only with the flag on and the region known.
+    var page by rememberSaveable { mutableStateOf(CabinetPage.Mine) }
+    val onRegion = region.available && page == CabinetPage.Region
+    var showInfo by remember { mutableStateOf(false) }
+    var openYears by remember { mutableStateOf(emptySet<Int>()) }
     var selected by remember { mutableStateOf<Medal?>(null) }
     // The top bar's filter, as on the other lists: by metal earned, or the
     // ones still to earn. The summary keeps counting them all.
     var filter by remember { mutableStateOf(MedalFilter.All) }
     var showFilterMenu by remember { mutableStateOf(false) }
     val shown = remember(medals, filter) { medals.filter(filter::matches) }
+    val regionShown = remember(region.current, filter) { region.current.filter(filter::matches) }
+    val switch: (@Composable () -> Unit)? = if (region.available) {
+        { CabinetSwitch(page = if (onRegion) CabinetPage.Region else CabinetPage.Mine, onChange = { page = it }) }
+    } else null
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -126,6 +140,11 @@ fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
                     }
                 },
                 actions = {
+                    if (onRegion) {
+                        IconButton(onClick = { showInfo = true }) {
+                            Icon(Icons.Outlined.Info, contentDescription = tr("leaderboard.how_it_works", "Come funziona"))
+                        }
+                    }
                     Box {
                         IconButton(onClick = { showFilterMenu = true }) {
                             Icon(
@@ -159,47 +178,161 @@ fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
             )
         },
     ) { padding ->
+        val contentPadding = PaddingValues(
+            start = 20.dp,
+            end = 20.dp,
+            top = padding.calculateTopPadding() + 8.dp,
+            bottom = padding.calculateBottomPadding() + 32.dp,
+        )
         when {
+            onRegion -> LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = contentPadding,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                item(key = "switch", span = { GridItemSpan(maxLineSpan) }) { switch?.invoke() }
+                regionPage(
+                    region = region,
+                    filter = filter,
+                    shown = regionShown,
+                    openYears = openYears,
+                    onToggleYear = { year -> openYears = if (year in openYears) openYears - year else openYears + year },
+                    onSelect = { selected = it },
+                )
+            }
             medals.isNotEmpty() -> LazyVerticalGrid(
                 columns = GridCells.Adaptive(150.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
-                contentPadding = PaddingValues(
-                    start = 20.dp,
-                    end = 20.dp,
-                    top = padding.calculateTopPadding() + 8.dp,
-                    bottom = padding.calculateBottomPadding() + 32.dp,
-                ),
+                contentPadding = contentPadding,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                item(span = { GridItemSpan(maxLineSpan) }) { Summary(medals) }
+                switch?.let { item(key = "switch", span = { GridItemSpan(maxLineSpan) }) { it() } }
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Summary(
+                        medals = medals,
+                        headline = tr("medals.count_of", "{earned} di {total}", "earned" to medals.count { it.isEarned }, "total" to medals.size),
+                        caption = tr("medals.count_caption_case", "Medaglie in teca"),
+                    )
+                }
                 items(shown, key = { it.id }) { medal ->
                     MedalCase(medal = medal, onClick = { selected = medal })
                 }
                 if (shown.isEmpty()) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Text(
-                            text = tr("medals.filter.empty", "Nessuna medaglia qui, per ora."),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                        )
-                    }
+                    item(span = { GridItemSpan(maxLineSpan) }) { FilterEmpty() }
                 }
             }
-            state.failed -> Text(
-                text = tr("medals.load_error", "Non riesco a leggere le medaglie. Riprova più tardi."),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxSize().padding(padding).padding(32.dp),
-            )
-            else -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                LoadingIndicator()
+            state.failed -> Column(Modifier.fillMaxSize().padding(padding)) {
+                switch?.let { Box(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { it() } }
+                Text(
+                    text = tr("medals.load_error", "Non riesco a leggere le medaglie. Riprova più tardi."),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxSize().padding(32.dp),
+                )
+            }
+            else -> Column(Modifier.fillMaxSize().padding(padding)) {
+                switch?.let { Box(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { it() } }
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingIndicator() }
             }
         }
     }
 
+    if (showInfo) RegionMedalsInfoSheet(onDismiss = { showInfo = false })
+
     selected?.let { medal -> MedalShowcase(medal = medal, onDismiss = { selected = null }) }
+}
+
+/** The line shown when the filter lets no medal through. */
+@Composable
+private fun FilterEmpty() {
+    Text(
+        text = tr("medals.filter.empty", "Nessuna medaglia qui, per ora."),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+    )
+}
+
+/**
+ * The region's page: the ring of this year's medals, the rules, the ten
+ * medals in their cases, then the earlier years folded under their headers.
+ * The filter in the top bar applies to every year. Mirrors iOS
+ * `MedalCabinetView.regionPage`.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private fun LazyGridScope.regionPage(
+    region: RegionMedalsUi,
+    filter: MedalFilter,
+    shown: List<Medal>,
+    openYears: Set<Int>,
+    onToggleYear: (Int) -> Unit,
+    onSelect: (Medal) -> Unit,
+) {
+    val span: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
+    if (!region.loaded) {
+        item(key = "loading", span = span) {
+            Box(Modifier.fillMaxWidth().height(240.dp), contentAlignment = Alignment.Center) {
+                if (region.failed) {
+                    Text(
+                        text = tr("medals.region.load_error", "Non riesco a leggere le medaglie della regione. Riprova più tardi."),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    LoadingIndicator()
+                }
+            }
+        }
+        return
+    }
+    if (region.current.isEmpty()) {
+        item(key = "empty", span = span) {
+            Text(
+                text = tr("medals.region.empty", "Le medaglie della regione arriveranno presto."),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+            )
+        }
+    } else {
+        item(key = "summary", span = span) {
+            Summary(
+                medals = region.current,
+                headline = tr("medals.region.count_of", "{earned} su {total}", "earned" to region.earnedCount, "total" to region.current.size),
+                caption = if (region.regionName.isBlank()) {
+                    tr("medals.region.count_caption", "Medaglie di regione {year}", "year" to region.year)
+                } else "${region.regionName} · ${region.year}",
+                tiers = MedalTier.entries - MedalTier.Platinum,
+            )
+        }
+        item(key = "rules", span = span) { RegionRules() }
+        items(shown, key = { it.id }) { medal -> MedalCase(medal = medal, onClick = { onSelect(medal) }) }
+        if (shown.isEmpty()) item(key = "filter-empty", span = span) { FilterEmpty() }
+    }
+    if (region.past.isNotEmpty()) {
+        item(key = "years", span = span) {
+            Text(
+                text = tr("medals.region.years", "Annate").uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 2.sp,
+                color = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        region.past.forEach { (year, medals) ->
+            val open = year in openYears
+            item(key = "year-$year", span = span) {
+                YearHeader(year = year, earned = medals.count { it.isEarned }, total = medals.size, expanded = open, onClick = { onToggleYear(year) })
+            }
+            if (open) {
+                val visible = medals.filter(filter::matches)
+                items(visible, key = { it.id }) { medal -> MedalCase(medal = medal, onClick = { onSelect(medal) }) }
+            }
+        }
+    }
 }
 
 /** What the cabinet's filter can show: everything, one metal (earned), or the ones still to earn. */
@@ -222,7 +355,12 @@ private enum class MedalFilter(val tier: MedalTier?) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun Summary(medals: List<Medal>) {
+private fun Summary(
+    medals: List<Medal>,
+    headline: String,
+    caption: String,
+    tiers: List<MedalTier> = MedalTier.entries,
+) {
     val earned = medals.count { it.isEarned }
     val gold = MedalTier.Gold.metal
     Row(
@@ -247,19 +385,19 @@ private fun Summary(medals: List<Medal>) {
         Spacer(Modifier.width(18.dp))
         Column {
             Text(
-                text = tr("medals.count_of", "{earned} di {total}", "earned" to earned, "total" to medals.size),
+                text = headline,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = tr("medals.count_caption_case", "Medaglie in teca").uppercase(),
+                text = caption.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 2.sp,
                 color = Color.White.copy(alpha = 0.5f),
             )
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                MedalTier.entries.forEach { tier ->
+                tiers.forEach { tier ->
                     val label = tier.label
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -338,7 +476,8 @@ private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
             TierBadge(medal)
             Spacer(Modifier.height(14.dp))
             Text(
-                text = medal.title,
+                // A region medal is "Name 2026": each year is its own.
+                text = medal.region?.let { "${medal.title} ${it.year}" } ?: medal.title,
                 style = MaterialTheme.typography.headlineMedium,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
@@ -353,15 +492,29 @@ private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp),
             )
-            if (medal.levels.size > 1 && !medal.isHidden) {
+            val region = medal.region
+            if (region != null) {
+                if (region.witnessed) {
+                    Spacer(Modifier.height(14.dp))
+                    WitnessBadge()
+                }
                 Spacer(Modifier.height(28.dp))
-                TierLadder(medal, Modifier.padding(horizontal = 28.dp))
-            }
-            Spacer(Modifier.height(24.dp))
-            Status(medal, Modifier.padding(horizontal = 32.dp))
-            if (medal.countsStamps && !medal.isHidden) {
+                RegionTierLadder(medal, region, Modifier.padding(horizontal = 28.dp))
                 Spacer(Modifier.height(24.dp))
-                StampRules(Modifier.padding(horizontal = 24.dp))
+                RegionStatus(medal, region, Modifier.padding(horizontal = 32.dp))
+                Spacer(Modifier.height(24.dp))
+                RegionRuleCard(region.rule, Modifier.padding(horizontal = 24.dp))
+            } else {
+                if (medal.levels.size > 1 && !medal.isHidden) {
+                    Spacer(Modifier.height(28.dp))
+                    TierLadder(medal, Modifier.padding(horizontal = 28.dp))
+                }
+                Spacer(Modifier.height(24.dp))
+                Status(medal, Modifier.padding(horizontal = 32.dp))
+                if (medal.countsStamps && !medal.isHidden) {
+                    Spacer(Modifier.height(24.dp))
+                    StampRules(Modifier.padding(horizontal = 24.dp))
+                }
             }
             Spacer(Modifier.height(20.dp))
             Text(
@@ -420,7 +573,7 @@ private fun StampRules(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StampRule(icon: ImageVector, text: String) {
+internal fun StampRule(icon: ImageVector, text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Icon(icon, contentDescription = null, tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
         Text(

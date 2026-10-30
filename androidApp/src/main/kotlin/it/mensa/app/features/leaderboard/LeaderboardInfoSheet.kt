@@ -205,7 +205,7 @@ private fun BasicExplanation(kinds: List<LeaderboardKind>) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun InfoPoint(icon: ImageVector, title: String, detail: String, index: Int, count: Int) {
+internal fun InfoPoint(icon: ImageVector, title: String, detail: String, index: Int, count: Int) {
     Card(shape = ListItemDefaults.segmentedShapes(index = index, count = count).shape) {
         ListItem(
             leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },

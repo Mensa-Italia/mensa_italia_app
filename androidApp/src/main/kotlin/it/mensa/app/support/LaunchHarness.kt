@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.leaderboard.LeaderboardFixtures
 import it.mensa.shared.medals.MedalFixtures
+import it.mensa.shared.medals.RegionMedalFixtures
 
 /**
  * LaunchHarness: intent-driven launch overrides used by automation
@@ -38,6 +39,7 @@ object LaunchHarness {
     const val EXTRA_LEADERBOARD_FIXTURE = "mensa_leaderboard_fixture"
     const val EXTRA_LEADERBOARD_ME = "mensa_leaderboard_me"
     const val EXTRA_MEDALS_FIXTURE = "mensa_medals_fixture"
+    const val EXTRA_REGION_MEDALS_FIXTURE = "mensa_region_medals_fixture"
 
     /** Requested destination alias (e.g. `today`, `events`, `card`), or null. */
     var screen: String? = null
@@ -48,8 +50,8 @@ object LaunchHarness {
 
     /**
      * A screen to mount on its own, before and without the login: only the
-     * leaderboard and medal previews, which run on [LeaderboardFixtures] and
-     * [MedalFixtures].
+     * leaderboard and medal previews, which run on [LeaderboardFixtures],
+     * [MedalFixtures] and [RegionMedalFixtures].
      */
     val standalonePreview: String?
         get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" || it == "changelog_preview" }
@@ -84,7 +86,10 @@ object LaunchHarness {
         // [LeaderboardFixtures] e `LeaderboardPreviewHarness`.
         LeaderboardFixtures.enabled = extras.getString(EXTRA_LEADERBOARD_FIXTURE) == "1"
         extras.getString(EXTRA_LEADERBOARD_ME)?.toIntOrNull()?.let { LeaderboardFixtures.mePlace = it }
-        MedalFixtures.enabled = extras.getString(EXTRA_MEDALS_FIXTURE) == "1"
+        // Medaglie di regione inventate (e il flag acceso): vedi [RegionMedalFixtures].
+        // Il medagliere ha anche la pagina personale, quindi le porta con se'.
+        RegionMedalFixtures.enabled = extras.getString(EXTRA_REGION_MEDALS_FIXTURE) == "1"
+        MedalFixtures.enabled = extras.getString(EXTRA_MEDALS_FIXTURE) == "1" || RegionMedalFixtures.enabled
         if (isActive) {
             Logger.i("LaunchHarness", "configure", "active: screen=$screen autologin=${email != null}")
         }

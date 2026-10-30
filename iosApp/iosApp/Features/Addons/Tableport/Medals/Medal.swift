@@ -29,6 +29,33 @@ struct Medal: Identifiable, Hashable {
     let levels: [(tier: Tier, threshold: Int)]
     /// Counts stamps, so only the ones `view_medals` lets through (see `MedalCatalog.stampBased`).
     let countsStamps: Bool
+    /// Set for a medal of the member's region, which has more to say than a personal one.
+    let region: Region?
+
+    /// What a region medal adds: its year, how it's earned, the figure in its
+    /// unit and the ladder with thresholds written in that unit (a threshold
+    /// can be 8,5%, so `levels`' whole numbers won't do). Mirrors Android
+    /// `RegionMedalDetail`.
+    struct Region {
+        let year: Int
+        /// "Come si ottiene".
+        let rule: String
+        /// The figure in its unit: "11,2%", "6", "3°".
+        let valueLabel: String
+        /// An earlier year: the figure is final, with no next goal.
+        let isPast: Bool
+        let isPodium: Bool
+        /// Every metal with the figure that earns it, and whether the year reached it.
+        let ladder: [(tier: Tier, label: String, reached: Bool)]
+        /// The next metal's threshold, in the unit.
+        let nextLabel: String?
+        /// The secondary figures, labelled, in words the member reads.
+        let figures: [(label: String, value: String)]
+        /// Set while too few people stand behind the figure for it to count.
+        let minimumNote: String?
+        /// The member was in the region when the metal shown was reached.
+        let witnessed: Bool
+    }
 
     static func == (a: Medal, b: Medal) -> Bool {
         a.id == b.id && a.tier == b.tier && a.isEarned == b.isEarned && a.value == b.value
@@ -61,6 +88,7 @@ extension Medal {
         progress = status.progress
         levels = status.levels.map { (Tier($0.tier), Int($0.threshold)) }
         countsStamps = MedalCatalog.stampBased.contains(status.id)
+        region = nil
     }
 }
 

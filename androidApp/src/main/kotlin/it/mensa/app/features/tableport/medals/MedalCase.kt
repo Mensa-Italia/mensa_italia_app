@@ -151,7 +151,8 @@ internal fun MedalCase(medal: Medal, onClick: () -> Unit, modifier: Modifier = M
                     modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
                 )
                 else -> Text(
-                    text = tr("medals.secret.short", "Segreta").uppercase(),
+                    // A past year's medal missed stays dark; a personal one left is a secret.
+                    text = (if (medal.region != null) tr("medals.region.missed", "Non ottenuta") else tr("medals.secret.short", "Segreta")).uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
