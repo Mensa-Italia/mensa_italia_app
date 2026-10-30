@@ -11,7 +11,12 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-coroutines-test = "1.10.2"
 kotlinx-datetime = "0.6.2"
 multiplatform-settings = "1.2.0"
-compose-bom = "2024.10.01"
+compose-bom = "2026.03.00"
+# Material 3 Expressive (ButtonGroup, ToggleButton, LoadingIndicator,
+# MaterialExpressiveTheme...) esiste solo dalla 1.5: la BOM porta la 1.4.
+# Fermi alla alpha14 e alla BOM 2026.03 (Compose 1.10): le successive
+# vogliono Compose 1.11+, che chiede AGP 9 e compileSdk 37.
+material3 = "1.5.0-alpha14"
 androidx-activity = "1.9.3"
 koin-android = "4.0.4"
 
@@ -94,7 +99,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-and
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }

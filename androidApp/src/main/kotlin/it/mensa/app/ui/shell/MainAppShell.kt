@@ -53,6 +53,8 @@ import it.mensa.app.features.external.externalNavGraph
 import it.mensa.app.features.localoffices.LocalOfficesRoutes
 import it.mensa.app.features.locations.locationsNavGraph
 import it.mensa.app.features.localoffices.localOfficesNavGraph
+import it.mensa.app.features.leaderboard.LeaderboardRoutes
+import it.mensa.app.features.leaderboard.leaderboardNavGraph
 import it.mensa.app.features.members.MembersRoutes
 import it.mensa.app.features.members.membersNavGraph
 import it.mensa.app.features.notifications.AccountConfirmationHost
@@ -151,6 +153,7 @@ private fun harnessRoute(alias: String): String? = when (alias.lowercase()) {
     "documents" -> DocumentsRoutes.LIST
     "notifications" -> NotificationsRoutes.LIST
     "tableport" -> TableportRoutes.PASSPORT
+    "leaderboard" -> LeaderboardRoutes.BOARD
     "quid" -> QuidRoute.ISSUES
     "podcasts" -> PodcastsRoutes.LIST
     "contacts" -> ContactsRoutes.LIST
@@ -313,6 +316,7 @@ fun MainAppShell() {
                             }
                         },
                         onTableportClick = { navController.navigate(TableportRoutes.PASSPORT) },
+                        onLeaderboardClick = { navController.navigate(LeaderboardRoutes.BOARD) },
                         onTicketsClick = { navController.navigate(TicketsRoutes.LIST) },
                         onMemberClick = { id -> navController.navigate(MembersRoutes.detail(id)) },
                         onSearchTap = { navController.navigate(SearchRoute.ROUTE) },
@@ -362,6 +366,7 @@ fun MainAppShell() {
                 contactsNavGraph(navController)
                 externalNavGraph(navController)
                 tableportNavGraph(navController)
+                leaderboardNavGraph(navController)
                 testAssistantNavGraph(navController)
                 addonsHubNavGraph(
                     navController = navController,

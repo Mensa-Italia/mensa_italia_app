@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.mensa.app.R
+import it.mensa.app.features.leaderboard.PodiumStampOverlay
 import it.mensa.app.ui.theme.GothamBold
 import it.mensa.app.ui.theme.MensaBlue
 import it.mensa.app.ui.theme.MensaMotion
@@ -82,6 +83,8 @@ fun MembershipCardHero(
     fullName: String,
     memberId: String,
     modifier: Modifier = Modifier,
+    /** 1 to 3 when the member is on the ranking's podium: a stamp on the front. */
+    podiumPlace: Int? = null,
 ) {
     val flipRotation = remember { Animatable(0f) }
     val scaleAnim = remember { Animatable(0.85f) }
@@ -188,6 +191,7 @@ fun MembershipCardHero(
 
             if (showFront) {
                 CardFrontFace(u = u)
+                podiumPlace?.let { PodiumStampOverlay(place = it) }
             } else {
                 Box(
                     modifier = Modifier

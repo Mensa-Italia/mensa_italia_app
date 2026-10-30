@@ -58,31 +58,31 @@ class Changelog internal constructor(
 
     companion object {
         /** Cambialo, con [ITEMS], per far ricomparire il changelog in un rilascio. */
-        const val ID = "2026-11-tableport"
+        const val ID = "2026-11-classifica"
 
         private const val KEY_SEEN = "changelog.seen"
 
         private val ITEMS = listOf(
             ChangelogItem(
-                icon = "passport",
-                titleKey = "changelog.2026_11.tableport.title",
-                titleFallback = "Il Tableport è in Home",
-                bodyKey = "changelog.2026_11.tableport.body",
-                bodyFallback = "Il passaporto dei timbri ora sta sopra i tuoi ticket: copertina in pelle, si apre come un libro e i timbri scorrono tutti insieme.",
+                icon = "trophy",
+                titleKey = "changelog.2026_11.leaderboard.title",
+                titleFallback = "La classifica",
+                bodyKey = "changelog.2026_11.leaderboard.body",
+                bodyFallback = "Soci, regioni e segretari sugli ultimi 12 mesi. Un timbro vale di più dove hanno timbrato in tanti rispetto ai soci della regione; come si calcola tutto è scritto nella ⓘ, formula compresa.",
             ),
             ChangelogItem(
                 icon = "medal",
                 titleKey = "changelog.2026_11.medals.title",
-                titleFallback = "Il medagliere",
+                titleFallback = "Medagliere più chiaro",
                 bodyKey = "changelog.2026_11.medals.body",
-                bodyFallback = "Ventisei medaglie da sbloccare con timbri, eventi e vita associativa. Alcune sono segrete: le trovi nel passaporto.",
+                bodyFallback = "Filtra le medaglie per metallo e, in ogni medaglia sui timbri, leggi quali timbri contano e perché.",
             ),
             ChangelogItem(
-                icon = "fixes",
-                titleKey = "changelog.2026_11.fixes.title",
-                titleFallback = "Risolti bug minori",
-                bodyKey = "changelog.2026_11.fixes.body",
-                bodyFallback = "I QR dei francobolli e i link aprono l'app, l'avvio è più veloce e funziona anche offline, le notifiche portano dritte al contenuto.",
+                icon = "shield",
+                titleKey = "changelog.2026_11.privacy.title",
+                titleFallback = "Se preferisci non esserci",
+                bodyKey = "changelog.2026_11.privacy.body",
+                bodyFallback = "Dalle impostazioni della classifica puoi uscirne quando vuoi: la tua riga sparisce per tutti, i tuoi timbri restano.",
             ),
         )
     }

@@ -9,6 +9,7 @@ struct TodayView: View {
     /// Tableport's passport: full screen, the phone being the passport.
     @State private var showPassport = false
     @State private var medalStore = MedalStore.shared
+    @State private var leaderboardStore = LeaderboardStore.shared
     var onSearchTap: (() -> Void)?
 
     var body: some View {
@@ -80,6 +81,7 @@ struct TodayView: View {
         .navigationBarHidden(true)
         .task { await vm.load() }
         .task { await medalStore.refresh() }
+        .task { await leaderboardStore.refresh() }
         .animation(.smooth, value: ConnectivityStore.shared.isOffline)
         .task {
             // I timbri del passaporto su disco prima che lo si apra: chi lo
@@ -166,7 +168,9 @@ struct TodayView: View {
             memberId: vm.user?.id ?? "-",
             avatarURL: vm.userAvatar,
             isFullScreen: false,
-            avatarSize: 54
+            avatarSize: 54,
+            podiumPlace: koin.featureFlags.enabledLeaderboards().contains(.members)
+                ? leaderboardStore.board?.myPodiumPlace.map { Int($0.int32Value) } : nil
         )
         .frame(maxWidth: 420)
         .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 8)
@@ -218,6 +222,28 @@ struct TodayView: View {
                     )
                 }
                 .buttonStyle(.plain)
+
+                // La classifica sta con il Tableport: si fa con i suoi timbri.
+                // Solo con almeno una classifica accesa in `configs`; quella
+                // dei soci solo quando e' stata letta, senza non ha niente da dire.
+                let boards = koin.featureFlags.enabledLeaderboards()
+                let membersOn = boards.contains(.members)
+                let membersBoard = leaderboardStore.board.flatMap { $0.rows.isEmpty ? nil : $0 }
+                // Arriva dalla rete dopo il resto della card: entra sfumando
+                // (the store sets `board` inside withAnimation).
+                if !boards.isEmpty, !membersOn || membersBoard != nil {
+                    Group {
+                        Divider().padding(.leading, 60)
+
+                        NavigationLink {
+                            LeaderboardView()
+                        } label: {
+                            LeaderboardMembershipRow(board: membersOn ? membersBoard : nil)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
 
                 // Solo con un ticket ancora valido: una voce che apre una
                 // lista vuota o di ticket scaduti era rumore.

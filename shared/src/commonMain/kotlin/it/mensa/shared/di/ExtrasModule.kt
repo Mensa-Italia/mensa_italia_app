@@ -36,6 +36,7 @@ import it.mensa.shared.repository.ExAppsRepository
 import it.mensa.shared.repository.LocationsRepository
 import it.mensa.shared.repository.MetadataRepository
 import it.mensa.shared.repository.OrgChartRepository
+import it.mensa.shared.leaderboard.LeaderboardRepository
 import it.mensa.shared.medals.MedalsRepository
 import it.mensa.shared.repository.NotificationsRepository
 import it.mensa.shared.repository.PodcastsRepository
@@ -90,7 +91,8 @@ val extrasModule = module {
     single { PaymentMethodsRepository(get(), get()) }
     single { MetadataRepository(get()) }
     single { OrgChartRepository(get(), get()) }
-    single { MedalsRepository(get(), get()) }
+    single { MedalsRepository(get(), get(), get(), get()) }
+    single { LeaderboardRepository(get(), get(), get(), get(), get(), get()) }
     single { QuidRepository(get(), get()) }
     single { PodcastsRepository(get()) }
     single { LocalOfficesRepository(get()) }

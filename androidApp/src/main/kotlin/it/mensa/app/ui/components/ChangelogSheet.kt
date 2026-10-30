@@ -15,10 +15,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -183,6 +185,8 @@ private fun iconFor(name: String): Pair<ImageVector, Color> = when (name) {
     "qr" -> Icons.Filled.QrCodeScanner to Color(0xFF007AFF)
     "bolt" -> Icons.Filled.Bolt to Color(0xFFFFCC00)
     "bell" -> Icons.Filled.NotificationsActive to Color(0xFFFF3B30)
+    "trophy" -> Icons.Filled.EmojiEvents to Color(0xFFFFCC00)
+    "shield" -> Icons.Filled.Shield to Color(0xFF5856D6)
     "fixes" -> Icons.Filled.Build to Color(0xFF8E8E93)
     else -> Icons.Filled.AutoAwesome to Color(0xFF184295)
 }

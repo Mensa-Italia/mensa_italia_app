@@ -69,10 +69,14 @@ struct MembershipCardHero: View {
     var avatarURL: URL?          // accepted for source compat; unused
     var isFullScreen: Bool = false
     var avatarSize: CGFloat = 72       // accepted for source compat; unused
+    /// 1 to 3 when the member is on the ranking's podium: a stamp on the front.
+    var podiumPlace: Int? = nil
 
     @StateObject private var motion = TesseraMotionManager()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flipped: Bool = false
+    /// Set once the card is on screen, so the stamp comes down with a thump.
+    @State private var stampDown = false
 
     // ISO/IEC 7810 ID-1 card aspect ratio (Flutter source)
     private let aspect: CGFloat = 1.586
@@ -105,6 +109,11 @@ struct MembershipCardHero: View {
                     cornerRadius: cornerRadius,
                     normalizedRotation: normalizedRotation
                 )
+                .overlay {
+                    if let podiumPlace {
+                        PodiumStampOverlay(place: podiumPlace, shown: stampDown && visibleFront)
+                    }
+                }
                 .opacity(visibleFront ? 1 : 0)
 
                 // BACK (counter-rotated so the content reads correctly when flipped)
@@ -146,7 +155,10 @@ struct MembershipCardHero: View {
             }
         }
         .aspectRatio(aspect, contentMode: .fit)
-        .onAppear { motion.start() }
+        .onAppear {
+            motion.start()
+            stampDown = true
+        }
         .onDisappear { motion.stop() }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text(tr(

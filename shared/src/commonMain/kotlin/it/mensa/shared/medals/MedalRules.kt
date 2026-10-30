@@ -23,6 +23,9 @@ class MedalRule(
 )
 
 /** Where the member stands with one medal. */
+/** One metal of a medal and the counter value that earns it. */
+data class MedalLevel(val tier: MedalTier, val threshold: Int)
+
 data class MedalStatus(
     val id: String,
     /** The counter's current value. */
@@ -41,6 +44,8 @@ data class MedalStatus(
     val firstTier: MedalTier,
     /** One level only, rather than a bronze → platinum climb. */
     val isSingle: Boolean,
+    /** Every metal of the medal, ascending, with the value that earns it. */
+    val levels: List<MedalLevel>,
 ) {
     val isEarned: Boolean get() = earnedTier != null
 
@@ -126,6 +131,7 @@ object MedalRules {
             secret = rule.secret,
             firstTier = rule.levels.first().first,
             isSingle = rule.levels.size == 1,
+            levels = rule.levels.map { MedalLevel(it.first, it.second) },
         )
     }
 }

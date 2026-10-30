@@ -23,6 +23,7 @@ import it.mensa.app.services.audio.AudioPlayerController
 import it.mensa.app.services.push.DeviceRegistrar
 import it.mensa.app.services.push.PendingPushTarget
 import it.mensa.app.services.push.PushDeepLinkRouter
+import it.mensa.app.features.leaderboard.LeaderboardPreviewHarness
 import it.mensa.app.support.LaunchHarness
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.ThemeManager
@@ -86,7 +87,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-                MensaApp()
+                val preview = LaunchHarness.standalonePreview
+                if (preview != null) {
+                    LeaderboardPreviewHarness(preview)
+                } else {
+                    MensaApp()
+                }
             }
         }
     }

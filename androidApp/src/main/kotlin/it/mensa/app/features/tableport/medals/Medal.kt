@@ -66,6 +66,10 @@ data class Medal(
     val nextThreshold: Int?,
     /** 0…1 toward [nextThreshold]. */
     val progress: Float,
+    /** Every metal of the medal, ascending, with the value that earns it. */
+    val levels: List<Pair<MedalTier, Int>>,
+    /** Counts stamps, so only the ones `view_medals` lets through (see [MedalCatalog.stampBased]). */
+    val countsStamps: Boolean,
 )
 
 /** The metal's ramp: where light hits, the body, the shade. */
@@ -106,8 +110,20 @@ data class MedalInfo(val title: String, val detail: String, val icon: ImageVecto
  * iOS keeps the same table in `Medal.swift`.
  */
 object MedalCatalog {
+    /**
+     * The medals whose counter is made of stamps: `view_medals` keeps, for
+     * all of them, only the stamps worth at least a point in the ranking
+     * (enough stampers for the region's size), not the member's own events'
+     * and none of their region's while on its staff. Their showcase says so.
+     */
+    val stampBased: Set<String> = setOf(
+        "collector", "steady", "unstoppable", "marathon", "four_seasons", "pioneer",
+        "globetrotter", "traveller", "national_rally",
+        "night_owl", "early_bird", "halloween", "new_year", "valentine", "pi_day", "birthday", "front_row", "better_late",
+    )
+
     val info: Map<String, MedalInfo> = mapOf(
-        "collector" to MedalInfo("Collezionista", "Francobolli raccolti nel passaporto.", Icons.Filled.Verified),
+        "collector" to MedalInfo("Collezionista", "Francobolli raccolti nel passaporto, tra quelli che in classifica valgono almeno un punto. Quelli dei tuoi eventi contano nella medaglia Organizzatore.", Icons.Filled.Verified),
         "steady" to MedalInfo("Costante", "Mesi diversi con almeno un francobollo.", Icons.Filled.CalendarMonth),
         "unstoppable" to MedalInfo("Inarrestabile", "Mesi consecutivi con almeno un francobollo.", Icons.Filled.LocalFireDepartment),
         "marathon" to MedalInfo("Maratoneta", "Francobolli raccolti in un solo giorno.", Icons.Filled.DirectionsRun),
@@ -126,7 +142,7 @@ object MedalCatalog {
         "front_row" to MedalInfo("Prima fila", "Un francobollo raccolto il giorno stesso in cui è uscito.", Icons.Filled.Bolt),
         "better_late" to MedalInfo("Meglio tardi", "Un francobollo raccolto sei mesi dopo la sua uscita.", Icons.Filled.HourglassBottom),
         "always_there" to MedalInfo("Sempre presente", "Iscrizioni agli appuntamenti degli eventi.", Icons.Filled.Groups),
-        "organizer" to MedalInfo("Organizzatore", "Eventi che hai organizzato.", Icons.Filled.Campaign),
+        "organizer" to MedalInfo("Organizzatore", "Eventi che hai organizzato: i francobolli dei tuoi eventi contano qui, non nelle altre medaglie.", Icons.Filled.Campaign),
         "national_director" to MedalInfo("Regista nazionale", "Hai organizzato un evento nazionale.", Icons.Filled.Stars),
         "active_member" to MedalInfo("Socio attivo", "Iscrizione in corso di validità.", Icons.Filled.VerifiedUser),
         "early_adopter" to MedalInfo("Della prima ora", "Anni passati con l'app.", Icons.Filled.PhoneIphone),
@@ -152,6 +168,8 @@ private fun MedalStatus.toMedal(): Medal {
         nextTier = nextTier?.let { MedalTier.of(it) },
         nextThreshold = nextThreshold,
         progress = progress.toFloat(),
+        levels = levels.map { MedalTier.of(it.tier) to it.threshold },
+        countsStamps = id in MedalCatalog.stampBased,
     )
 }
 

@@ -25,6 +25,10 @@ struct Medal: Identifiable, Hashable {
     let next: (tier: Tier, threshold: Int)?
     /// 0…1 toward `next`.
     let progress: Double
+    /// Every metal of the medal, ascending, with the value that earns it.
+    let levels: [(tier: Tier, threshold: Int)]
+    /// Counts stamps, so only the ones `view_medals` lets through (see `MedalCatalog.stampBased`).
+    let countsStamps: Bool
 
     static func == (a: Medal, b: Medal) -> Bool {
         a.id == b.id && a.tier == b.tier && a.isEarned == b.isEarned && a.value == b.value
@@ -55,6 +59,8 @@ extension Medal {
             next = nil
         }
         progress = status.progress
+        levels = status.levels.map { (Tier($0.tier), Int($0.threshold)) }
+        countsStamps = MedalCatalog.stampBased.contains(status.id)
     }
 }
 
@@ -102,8 +108,18 @@ extension Medal.Tier {
 /// themselves (counters, thresholds) are the shared module's `MedalRules`;
 /// Android keeps the same table in `MedalCatalog.kt`.
 enum MedalCatalog {
+    /// The medals whose counter is made of stamps: `view_medals` keeps, for
+    /// all of them, only the stamps worth at least a point in the ranking
+    /// (enough stampers for the region's size), not the member's own events'
+    /// and none of their region's while on its staff. Their showcase says so.
+    static let stampBased: Set<String> = [
+        "collector", "steady", "unstoppable", "marathon", "four_seasons", "pioneer",
+        "globetrotter", "traveller", "national_rally",
+        "night_owl", "early_bird", "halloween", "new_year", "valentine", "pi_day", "birthday", "front_row", "better_late",
+    ]
+
     static let info: [String: (title: String, detail: String, symbol: String)] = [
-        "collector": ("Collezionista", "Francobolli raccolti nel passaporto.", "seal.fill"),
+        "collector": ("Collezionista", "Francobolli raccolti nel passaporto, tra quelli che in classifica valgono almeno un punto. Quelli dei tuoi eventi contano nella medaglia Organizzatore.", "seal.fill"),
         "steady": ("Costante", "Mesi diversi con almeno un francobollo.", "calendar"),
         "unstoppable": ("Inarrestabile", "Mesi consecutivi con almeno un francobollo.", "flame.fill"),
         "marathon": ("Maratoneta", "Francobolli raccolti in un solo giorno.", "figure.run"),
@@ -122,7 +138,7 @@ enum MedalCatalog {
         "front_row": ("Prima fila", "Un francobollo raccolto il giorno stesso in cui è uscito.", "bolt.fill"),
         "better_late": ("Meglio tardi", "Un francobollo raccolto sei mesi dopo la sua uscita.", "hourglass"),
         "always_there": ("Sempre presente", "Iscrizioni agli appuntamenti degli eventi.", "person.3.fill"),
-        "organizer": ("Organizzatore", "Eventi che hai organizzato.", "megaphone.fill"),
+        "organizer": ("Organizzatore", "Eventi che hai organizzato: i francobolli dei tuoi eventi contano qui, non nelle altre medaglie.", "megaphone.fill"),
         "national_director": ("Regista nazionale", "Hai organizzato un evento nazionale.", "star.circle.fill"),
         "active_member": ("Socio attivo", "Iscrizione in corso di validità.", "checkmark.seal.fill"),
         "early_adopter": ("Della prima ora", "Anni passati con l'app.", "iphone"),

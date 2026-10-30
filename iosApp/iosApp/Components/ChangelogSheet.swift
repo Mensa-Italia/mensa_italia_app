@@ -66,6 +66,8 @@ struct ChangelogSheet: View {
         case "qr": return ("qrcode.viewfinder", .blue)
         case "bolt": return ("bolt.fill", .yellow)
         case "bell": return ("bell.badge.fill", .red)
+        case "trophy": return ("trophy.fill", .yellow)
+        case "shield": return ("hand.raised.fill", .indigo)
         case "fixes": return ("wrench.and.screwdriver.fill", .gray)
         default: return ("sparkles", AppTheme.Colors.mensaBlue)
         }

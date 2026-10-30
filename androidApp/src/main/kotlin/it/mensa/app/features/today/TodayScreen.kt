@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.leaderboard.rememberLeaderboard
+import it.mensa.app.support.koinAccess
+import it.mensa.shared.leaderboard.LeaderboardFixtures
 import it.mensa.app.features.today._components.BirthdaysCard
 import it.mensa.app.features.today._components.MembershipSection
 import it.mensa.app.features.today._components.NotificationsPreview
@@ -89,6 +92,7 @@ fun TodayScreen(
     onNotificationsClick: () -> Unit = {},
     onNotificationTap: (NotificationModel) -> Unit = {},
     onTableportClick: () -> Unit = {},
+    onLeaderboardClick: () -> Unit = {},
     onTicketsClick: () -> Unit = {},
     onMemberClick: (String) -> Unit = {},
     onSearchTap: () -> Unit = {},
@@ -178,6 +182,7 @@ fun TodayScreen(
                         onNavigateToTab = onNavigateToTab,
                         onEventClick = onEventClick,
                         onTableportClick = onTableportClick,
+                        onLeaderboardClick = onLeaderboardClick,
                         onTicketsClick = onTicketsClick,
                         onNotificationsClick = onNotificationsClick,
                         onNotificationTap = { notif ->
@@ -200,6 +205,7 @@ private fun TodayContent(
     onNavigateToTab: (MainTab) -> Unit,
     onEventClick: (String) -> Unit,
     onTableportClick: () -> Unit,
+    onLeaderboardClick: () -> Unit,
     onTicketsClick: () -> Unit,
     onNotificationsClick: () -> Unit,
     onNotificationTap: (NotificationModel) -> Unit,
@@ -234,6 +240,8 @@ private fun TodayContent(
                     MembershipCardHero(
                         fullName = fullName,
                         memberId = user.id,
+                        podiumPlace = rememberLeaderboard().board?.myPodiumPlace
+                            ?.takeIf { koinAccess().featureFlags.leaderboardMembersEnabled || LeaderboardFixtures.enabled },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -246,6 +254,7 @@ private fun TodayContent(
                 MembershipSection(
                     user = user,
                     onTableportClick = onTableportClick,
+                    onLeaderboardClick = onLeaderboardClick,
                     onTicketsClick = onTicketsClick,
                     showTickets = hasUpcomingTickets,
                     modifier = Modifier.padding(horizontal = 20.dp).padding(top = 12.dp),

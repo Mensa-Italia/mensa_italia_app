@@ -25,6 +25,17 @@ struct MensaApp: App {
         // database e può stare qui, prima di `BootstrapGate`.
         DemoIdentity.shared.enabled =
             ProcessInfo.processInfo.environment["MENSA_DEMO_IDENTITY"] == "1"
+        #if DEBUG
+        // Classifica inventata, per catturarne le schermate senza login:
+        // vedi `LeaderboardFixtures` e i case `leaderboard_preview` qui sotto.
+        LeaderboardFixtures.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_LEADERBOARD_FIXTURE"] == "1"
+        MedalFixtures.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_MEDALS_FIXTURE"] == "1"
+        if let place = ProcessInfo.processInfo.environment["MENSA_LEADERBOARD_ME"].flatMap(Int32.init) {
+            LeaderboardFixtures.shared.mePlace = place
+        }
+        #endif
         // Register the iOS Spotlight sink with KMP. KMP owns the diff +
         // image download + batching; the sink is a thin translator from
         // `SpotlightMemberBlock` → `CSSearchableItem`. clearAll() also
@@ -32,6 +43,12 @@ struct MensaApp: App {
         // previous `SpotlightCleaner` callback handled.
         SpotlightSinkRegistry.shared.sink = SpotlightSinkImpl.shared
         DebugRefreshHarness.runIfRequested()
+        #if DEBUG
+        // Registro soci inventato, per provarne ricerca e filtro per regione
+        // senza login: con `MENSA_LAUNCH_SCREEN=members`. Vedi `RegSociFixtures`.
+        RegSociFixtures.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_REGSOCI_FIXTURE"] == "1"
+        #endif
         // Stripe bootstrap moved into `BootstrapGate` below — it must run
         // AFTER the SQLDelight database is initialised, otherwise the first
         // koin access inside `StripeService.bootstrap` throws
@@ -132,6 +149,9 @@ struct DebugLaunchSelector: View {
                     case "notifications": NotificationsListView()
                     case "addonsHub": AddonsHubView()
                     case "nowPlaying": DebugNowPlayingPreview()
+                    case "leaderboard_preview": LeaderboardView()
+                    case "medals_preview": MedalCabinetView()
+                    case "leaderboard_preview_card": DebugLeaderboardCardPreview()
                     default: Text("Unknown screen: \(target)")
                     }
                 }
@@ -198,5 +218,41 @@ private struct DebugNowPlayingPreview: View {
             AudioPlayerService.shared.presentFullPlayer()
             presented = true
         }
+    }
+}
+
+/// Today's membership card, with the podium stamp on its back, and the
+/// ranking's row, on the made-up ranking (`MENSA_LEADERBOARD_FIXTURE=1`,
+/// `MENSA_LEADERBOARD_ME=1` to stand on the podium), for screenshots
+/// without the login.
+private struct DebugLeaderboardCardPreview: View {
+    @State private var store = LeaderboardStore.shared
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Today").font(.largeTitle.weight(.heavy)).padding(.bottom, 8)
+                MembershipCardHero(
+                    fullName: "Giorgia Bianchi",
+                    memberSince: "2024",
+                    expiry: "31/12/2026",
+                    memberId: "12345",
+                    podiumPlace: store.board?.myPodiumPlace.map { Int($0.int32Value) }
+                )
+                .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 8)
+                if let board = store.board {
+                    Label("ISCRIZIONE", systemImage: "person.text.rectangle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 12)
+                    NavigationLink { LeaderboardView() } label: { LeaderboardMembershipRow(board: board) }
+                        .buttonStyle(.plain)
+                        .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color(.secondarySystemBackground)))
+                }
+            }
+            .padding(16)
+        }
+        .background(Color(.systemBackground))
+        .task { await store.refresh() }
     }
 }

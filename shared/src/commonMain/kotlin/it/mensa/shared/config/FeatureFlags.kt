@@ -36,7 +36,13 @@ class FeatureFlags(
         val donationLinkOnAndroid: Boolean = false,
         val donationStripeLink: String = "",
         val quidAudio: Boolean = false,
+        /** The three rankings, each on its own switch; with all three off the Home row goes too. */
+        val leaderboardMembers: Boolean = false,
+        val leaderboardRegions: Boolean = false,
+        val leaderboardSecretaries: Boolean = false,
     ) {
+        val leaderboard: Boolean get() = leaderboardMembers || leaderboardRegions || leaderboardSecretaries
+
         /**
          * Link esterno da aprire al posto della pagina di donazione nativa,
          * oppure null per usare quella nativa.
@@ -80,6 +86,11 @@ class FeatureFlags(
     val localGroupsEnabled: Boolean get() = _flags.value.localGroups
     val passkeysEnabled: Boolean get() = _flags.value.passkeys
     val quidAudioEnabled: Boolean get() = _flags.value.quidAudio
+    val leaderboardMembersEnabled: Boolean get() = _flags.value.leaderboardMembers
+    val leaderboardRegionsEnabled: Boolean get() = _flags.value.leaderboardRegions
+    val leaderboardSecretariesEnabled: Boolean get() = _flags.value.leaderboardSecretaries
+    /** Any of the three rankings on: the Home row and the page exist. */
+    val leaderboardEnabled: Boolean get() = _flags.value.leaderboard
 
     /** Vedi [Flags.donationLinkIos]. */
     val donationLinkIos: String? get() = _flags.value.donationLinkIos
@@ -129,6 +140,9 @@ class FeatureFlags(
                 donationLinkOnAndroid = configs[KEY_DONATION_LINK_ANDROID].toFlag(),
                 donationStripeLink = configs[KEY_DONATION_STRIPE_LINK]?.trim().orEmpty(),
                 quidAudio = configs[KEY_QUID_AUDIO].toFlag(),
+                leaderboardMembers = configs[KEY_LEADERBOARD_MEMBERS].toFlag(),
+                leaderboardRegions = configs[KEY_LEADERBOARD_REGIONS].toFlag(),
+                leaderboardSecretaries = configs[KEY_LEADERBOARD_SECRETARIES].toFlag(),
             )
             _flags.value = fresh
             writeCached(fresh)
@@ -142,7 +156,7 @@ class FeatureFlags(
         val parts = raw.split(',')
         // Length check doubles as a version guard: a cache written by an older
         // build with fewer flags is discarded rather than read short.
-        if (parts.size != 7) return null
+        if (parts.size != 10) return null
         return Flags(
             publicArea = parts[0] == "1",
             orgChart = parts[1] == "1",
@@ -151,6 +165,9 @@ class FeatureFlags(
             donationLinkOnIos = parts[4] == "1",
             donationLinkOnAndroid = parts[5] == "1",
             quidAudio = parts[6] == "1",
+            leaderboardMembers = parts[7] == "1",
+            leaderboardRegions = parts[8] == "1",
+            leaderboardSecretaries = parts[9] == "1",
             donationStripeLink = db.keyValueQueries
                 .selectById(CACHE_KEY_DONATION_LINK).awaitAsOneOrNull()?.value_.orEmpty(),
         )
@@ -165,6 +182,9 @@ class FeatureFlags(
             flags.donationLinkOnIos,
             flags.donationLinkOnAndroid,
             flags.quidAudio,
+            flags.leaderboardMembers,
+            flags.leaderboardRegions,
+            flags.leaderboardSecretaries,
         ).joinToString(",") { if (it) "1" else "0" }
         try {
             db.keyValueQueries.insertOrReplace(key = CACHE_KEY, value_ = encoded)
@@ -193,6 +213,9 @@ class FeatureFlags(
         const val KEY_DONATION_LINK_ANDROID = "donation_link_on_android"
         const val KEY_DONATION_STRIPE_LINK = "donation_stripe_link"
         const val KEY_QUID_AUDIO = "quid_audio_enabled"
+        const val KEY_LEADERBOARD_MEMBERS = "leaderboard_members_enabled"
+        const val KEY_LEADERBOARD_REGIONS = "leaderboard_regions_enabled"
+        const val KEY_LEADERBOARD_SECRETARIES = "leaderboard_secretaries_enabled"
         const val CACHE_KEY = "config.feature_flags"
         // Il link sta per conto suo e non nella lista separata da virgole:
         // un URL puo' contenerne una, e la spezzerebbe in due campi.

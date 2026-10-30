@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import it.mensa.shared.demo.DemoIdentity
+import it.mensa.shared.leaderboard.LeaderboardFixtures
+import it.mensa.shared.medals.MedalFixtures
 
 /**
  * LaunchHarness: intent-driven launch overrides used by automation
@@ -33,6 +35,9 @@ object LaunchHarness {
     const val EXTRA_EMAIL = "mensa_autologin_email"
     const val EXTRA_PASSWORD = "mensa_autologin_pwd"
     const val EXTRA_DEMO_IDENTITY = "mensa_demo_identity"
+    const val EXTRA_LEADERBOARD_FIXTURE = "mensa_leaderboard_fixture"
+    const val EXTRA_LEADERBOARD_ME = "mensa_leaderboard_me"
+    const val EXTRA_MEDALS_FIXTURE = "mensa_medals_fixture"
 
     /** Requested destination alias (e.g. `today`, `events`, `card`), or null. */
     var screen: String? = null
@@ -40,6 +45,14 @@ object LaunchHarness {
 
     private var email: String? = null
     private var password: String? = null
+
+    /**
+     * A screen to mount on its own, before and without the login: only the
+     * leaderboard and medal previews, which run on [LeaderboardFixtures] and
+     * [MedalFixtures].
+     */
+    val standalonePreview: String?
+        get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" }
 
     /** True when this process was launched by the screenshot/automation harness. */
     val isActive: Boolean
@@ -67,6 +80,11 @@ object LaunchHarness {
         // segnaposto, cosi' gli screenshot pubblicati non espongono i dati di
         // chi ha fatto il login. Vedi [DemoIdentity].
         DemoIdentity.enabled = extras.getString(EXTRA_DEMO_IDENTITY) == "1"
+        // Classifica inventata, per catturarne le schermate senza login: vedi
+        // [LeaderboardFixtures] e `LeaderboardPreviewHarness`.
+        LeaderboardFixtures.enabled = extras.getString(EXTRA_LEADERBOARD_FIXTURE) == "1"
+        extras.getString(EXTRA_LEADERBOARD_ME)?.toIntOrNull()?.let { LeaderboardFixtures.mePlace = it }
+        MedalFixtures.enabled = extras.getString(EXTRA_MEDALS_FIXTURE) == "1"
         if (isActive) {
             Logger.i("LaunchHarness", "configure", "active: screen=$screen autologin=${email != null}")
         }

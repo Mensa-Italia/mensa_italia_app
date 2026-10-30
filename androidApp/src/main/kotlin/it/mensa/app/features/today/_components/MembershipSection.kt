@@ -1,5 +1,8 @@
 package it.mensa.app.features.today._components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,11 +38,18 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.foundation.layout.size
 import it.mensa.app.features.tableport.medals.rememberMedals
+import it.mensa.app.features.leaderboard.LeaderboardMembershipRow
+import it.mensa.app.features.leaderboard.rememberLeaderboard
 import it.mensa.app.ui.components.mensaImageLoader
 import it.mensa.app.features.tableport.util.StampImagePrefetcher
 import it.mensa.app.support.koinAccess
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import it.mensa.shared.leaderboard.LeaderboardKind
+import it.mensa.shared.leaderboard.enabledLeaderboards
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import it.mensa.app.support.ExternalLinks
@@ -66,11 +76,19 @@ fun MembershipSection(
     onTableportClick: () -> Unit,
     onTicketsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLeaderboardClick: () -> Unit = {},
     /** Almeno un ticket ancora valido: solo allora la voce "I miei ticket". */
     showTickets: Boolean = true,
 ) {
     val context = LocalContext.current
     val medals = rememberMedals()
+    // Le classifiche accese in `configs`: con tutte spente la riga non c'e'.
+    // Quella dei soci solo quando e' stata letta: senza, non ha niente da dire.
+    val flags by koinAccess().featureFlags.flags.collectAsState()
+    val boards = remember(flags) { koinAccess().featureFlags.enabledLeaderboards() }
+    val membersBoard = rememberLeaderboard().board?.takeIf { it.rows.isNotEmpty() }
+    val board = membersBoard.takeIf { LeaderboardKind.MEMBERS in boards }
+    val showLeaderboard = boards.isNotEmpty() && (LeaderboardKind.MEMBERS !in boards || board != null)
     // I timbri del passaporto su disco prima che lo si apra: chi lo sfoglia
     // li trova gia' li'. Dal database; dalla rete solo se e' ancora vuoto.
     LaunchedEffect(user.id) {
@@ -150,6 +168,15 @@ fun MembershipSection(
                 // inside and find out what they are.
                 medalCount = medals.earnedCount.takeIf { medals.medals.isNotEmpty() },
             )
+            // La classifica sta con il Tableport: si fa con i suoi timbri.
+            // Arriva dalla rete dopo il resto della card: entra sfumando e
+            // aprendosi, invece di comparire di colpo.
+            AnimatedVisibility(visible = showLeaderboard, enter = fadeIn() + expandVertically()) {
+                Column {
+                    HorizontalDivider(modifier = Modifier.padding(start = 20.dp))
+                    LeaderboardMembershipRow(board = board, onClick = onLeaderboardClick)
+                }
+            }
             // Solo con un ticket ancora valido: una voce che apre una lista
             // vuota o di ticket scaduti era rumore.
             if (showTickets) {
