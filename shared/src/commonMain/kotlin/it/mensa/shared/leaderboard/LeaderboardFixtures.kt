@@ -56,20 +56,23 @@ object LeaderboardFixtures {
         val national: Int, val events: Int, val attendance: Int, val distinct: Int, val effective: Int,
     )
 
+    // Invented seats with invented numbers: none of these is a real region or a
+    // real figure, the spread (a small active seat, a large quiet one, a seat
+    // with only a national, empty ones) is what the screens need to show.
     private val regionSeeds = listOf(
-        RegionSeed("Trentino Alto Adige", 57, 19, 100, 0, 18, 75, 23, 14),
-        RegionSeed("Lombardia", 631, 8, 95, 0, 26, 263, 106, 54),
-        RegionSeed("Sicilia", 75, 0, 0, 8, 0, 0, 0, 0),
-        RegionSeed("Liguria", 89, 0, 0, 7, 4, 5, 1, 1),
-        RegionSeed("Emilia Romagna", 257, 5, 100, 0, 12, 55, 46, 40),
-        RegionSeed("Veneto", 301, 6, 92, 0, 20, 117, 54, 31),
-        RegionSeed("Campania", 131, 0, 0, 3, 0, 0, 0, 0),
-        RegionSeed("Marche", 65, 3, 67, 0, 4, 19, 11, 8),
-        RegionSeed("Piemonte e Val d'Aosta", 223, 2, 23, 0, 51, 183, 51, 12),
-        RegionSeed("Abruzzo", 67, 1, 48, 0, 3, 11, 9, 7),
-        RegionSeed("Toscana", 178, 0, 0, 0, 1, 1, 1, 1),
-        RegionSeed("Lazio", 313, 0, 0, 0, 0, 0, 0, 0),
-        RegionSeed("Calabria", 19, 0, 0, 0, 0, 0, 0, 0),
+        RegionSeed("Valle Chiara", 60, 18, 100, 0, 16, 70, 22, 15),
+        RegionSeed("Pianura Grande", 600, 8, 90, 0, 24, 240, 100, 50),
+        RegionSeed("Isola Maggiore", 80, 0, 0, 8, 0, 0, 0, 0),
+        RegionSeed("Riviera", 90, 0, 0, 7, 4, 5, 1, 1),
+        RegionSeed("Terre Alte", 250, 5, 100, 0, 12, 55, 45, 40),
+        RegionSeed("Laguna", 300, 6, 90, 0, 20, 115, 55, 30),
+        RegionSeed("Golfo", 130, 0, 0, 3, 0, 0, 0, 0),
+        RegionSeed("Colline", 65, 3, 70, 0, 4, 20, 11, 8),
+        RegionSeed("Altopiano", 220, 2, 30, 0, 40, 150, 45, 12),
+        RegionSeed("Costa Verde", 70, 1, 50, 0, 3, 11, 9, 7),
+        RegionSeed("Vallata", 180, 0, 0, 0, 1, 1, 1, 1),
+        RegionSeed("Piana", 310, 0, 0, 0, 0, 0, 0, 0),
+        RegionSeed("Promontorio", 20, 0, 0, 0, 0, 0, 0, 0),
     )
 
     // Rounded like the view does, so ties share a place.
