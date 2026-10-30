@@ -120,6 +120,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    lint {
+        // Il lint jar di androidx.lifecycle (arrivato con la BOM Compose
+        // 2026.03) e' compilato contro un'API di analisi Kotlin piu' nuova
+        // di quella del nostro AGP: il suo NullSafeMutableLiveData va in
+        // IncompatibleClassChangeError e fa cadere lintVitalAnalyzeRelease,
+        // quindi il rilascio (v22.3.0, 30/10/2026). LiveData non lo usiamo:
+        // spegnere il controllo non perde niente.
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 dependencies {
