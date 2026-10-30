@@ -70,7 +70,38 @@ data class Medal(
     val levels: List<Pair<MedalTier, Int>>,
     /** Counts stamps, so only the ones `view_medals` lets through (see [MedalCatalog.stampBased]). */
     val countsStamps: Boolean,
+    /** Set for a medal of the member's region, which has more to say than a personal one. */
+    val region: RegionMedalDetail? = null,
 )
+
+/**
+ * What a region medal adds to [Medal]: its year, how it's earned, the figure
+ * in its unit and the ladder with thresholds written in that unit (a
+ * threshold can be 8,5%, so [Medal.levels]' whole numbers won't do).
+ * Mirrors iOS `Medal.Region`.
+ */
+data class RegionMedalDetail(
+    val year: Int,
+    /** "Come si ottiene". */
+    val rule: String,
+    /** The figure in its unit: "11,2%", "6", "3°". */
+    val valueLabel: String,
+    /** An earlier year: the figure is final, with no next goal. */
+    val isPast: Boolean,
+    val isPodium: Boolean,
+    /** Every metal with the figure that earns it, and whether the year reached it. */
+    val ladder: List<RegionLadderStep>,
+    /** The next metal's threshold, in the unit. */
+    val nextLabel: String?,
+    /** The secondary figures, labelled, in words the member reads. */
+    val figures: List<Pair<String, String>>,
+    /** Set while too few people stand behind the figure for it to count. */
+    val minimumNote: String?,
+    /** The member was in the region when the metal shown was reached. */
+    val witnessed: Boolean,
+)
+
+data class RegionLadderStep(val tier: MedalTier, val label: String, val reached: Boolean)
 
 /** The metal's ramp: where light hits, the body, the shade. */
 data class MetalRamp(val hi: Color, val mid: Color, val lo: Color)

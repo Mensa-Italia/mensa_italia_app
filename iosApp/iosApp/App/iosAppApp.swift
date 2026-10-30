@@ -30,8 +30,12 @@ struct MensaApp: App {
         // vedi `LeaderboardFixtures` e i case `leaderboard_preview` qui sotto.
         LeaderboardFixtures.shared.enabled =
             ProcessInfo.processInfo.environment["MENSA_LEADERBOARD_FIXTURE"] == "1"
+        // Medaglie di regione inventate (e il flag acceso): vedi `RegionMedalFixtures`.
+        // Il medagliere ha anche la pagina personale, quindi le porta con se'.
+        RegionMedalFixtures.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_REGION_MEDALS_FIXTURE"] == "1"
         MedalFixtures.shared.enabled =
-            ProcessInfo.processInfo.environment["MENSA_MEDALS_FIXTURE"] == "1"
+            ProcessInfo.processInfo.environment["MENSA_MEDALS_FIXTURE"] == "1" || RegionMedalFixtures.shared.enabled
         if let place = ProcessInfo.processInfo.environment["MENSA_LEADERBOARD_ME"].flatMap(Int32.init) {
             LeaderboardFixtures.shared.mePlace = place
         }

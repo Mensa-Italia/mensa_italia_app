@@ -110,7 +110,10 @@ struct MedalCase: View {
                     .tint(metal.mid)
                     .padding(.vertical, 4)
             } else {
-                Text(tr("medals.secret.short", fallback: "Segreta").uppercased())
+                // A past year's medal missed stays dark; a personal one left is a secret.
+                Text((medal.region != nil
+                      ? tr("medals.region.missed", fallback: "Non ottenuta")
+                      : tr("medals.secret.short", fallback: "Segreta")).uppercased())
                     .font(.caption2.weight(.bold))
                     .tracking(2)
                     .foregroundStyle(.white.opacity(0.35))

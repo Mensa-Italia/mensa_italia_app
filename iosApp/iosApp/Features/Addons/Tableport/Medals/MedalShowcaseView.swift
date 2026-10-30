@@ -28,7 +28,8 @@ struct MedalShowcaseView: View {
                     .accessibilityHint(Text(tr("medals.spin_hint", fallback: "Trascina per girarla")))
 
                     TierBadge(medal: medal)
-                    Text(medal.title)
+                    // A region medal is "Name 2026": each year is its own.
+                    Text(medal.region.map { "\(medal.title) \($0.year)" } ?? medal.title)
                         .font(.system(.title, design: .serif).weight(.bold))
                         .multilineTextAlignment(.center)
                         .padding(.top, 14)
@@ -39,18 +40,34 @@ struct MedalShowcaseView: View {
                         .multilineTextAlignment(.center)
                         .padding(.top, 8)
                         .padding(.horizontal, 32)
-                    if medal.levels.count > 1, !medal.isHidden {
-                        TierLadder(medal: medal)
+                    if let region = medal.region {
+                        if region.witnessed {
+                            WitnessBadge()
+                                .padding(.top, 14)
+                        }
+                        RegionTierLadder(medal: medal, region: region)
                             .padding(.top, 28)
                             .padding(.horizontal, 28)
-                    }
-                    status
-                        .padding(.top, 24)
-                        .padding(.horizontal, 32)
-                    if medal.countsStamps, !medal.isHidden {
-                        StampRules()
+                        RegionStatus(medal: medal, region: region)
+                            .padding(.top, 24)
+                            .padding(.horizontal, 32)
+                        RegionRuleCard(rule: region.rule)
                             .padding(.top, 24)
                             .padding(.horizontal, 24)
+                    } else {
+                        if medal.levels.count > 1, !medal.isHidden {
+                            TierLadder(medal: medal)
+                                .padding(.top, 28)
+                                .padding(.horizontal, 28)
+                        }
+                        status
+                            .padding(.top, 24)
+                            .padding(.horizontal, 32)
+                        if medal.countsStamps, !medal.isHidden {
+                            StampRules()
+                                .padding(.top, 24)
+                                .padding(.horizontal, 24)
+                        }
                     }
                     Text(tr("medals.spin_hint", fallback: "Trascina per girarla"))
                         .font(.footnote)

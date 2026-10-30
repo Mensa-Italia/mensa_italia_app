@@ -19,12 +19,20 @@ struct MedalCabinetView: View {
         }
     }
 
+    /// "Le mie" / "La mia regione": the switch exists only with the flag on and the region known.
+    private enum Page: Hashable { case mine, region }
+
     @State private var store = MedalStore.shared
+    @State private var region = RegionMedalStore.shared
     @State private var selected: Medal?
     @State private var filter = Filter.all
+    @State private var page = Page.mine
+    @State private var showInfo = false
+    @State private var openYears = Set<Int>()
 
     private var medals: [Medal] { store.medals }
     private var shown: [Medal] { medals.filter(filter.matches) }
+    private var onRegion: Bool { region.available && page == .region }
 
     private var earnedCount: Int { medals.filter(\.isEarned).count }
 
@@ -33,12 +41,17 @@ struct MedalCabinetView: View {
     var body: some View {
         GeometryReader { geo in
             ScrollView {
-                if let hinge = geo.verticalHinge {
+                if let hinge = geo.verticalHinge, !onRegion {
                     foldedOpen(width: geo.size.width, hinge: hinge)
                 } else {
                     VStack(spacing: 24) {
-                        summary
-                        grid
+                        if region.available { pageSwitch }
+                        if onRegion {
+                            regionPage
+                        } else {
+                            summary
+                            grid
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
@@ -53,8 +66,9 @@ struct MedalCabinetView: View {
         .sheet(item: $selected) { medal in
             MedalShowcaseView(medal: medal)
         }
+        .sheet(isPresented: $showInfo) { RegionMedalsInfoSheet() }
         .overlay {
-            if medals.isEmpty {
+            if medals.isEmpty, !onRegion {
                 if store.failed {
                     ContentUnavailableView(
                         tr("medals.title", fallback: "Medagliere"),
@@ -66,8 +80,102 @@ struct MedalCabinetView: View {
                 }
             }
         }
-        .refreshable { await store.refresh() }
-        .task { await store.refresh() }
+        .refreshable {
+            async let mine: Void = store.refresh()
+            async let theirs: Void = region.refresh()
+            _ = await (mine, theirs)
+        }
+        .task {
+            async let mine: Void = store.refresh()
+            async let theirs: Void = region.refresh()
+            _ = await (mine, theirs)
+        }
+    }
+
+    /// The same switch as the leaderboard's.
+    private var pageSwitch: some View {
+        Picker(tr("medals.title", fallback: "Medagliere"), selection: $page) {
+            Text(tr("medals.tab.mine", fallback: "Le mie")).tag(Page.mine)
+            Text(tr("medals.tab.region", fallback: "La mia regione")).tag(Page.region)
+        }
+        .pickerStyle(.segmented)
+    }
+
+    // MARK: - The region page
+
+    /// The ring of this year's medals, the rules, the ten medals in their
+    /// cases, then the earlier years folded under their headers. The filter
+    /// in the top bar applies to every year. Mirrors Android `regionPage`.
+    @ViewBuilder private var regionPage: some View {
+        if !region.loaded {
+            if region.failed {
+                Text(tr("medals.region.load_error", fallback: "Non riesco a leggere le medaglie della regione. Riprova più tardi."))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, minHeight: 240)
+            } else {
+                ProgressView().frame(maxWidth: .infinity, minHeight: 240)
+            }
+        } else {
+            if region.current.isEmpty {
+                Text(tr("medals.region.empty", fallback: "Le medaglie della regione arriveranno presto."))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 32)
+            } else {
+                summaryGauge(
+                    of: region.current,
+                    headline: tr("medals.region.count_of", fallback: "{earned} su {total}",
+                                 ["earned": "\(region.earnedCount)", "total": "\(region.current.count)"]),
+                    caption: region.regionName.isEmpty
+                        ? tr("medals.region.count_caption", fallback: "Medaglie di regione {year}", ["year": "\(region.year)"])
+                        : "\(region.regionName) · \(region.year)",
+                    tiers: Medal.Tier.allCases.filter { $0 != .platinum }
+                )
+                RegionRules()
+                cases(region.current.filter(filter.matches))
+            }
+            if !region.past.isEmpty { years }
+        }
+    }
+
+    /// The earlier years, each folded under its header.
+    private var years: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(tr("medals.region.years", fallback: "Annate").uppercased())
+                .font(.caption2.weight(.semibold))
+                .tracking(2)
+                .foregroundStyle(.white.opacity(0.5))
+            ForEach(region.past) { entry in
+                let open = openYears.contains(entry.year)
+                RegionYearHeader(entry: entry, expanded: open) {
+                    withAnimation(.snappy) {
+                        if open { openYears.remove(entry.year) } else { openYears.insert(entry.year) }
+                    }
+                }
+                if open {
+                    LazyVGrid(columns: columns, spacing: 24) {
+                        ForEach(entry.medals.filter(filter.matches)) { caseButton($0) }
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The cases that pass the filter; a line when none does.
+    @ViewBuilder private func cases(_ list: [Medal]) -> some View {
+        if list.isEmpty {
+            Text(tr("medals.filter.empty", fallback: "Nessuna medaglia qui, per ora."))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+        } else {
+            LazyVGrid(columns: columns, spacing: 24) {
+                ForEach(list) { caseButton($0) }
+            }
+        }
     }
 
     /// iPhone Duo unfolded: the summary over the left half, then the cases in
@@ -128,6 +236,13 @@ struct MedalCabinetView: View {
 
     /// The filter, as on the other lists: a menu in the top bar, filled when active.
     @ToolbarContentBuilder private var filterToolbarItem: some ToolbarContent {
+        if onRegion {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showInfo = true } label: {
+                    Label(tr("leaderboard.how_it_works", fallback: "Come funziona"), systemImage: "info.circle")
+                }
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 Picker(selection: $filter, label: EmptyView()) {
@@ -156,12 +271,23 @@ struct MedalCabinetView: View {
     }
 
     private var summary: some View {
+        summaryGauge(
+            of: medals,
+            headline: tr("medals.count_of", fallback: "{earned} di {total}",
+                         ["earned": "\(earnedCount)", "total": "\(medals.count)"]),
+            caption: tr("medals.count_caption_case", fallback: "Medaglie in teca"),
+            tiers: Medal.Tier.allCases
+        )
+    }
+
+    private func summaryGauge(of list: [Medal], headline: String, caption: String, tiers: [Medal.Tier]) -> some View {
+        let earned = list.filter(\.isEarned).count
         let gold = Medal.Tier.gold.metal
         return HStack(spacing: 18) {
-            Gauge(value: Double(earnedCount), in: 0...Double(max(medals.count, 1))) {
+            Gauge(value: Double(earned), in: 0...Double(max(list.count, 1))) {
                 Image(systemName: "medal.fill")
             } currentValueLabel: {
-                Text("\(earnedCount)")
+                Text("\(earned)")
                     .foregroundStyle(LinearGradient(colors: [gold.hi, gold.mid], startPoint: .top, endPoint: .bottom))
             }
             .gaugeStyle(.accessoryCircularCapacity)
@@ -170,18 +296,17 @@ struct MedalCabinetView: View {
             .frame(width: 80, height: 80)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(tr("medals.count_of", fallback: "{earned} di {total}",
-                        ["earned": "\(earnedCount)", "total": "\(medals.count)"]))
+                Text(headline)
                     .font(.title2.weight(.bold).monospacedDigit())
-                Text(tr("medals.count_caption_case", fallback: "Medaglie in teca").uppercased())
+                Text(caption.uppercased())
                     .font(.caption2.weight(.semibold))
                     .tracking(2)
                     .foregroundStyle(.white.opacity(0.5))
                 HStack(spacing: 14) {
-                    ForEach(Medal.Tier.allCases, id: \.self) { tier in
+                    ForEach(tiers, id: \.self) { tier in
                         HStack(spacing: 5) {
                             MedalArtwork(tier: tier, symbol: "star.fill", size: 18)
-                            Text("\(medals.filter { $0.tier == tier && $0.isEarned }.count)")
+                            Text("\(list.filter { $0.tier == tier && $0.isEarned }.count)")
                                 .font(.footnote.weight(.semibold).monospacedDigit())
                                 .foregroundStyle(.white.opacity(0.8))
                         }
