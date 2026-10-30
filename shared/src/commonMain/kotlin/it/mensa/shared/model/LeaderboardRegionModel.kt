@@ -31,6 +31,9 @@ data class LeaderboardRegionModel(
     @SerialName("attendance_total") val attendanceTotal: Double = 0.0,
     @SerialName("members_active") val membersActive: Double = 0.0,
     @SerialName("avg_share_pct") val avgSharePct: Double = 0.0,
+    /** Position at the last daily snapshot; 0 when there is none yet. */
+    @SerialName("previous_position") val previousPosition: Double = 0.0,
+    @SerialName("previous_score") val previousScore: Double = 0.0,
 )
 
 /**
@@ -59,4 +62,7 @@ data class LeaderboardSecretaryModel(
     @SerialName("attendance_total") val attendanceTotal: Double = 0.0,
     @SerialName("members_active") val membersActive: Double = 0.0,
     @SerialName("avg_share_pct") val avgSharePct: Double = 0.0,
+    /** Position at the last daily snapshot; 0 when there is none yet. */
+    @SerialName("previous_position") val previousPosition: Double = 0.0,
+    @SerialName("previous_score") val previousScore: Double = 0.0,
 )

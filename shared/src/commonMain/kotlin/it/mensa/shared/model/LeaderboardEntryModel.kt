@@ -24,4 +24,7 @@ data class LeaderboardEntryModel(
     @SerialName("events_points") val eventsPoints: Double = 0.0,
     @SerialName("stamps_total") val stampsTotal: Double = 0.0,
     @SerialName("stamps_distinct_regions") val stampsDistinctRegions: Double = 0.0,
+    /** Position at the last daily snapshot; 0 when there is none yet (table filled by the server's cron). */
+    @SerialName("previous_position") val previousPosition: Double = 0.0,
+    @SerialName("previous_score") val previousScore: Double = 0.0,
 )

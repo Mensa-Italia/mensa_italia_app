@@ -47,6 +47,8 @@ object LeaderboardFixtures {
             eventsPoints = events,
             stampsTotal = (34 - index * 0.7).coerceAtLeast(2.0),
             stampsDistinctRegions = (6 - index / 8).coerceAtLeast(1).toDouble(),
+            // Yesterday's place, for the arrows: some up, some down, some still.
+            previousPosition = (index + 1 + listOf(0, 2, -1)[index % 3]).coerceAtLeast(1).toDouble(),
         )
     }
 
@@ -101,6 +103,7 @@ object LeaderboardFixtures {
             eventsTotal = s.events.toDouble(), eventsScoring = (s.events * 0.6).toDouble(),
             attendanceTotal = s.attendance.toDouble(), membersActive = s.members.toDouble(),
             avgSharePct = if (s.events > 0) 100.0 * s.attendance / s.events / s.members else 0.0,
+            previousPosition = if (position % 2 == 0) position + 1.0 else (position - 1).coerceAtLeast(1).toDouble(),
         )
     }
 
@@ -117,6 +120,7 @@ object LeaderboardFixtures {
             eventsTotal = s.events.toDouble(), eventsScoring = (s.events * 0.6).toDouble(),
             attendanceTotal = s.attendance.toDouble(), membersActive = s.members.toDouble(),
             avgSharePct = if (s.events > 0) 100.0 * s.attendance / s.events / s.members else 0.0,
+            previousPosition = if (position % 2 == 0) position + 1.0 else (position - 1).coerceAtLeast(1).toDouble(),
         )
     }
 }

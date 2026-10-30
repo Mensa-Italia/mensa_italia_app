@@ -494,18 +494,7 @@ private fun RankItem(row: LeaderboardRow, index: Int, count: Int, onMemberClick:
         },
         leadingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.widthIn(min = 28.dp), contentAlignment = Alignment.Center) {
-                    val tier = podiumTier(row.position)
-                    if (tier != null) {
-                        Icon(Icons.Filled.MilitaryTech, contentDescription = "${row.position}°", tint = tier.metal.mid)
-                    } else {
-                        Text(
-                            "${row.position}",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                Place(row.position, row.trend)
                 Spacer(Modifier.width(12.dp))
                 RankAvatar(row = row, size = 40.dp)
             }

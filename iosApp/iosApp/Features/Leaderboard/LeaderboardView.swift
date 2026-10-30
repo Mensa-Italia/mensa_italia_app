@@ -259,9 +259,11 @@ private struct ScoreDetail: Identifiable {
 
 private struct Place: View {
     let position: Int32
+    /// Places gained since yesterday's snapshot (negative = lost); nil when unknown.
+    var trend: KotlinInt? = nil
 
     var body: some View {
-        Group {
+        VStack(spacing: 1) {
             if let tier = podiumMetal(position: Int(position)) {
                 Image(systemName: "medal.fill")
                     .font(.title3)
@@ -271,8 +273,23 @@ private struct Place: View {
                     .font(.body.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
+            Trend(trend: trend)
         }
         .frame(width: 28)
+    }
+}
+
+/// "▲2" in green or "▼1" in red under the position; nothing when unchanged
+/// or unknown. The server writes `previous_position` from its daily history.
+private struct Trend: View {
+    let trend: KotlinInt?
+
+    var body: some View {
+        if let t = trend?.int32Value, t != 0 {
+            Text(t > 0 ? "▲\(t)" : "▼\(-t)")
+                .font(.caption2.weight(.semibold).monospacedDigit())
+                .foregroundStyle(t > 0 ? Color.green : Color.red)
+        }
     }
 }
 
@@ -283,7 +300,7 @@ private struct RegionRankRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                Place(position: row.position)
+                Place(position: row.position, trend: row.trend)
                 Text(row.displayName).lineLimit(1)
                 Spacer()
                 Text(tr("leaderboard.points", fallback: "{points} pt", ["points": "\(row.score)"]))
@@ -305,7 +322,7 @@ private struct SecretaryRankRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                Place(position: row.position)
+                Place(position: row.position, trend: row.trend)
                 SecretaryAvatar(row: row, size: 40)
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 6) {
@@ -555,18 +572,7 @@ private struct RankRow: View {
 
     private var content: some View {
         HStack(spacing: 12) {
-            Group {
-                if let tier = row.podiumTier {
-                    Image(systemName: "medal.fill")
-                        .font(.title3)
-                        .foregroundStyle(tier.metal.mid)
-                } else {
-                    Text("\(row.position)")
-                        .font(.body.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: 28)
+            Place(position: row.position, trend: row.trend)
             RankAvatar(row: row, size: 40)
             HStack(spacing: 6) {
                 Text(row.displayName).lineLimit(1)

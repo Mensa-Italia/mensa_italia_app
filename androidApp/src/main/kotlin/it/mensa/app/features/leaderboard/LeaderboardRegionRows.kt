@@ -27,6 +27,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.mensa.app.support.tr
@@ -47,7 +48,7 @@ internal fun RegionItem(row: RegionRow, index: Int, count: Int, onClick: () -> U
         onClick = onClick,
         shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
         colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        leadingContent = { Place(row.position) },
+        leadingContent = { Place(row.position, row.trend) },
         trailingContent = {
             Text(tr("leaderboard.points", "{points} pt", "points" to row.score), style = MaterialTheme.typography.titleMedium)
         },
@@ -69,7 +70,7 @@ internal fun SecretaryItem(row: SecretaryRow, index: Int, count: Int, onClick: (
         },
         leadingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Place(row.position)
+                Place(row.position, row.trend)
                 Spacer(Modifier.width(12.dp))
                 RankAvatar(row = row, size = 40.dp)
             }
@@ -88,15 +89,31 @@ internal fun SecretaryItem(row: SecretaryRow, index: Int, count: Int, onClick: (
 }
 
 @Composable
-private fun Place(position: Int) {
-    Box(Modifier.widthIn(min = 28.dp), contentAlignment = Alignment.Center) {
+internal fun Place(position: Int, trend: Int? = null) {
+    Column(Modifier.widthIn(min = 28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         val tier = podiumTier(position)
         if (tier != null) {
             Icon(Icons.Filled.MilitaryTech, contentDescription = "$position°", tint = tier.metal.mid)
         } else {
             Text("$position", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        Trend(trend)
     }
+}
+
+/**
+ * Places gained or lost since yesterday's snapshot, under the position:
+ * "▲2" in green, "▼1" in red, nothing when unchanged or unknown. The
+ * server writes `previous_position` from its daily history.
+ */
+@Composable
+private fun Trend(trend: Int?) {
+    if (trend == null || trend == 0) return
+    Text(
+        text = if (trend > 0) "▲$trend" else "▼${-trend}",
+        style = MaterialTheme.typography.labelSmall,
+        color = if (trend > 0) Color(0xFF34C759) else Color(0xFFFF453A),
+    )
 }
 
 // ── The calculation ──────────────────────────────────────────────────────────

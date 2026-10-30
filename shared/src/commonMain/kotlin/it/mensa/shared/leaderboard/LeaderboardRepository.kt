@@ -35,6 +35,9 @@ data class LeaderboardRow(
     val stampsTotal: Int get() = entry.stampsTotal.roundToInt()
     val regions: Int get() = entry.stampsDistinctRegions.roundToInt()
 
+    /** Places gained since the last daily snapshot (negative = lost); null without a snapshot. */
+    val trend: Int? get() = trendOf(entry.previousPosition, position)
+
     /** The name as written in the directory, or the account's when it isn't cached. */
     val displayName: String get() = titleCase(member?.name?.takeIf { it.isNotBlank() } ?: entry.name)
 
@@ -85,6 +88,8 @@ interface RegionScore {
     val regionName: String
     val position: Int
     val score: Int
+    /** Places gained since the last daily snapshot (negative = lost); null without a snapshot. */
+    val trend: Int?
     /** Points of the region's own events over 12 months, before the community factor. */
     val participation: Int
     /** The community factor, 0 to 100. */
@@ -115,6 +120,7 @@ data class RegionRow(val entry: LeaderboardRegionModel) : RegionScore {
     override val regionName: String get() = entry.region.ifBlank { entry.name }
     override val position: Int get() = entry.position.roundToInt()
     override val score: Int get() = entry.score.roundToInt()
+    override val trend: Int? get() = trendOf(entry.previousPosition, position)
     override val participation: Int get() = entry.participation.roundToInt()
     override val communityPct: Int get() = entry.communityPct.roundToInt()
     override val nationalPoints: Int get() = entry.nationalPoints.roundToInt()
@@ -142,6 +148,7 @@ data class SecretaryRow(
     val id: String get() = entry.id
     override val regionName: String get() = entry.region
     override val position: Int get() = entry.position.roundToInt()
+    override val trend: Int? get() = trendOf(entry.previousPosition, position)
     override val score: Int get() = entry.score.roundToInt()
     override val participation: Int get() = entry.participation.roundToInt()
     override val communityPct: Int get() = entry.communityPct.roundToInt()
@@ -358,4 +365,10 @@ internal fun titleCase(name: String): String {
     return trimmed.split(" ").joinToString(" ") { word ->
         word.lowercase().replaceFirstChar { it.uppercaseChar() }
     }
+}
+
+/** Places gained between the last snapshot and now; null when the server has no snapshot yet (previous = 0). */
+internal fun trendOf(previous: Double, current: Int): Int? {
+    val before = previous.roundToInt()
+    return if (before <= 0) null else before - current
 }
