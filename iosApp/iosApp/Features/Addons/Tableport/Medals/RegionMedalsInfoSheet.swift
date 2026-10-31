@@ -49,11 +49,11 @@ struct RegionMedalsInfoSheet: View {
                   tr("medals.region.info.team.title", fallback: "La squadra"),
                   tr("medals.region.rules.team", fallback: "Le medaglie di regione sono della squadra: le conquista la regione tutta insieme e le vede chi ne fa parte oggi."))
             point("calendar", .orange,
-                  tr("medals.region.info.yearly.title", fallback: "Ogni anno"),
-                  tr("medals.region.rules.yearly", fallback: "Ogni anno si ricomincia; le annate passate restano in bacheca."))
+                  tr("medals.region.info.yearly.title_v2", fallback: "Ogni stagione"),
+                  tr("medals.region.rules.yearly_v2", fallback: "Ogni stagione, dal 1° ottobre al 30 settembre, si ricomincia; le annate passate restano in bacheca."))
             point("person", .teal,
                   tr("medals.region.info.people.title", fallback: "Le persone"),
-                  tr("medals.region.rules.people", fallback: "Contano le persone, non i timbri: chi si vede una volta sola nell'anno non fa numero."))
+                  tr("medals.region.rules.people_v2", fallback: "Contano le persone, non i timbri: chi si vede una volta sola nella stagione non fa numero."))
         }
         Section(tr("medals.region.info.medals", fallback: "Le dieci medaglie")) {
             ForEach(RegionMedalCatalog.order, id: \.self) { key in
@@ -84,26 +84,26 @@ struct RegionMedalsInfoSheet: View {
             Fraction(numerator: "v", denominator: "N_{r}^{0,7} · N̄^{0,3}")
         }
         formula(tr("medals.region.math.lemma", fallback: "Lemma · i soci effettivi"),
-                tr("medals.region.math.lemma.caption", fallback: "$n_{i}$ i timbri dell'$i$-esimo socio agli eventi della regione nell'anno. $e$ è uguale ai soci presenti se ognuno timbra una volta sola, e tende a 1 se timbra sempre uno solo: conta chi c'è spesso, poco chi passa una volta.")) {
+                tr("medals.region.math.lemma.caption_v2", fallback: "$n_{i}$ i timbri dell'$i$-esimo socio agli eventi della regione nella stagione. $e$ è uguale ai soci presenti se ognuno timbra una volta sola, e tende a 1 se timbra sempre uno solo: conta chi c'è spesso, poco chi passa una volta.")) {
             MathText("e = ")
             Fraction(numerator: "(Σ n_{i})^{2}", denominator: "Σ n_{i}^{2}")
         }
         formula(tr("medals.region.math.thm1", fallback: "Teorema 1 · Sala piena e Zoccolo duro"),
-                tr("medals.region.math.thm1.caption", fallback: "Bronzo, argento, oro. Per Sala piena $v$ sono i timbratori dell'evento migliore dell'anno; per Zoccolo duro $v = e$, sugli eventi della regione.")) {
+                tr("medals.region.math.thm1.caption_v2", fallback: "Bronzo, argento, oro. Per Sala piena $v$ sono i timbratori dell'evento migliore della stagione; per Zoccolo duro $v = e$, sugli eventi della regione.")) {
             MathText("q ≥ 8,5% · 15% · 25%")
         }
         formula(tr("medals.region.math.thm2", fallback: "Teorema 2 · Tutti presenti"),
-                tr("medals.region.math.thm2.caption", fallback: "Bronzo, argento, oro. $v$ sono i soci visti ad almeno due eventi diversi nell'anno, in tutta Italia: chi compare una volta sola non entra.")) {
+                tr("medals.region.math.thm2.caption_v2", fallback: "Bronzo, argento, oro. $v$ sono i soci visti ad almeno due eventi diversi nella stagione, in tutta Italia: chi compare una volta sola non entra.")) {
             MathText("q ≥ 5% · 10% · 15%")
         }
         formula(tr("medals.region.math.thm3", fallback: "Teorema 3 · Benvenuto"),
-                tr("medals.region.math.thm3.caption", fallback: "$n_{i}$ i soci della regione iscritti all'app nell'anno, $n_{t}$ quelli con il primo timbro entro due mesi. Qui la quota è semplice, senza l'esponente.")) {
+                tr("medals.region.math.thm3.caption_v2", fallback: "$n_{i}$ i soci della regione iscritti all'app nella stagione, $n_{t}$ quelli con il primo timbro entro due mesi. Qui la quota è semplice, senza l'esponente.")) {
             MathText("b = ")
             Fraction(numerator: "n_{t}", denominator: "n_{i}")
             MathText(" ≥ 25% · 40% · 60%")
         }
         formula(tr("medals.region.math.thm4", fallback: "Teorema 4 · i conteggi"),
-                tr("medals.region.math.thm4.caption", fallback: "Casa aperta 2 · 4 · 6 regioni. In trasferta 2 · 4 · 6 regioni. Senza pause 6 · 9 · 12 mesi. Padroni di casa 1 · 2 · 3 eventi. Staffetta 2 · 3 · 4 persone. Podio: 3°, 2°, 1° posto al 31 dicembre.")) {
+                tr("medals.region.math.thm4.caption_v2", fallback: "Casa aperta 2 · 4 · 6 regioni. In trasferta 2 · 4 · 6 regioni. Senza pause 6 · 9 · 12 mesi. Padroni di casa 1 · 2 · 3 eventi. Staffetta 2 · 3 · 4 persone. Podio: 3°, 2°, 1° posto al 30 settembre.")) {
             MathText("c ≥ c_{bronzo}, c_{argento}, c_{oro}")
         }
     }

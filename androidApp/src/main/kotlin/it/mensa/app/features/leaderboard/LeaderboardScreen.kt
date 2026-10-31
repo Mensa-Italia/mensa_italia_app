@@ -32,6 +32,7 @@ import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -81,6 +82,7 @@ import it.mensa.shared.leaderboard.LeaderboardRow
 import it.mensa.shared.leaderboard.enabledLeaderboards
 import it.mensa.shared.leaderboard.RegionRow
 import it.mensa.shared.leaderboard.SecretaryRow
+import it.mensa.shared.time.Season
 
 /**
  * The members' ranking: where the member stands and how far the next place
@@ -93,6 +95,8 @@ import it.mensa.shared.leaderboard.SecretaryRow
 fun LeaderboardScreen(
     onNavigateBack: () -> Unit,
     onMemberClick: (String) -> Unit = {},
+    /** Opens with the hall of fame already up: for the preview harness. */
+    startWithHall: Boolean = false,
 ) = DarkStage {
     val state = rememberLeaderboard()
     val board = state.board
@@ -104,7 +108,11 @@ fun LeaderboardScreen(
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val kind = kinds.getOrNull(tab) ?: kinds.firstOrNull()
     var showInfo by remember { mutableStateOf(false) }
+    var showHall by remember { mutableStateOf(startWithHall) }
     var showSettings by remember { mutableStateOf(false) }
+    val hall = rememberHall().hall
+    // The season the rankings are for, as the rows say; the current one before they are read.
+    val seasonLabel = Season.label(board?.season ?: regionBoards.regions?.firstOrNull { it.season > 0 }?.season ?: Season.current())
     // A region's or secretary's row, tapped: its calculation in a sheet.
     var detail by remember { mutableStateOf<Any?>(null) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -129,6 +137,9 @@ fun LeaderboardScreen(
         }
     }
     val actions: @Composable RowScope.() -> Unit = {
+        IconButton(onClick = { showHall = true }) {
+            Icon(Icons.Outlined.WorkspacePremium, contentDescription = tr("leaderboard.hall.title", "Albo d'oro"))
+        }
         IconButton(onClick = { showInfo = true }) {
             Icon(Icons.Outlined.Info, contentDescription = tr("leaderboard.how_it_works", "Come funziona"))
         }
@@ -158,12 +169,13 @@ fun LeaderboardScreen(
                     Text(
                         if (kind == LeaderboardKind.MEMBERS) {
                             tr(
-                                "leaderboard.subtitle_top",
-                                "Ultimi 12 mesi · i primi {count}",
+                                "leaderboard.subtitle_top_v2",
+                                "Stagione {season} · i primi {count}",
+                                "season" to seasonLabel,
                                 "count" to LeaderboardBoard.TOP_SIZE,
                             )
                         } else {
-                            tr("leaderboard.last_year", "Ultimi 12 mesi")
+                            tr("leaderboard.season", "Stagione {season}", "season" to seasonLabel)
                         },
                     )
                 },
@@ -200,8 +212,8 @@ fun LeaderboardScreen(
         }
         val rankings: @Composable (PaddingValues, Boolean) -> Unit = { listPadding, withSummary ->
             when {
-                kind == LeaderboardKind.REGIONS -> RegionsList(regionBoards, listPadding, switch) { detail = it }
-                kind == LeaderboardKind.SECRETARIES -> SecretariesList(regionBoards, listPadding, switch) { detail = it }
+                kind == LeaderboardKind.REGIONS -> RegionsList(regionBoards, seasonLabel, listPadding, switch) { detail = it }
+                kind == LeaderboardKind.SECRETARIES -> SecretariesList(regionBoards, seasonLabel, listPadding, switch) { detail = it }
                 board != null -> MembersList(board, listPadding, switch, withSummary, onMemberClick)
                 state.failed -> Text(
                     text = tr("leaderboard.load_error", "Non riesco a leggere la classifica. Riprova più tardi."),
@@ -250,6 +262,7 @@ fun LeaderboardScreen(
     }
 
     if (showInfo) LeaderboardInfoSheet(kinds = kinds, onDismiss = { showInfo = false })
+    if (showHall) LeaderboardHallSheet(hall = hall, kinds = kinds, onDismiss = { showHall = false })
     if (showSettings) LeaderboardSettingsSheet(onDismiss = { showSettings = false })
     when (val d = detail) {
         is RegionRow -> RegionScoreSheet(score = d, subtitle = null, onOpenMember = null, onDismiss = { detail = null })
@@ -319,7 +332,7 @@ private fun MembersList(
         }
         item(key = "footer") {
             Text(
-                text = tr("leaderboard.footer", "Ultimi 12 mesi. A pari punti, pari posizione."),
+                text = tr("leaderboard.footer_v2", "Dal 1° ottobre al 30 settembre. A pari punti, pari posizione."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 4.dp, top = 12.dp),
@@ -384,11 +397,12 @@ private fun FitHeight(modifier: Modifier = Modifier, maxScale: Float = 1.3f, con
 @Composable
 private fun RegionsList(
     state: RegionBoardsState,
+    seasonLabel: String,
     contentPadding: PaddingValues,
     switch: @Composable () -> Unit,
     onClick: (RegionRow) -> Unit,
 ) {
-    RankingList(state.regions, state.failed, contentPadding, switch, isMine = { it.score < LeaderboardRepository.VISIBLE_MIN_SCORE }) { rows ->
+    RankingList(state.regions, state.failed, seasonLabel, contentPadding, switch, isMine = { it.score < LeaderboardRepository.VISIBLE_MIN_SCORE }) { rows ->
         itemsIndexed(rows, key = { _, row -> row.id }) { index, row -> RegionItem(row, index, rows.size) { onClick(row) } }
     }
 }
@@ -396,11 +410,12 @@ private fun RegionsList(
 @Composable
 private fun SecretariesList(
     state: RegionBoardsState,
+    seasonLabel: String,
     contentPadding: PaddingValues,
     switch: @Composable () -> Unit,
     onClick: (SecretaryRow) -> Unit,
 ) {
-    RankingList(state.secretaries, state.failed, contentPadding, switch, isMine = { it.score < LeaderboardRepository.VISIBLE_MIN_SCORE }) { rows ->
+    RankingList(state.secretaries, state.failed, seasonLabel, contentPadding, switch, isMine = { it.score < LeaderboardRepository.VISIBLE_MIN_SCORE }) { rows ->
         itemsIndexed(rows, key = { _, row -> row.id }) { index, row -> SecretaryItem(row, index, rows.size) { onClick(row) } }
     }
 }
@@ -416,6 +431,7 @@ private fun SecretariesList(
 private fun <T> RankingList(
     rows: List<T>?,
     failed: Boolean,
+    seasonLabel: String,
     contentPadding: PaddingValues,
     switch: @Composable () -> Unit,
     isMine: (T) -> Boolean,
@@ -430,7 +446,7 @@ private fun <T> RankingList(
         when {
             rows != null -> {
                 val (mine, visible) = rows.partition(isMine)
-                item(key = "label") { SectionTitle(tr("leaderboard.last_year", "Ultimi 12 mesi")) }
+                item(key = "label") { SectionTitle(tr("leaderboard.season", "Stagione {season}", "season" to seasonLabel)) }
                 items(visible)
                 if (mine.isNotEmpty()) {
                     item(key = "gap") {

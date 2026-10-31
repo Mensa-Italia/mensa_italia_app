@@ -20,13 +20,13 @@ class RegionMedalsTest {
         value: Double,
         tier: String,
         levels: Triple<Int, Int, Int>,
-        year: Int = 2026,
+        season: Int = 2026,
         current: String = tier,
         witnesses: Map<String, List<String>> = emptyMap(),
         extra: kotlinx.serialization.json.JsonElement = JsonNull,
     ) = RegionMedalModel(
         medal = medal,
-        year = year.toDouble(),
+        season = season.toDouble(),
         value = value,
         tier = tier,
         currentTier = current,
@@ -150,7 +150,7 @@ class RegionMedalsTest {
     fun jsonColumnsCameBackAsTextStillRead() {
         val model = RegionMedalModel(
             medal = "host",
-            year = 2026.0,
+            season = 2026.0,
             tier = "bronze",
             levels = JsonPrimitive("""{"bronze":2,"silver":4,"gold":6}"""),
             witnesses = JsonPrimitive("""{"bronze":["me"]}"""),
@@ -162,7 +162,7 @@ class RegionMedalsTest {
 
     @Test
     fun missingOrBrokenJsonDoesNotBreakTheRow() {
-        val s = status(RegionMedalModel(medal = "relay", year = 2026.0, levels = JsonPrimitive("not json"), witnesses = JsonNull))
+        val s = status(RegionMedalModel(medal = "relay", season = 2026.0, levels = JsonPrimitive("not json"), witnesses = JsonNull))
         assertTrue(s.levels.isEmpty())
         assertNull(s.nextTier)
         assertFalse(s.witnessed("me"))
@@ -197,24 +197,24 @@ class RegionMedalsTest {
     // ── The page ─────────────────────────────────────────────────────────────
 
     @Test
-    fun theStateSplitsTheCurrentYearFromThePastOnes() {
+    fun theStateSplitsTheCurrentSeasonFromThePastOnes() {
         val rows = listOf(
-            row("present", 1.0, "none", Triple(5, 10, 15), year = 2026),
-            row("host", 5.0, "silver", Triple(2, 4, 6), year = 2026),
-            row("host", 2.0, "bronze", Triple(2, 4, 6), year = 2025),
-            row("months", 9.0, "silver", Triple(6, 9, 12), year = 2024),
-            row("present", 6.0, "bronze", Triple(5, 10, 15), year = 2025),
+            row("present", 1.0, "none", Triple(5, 10, 15), season = 2026),
+            row("host", 5.0, "silver", Triple(2, 4, 6), season = 2026),
+            row("host", 2.0, "bronze", Triple(2, 4, 6), season = 2025),
+            row("months", 9.0, "silver", Triple(6, 9, 12), season = 2024),
+            row("present", 6.0, "bronze", Triple(5, 10, 15), season = 2025),
         )
         val state = RegionMedalsState.build(rows, 2026)
-        assertEquals(listOf("host", "present"), state.currentYear.map { it.kind.key })
-        assertEquals(listOf(2025, 2024), state.pastYearList)
-        // Past years keep the kinds' order.
+        assertEquals(listOf("host", "present"), state.currentSeason.map { it.kind.key })
+        assertEquals(listOf(2025, 2024), state.pastSeasonList)
+        // Past seasons keep the kinds' order.
         assertEquals(listOf("present", "host"), state.past(2025).map { it.kind.key })
         assertEquals(1, state.earnedCount)
     }
 
     @Test
-    fun theCurrentYearListsTheBestMetalFirstThenTheClosest() {
+    fun theCurrentSeasonListsTheBestMetalFirstThenTheClosest() {
         val rows = listOf(
             row("host", 1.0, "none", Triple(2, 4, 6)),
             row("months", 7.0, "bronze", Triple(6, 9, 12)),
@@ -223,28 +223,28 @@ class RegionMedalsTest {
             row("core", 9.0, "bronze", Triple(8, 15, 25)),
             row("away", 3.0, "none", Triple(2, 4, 6)),
         )
-        val order = RegionMedalsState.build(rows, 2026).currentYear.map { it.kind.key }
+        val order = RegionMedalsState.build(rows, 2026).currentSeason.map { it.kind.key }
         // Gold, silver, the bronzes in the kinds' order; then the unearned, the closest to bronze first.
         assertEquals(listOf("relay", "present", "months", "core", "away", "host"), order)
     }
 
     @Test
     fun theRegionNameIsTheSeatsOwn() {
-        val rows = listOf(RegionMedalModel(medal = "host", year = 2026.0, region = "Sede delle Tre Valli"))
+        val rows = listOf(RegionMedalModel(medal = "host", season = 2026.0, region = "Sede delle Tre Valli"))
         assertEquals("Sede delle Tre Valli", RegionMedalsState.build(rows, 2026).regionName)
         assertEquals("", RegionMedalsState.build(emptyList(), 2026).regionName)
     }
 
     @Test
     fun aRowParsesFromTheServersJson() {
-        val body = """{"id":"x","local_office":"o","region":"R","region_key":"K","year":2026,"medal":"present","value":11.2,
+        val body = """{"id":"x","local_office":"o","region":"R","region_key":"K","season":2026,"medal":"present","value":11.2,
             "count":16,"extra":[16,21],"levels":{"bronze":5,"silver":10,"gold":15},"minimum":3,"eligible":true,
             "current_tier":"silver","tier":"silver","unlocked":{"bronze":"2026-05-01 10:00:00.000Z"},
             "witnesses":{"silver":["u1"]},"updated":"","created":"","collectionName":"x"}"""
         val model = Json { ignoreUnknownKeys = true; coerceInputValues = true }.decodeFromString(RegionMedalModel.serializer(), body)
         val s = status(model)
         assertEquals(RegionMedalKind.PRESENT, s.kind)
-        assertEquals(2026, s.year)
+        assertEquals(2026, s.season)
         assertEquals(RegionMedalTier.SILVER, s.tier)
         assertEquals(listOf(16.0, 21.0), s.extra)
         assertTrue(s.witnessed("u1"))
@@ -276,13 +276,13 @@ class RegionMedalsTest {
     }
 
     @Test
-    fun theFixtureCoversTheTiersAndTheYears() {
+    fun theFixtureCoversTheTiersAndTheSeasons() {
         val state = RegionMedalsState.build(RegionMedalFixtures.rows(2026), 2026)
-        assertEquals(10, state.currentYear.size)
-        assertEquals(listOf(2025), state.pastYearList)
+        assertEquals(10, state.currentSeason.size)
+        assertEquals(listOf(2025), state.pastSeasonList)
         assertEquals(7, state.earnedCount)
-        assertTrue(state.currentYear.any { it.witnessed(MedalFixtures.ME_ID) })
-        assertTrue(state.currentYear.any { it.isEarned && !it.witnessed(MedalFixtures.ME_ID) })
-        assertEquals(setOf(RegionMedalTier.NONE, RegionMedalTier.BRONZE, RegionMedalTier.SILVER, RegionMedalTier.GOLD), state.currentYear.map { it.tier }.toSet())
+        assertTrue(state.currentSeason.any { it.witnessed(MedalFixtures.ME_ID) })
+        assertTrue(state.currentSeason.any { it.isEarned && !it.witnessed(MedalFixtures.ME_ID) })
+        assertEquals(setOf(RegionMedalTier.NONE, RegionMedalTier.BRONZE, RegionMedalTier.SILVER, RegionMedalTier.GOLD), state.currentSeason.map { it.tier }.toSet())
     }
 }

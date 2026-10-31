@@ -1,3 +1,4 @@
+import Shared
 import SwiftUI
 
 /// The medal collection as a gallery, always dark: how many are earned, then
@@ -28,10 +29,14 @@ struct MedalCabinetView: View {
     @State private var filter = Filter.all
     @State private var page = Page.mine
     @State private var showInfo = false
-    @State private var openYears = Set<Int>()
+    @State private var openSeasons = Set<Int>()
 
     private var medals: [Medal] { store.medals }
-    private var shown: [Medal] { medals.filter(filter.matches) }
+    /// The season's medals first, then the permanent ones, as the grid lists them.
+    private var shown: [Medal] {
+        let list = medals.filter(filter.matches)
+        return list.filter(\.isSeasonal) + list.filter { !$0.isSeasonal }
+    }
     private var onRegion: Bool { region.available && page == .region }
 
     private var earnedCount: Int { medals.filter(\.isEarned).count }
@@ -51,6 +56,7 @@ struct MedalCabinetView: View {
                         } else {
                             summary
                             grid
+                            annate
                         }
                     }
                     .padding(.horizontal, 20)
@@ -103,9 +109,9 @@ struct MedalCabinetView: View {
 
     // MARK: - The region page
 
-    /// The ring of this year's medals, the rules, the ten medals in their
-    /// cases, then the earlier years folded under their headers. The filter
-    /// in the top bar applies to every year. Mirrors Android `regionPage`.
+    /// The ring of this season's medals, the rules, the ten medals in their
+    /// cases, then the earlier seasons folded under their headers. The filter
+    /// in the top bar applies to every season. Mirrors Android `regionPage`.
     @ViewBuilder private var regionPage: some View {
         if !region.loaded {
             if region.failed {
@@ -129,39 +135,76 @@ struct MedalCabinetView: View {
                     headline: tr("medals.region.count_of", fallback: "{earned} su {total}",
                                  ["earned": "\(region.earnedCount)", "total": "\(region.current.count)"]),
                     caption: region.regionName.isEmpty
-                        ? tr("medals.region.count_caption", fallback: "Medaglie di regione {year}", ["year": "\(region.year)"])
-                        : "\(region.regionName) · \(region.year)",
+                        ? tr("medals.region.count_caption_v2", fallback: "Medaglie di regione {season}", ["season": Season.shared.label(season: Int32(region.season))])
+                        : "\(region.regionName) · \(Season.shared.label(season: Int32(region.season)))",
                     tiers: Medal.Tier.allCases.filter { $0 != .platinum }
                 )
                 RegionRules()
                 cases(region.current.filter(filter.matches))
             }
-            if !region.past.isEmpty { years }
+            if !region.past.isEmpty { regionSeasons }
         }
     }
 
-    /// The earlier years, each folded under its header.
-    private var years: some View {
+    /// The region's earlier seasons, each folded under its header.
+    private var regionSeasons: some View {
+        pastSeasons(
+            region.past.map { entry in
+                PastBlock(id: entry.season, label: Season.shared.label(season: Int32(entry.season)),
+                          medals: entry.medals, earned: entry.earnedCount)
+            }
+        )
+    }
+
+    /// One closed season, as the collapsible blocks list it.
+    private struct PastBlock: Identifiable {
+        let id: Int
+        let label: String
+        let medals: [Medal]
+        let earned: Int
+    }
+
+    /// "Annate": the member's seasonal medals in the seasons already closed.
+    @ViewBuilder private var annate: some View {
+        if !store.past.isEmpty {
+            pastSeasons(
+                store.past.map { PastBlock(id: $0.season, label: $0.label, medals: $0.medals, earned: $0.earnedCount) }
+            )
+        }
+    }
+
+    /// The earlier seasons under their small title, each folded under its header.
+    private func pastSeasons(_ blocks: [PastBlock]) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(tr("medals.region.years", fallback: "Annate").uppercased())
-                .font(.caption2.weight(.semibold))
-                .tracking(2)
-                .foregroundStyle(.white.opacity(0.5))
-            ForEach(region.past) { entry in
-                let open = openYears.contains(entry.year)
-                RegionYearHeader(entry: entry, expanded: open) {
+            sectionTitle(tr("medals.history.title", fallback: "Annate"))
+            ForEach(blocks) { block in
+                let open = openSeasons.contains(block.id)
+                SeasonHeader(
+                    label: block.label,
+                    summary: tr("medals.history.count", fallback: "{earned} di {total}",
+                                ["earned": "\(block.earned)", "total": "\(block.medals.count)"]),
+                    expanded: open
+                ) {
                     withAnimation(.snappy) {
-                        if open { openYears.remove(entry.year) } else { openYears.insert(entry.year) }
+                        if open { openSeasons.remove(block.id) } else { openSeasons.insert(block.id) }
                     }
                 }
                 if open {
                     LazyVGrid(columns: columns, spacing: 24) {
-                        ForEach(entry.medals.filter(filter.matches)) { caseButton($0) }
+                        ForEach(block.medals.filter(filter.matches)) { caseButton($0) }
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// A small caps title over a group of cases.
+    private func sectionTitle(_ text: String) -> some View {
+        Text(text.uppercased())
+            .font(.caption2.weight(.semibold))
+            .tracking(2)
+            .foregroundStyle(.white.opacity(0.5))
     }
 
     /// The cases that pass the filter; a line when none does.
@@ -215,12 +258,14 @@ struct MedalCabinetView: View {
                     side(row.dropFirst(perSide), width: rightWidth).padding(.horizontal, margin)
                 }
             }
+            annate.padding(.horizontal, margin)
         }
         .padding(.top, 8)
         .padding(.bottom, 32)
     }
 
-    /// The cases that pass the filter; a line when none does.
+    /// The cases that pass the filter, the season's under their header and
+    /// the permanent ones under "Sempre"; a line when none does.
     @ViewBuilder private var grid: some View {
         if shown.isEmpty, !medals.isEmpty {
             Text(tr("medals.filter.empty", fallback: "Nessuna medaglia qui, per ora."))
@@ -228,8 +273,21 @@ struct MedalCabinetView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 32)
         } else {
-            LazyVGrid(columns: columns, spacing: 24) {
-                ForEach(shown) { caseButton($0) }
+            VStack(alignment: .leading, spacing: 24) {
+                group(tr("medals.section.season", fallback: "Stagione {season}", ["season": store.seasonLabel]),
+                      shown.filter(\.isSeasonal))
+                group(tr("medals.section.permanent", fallback: "Sempre"), shown.filter { !$0.isSeasonal })
+            }
+        }
+    }
+
+    @ViewBuilder private func group(_ title: String, _ list: [Medal]) -> some View {
+        if !list.isEmpty {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionTitle(title)
+                LazyVGrid(columns: columns, spacing: 24) {
+                    ForEach(list) { caseButton($0) }
+                }
             }
         }
     }
@@ -275,7 +333,7 @@ struct MedalCabinetView: View {
             of: medals,
             headline: tr("medals.count_of", fallback: "{earned} di {total}",
                          ["earned": "\(earnedCount)", "total": "\(medals.count)"]),
-            caption: tr("medals.count_caption_case", fallback: "Medaglie in teca"),
+            caption: tr("medals.section.season", fallback: "Stagione {season}", ["season": store.seasonLabel]),
             tiers: Medal.Tier.allCases
         )
     }

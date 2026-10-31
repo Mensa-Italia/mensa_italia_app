@@ -10,7 +10,9 @@ import kotlinx.serialization.UseSerializers
 /**
  * One row of `view_medals`: the
  * counters medals are earned from, for the signed-in member. The view has a
- * row per user, keyed by the user's id.
+ * row per user, keyed by the user's id. The seasonal medals' counters are
+ * limited to [season] (the current one) by the server; the permanent ones
+ * are lifetime.
  *
  * Counters are declared as numbers in PocketBase's schema, so they may come
  * as `12` or `12.0`: read as Double, used as whole numbers.
@@ -18,6 +20,8 @@ import kotlinx.serialization.UseSerializers
 @Serializable
 data class MedalStatsModel(
     val id: String = "",
+    /** The season the seasonal counters are for, by the year it starts in; 0 from an older view. */
+    val season: Double = 0.0,
     @SerialName("app_since") val appSince: Instant = Instant.fromEpochMilliseconds(0),
     @SerialName("expire_membership") val expireMembership: Instant = Instant.fromEpochMilliseconds(0),
     @SerialName("is_membership_active") val isMembershipActive: Boolean = false,

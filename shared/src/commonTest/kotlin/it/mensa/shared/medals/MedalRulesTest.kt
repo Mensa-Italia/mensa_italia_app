@@ -21,13 +21,13 @@ class MedalRulesTest {
         assertEquals(MedalTier.BRONZE, none.nextTier)
         assertEquals(MedalTier.BRONZE, none.displayTier)
 
-        val silver = status("collector", MedalStatsModel(stampsTotal = 30.0))
+        val silver = status("collector", MedalStatsModel(stampsTotal = 4.0))
         assertEquals(MedalTier.SILVER, silver.earnedTier)
         assertEquals(MedalTier.GOLD, silver.nextTier)
-        assertEquals(100, silver.nextThreshold)
-        assertEquals(0.3, silver.progress, 0.0001)
+        assertEquals(6, silver.nextThreshold)
+        assertEquals(4.0 / 6.0, silver.progress, 0.0001)
 
-        val top = status("collector", MedalStatsModel(stampsTotal = 999.0))
+        val top = status("collector", MedalStatsModel(stampsTotal = 99.0))
         assertEquals(MedalTier.PLATINUM, top.earnedTier)
         assertNull(top.nextTier)
         assertEquals(1.0, top.progress)
@@ -61,6 +61,38 @@ class MedalRulesTest {
         val single = status("night_owl", MedalStatsModel())
         assertTrue(single.isSingle)
         assertEquals(MedalTier.PLATINUM, single.displayTier)
+    }
+
+    @Test
+    fun seasonalThresholdsAreTheOnesOfASeason() {
+        val expected = mapOf(
+            "collector" to listOf(1, 3, 6, 10),
+            "steady" to listOf(1, 3, 5, 7),
+            "unstoppable" to listOf(2, 3, 4, 6),
+            "marathon" to listOf(2, 3, 4, 5),
+            "pioneer" to listOf(1, 2, 4, 6),
+            "globetrotter" to listOf(2, 3, 4, 5),
+            "traveller" to listOf(1, 3, 6, 10),
+            "national_rally" to listOf(1, 2, 3, 4),
+            "always_there" to listOf(1, 3, 6, 10),
+            "organizer" to listOf(1, 3, 8, 15),
+        )
+        expected.forEach { (id, thresholds) ->
+            assertEquals(thresholds, MedalRules.rule(id)!!.levels.map { it.second }, id)
+        }
+        assertEquals(listOf(4), MedalRules.rule("four_seasons")!!.levels.map { it.second })
+    }
+
+    @Test
+    fun familiesSplitTheTable() {
+        val permanent = setOf("active_member", "early_adopter", "up_to_date", "cartographer", "multiscreen")
+        MedalRules.all.forEach {
+            assertEquals(if (it.id in permanent) MedalFamily.PERMANENT else MedalFamily.SEASONAL, it.family, it.id)
+        }
+        assertEquals(permanent, MedalRules.all.filter { it.family == MedalFamily.PERMANENT }.map { it.id }.toSet())
+        assertEquals(MedalFamily.SEASONAL, status("collector", MedalStatsModel()).family)
+        assertTrue(status("pi_day", MedalStatsModel()).isSeasonal)
+        assertFalse(status("up_to_date", MedalStatsModel()).isSeasonal)
     }
 
     @Test

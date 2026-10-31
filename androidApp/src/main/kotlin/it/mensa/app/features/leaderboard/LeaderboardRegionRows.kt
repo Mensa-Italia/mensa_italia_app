@@ -228,11 +228,11 @@ private fun scoreSteps(score: RegionScore): List<Triple<String, String, String>>
         tr("leaderboard.calc.step1.title", "1 · Gli eventi in regione"),
         tr("leaderboard.points", "{points} pt", "points" to score.participation),
         if (score.eventsTotal == 0) {
-            tr("leaderboard.calc.step1.none", "Nessun evento in regione negli ultimi 12 mesi, quindi nessun punto da questa voce.")
+            tr("leaderboard.calc.step1.none_v2", "Nessun evento in regione in questa stagione, quindi nessun punto da questa voce.")
         } else {
             tr(
-                "leaderboard.calc.step1.detail",
-                "Negli ultimi 12 mesi in regione si sono fatti {events} eventi, {attendance} timbri in tutto. Ogni evento vale fino a 10 punti secondo quanti soci della regione hanno timbrato: niente se erano meno del 2%, il massimo dal 15% in su. Ne hanno superato la soglia {scoring}; i punti calano col passare dei mesi e spariscono dopo un anno. Sommati fanno {points} punti.",
+                "leaderboard.calc.step1.detail_v2",
+                "In questa stagione in regione si sono fatti {events} eventi, {attendance} timbri in tutto. Ogni evento vale fino a 10 punti secondo quanti soci della regione hanno timbrato: niente se erano meno del 2%, il massimo dal 15% in su. Ne hanno superato la soglia {scoring}; i punti non calano, valgono per intero fino alla chiusura della stagione. Sommati fanno {points} punti.",
                 "events" to score.eventsTotal,
                 "attendance" to score.attendanceTotal,
                 "scoring" to score.eventsScoring,
@@ -261,11 +261,11 @@ private fun scoreSteps(score: RegionScore): List<Triple<String, String, String>>
         tr("leaderboard.calc.step3.title", "3 · I nazionali ospitati"),
         "+ ${tr("leaderboard.points", "{points} pt", "points" to score.nationalPoints)}",
         if (score.nationalEvents == 0) {
-            tr("leaderboard.calc.step3.none", "Nessun evento nazionale ospitato negli ultimi 24 mesi: niente da aggiungere.")
+            tr("leaderboard.calc.step3.none_v2", "Nessun evento nazionale ospitato in questa stagione: niente da aggiungere.")
         } else {
             tr(
-                "leaderboard.calc.step3.detail",
-                "La regione ha ospitato {events} eventi nazionali negli ultimi 24 mesi, che valgono {points} punti con la stessa curva sui timbri. Si sommano a parte, senza il fattore del passo 2: un convegno porta gente da tutta Italia, non misura la comunità locale.",
+                "leaderboard.calc.step3.detail_v2",
+                "La regione ha ospitato {events} eventi nazionali in questa stagione, che valgono {points} punti con la stessa curva sui timbri. Si sommano a parte, senza il fattore del passo 2: un convegno porta gente da tutta Italia, non misura la comunità locale.",
                 "events" to score.nationalEvents,
                 "points" to score.nationalPoints,
             )

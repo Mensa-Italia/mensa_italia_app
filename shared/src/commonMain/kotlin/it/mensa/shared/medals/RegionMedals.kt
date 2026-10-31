@@ -16,7 +16,7 @@ import kotlin.math.roundToLong
 
 /**
  * One row of `leaderboard_region_medals`: a medal of a local office's region
- * for one year, as the server computes it. The medals belong to the region,
+ * for one season (1 October to 30 September), as the server computes it. The medals belong to the region,
  * not to the member: the app only shows the ones of the region the member is
  * in now. Numbers come as `12` or `12.0`, so they're read as Double; the json
  * columns are kept as they come and read leniently by [RegionMedalStatus].
@@ -29,7 +29,8 @@ data class RegionMedalModel(
     val region: String = "",
     /** Normalized region name, the key the app filters on: see [RegionKey]. */
     @SerialName("region_key") val regionKey: String = "",
-    val year: Double = 0.0,
+    /** The season, by the year it starts in: 2026 is "2026/27". */
+    val season: Double = 0.0,
     /** One of [RegionMedalKind]'s keys. */
     val medal: String = "",
     /** The figure compared with the thresholds (a podium's is the live position). */
@@ -42,7 +43,7 @@ data class RegionMedalModel(
     val minimum: Double = 0.0,
     val eligible: Boolean = false,
     @SerialName("current_tier") val currentTier: String = "",
-    /** The highest metal reached in the year. */
+    /** The highest metal reached in the season. */
     val tier: String = "",
     /** `{"bronze":"<datetime>",…}`. */
     val unlocked: JsonElement = JsonNull,
@@ -70,13 +71,13 @@ enum class RegionMedalKind(val key: String, val unit: RegionFigureUnit) {
     /** Other regions where the region's members seen twice have stamped. Extras: members. */
     AWAY("away", RegionFigureUnit.COUNT),
 
-    /** Months of the year with a stamped event in the region. Extras: regional events. */
+    /** Months of the season with a stamped event in the region. Extras: regional events. */
     MONTHS("months", RegionFigureUnit.COUNT),
 
-    /** Newcomers of the year stamped within two months, as a share. Extras: stamped, total. */
+    /** Newcomers of the season stamped within two months, as a share. Extras: stamped, total. */
     WELCOME("welcome", RegionFigureUnit.PERCENT),
 
-    /** The year's best-attended event, as a share. Extras: stampers. */
+    /** The season's best-attended event, as a share. Extras: stampers. */
     FULLHOUSE("fullhouse", RegionFigureUnit.PERCENT),
 
     /** Effective regulars at the region's events, as a share. Extras: persons, effective. */
@@ -88,7 +89,7 @@ enum class RegionMedalKind(val key: String, val unit: RegionFigureUnit) {
     /** Different people who organized events in the region. Extras: regional events. */
     RELAY("relay", RegionFigureUnit.COUNT),
 
-    /** The region's place in the regions' ranking at the year's end. Extras: score. */
+    /** The region's place in the regions' ranking at the season's end (30 September). Extras: score. */
     PODIUM("podium", RegionFigureUnit.POSITION);
 
     /** False for the podium: a lower place is better. */
@@ -113,13 +114,13 @@ enum class RegionMedalTier(val key: String) {
 data class RegionMedalLevel(val tier: RegionMedalTier, val threshold: Double)
 
 /**
- * Where the region stands with one medal of one year: the row from the
+ * Where the region stands with one medal of one season: the row from the
  * server, read into what the screens show.
  */
 class RegionMedalStatus(
     val kind: RegionMedalKind,
-    val year: Int,
-    /** The highest metal reached in the year; [RegionMedalTier.NONE] while none. */
+    val season: Int,
+    /** The highest metal reached in the season; [RegionMedalTier.NONE] while none. */
     val tier: RegionMedalTier,
     /** The metal the figure is at right now, which can be lower than [tier]. */
     val currentTier: RegionMedalTier,
@@ -190,7 +191,7 @@ class RegionMedalStatus(
                 .filter { it.tier != RegionMedalTier.NONE }
                 .sortedBy { it.tier.ordinal }
             val current = RegionMedalTier.fromKey(model.currentTier)
-            // `tier` is the best of the year; an older row without it falls back to the live one.
+            // `tier` is the best of the season; an older row without it falls back to the live one.
             val best = RegionMedalTier.fromKey(model.tier).let { if (it == RegionMedalTier.NONE) current else it }
             val witnesses = (model.witnesses.element(json) as? JsonObject).orEmpty()
                 .mapNotNull { (key, ids) ->
@@ -200,7 +201,7 @@ class RegionMedalStatus(
                 .toMap()
             return RegionMedalStatus(
                 kind = kind,
-                year = model.year.roundToLong().toInt(),
+                season = model.season.roundToLong().toInt(),
                 tier = best,
                 currentTier = current,
                 value = model.value,
@@ -253,41 +254,41 @@ fun formatFigure(figure: Double): String {
 class RegionMedalsState(
     /** The region as the seat names itself; empty while no row says so. */
     val regionName: String,
-    /** This year's medals, best first (earned by metal, then the closest to the next). */
-    val currentYear: List<RegionMedalStatus>,
-    /** Earlier years, each in the kinds' order. */
-    val pastYears: Map<Int, List<RegionMedalStatus>>,
-    val year: Int,
+    /** This season's medals, best first (earned by metal, then the closest to the next). */
+    val currentSeason: List<RegionMedalStatus>,
+    /** Earlier seasons, each in the kinds' order. */
+    val pastSeasons: Map<Int, List<RegionMedalStatus>>,
+    val season: Int,
     /** The member the page is for, to tell which medals they were there for. */
     val userId: String? = null,
 ) {
-    /** The earlier years, latest first, as a list Swift can walk. */
-    val pastYearList: List<Int> get() = pastYears.keys.sortedDescending()
+    /** The earlier seasons, latest first, as a list Swift can walk. */
+    val pastSeasonList: List<Int> get() = pastSeasons.keys.sortedDescending()
 
-    fun past(year: Int): List<RegionMedalStatus> = pastYears[year].orEmpty()
+    fun past(season: Int): List<RegionMedalStatus> = pastSeasons[season].orEmpty()
 
-    val earnedCount: Int get() = currentYear.count { it.isEarned }
+    val earnedCount: Int get() = currentSeason.count { it.isEarned }
 
     /** Whether the member was in the region when [status]'s metal was reached. */
     fun witnessed(status: RegionMedalStatus): Boolean = status.witnessed(userId)
 
     companion object {
-        /** Builds the page from the region's rows; [year] is the current year. */
+        /** Builds the page from the region's rows; [season] is the current season. */
         fun build(
             rows: List<RegionMedalModel>,
-            year: Int,
+            season: Int,
             json: Json = Json { ignoreUnknownKeys = true; isLenient = true },
             userId: String? = null,
         ): RegionMedalsState {
             val statuses = rows.mapNotNull { RegionMedalStatus.from(it, json) }
-            val byYear = statuses.groupBy { it.year }
+            val bySeason = statuses.groupBy { it.season }
             return RegionMedalsState(
                 regionName = rows.firstOrNull { it.region.isNotBlank() }?.region.orEmpty(),
-                currentYear = bestFirst(byYear[year].orEmpty()),
-                pastYears = byYear.filterKeys { it < year }.toList()
+                currentSeason = bestFirst(bySeason[season].orEmpty()),
+                pastSeasons = bySeason.filterKeys { it < season }.toList()
                     .sortedByDescending { it.first }
                     .associate { (y, list) -> y to list.sortedBy { it.kind.ordinal } },
-                year = year,
+                season = season,
                 userId = userId,
             )
         }

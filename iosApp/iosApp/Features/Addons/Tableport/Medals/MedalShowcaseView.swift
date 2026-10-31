@@ -1,3 +1,4 @@
+import Shared
 import SwiftUI
 
 /// One medal brought out of its case, in a sheet: large, in a halo of its
@@ -28,8 +29,16 @@ struct MedalShowcaseView: View {
                     .accessibilityHint(Text(tr("medals.spin_hint", fallback: "Trascina per girarla")))
 
                     TierBadge(medal: medal)
-                    // A region medal is "Name 2026": each year is its own.
-                    Text(medal.region.map { "\(medal.title) \($0.year)" } ?? medal.title)
+                    if let past = medal.pastSeason {
+                        Text(tr("medals.section.season", fallback: "Stagione {season}",
+                                ["season": Season.shared.label(season: Int32(past))]).uppercased())
+                            .font(.caption2.weight(.semibold))
+                            .tracking(2)
+                            .foregroundStyle(.white.opacity(0.5))
+                            .padding(.top, 8)
+                    }
+                    // A region medal is "Name 2026/27": each season is its own.
+                    Text(titleLine)
                         .font(.system(.title, design: .serif).weight(.bold))
                         .multilineTextAlignment(.center)
                         .padding(.top, 14)
@@ -55,6 +64,11 @@ struct MedalShowcaseView: View {
                             .padding(.top, 24)
                             .padding(.horizontal, 24)
                     } else {
+                        if !medal.isHidden, !medal.isPast {
+                            FamilyNote(seasonal: medal.isSeasonal)
+                                .padding(.top, 16)
+                                .padding(.horizontal, 32)
+                        }
                         if medal.levels.count > 1, !medal.isHidden {
                             TierLadder(medal: medal)
                                 .padding(.top, 28)
@@ -63,7 +77,12 @@ struct MedalShowcaseView: View {
                         status
                             .padding(.top, 24)
                             .padding(.horizontal, 32)
-                        if medal.countsStamps, !medal.isHidden {
+                        if !medal.history.isEmpty {
+                            PastSeasonsStrip(results: medal.history, symbol: medal.symbol)
+                                .padding(.top, 28)
+                                .padding(.horizontal, 24)
+                        }
+                        if medal.countsStamps, !medal.isHidden, !medal.isPast {
                             StampRules()
                                 .padding(.top, 24)
                                 .padding(.horizontal, 24)
@@ -92,11 +111,20 @@ struct MedalShowcaseView: View {
         .preferredColorScheme(.dark)
     }
 
+    private var titleLine: String {
+        if let region = medal.region { return "\(medal.title) \(Season.shared.label(season: Int32(region.season)))" }
+        return medal.title
+    }
+
     /// Where the member stands with it: how far the next metal is, or that
-    /// it's done.
+    /// it's done. A closed season has nothing to aim for.
     @ViewBuilder
     private var status: some View {
-        if let next = medal.next, !medal.isHidden {
+        if medal.isPast {
+            // The season is closed: the figure it ended on, with no goal ahead.
+            Text(tr("medals.history.value", fallback: "Risultato della stagione: {value}", ["value": "\(medal.value)"]))
+                .font(.subheadline.weight(.semibold))
+        } else if let next = medal.next, !medal.isHidden {
             VStack(spacing: 8) {
                 Text(tr("medals.next", fallback: "Prossimo traguardo: %1$@ a %2$d")
                     .replacingOccurrences(of: "%1$@", with: next.tier.name)
@@ -177,6 +205,51 @@ private struct StampRules: View {
     }
 }
 
+/// Whether the medal starts over every season or stays for good.
+private struct FamilyNote: View {
+    let seasonal: Bool
+
+    var body: some View {
+        Text(seasonal
+             ? tr("medals.family.seasonal", fallback: "Si vince di nuovo ogni stagione, dal 1° ottobre al 30 settembre.")
+             : tr("medals.family.permanent", fallback: "Resta per sempre: non riparte con la stagione."))
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.white.opacity(0.45))
+            .multilineTextAlignment(.center)
+    }
+}
+
+/// "Stagioni passate": the metal a seasonal medal ended in, season by
+/// season, latest first ("2025/26 Argento"). Mirrors Android `PastSeasonsStrip`.
+private struct PastSeasonsStrip: View {
+    let results: [Medal.PastResult]
+    let symbol: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(tr("medals.detail.seasons", fallback: "Stagioni passate"))
+                .font(.subheadline.weight(.semibold))
+            ForEach(results) { result in
+                HStack(spacing: 8) {
+                    Text(result.label).font(.subheadline.monospacedDigit())
+                    Spacer()
+                    if let tier = result.tier {
+                        MedalArtwork(tier: tier, symbol: symbol, size: 18)
+                    }
+                    Text(result.tier?.name ?? tr("medals.history.not_earned", fallback: "Non ottenuta"))
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(result.tier?.metal.hi ?? .white.opacity(0.45))
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+}
+
 /// A glow of the medal's colour, and rays turning slowly behind an earned one.
 private struct Halo: View {
     let color: Color
@@ -228,7 +301,9 @@ private struct TierBadge: View {
             }
             Text(medal.isEarned
                  ? medal.tier.name.uppercased()
-                 : tr("medals.locked", fallback: "Non ancora ottenuta").uppercased())
+                 : (medal.isPast
+                    ? tr("medals.history.not_earned", fallback: "Non ottenuta")
+                    : tr("medals.locked", fallback: "Non ancora ottenuta")).uppercased())
                 .font(.caption.weight(.bold))
                 .tracking(2)
                 .foregroundStyle(medal.isEarned ? metal.hi : .white.opacity(0.55))

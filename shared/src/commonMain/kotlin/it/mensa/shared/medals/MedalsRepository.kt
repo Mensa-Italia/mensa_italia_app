@@ -5,15 +5,19 @@ import it.mensa.shared.api.PocketBaseClient
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.MedalStatsModel
+import it.mensa.shared.time.Season
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlin.math.roundToInt
 import kotlinx.serialization.json.Json
 
 /**
  * The signed-in member's medals: `view_medals` read and run through
  * [MedalRules]. In memory, tied to the user it was read for, so another
- * account never sees the previous one's medals; the last counters read are
+ * account never sees the previous one's medals. The seasonal counters are
+ * already limited to the current season by the view, which says which one it
+ * is ([observeSeason]); the last counters read are
  * also kept in SQLite (KeyValue, one row per user), so after a cold start
  * the medals show at once and the network only brings them up to date.
  */
@@ -23,38 +27,51 @@ class MedalsRepository(
     private val db: MensaDatabase,
     private val json: Json,
 ) {
-    private val cache = MutableStateFlow<Pair<String, List<MedalStatus>>?>(null)
+    private data class Held(val userId: String, val medals: List<MedalStatus>, val season: Int)
+
+    private val cache = MutableStateFlow<Held?>(null)
 
     /** The medals, once read for the current user; empty until then. */
     fun observe(): Flow<List<MedalStatus>> =
         combine(cache, auth.currentUser) { cached, user ->
             val meId = if (MedalFixtures.enabled) MedalFixtures.ME_ID else user?.id
-            if (cached != null && meId != null && cached.first == meId) cached.second else emptyList()
+            if (cached != null && meId != null && cached.userId == meId) cached.medals else emptyList()
+        }
+
+    /**
+     * The season the seasonal medals are counted in: the one `view_medals`
+     * says, or the current one until it's read (or from a view without it).
+     */
+    fun observeSeason(): Flow<Int> =
+        combine(cache, auth.currentUser) { cached, user ->
+            val meId = if (MedalFixtures.enabled) MedalFixtures.ME_ID else user?.id
+            cached?.takeIf { meId != null && it.userId == meId }?.season?.takeIf { it > 0 } ?: Season.current()
         }
 
     /** Rereads the counters. Throws on network errors; the last read stays. */
     @Throws(Exception::class)
     suspend fun refresh(): List<MedalStatus> {
         if (MedalFixtures.enabled) {
-            return MedalRules.evaluate(MedalFixtures.stats).also { cache.value = MedalFixtures.ME_ID to it }
+            val stats = MedalFixtures.stats
+            return MedalRules.evaluate(stats).also { cache.value = Held(MedalFixtures.ME_ID, it, stats.season.roundToInt()) }
         }
         val userId = auth.currentUser.value?.id ?: return emptyList()
         primeFromDisk(userId)
         val stats: MedalStatsModel = pb.getOne(COLLECTION, userId)
         val medals = MedalRules.evaluate(stats)
-        cache.value = userId to medals
+        cache.value = Held(userId, medals, stats.season.roundToInt())
         runCatching { db.keyValueQueries.insertOrReplace(key = cacheKey(userId), value_ = json.encodeToString(MedalStatsModel.serializer(), stats)) }
         return medals
     }
 
     /** Publishes the counters saved for [userId], if any, while nothing newer is in memory. */
     private suspend fun primeFromDisk(userId: String) {
-        if (cache.value?.first == userId) return
+        if (cache.value?.userId == userId) return
         val saved = runCatching {
             db.keyValueQueries.selectById(cacheKey(userId)).awaitAsOneOrNull()?.value_
                 ?.let { json.decodeFromString(MedalStatsModel.serializer(), it) }
         }.getOrNull() ?: return
-        if (cache.value?.first != userId) cache.value = userId to MedalRules.evaluate(saved)
+        if (cache.value?.userId != userId) cache.value = Held(userId, MedalRules.evaluate(saved), saved.season.roundToInt())
     }
 
     private fun cacheKey(userId: String) = "$CACHE_KEY_PREFIX$userId"

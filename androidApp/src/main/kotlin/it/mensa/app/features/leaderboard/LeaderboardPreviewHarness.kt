@@ -29,7 +29,8 @@ import it.mensa.app.ui.components.ChangelogSheet
  * (`--es mensa_screen leaderboard_preview --es mensa_leaderboard_fixture 1`,
  * `--es mensa_leaderboard_me 1` to stand on the podium).
  * `leaderboard_preview_card` shows Today's membership card, with the podium
- * stamp on its front, and the ranking's row instead; `medals_preview`
+ * stamp on its front, and the ranking's row instead; `leaderboard_preview_hall`
+ * opens the hall of fame sheet; `medals_preview`
  * (with `--es mensa_medals_fixture 1`, and `--es mensa_region_medals_fixture 1` for
  * the region's page) the medal collection. Reached only through
  * [it.mensa.app.support.LaunchHarness], which is inert on release builds.
@@ -68,6 +69,7 @@ fun LeaderboardPreviewHarness(screen: String) {
         // The release's "Novita'" sheet, to proof its texts before tagging.
         ChangelogSheet(items = koinAccess().changelog.items, onDone = {})
     } else {
-        LeaderboardScreen(onNavigateBack = {})
+        // `leaderboard_preview_hall` opens the hall of fame ("Albo d'oro") over the page.
+        LeaderboardScreen(onNavigateBack = {}, startWithHall = screen == "leaderboard_preview_hall")
     }
 }

@@ -31,6 +31,7 @@ import it.mensa.shared.repository.LocalOfficesRepository
 import it.mensa.shared.repository.PodcastsRepository
 import it.mensa.shared.iqtest.MensaTestClient
 import it.mensa.shared.leaderboard.LeaderboardRepository
+import it.mensa.shared.medals.MedalsHistoryRepository
 import it.mensa.shared.medals.MedalsRepository
 import it.mensa.shared.medals.RegionMedalsRepository
 import it.mensa.shared.repository.QuidRepository
@@ -73,6 +74,7 @@ class KoinAccess(
     val mensaTest: MensaTestClient,
     val spotlightSync: SpotlightSyncEngine,
     val medals: MedalsRepository,
+    val medalsHistory: MedalsHistoryRepository,
     val regionMedals: RegionMedalsRepository,
     val leaderboard: LeaderboardRepository,
     val connectivity: Connectivity,
@@ -112,6 +114,7 @@ fun koinAccess(): KoinAccess = KoinAccess(
     mensaTest = KoinPlatform.getKoin().get(),
     spotlightSync = KoinPlatform.getKoin().get(),
     medals = KoinPlatform.getKoin().get(),
+    medalsHistory = KoinPlatform.getKoin().get(),
     regionMedals = KoinPlatform.getKoin().get(),
     leaderboard = KoinPlatform.getKoin().get(),
     connectivity = KoinPlatform.getKoin().get(),

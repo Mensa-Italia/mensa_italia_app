@@ -13,45 +13,47 @@ enum RegionMedalCatalog {
         let symbol: String
         /// One label per secondary figure, in the order the server sends them.
         let figures: [String]
+        /// Appended to the detail's and rule's keys, bumped when their text changes meaning.
+        var keySuffix = ""
     }
 
     static let info: [String: Info] = [
         "present": Info(
             title: "Tutti presenti",
             detail: "I soci che tornano agli eventi, in rapporto a quanti sono.",
-            rule: "Soci della regione che nell'anno si sono visti ad almeno due eventi diversi, in rapporto a quanti sono. Chi compare una volta sola non conta.",
+            rule: "Soci della regione che nella stagione si sono visti ad almeno due eventi diversi, in rapporto a quanti sono. Chi compare una volta sola non conta.",
             symbol: "person.3.fill",
-            figures: ["Soci tornati", "Di passaggio"]),
+            figures: ["Soci tornati", "Di passaggio"], keySuffix: "_v2"),
         "host": Info(
             title: "Casa aperta",
             detail: "Le regioni da cui arrivano ospiti agli eventi di casa.",
-            rule: "Da quante regioni diverse arrivano, agli eventi della regione, soci che nell'anno si sono visti almeno due volte.",
+            rule: "Da quante regioni diverse arrivano, agli eventi della regione, soci che nella stagione si sono visti almeno due volte.",
             symbol: "house.fill",
-            figures: ["Ospiti da fuori"]),
+            figures: ["Ospiti da fuori"], keySuffix: "_v2"),
         "away": Info(
             title: "In trasferta",
             detail: "Le regioni in cui i soci vanno a timbrare fuori casa.",
-            rule: "In quante altre regioni i soci della regione, visti almeno due volte nell'anno, sono andati a timbrare.",
+            rule: "In quante altre regioni i soci della regione, visti almeno due volte nella stagione, sono andati a timbrare.",
             symbol: "suitcase.fill",
-            figures: ["Soci in trasferta"]),
+            figures: ["Soci in trasferta"], keySuffix: "_v2"),
         "months": Info(
             title: "Senza pause",
-            detail: "I mesi dell'anno con un evento timbrato in regione.",
-            rule: "Mesi dell'anno con almeno un evento nella regione a cui qualcuno ha timbrato.",
+            detail: "I mesi della stagione con un evento timbrato in regione.",
+            rule: "Mesi della stagione con almeno un evento nella regione a cui qualcuno ha timbrato.",
             symbol: "calendar.badge.clock",
-            figures: ["Eventi in regione"]),
+            figures: ["Eventi in regione"], keySuffix: "_v2"),
         "welcome": Info(
             title: "Benvenuto",
-            detail: "Chi si è iscritto quest'anno e ha timbrato presto.",
-            rule: "Tra chi si è iscritto all'app quest'anno, quanti hanno preso il primo timbro entro due mesi.",
+            detail: "Chi si è iscritto in questa stagione e ha timbrato presto.",
+            rule: "Tra chi si è iscritto all'app nella stagione, quanti hanno preso il primo timbro entro due mesi.",
             symbol: "hand.wave.fill",
-            figures: ["Nuovi con un timbro", "Nuovi iscritti"]),
+            figures: ["Nuovi con un timbro", "Nuovi iscritti"], keySuffix: "_v2"),
         "fullhouse": Info(
             title: "Sala piena",
-            detail: "L'evento più partecipato dell'anno.",
-            rule: "L'evento dell'anno con più timbratori, in rapporto ai soci della regione.",
+            detail: "L'evento più partecipato della stagione.",
+            rule: "L'evento della stagione con più timbratori, in rapporto ai soci della regione.",
             symbol: "person.3.sequence.fill",
-            figures: ["Timbratori"]),
+            figures: ["Timbratori"], keySuffix: "_v2"),
         "core": Info(
             title: "Zoccolo duro",
             detail: "Chi torna davvero agli eventi della regione.",
@@ -72,10 +74,10 @@ enum RegionMedalCatalog {
             figures: ["Eventi in regione"]),
         "podium": Info(
             title: "Podio",
-            detail: "Il posto della regione in classifica a fine anno.",
-            rule: "Posizione della regione nella classifica regioni a fine anno. Si assegna il 31 dicembre.",
+            detail: "Il posto della regione in classifica a fine stagione.",
+            rule: "Posizione della regione nella classifica regioni a fine stagione. Si assegna il 30 settembre.",
             symbol: "trophy.fill",
-            figures: ["Punteggio della regione"]),
+            figures: ["Punteggio della regione"], keySuffix: "_v2"),
     ]
 
     /// The kinds in the order the sheets list them.
@@ -86,7 +88,7 @@ enum RegionMedalCatalog {
     }
 
     static func rule(_ key: String) -> String {
-        tr("medals.region.\(key).rule", fallback: info[key]?.rule ?? "")
+        tr("medals.region.\(key).rule\(info[key]?.keySuffix ?? "")", fallback: info[key]?.rule ?? "")
     }
 }
 
@@ -100,7 +102,7 @@ extension Medal.Tier {
 }
 
 extension Medal {
-    /// A medal of the member's region, in `past` year or the current one.
+    /// A medal of the member's region, in `past` season or the current one.
     init(_ status: RegionMedalStatus, state: RegionMedalsState, past: Bool) {
         let key = status.kind.key
         let info = RegionMedalCatalog.info[key] ?? RegionMedalCatalog.Info(title: key, detail: "", rule: "", symbol: "rosette", figures: [])
@@ -112,9 +114,9 @@ extension Medal {
             return (tr("medals.region.\(key).fig\(index)", fallback: label), RegionMedalsKt.formatFigure(figure: status.extra[index].doubleValue))
         }
         let earnedTier = Tier(region: status.tier)
-        id = "region-\(key)-\(status.year)"
+        id = "region-\(key)-\(status.season)"
         title = tr("medals.region.\(key).title", fallback: info.title)
-        detail = tr("medals.region.\(key).detail", fallback: info.detail)
+        detail = tr("medals.region.\(key).detail\(info.keySuffix)", fallback: info.detail)
         symbol = info.symbol
         tier = status.isEarned ? earnedTier : .bronze
         isEarned = status.isEarned
@@ -128,9 +130,11 @@ extension Medal {
         progress = past ? 1 : status.progress
         levels = levelList.map { (Tier(region: $0.tier), Int($0.threshold.rounded())) }
         countsStamps = false
+        isSeasonal = false
+        pastSeason = nil
         region = Region(
-            year: Int(status.year),
-            rule: tr("medals.region.\(key).rule", fallback: info.rule),
+            season: Int(status.season),
+            rule: tr("medals.region.\(key).rule\(info.keySuffix)", fallback: info.rule),
             valueLabel: status.valueLabel,
             isPast: past,
             isPodium: key == "podium",
@@ -148,11 +152,11 @@ extension Medal {
     }
 }
 
-/// An earlier year of the region's medals.
-struct RegionPastYear: Identifiable {
-    let year: Int
+/// An earlier season of the region's medals.
+struct RegionPastSeason: Identifiable {
+    let season: Int
     let medals: [Medal]
-    var id: Int { year }
+    var id: Int { season }
     var earnedCount: Int { medals.filter(\.isEarned).count }
 }
 
@@ -171,11 +175,11 @@ final class RegionMedalStore {
     /// Set when the last read failed and nothing was read before.
     private(set) var failed = false
     private(set) var regionName = ""
-    private(set) var year = 0
-    /// This year's medals, best first.
+    private(set) var season = 0
+    /// This season's medals, best first.
     private(set) var current: [Medal] = []
-    /// Earlier years, latest first, each in the kinds' order.
-    private(set) var past: [RegionPastYear] = []
+    /// Earlier seasons, latest first, each in the kinds' order.
+    private(set) var past: [RegionPastSeason] = []
     private var subscriptions: [Closeable] = []
 
     var earnedCount: Int { current.filter(\.isEarned).count }
@@ -198,12 +202,12 @@ final class RegionMedalStore {
         }
         loaded = true
         regionName = state.regionName
-        year = Int(state.year)
-        current = state.currentYear.map { Medal($0, state: state, past: false) }
-        past = state.pastYearList.map { entry in
-            RegionPastYear(
-                year: entry.intValue,
-                medals: state.past(year: entry.int32Value).map { Medal($0, state: state, past: true) }
+        season = Int(state.season)
+        current = state.currentSeason.map { Medal($0, state: state, past: false) }
+        past = state.pastSeasonList.map { entry in
+            RegionPastSeason(
+                season: entry.intValue,
+                medals: state.past(season: entry.int32Value).map { Medal($0, state: state, past: true) }
             )
         }
     }
@@ -221,7 +225,7 @@ final class RegionMedalStore {
 // MARK: - The region page
 
 /// What the region's medals are, said once at the top of their page: of the
-/// team, by year, counting people. Mirrors Android `RegionRules`.
+/// team, by season, counting people. Mirrors Android `RegionRules`.
 struct RegionRules: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -230,9 +234,9 @@ struct RegionRules: View {
             rule("person.3.fill",
                  tr("medals.region.rules.team", fallback: "Le medaglie di regione sono della squadra: le conquista la regione tutta insieme e le vede chi ne fa parte oggi."))
             rule("calendar",
-                 tr("medals.region.rules.yearly", fallback: "Ogni anno si ricomincia; le annate passate restano in bacheca."))
+                 tr("medals.region.rules.yearly_v2", fallback: "Ogni stagione, dal 1° ottobre al 30 settembre, si ricomincia; le annate passate restano in bacheca."))
             rule("person.fill",
-                 tr("medals.region.rules.people", fallback: "Contano le persone, non i timbri: chi si vede una volta sola nell'anno non fa numero."))
+                 tr("medals.region.rules.people_v2", fallback: "Contano le persone, non i timbri: chi si vede una volta sola nella stagione non fa numero."))
             Text(tr("medals.region.rules.more", fallback: "Il criterio esatto, formula compresa, è nella scheda ⓘ, sezione Matematica."))
                 .font(.footnote)
                 .foregroundStyle(.white.opacity(0.45))
@@ -257,18 +261,18 @@ struct RegionRules: View {
     }
 }
 
-/// An earlier year's header: tap to open or close its medals.
-struct RegionYearHeader: View {
-    let entry: RegionPastYear
+/// An earlier season's header: tap to open or close its medals.
+struct SeasonHeader: View {
+    /// "2025/26".
+    let label: String
+    let summary: String
     let expanded: Bool
     let action: () -> Void
 
     var body: some View {
-        let summary = tr("medals.region.count_of", fallback: "{earned} su {total}",
-                         ["earned": "\(entry.earnedCount)", "total": "\(entry.medals.count)"])
         Button(action: action) {
             HStack {
-                Text(String(entry.year))
+                Text(label)
                     .font(.headline.monospacedDigit())
                     .foregroundStyle(.white)
                 Spacer()
@@ -286,7 +290,7 @@ struct RegionYearHeader: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(String(entry.year)), \(summary)"))
+        .accessibilityLabel(Text("\(label), \(summary)"))
         .accessibilityAddTraits(.isButton)
     }
 }
@@ -307,7 +311,7 @@ struct WitnessBadge: View {
 }
 
 /// The ladder of a region medal: each metal with the figure that earns it,
-/// the ones the year reached lit.
+/// the ones the season reached lit.
 struct RegionTierLadder: View {
     let medal: Medal
     let region: Medal.Region
@@ -389,7 +393,7 @@ struct RegionStatus: View {
                     .padding(.top, 10)
             }
             if region.isPodium, !medal.isEarned, !region.isPast {
-                Text(tr("medals.region.podium_pending", fallback: "Si assegna il 31 dicembre"))
+                Text(tr("medals.region.podium_pending_v2", fallback: "Si assegna il 30 settembre"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.75))
                     .padding(.top, 10)
@@ -400,7 +404,7 @@ struct RegionStatus: View {
     }
 
     private var caption: String {
-        if region.isPast { return tr("medals.region.value_year", fallback: "Nell'anno") }
+        if region.isPast { return tr("medals.region.value_season", fallback: "Nella stagione") }
         if region.isPodium { return tr("medals.region.value_podium", fallback: "Posizione attuale") }
         return tr("medals.region.value_now", fallback: "Adesso")
     }

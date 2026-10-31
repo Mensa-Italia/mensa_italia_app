@@ -58,38 +58,24 @@ class Changelog internal constructor(
 
     companion object {
         /** Cambialo, con [ITEMS], per far ricomparire il changelog in un rilascio. */
-        const val ID = "2026-11-medaglie-regione"
+        const val ID = "2026-11-stagione"
 
         private const val KEY_SEEN = "changelog.seen"
 
         private val ITEMS = listOf(
             ChangelogItem(
                 icon = "trophy",
-                titleKey = "changelog.2026_11.leaderboard.title",
-                titleFallback = "La classifica",
-                bodyKey = "changelog.2026_11.leaderboard.body",
-                bodyFallback = "Soci, regioni e segretari sugli ultimi 12 mesi. Un timbro vale di più dove hanno timbrato in tanti rispetto ai soci della regione; come si calcola tutto è scritto nella ⓘ, formula compresa.",
+                titleKey = "changelog.2026_11.season.title",
+                titleFallback = "Si gioca a stagioni",
+                bodyKey = "changelog.2026_11.season.body",
+                bodyFallback = "Classifica e medaglie ripartono ogni 1° ottobre e si chiudono il 30 settembre: chi arriva adesso parte alla pari. Le stagioni chiuse restano nell'albo d'oro e nelle annate del medagliere.",
             ),
             ChangelogItem(
                 icon = "medal",
-                titleKey = "changelog.2026_11.medals.title",
-                titleFallback = "Medagliere più chiaro",
-                bodyKey = "changelog.2026_11.medals.body",
-                bodyFallback = "Filtra le medaglie per metallo e, in ogni medaglia sui timbri, leggi quali timbri contano e perché.",
-            ),
-            ChangelogItem(
-                icon = "medal",
-                titleKey = "changelog.2026_11.region_medals.title",
-                titleFallback = "Le medaglie della tua regione",
-                bodyKey = "changelog.2026_11.region_medals.body",
-                bodyFallback = "Nel medagliere, accanto alle tue, le medaglie che la tua regione conquista tutta insieme: dieci traguardi all'anno, tre metalli, e il segno di chi c'era quando sono arrivate.",
-            ),
-            ChangelogItem(
-                icon = "shield",
-                titleKey = "changelog.2026_11.privacy.title",
-                titleFallback = "Se preferisci non esserci",
-                bodyKey = "changelog.2026_11.privacy.body",
-                bodyFallback = "Dalle impostazioni della classifica puoi uscirne quando vuoi: la tua riga sparisce per tutti, i tuoi timbri restano.",
+                titleKey = "changelog.2026_11.season_medals.title",
+                titleFallback = "Medaglie: di stagione e per sempre",
+                bodyKey = "changelog.2026_11.season_medals.body",
+                bodyFallback = "Le medaglie sui timbri, i viaggi e le occasioni si vincono ogni stagione, con soglie nuove alla portata di una stagione; quelle su tessera, app e calendario restano per sempre. Quelle già vinte le ritrovi nell'annata 2025/26.",
             ),
         )
     }

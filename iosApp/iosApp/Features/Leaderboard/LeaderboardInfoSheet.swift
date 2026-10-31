@@ -57,22 +57,22 @@ struct LeaderboardInfoSheet: View {
                   tr("leaderboard.info.stamps.title", fallback: "Timbri"),
                   tr("leaderboard.info.stamps.detail_v6", fallback: "Ogni timbro vale fino a 20 punti. Vale tanto se all'evento hanno timbrato in tanti rispetto ai soci della regione, poco se in pochi. Ed è pesato per quanto è ampia, rispetto ai soci della regione, la comunità che timbra ai suoi eventi."))
             point("hourglass", .gray,
-                  tr("leaderboard.info.time.title_v2", fallback: "Scadenza"),
-                  tr("leaderboard.info.time.detail_v3", fallback: "I punti durano un anno e calano piano piano; due anni per gli eventi nazionali."))
+                  tr("leaderboard.info.time.title_v3", fallback: "Stagione"),
+                  tr("leaderboard.info.time.detail_v4", fallback: "La classifica conta una stagione, dal 1° ottobre al 30 settembre, e riparte da zero ogni 1° ottobre. Dentro la stagione i punti non calano: ogni timbro e ogni evento vale per intero fino alla chiusura. Le stagioni chiuse restano nell'albo d'oro."))
             point("medal", .orange,
                   tr("leaderboard.info.medals.title", fallback: "Medaglie"),
-                  tr("leaderboard.info.medals.detail_v5", fallback: "Ogni medaglia del Tableport aggiunge punti: più il metallo è prezioso, più punti. Contano solo i timbri che in classifica valgono almeno un punto."))
+                  tr("leaderboard.info.medals.detail_v6", fallback: "Ogni medaglia di stagione del Tableport aggiunge punti: più il metallo è prezioso, più punti. Le medaglie per sempre (tessera, app, calendario) non ne danno. Contano solo i timbri che in classifica valgono almeno un punto."))
             point("trophy", .teal,
                   tr("leaderboard.info.events.title", fallback: "Eventi organizzati"),
                   tr("leaderboard.info.events.detail_v4", fallback: "Chi organizza prende fino a 10 punti a evento, con lo stesso criterio dei timbri. Chi fa parte dello staff di una regione non prende i timbri degli eventi di casa."))
             point("list.number", .indigo,
                   tr("leaderboard.info.top.title", fallback: "I primi 10"),
-                  tr("leaderboard.info.top.detail_v3", fallback: "Si vedono i primi dieci. A pari punti, pari posizione."))
+                  tr("leaderboard.info.top.detail_v4", fallback: "Si vedono i primi dieci. A pari punti, pari posizione. Compare solo chi ha almeno un timbro valido nella stagione."))
         } }
         if regions { Section(tr("leaderboard.tab.regions", fallback: "Regioni")) {
             point("map", .green,
                   tr("leaderboard.info.regions.score.title", fallback: "Punteggio"),
-                  tr("leaderboard.info.regions.score.detail_v2", fallback: "Si sommano gli eventi fatti in regione nell'ultimo anno, da chiunque organizzati, fino a 10 punti l'uno. Il totale è poi pesato per quanto è ampia, rispetto ai soci della regione, la comunità che timbra ai suoi eventi. I nazionali ospitati si aggiungono a parte."))
+                  tr("leaderboard.info.regions.score.detail_v3", fallback: "Si sommano gli eventi fatti in regione nella stagione, da chiunque organizzati, fino a 10 punti l'uno. Il totale è poi pesato per quanto è ampia, rispetto ai soci della regione, la comunità che timbra ai suoi eventi. I nazionali ospitati si aggiungono a parte."))
             point("person.3", .purple,
                   tr("leaderboard.info.regions.who.title", fallback: "Chi c'è"),
                   tr("leaderboard.info.regions.who.detail_v2", fallback: "In classifica le regioni con almeno 3 punti. Chi fa parte dello staff di una regione vede anche la sua, sotto la lista, anche se è sotto i 3. A pari punti, pari posizione. Tocca una riga per vedere il conto, passo per passo."))
@@ -101,7 +101,7 @@ struct LeaderboardInfoSheet: View {
     private var math: some View {
         // Laid out like a proof: definitions, lemmas, theorems, corollaries.
         formula(tr("leaderboard.math.definitions", fallback: "Definizioni"),
-                tr("leaderboard.math.definitions.caption", fallback: "Sia $p$ il numero di soci che hanno preso il timbro di un evento, organizzatore escluso; $N_{r}$ i soci attivi della regione dell'evento, $N̄$ quelli di una regione media; $Δt$ i giorni trascorsi. $s$ è la quota di timbratori: l'esponente 0,7 perché l'affluenza cresce meno che linearmente con i soci. Le sedi che coprono due regioni contano come una; per gli eventi nazionali o senza regione $N_{r} = N̄$.")) {
+                tr("leaderboard.math.definitions.caption_v2", fallback: "Sia $p$ il numero di soci che hanno preso il timbro di un evento, organizzatore escluso; $N_{r}$ i soci attivi della regione dell'evento, $N̄$ quelli di una regione media. $s$ è la quota di timbratori: l'esponente 0,7 perché l'affluenza cresce meno che linearmente con i soci. Le sedi che coprono due regioni contano come una; per gli eventi nazionali o senza regione $N_{r} = N̄$.")) {
             MathText("s = ")
             Fraction(numerator: "p", denominator: "N_{r}^{0,7} · N̄^{0,3}")
         }
@@ -119,18 +119,16 @@ struct LeaderboardInfoSheet: View {
             }
         }
         formula(tr("leaderboard.math.lemma2", fallback: "Lemma 2 · la comunità"),
-                tr("leaderboard.math.lemma2.caption", fallback: "$n_{i}$ i timbri dell'$i$-esimo socio agli eventi regionali degli ultimi 12 mesi. $e$ è il numero di soci equivalenti: uguale ai timbratori se ognuno timbra una volta sola, tende a 1 se timbra sempre uno solo. La sua quota sulla regione passa nella stessa $σ$, quindi $c = 1$ dal 15% in su. Per i nazionali $c = 1$.")) {
+                tr("leaderboard.math.lemma2.caption_v2", fallback: "$n_{i}$ i timbri dell'$i$-esimo socio agli eventi regionali della stagione. $e$ è il numero di soci equivalenti: uguale ai timbratori se ognuno timbra una volta sola, tende a 1 se timbra sempre uno solo. La sua quota sulla regione passa nella stessa $σ$, quindi $c = 1$ dal 15% in su. Per i nazionali $c = 1$.")) {
             MathText("e = ")
             Fraction(numerator: "(Σ n_{i})^{2}", denominator: "Σ n_{i}^{2}")
             MathText(",  c = σ(")
             Fraction(numerator: "e", denominator: "N_{r}^{0,7} · N̄^{0,3}")
             MathText(")")
         }
-        formula(tr("leaderboard.math.lemma3", fallback: "Lemma 3 · la scadenza"),
-                tr("leaderboard.math.lemma3.caption", fallback: "Lineare; 730 al posto di 365 per gli eventi nazionali.")) {
-            MathText("d = max(0, 1 − ")
-            Fraction(numerator: "Δt", denominator: "365")
-            MathText(")")
+        formula(tr("leaderboard.math.lemma3_v2", fallback: "Lemma 3 · la stagione"),
+                tr("leaderboard.math.lemma3.caption_v2", fallback: "Vale 1 per un evento tra il 1° ottobre e il 30 settembre, 0 fuori dalla stagione: nessun decadimento. Vale anche per i nazionali.")) {
+            MathText("d = 1_{stagione}(data)")
         }
         if members {
             formula(tr("leaderboard.math.thm1", fallback: "Teorema 1 · il timbro"),
@@ -144,17 +142,17 @@ struct LeaderboardInfoSheet: View {
         }
         if members {
             formula(tr("leaderboard.math.thm3", fallback: "Teorema 3 · le medaglie"),
-                    tr("leaderboard.math.thm3.caption_v2", fallback: "Bronzo 3, argento 5, oro 10, platino 20; 8 per le medaglie a livello unico. Contano solo i timbri con $20 · σ(s) ≥ 1$, cioè $s$ oltre il 3,8%, a prescindere da $d$ e $c$.")) {
+                    tr("leaderboard.math.thm3.caption_v3", fallback: "Bronzo 3, argento 5, oro 10, platino 20; 8 per le medaglie a livello unico. Sommano solo le medaglie di stagione, coi contatori della stagione: quelle per sempre non danno punti. Contano solo i timbri con $20 · σ(s) ≥ 1$, cioè $s$ oltre il 3,8%, a prescindere da $d$ e $c$.")) {
                 MathText("M = Σ m,  m ∈ {3, 5, 8, 10, 20}")
             }
             formula(tr("leaderboard.math.cor1", fallback: "Corollario 1 · il socio"),
-                    tr("leaderboard.math.cor1.caption", fallback: "Sui timbri e sugli eventi degli ultimi 12 mesi (24 i nazionali); ordinamento per $S$ arrotondato.")) {
+                    tr("leaderboard.math.cor1.caption_v2", fallback: "Sui timbri e sugli eventi della stagione, dal 1° ottobre al 30 settembre; compare solo chi ha almeno un timbro valido nella stagione. Ordinamento per $S$ arrotondato.")) {
                 MathText("S = ΣT + ΣE + M")
             }
         }
         if regions {
             formula(tr("leaderboard.math.thm4", fallback: "Teorema 4 · la regione"),
-                    tr("leaderboard.math.thm4.caption", fallback: "$E_{r}$ come nel Teorema 2 ma con $c = 1$, sugli eventi non nazionali degli ultimi 12 mesi nella regione, da chiunque organizzati; il fattore si applica una volta sola alla somma, ed è lo stesso: $Σ c·E = c·ΣE$. $E_{n}$ sui nazionali ospitati, $d$ a 24 mesi, senza $c$.")) {
+                    tr("leaderboard.math.thm4.caption_v2", fallback: "$E_{r}$ come nel Teorema 2 ma con $c = 1$, sugli eventi non nazionali della stagione nella regione, da chiunque organizzati; il fattore si applica una volta sola alla somma, ed è lo stesso: $Σ c·E = c·ΣE$. $E_{n}$ sui nazionali ospitati della stagione, senza $c$.")) {
                 MathText("R = c · ΣE_{r} + ΣE_{n}")
             }
         }

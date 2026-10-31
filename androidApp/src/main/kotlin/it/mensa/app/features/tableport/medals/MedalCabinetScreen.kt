@@ -91,6 +91,7 @@ import it.mensa.app.features.leaderboard.mathInline
 import it.mensa.app.support.tr
 import it.mensa.app.ui.theme.DarkStage
 import it.mensa.app.ui.theme.StageSurface
+import it.mensa.shared.time.Season
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
@@ -110,12 +111,16 @@ import kotlin.math.sin
 fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
     val state = rememberMedals()
     val medals = state.medals
+    val history = rememberMedalHistory()
+    val seasonLabel = Season.label(state.season)
     val region = rememberRegionMedals()
     // "Le mie" / "La mia regione": the switch exists only with the flag on and the region known.
     var page by rememberSaveable { mutableStateOf(CabinetPage.Mine) }
     val onRegion = region.available && page == CabinetPage.Region
     var showInfo by remember { mutableStateOf(false) }
+    // Seasons unfolded under "Annate", on each of the two pages (they may share a season).
     var openYears by remember { mutableStateOf(emptySet<Int>()) }
+    var openPast by remember { mutableStateOf(emptySet<Int>()) }
     var selected by remember { mutableStateOf<Medal?>(null) }
     // The top bar's filter, as on the other lists: by metal earned, or the
     // ones still to earn. The summary keeps counting them all.
@@ -197,8 +202,8 @@ fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
                     region = region,
                     filter = filter,
                     shown = regionShown,
-                    openYears = openYears,
-                    onToggleYear = { year -> openYears = if (year in openYears) openYears - year else openYears + year },
+                    openSeasons = openYears,
+                    onToggleSeason = { season -> openYears = if (season in openYears) openYears - season else openYears + season },
                     onSelect = { selected = it },
                 )
             }
@@ -214,15 +219,33 @@ fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
                     Summary(
                         medals = medals,
                         headline = tr("medals.count_of", "{earned} di {total}", "earned" to medals.count { it.isEarned }, "total" to medals.size),
-                        caption = tr("medals.count_caption_case", "Medaglie in teca"),
+                        caption = tr("medals.section.season", "Stagione {season}", "season" to seasonLabel),
                     )
                 }
-                items(shown, key = { it.id }) { medal ->
-                    MedalCase(medal = medal, onClick = { selected = medal })
+                // The season's medals first, then the lifetime ones under "Sempre".
+                val (seasonal, permanent) = shown.partition { it.seasonal }
+                if (seasonal.isNotEmpty()) {
+                    item(key = "section-season", span = { GridItemSpan(maxLineSpan) }) {
+                        SectionLabel(tr("medals.section.season", "Stagione {season}", "season" to seasonLabel))
+                    }
+                    items(seasonal, key = { it.id }) { medal -> MedalCase(medal = medal, onClick = { selected = medal }) }
+                }
+                if (permanent.isNotEmpty()) {
+                    item(key = "section-permanent", span = { GridItemSpan(maxLineSpan) }) {
+                        SectionLabel(tr("medals.section.permanent", "Sempre"))
+                    }
+                    items(permanent, key = { it.id }) { medal -> MedalCase(medal = medal, onClick = { selected = medal }) }
                 }
                 if (shown.isEmpty()) {
                     item(span = { GridItemSpan(maxLineSpan) }) { FilterEmpty() }
                 }
+                pastSeasonsSection(
+                    seasons = history.seasons,
+                    filter = filter,
+                    open = openPast,
+                    onToggle = { season -> openPast = if (season in openPast) openPast - season else openPast + season },
+                    onSelect = { selected = it },
+                )
             }
             state.failed -> Column(Modifier.fillMaxSize().padding(padding)) {
                 switch?.let { Box(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { it() } }
@@ -242,7 +265,52 @@ fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
 
     if (showInfo) RegionMedalsInfoSheet(onDismiss = { showInfo = false })
 
-    selected?.let { medal -> MedalShowcase(medal = medal, onDismiss = { selected = null }) }
+    selected?.let { medal ->
+        MedalShowcase(medal = medal, past = history.results(medal.id), onDismiss = { selected = null })
+    }
+}
+
+/** A small caption over a group of medals ("Stagione 2026/27", "Sempre", "Annate"). */
+@Composable
+private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelSmall,
+        letterSpacing = 2.sp,
+        color = Color.White.copy(alpha = 0.5f),
+        modifier = modifier.padding(top = 8.dp),
+    )
+}
+
+/**
+ * The "Annate" of the personal page: each closed season folded under its
+ * header, with the seasonal medals and the metal each ended in. Mirrors iOS
+ * `MedalCabinetView.pastSeasons`.
+ */
+private fun LazyGridScope.pastSeasonsSection(
+    seasons: List<PastSeasonUi>,
+    filter: MedalFilter,
+    open: Set<Int>,
+    onToggle: (Int) -> Unit,
+    onSelect: (Medal) -> Unit,
+) {
+    if (seasons.isEmpty()) return
+    val span: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
+    item(key = "history", span = span) { SectionLabel(tr("medals.history.title", "Annate")) }
+    seasons.forEach { season ->
+        item(key = "past-${season.season}", span = span) {
+            SeasonHeader(
+                label = Season.label(season.season),
+                summary = tr("medals.history.count", "{earned} di {total}", "earned" to season.earnedCount, "total" to season.medals.size),
+                expanded = season.season in open,
+                onClick = { onToggle(season.season) },
+            )
+        }
+        if (season.season in open) {
+            val visible = season.medals.filter(filter::matches)
+            items(visible, key = { "past-${season.season}-${it.id}" }) { medal -> MedalCase(medal = medal, onClick = { onSelect(medal) }) }
+        }
+    }
 }
 
 /** The line shown when the filter lets no medal through. */
@@ -257,9 +325,9 @@ private fun FilterEmpty() {
 }
 
 /**
- * The region's page: the ring of this year's medals, the rules, the ten
- * medals in their cases, then the earlier years folded under their headers.
- * The filter in the top bar applies to every year. Mirrors iOS
+ * The region's page: the ring of this season's medals, the rules, the ten
+ * medals in their cases, then the earlier seasons folded under their headers.
+ * The filter in the top bar applies to every season. Mirrors iOS
  * `MedalCabinetView.regionPage`.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -267,8 +335,8 @@ private fun LazyGridScope.regionPage(
     region: RegionMedalsUi,
     filter: MedalFilter,
     shown: List<Medal>,
-    openYears: Set<Int>,
-    onToggleYear: (Int) -> Unit,
+    openSeasons: Set<Int>,
+    onToggleSeason: (Int) -> Unit,
     onSelect: (Medal) -> Unit,
 ) {
     val span: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
@@ -303,8 +371,8 @@ private fun LazyGridScope.regionPage(
                 medals = region.current,
                 headline = tr("medals.region.count_of", "{earned} su {total}", "earned" to region.earnedCount, "total" to region.current.size),
                 caption = if (region.regionName.isBlank()) {
-                    tr("medals.region.count_caption", "Medaglie di regione {year}", "year" to region.year)
-                } else "${region.regionName} · ${region.year}",
+                    tr("medals.region.count_caption_v2", "Medaglie di regione {season}", "season" to Season.label(region.season))
+                } else "${region.regionName} · ${Season.label(region.season)}",
                 tiers = MedalTier.entries - MedalTier.Platinum,
             )
         }
@@ -322,10 +390,15 @@ private fun LazyGridScope.regionPage(
                 modifier = Modifier.padding(top = 8.dp),
             )
         }
-        region.past.forEach { (year, medals) ->
-            val open = year in openYears
-            item(key = "year-$year", span = span) {
-                YearHeader(year = year, earned = medals.count { it.isEarned }, total = medals.size, expanded = open, onClick = { onToggleYear(year) })
+        region.past.forEach { (season, medals) ->
+            val open = season in openSeasons
+            item(key = "year-$season", span = span) {
+                SeasonHeader(
+                    label = Season.label(season),
+                    summary = tr("medals.region.count_of", "{earned} su {total}", "earned" to medals.count { it.isEarned }, "total" to medals.size),
+                    expanded = open,
+                    onClick = { onToggleSeason(season) },
+                )
             }
             if (open) {
                 val visible = medals.filter(filter::matches)
@@ -429,7 +502,7 @@ private fun Summary(
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
+private fun MedalShowcase(medal: Medal, past: List<PastResult>, onDismiss: () -> Unit) {
     val angle = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
     val metal = medal.tier.metal
@@ -476,10 +549,19 @@ private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
             }
 
             TierBadge(medal)
+            medal.pastSeason?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = tr("medals.section.season", "Stagione {season}", "season" to Season.label(it)).uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    letterSpacing = 2.sp,
+                    color = Color.White.copy(alpha = 0.5f),
+                )
+            }
             Spacer(Modifier.height(14.dp))
             Text(
-                // A region medal is "Name 2026": each year is its own.
-                text = medal.region?.let { "${medal.title} ${it.year}" } ?: medal.title,
+                // A region medal is "Name 2026/27": each season is its own.
+                text = medal.region?.let { "${medal.title} ${Season.label(it.season)}" } ?: medal.title,
                 style = MaterialTheme.typography.headlineMedium,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
@@ -513,6 +595,14 @@ private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
                 }
                 Spacer(Modifier.height(24.dp))
                 Status(medal, Modifier.padding(horizontal = 32.dp))
+                if (!medal.isHidden && medal.pastSeason == null) {
+                    Spacer(Modifier.height(16.dp))
+                    FamilyNote(medal.seasonal)
+                }
+                if (past.isNotEmpty() && medal.pastSeason == null && !medal.isHidden) {
+                    Spacer(Modifier.height(24.dp))
+                    PastSeasonsStrip(past, Modifier.padding(horizontal = 24.dp))
+                }
                 if (medal.countsStamps && !medal.isHidden) {
                     Spacer(Modifier.height(24.dp))
                     StampRules(Modifier.padding(horizontal = 24.dp))
@@ -524,6 +614,59 @@ private fun MedalShowcase(medal: Medal, onDismiss: () -> Unit) {
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White.copy(alpha = 0.35f),
             )
+        }
+    }
+}
+
+/** Whether the medal starts over every season or stays for good. */
+@Composable
+private fun FamilyNote(seasonal: Boolean) {
+    Text(
+        text = if (seasonal) {
+            tr("medals.family.seasonal", "Si vince di nuovo ogni stagione, dal 1° ottobre al 30 settembre.")
+        } else {
+            tr("medals.family.permanent", "Resta per sempre: non riparte con la stagione.")
+        },
+        style = MaterialTheme.typography.labelMedium,
+        color = Color.White.copy(alpha = 0.45f),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(horizontal = 32.dp),
+    )
+}
+
+/** The metal a seasonal medal ended in, season by season, latest first: "2025/26 Argento". */
+@Composable
+private fun PastSeasonsStrip(results: List<PastResult>, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(18.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(
+            text = tr("medals.detail.seasons", "Stagioni passate"),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        results.forEach { result ->
+            val label = Season.label(result.season)
+            val metal = result.tier?.label ?: tr("medals.history.not_earned", "Non ottenuta")
+            Row(
+                Modifier.fillMaxWidth().semantics(mergeDescendants = true) { contentDescription = "$label, $metal" },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                result.tier?.let {
+                    MedalArtwork(tier = it, icon = Icons.Filled.Star, size = 18.dp)
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text(
+                    text = metal,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = result.tier?.metal?.hi ?: Color.White.copy(alpha = 0.45f),
+                )
+            }
         }
     }
 }
@@ -648,7 +791,12 @@ private fun TierBadge(medal: Medal) {
     ) {
         if (earned) Icon(Icons.Filled.Verified, contentDescription = null, tint = metal.hi, modifier = Modifier.size(16.dp))
         Text(
-            text = if (earned) medal.tier.label.uppercase() else tr("medals.locked", "Non ancora ottenuta").uppercase(),
+            text = when {
+                earned -> medal.tier.label.uppercase()
+                // A closed season ended without it; otherwise there is still time.
+                medal.pastSeason != null -> tr("medals.history.not_earned", "Non ottenuta").uppercase()
+                else -> tr("medals.locked", "Non ancora ottenuta").uppercase()
+            },
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.sp,
@@ -718,7 +866,13 @@ private fun Status(medal: Medal, modifier: Modifier = Modifier) {
     val nextTier = medal.nextTier
     val nextThreshold = medal.nextThreshold
     Column(modifier.widthIn(max = 320.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        if (nextTier != null && nextThreshold != null && !medal.isHidden) {
+        if (medal.pastSeason != null) {
+            // The season is closed: the figure it ended on, with no goal ahead.
+            Text(
+                text = tr("medals.history.value", "Risultato della stagione: {value}", "value" to medal.value),
+                style = MaterialTheme.typography.titleSmall,
+            )
+        } else if (nextTier != null && nextThreshold != null && !medal.isHidden) {
             Text(
                 text = tr("medals.next", "Prossimo traguardo: %1\$@ a %2\$d")
                     .replace("%1\$@", nextTier.label)

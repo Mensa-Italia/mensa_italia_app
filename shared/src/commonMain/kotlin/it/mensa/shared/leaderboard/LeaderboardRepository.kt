@@ -7,9 +7,11 @@ import it.mensa.shared.db.MensaDatabase
 import it.mensa.shared.model.LeaderboardEntryModel
 import it.mensa.shared.model.LeaderboardRegionModel
 import it.mensa.shared.model.LeaderboardSecretaryModel
+import it.mensa.shared.model.LeaderboardSeasonModel
 import it.mensa.shared.model.RegSociModel
 import it.mensa.shared.repository.MetadataRepository
 import it.mensa.shared.repository.RegSociRepository
+import it.mensa.shared.time.Season
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,6 +36,9 @@ data class LeaderboardRow(
     val eventsPoints: Int get() = entry.eventsPoints.roundToInt()
     val stampsTotal: Int get() = entry.stampsTotal.roundToInt()
     val regions: Int get() = entry.stampsDistinctRegions.roundToInt()
+
+    /** The season the row is for; 0 from an older view. */
+    val season: Int get() = entry.season.roundToInt()
 
     /** Places gained since the last daily snapshot (negative = lost); null without a snapshot. */
     val trend: Int? get() = trendOf(entry.previousPosition, position)
@@ -60,6 +65,8 @@ data class LeaderboardBoard(
     val pointsToNext: Int?,
     /** The position they would reach with [pointsToNext]. */
     val nextPosition: Int?,
+    /** The season the ranking is for (the rows', or the current one while it has no rows). */
+    val season: Int = Season.current(),
 ) {
     val podium: List<LeaderboardRow> get() = rows.take(3)
 
@@ -136,6 +143,9 @@ data class RegionRow(val entry: LeaderboardRegionModel) : RegionScore {
     override val avgSharePct: Int get() = entry.avgSharePct.roundToInt()
 
     val displayName: String get() = regionName
+
+    /** The season the row is for; 0 from an older view. */
+    val season: Int get() = entry.season.roundToInt()
 }
 
 /** A regional secretary in their ranking: their region's numbers, their face. */
@@ -175,7 +185,8 @@ data class SecretaryRow(
 
 /**
  * The three rankings, read from `view_leaderboard`, `view_leaderboard_regioni`
- * and `view_leaderboard_segretari`. In memory, reread whenever a screen that
+ * and `view_leaderboard_segretari`, all for the current season (1 October to
+ * 30 September), and the hall of fame of the closed ones (`leaderboard_seasons`). In memory, reread whenever a screen that
  * shows them appears; the last rows read are also kept in SQLite (KeyValue,
  * as JSON), so after a cold start they show at once and the network only
  * brings them up to date. The members' one is tied to the user it was read
@@ -194,6 +205,7 @@ class LeaderboardRepository(
     private val fixtureHidden = MutableStateFlow(false)
     private val regionsCache = MutableStateFlow<List<LeaderboardRegionModel>?>(null)
     private val secretariesCache = MutableStateFlow<List<LeaderboardSecretaryModel>?>(null)
+    private val hallCache = MutableStateFlow<List<LeaderboardSeasonModel>?>(null)
 
     /**
      * The regions' ranking, best first; null until read. The server decides
@@ -241,6 +253,36 @@ class LeaderboardRepository(
         secretariesCache.value = secretaries
         writeSaved(CACHE_KEY_REGIONS, ListSerializer(LeaderboardRegionModel.serializer()), regions)
         writeSaved(CACHE_KEY_SECRETARIES, ListSerializer(LeaderboardSecretaryModel.serializer()), secretaries)
+    }
+
+    /**
+     * The hall of fame: the closed seasons, latest first, with the top of each
+     * board and the member's own row; null until read.
+     */
+    fun observeHall(): Flow<HallOfFame?> =
+        combine(hallCache, auth.currentUser, regSoci.observeAll()) { cached, user, members ->
+            if (cached == null) return@combine null
+            val meId = if (LeaderboardFixtures.enabled) LeaderboardFixtures.ME_ID else user?.id
+            HallOfFame.build(cached, meId, members.associateBy { it.id })
+        }
+
+    /** Rereads the hall of fame. Throws on network errors; the last read stays. */
+    @Throws(Exception::class)
+    suspend fun refreshHall() {
+        if (LeaderboardFixtures.enabled) {
+            hallCache.value = LeaderboardFixtures.seasons()
+            return
+        }
+        val serializer = ListSerializer(LeaderboardSeasonModel.serializer())
+        if (hallCache.value == null) {
+            // The top 10 is public; a row below it is the reader's own, and the saved one may be another account's.
+            val meId = auth.currentUser.value?.id
+            hallCache.value = readSaved(CACHE_KEY_SEASONS, serializer)
+                ?.filter { it.position <= HALL_TOP_SIZE || it.subject == meId }
+        }
+        val rows: List<LeaderboardSeasonModel> = pb.fullList(SEASONS_COLLECTION, sort = "-season,board,position")
+        hallCache.value = rows
+        writeSaved(CACHE_KEY_SEASONS, serializer, rows)
     }
 
     private suspend fun <T> readSaved(key: String, serializer: kotlinx.serialization.KSerializer<T>): T? =
@@ -315,6 +357,10 @@ class LeaderboardRepository(
         private const val COLLECTION = "view_leaderboard"
         private const val REGIONS_COLLECTION = "view_leaderboard_regioni"
         private const val SECRETARIES_COLLECTION = "view_leaderboard_segretari"
+        private const val SEASONS_COLLECTION = "leaderboard_seasons"
+
+        /** Places the server keeps for each board in `leaderboard_seasons`, besides the reader's own row. */
+        private const val HALL_TOP_SIZE = 10
 
         /** `users_metadata` key read by `view_leaderboard`: change both together. */
         const val KEY_HIDDEN: String = "leaderboard_hidden"
@@ -323,6 +369,7 @@ class LeaderboardRepository(
         private const val CACHE_KEY_MEMBERS = "leaderboard.members."
         private const val CACHE_KEY_REGIONS = "leaderboard.regions"
         private const val CACHE_KEY_SECRETARIES = "leaderboard.secretaries"
+        private const val CACHE_KEY_SEASONS = "leaderboard.seasons"
 
         /**
          * The regions' and secretaries' views are public from this score up;
@@ -353,6 +400,7 @@ class LeaderboardRepository(
                 me = me,
                 pointsToNext = gap,
                 nextPosition = above?.position,
+                season = rows.firstOrNull { it.season > 0 }?.season ?: Season.current(),
             )
         }
     }

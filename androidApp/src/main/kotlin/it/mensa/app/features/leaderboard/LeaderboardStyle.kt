@@ -13,6 +13,7 @@ import it.mensa.app.features.members._components.MemberAvatar
 import it.mensa.app.features.members._components.MemberHeroAvatar
 import it.mensa.app.features.tableport.medals.MedalTier
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.leaderboard.HallOfFame
 import it.mensa.shared.leaderboard.LeaderboardBoard
 import it.mensa.shared.leaderboard.LeaderboardRow
 import it.mensa.shared.leaderboard.RegionRow
@@ -60,6 +61,24 @@ internal fun rememberRegionBoards(): RegionBoardsState {
         failed = runCatching { repository.refreshRegions() }.isFailure && regions == null
     }
     return RegionBoardsState(regions, secretaries, failed)
+}
+
+/** The hall of fame (closed seasons), null until read. */
+internal data class HallState(val hall: HallOfFame?)
+
+/**
+ * The hall of fame, reread when the caller appears; with [enabled] false it
+ * only shows what is already read (Today asks for it just when the season has
+ * no ranking yet).
+ */
+@Composable
+internal fun rememberHall(enabled: Boolean = true): HallState {
+    val repository = remember { koinAccess().leaderboard }
+    val hall by repository.observeHall().collectAsState(initial = null)
+    LaunchedEffect(repository, enabled) {
+        if (enabled) runCatching { repository.refreshHall() }
+    }
+    return HallState(hall)
 }
 
 /**

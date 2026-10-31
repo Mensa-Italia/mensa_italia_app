@@ -106,15 +106,18 @@ private fun BasicExplanation() {
         ),
         Triple(
             Icons.Outlined.CalendarMonth,
-            tr("medals.region.info.yearly.title", "Ogni anno"),
-            tr("medals.region.rules.yearly", "Ogni anno si ricomincia; le annate passate restano in bacheca."),
+            tr("medals.region.info.yearly.title_v2", "Ogni stagione"),
+            tr(
+                "medals.region.rules.yearly_v2",
+                "Ogni stagione, dal 1° ottobre al 30 settembre, si ricomincia; le annate passate restano in bacheca.",
+            ),
         ),
         Triple(
             Icons.Outlined.Person,
             tr("medals.region.info.people.title", "Le persone"),
             tr(
-                "medals.region.rules.people",
-                "Contano le persone, non i timbri: chi si vede una volta sola nell'anno non fa numero.",
+                "medals.region.rules.people_v2",
+                "Contano le persone, non i timbri: chi si vede una volta sola nella stagione non fa numero.",
             ),
         ),
     )
@@ -128,7 +131,7 @@ private fun BasicExplanation() {
             InfoPoint(
                 info.icon,
                 tr("medals.region.${kind.key}.title", info.title),
-                tr("medals.region.${kind.key}.rule", info.rule),
+                tr("medals.region.${kind.key}.rule${info.keySuffix}", info.rule),
                 index,
                 kinds.size,
             )
@@ -169,24 +172,24 @@ private fun MathExplanation() {
                 Fraction("(Σ n_{i})^{2}", "Σ n_{i}^{2}")
             },
             caption = tr(
-                "medals.region.math.lemma.caption",
-                "\$n_{i}\$ i timbri dell'\$i\$-esimo socio agli eventi della regione nell'anno. \$e\$ è uguale ai soci presenti se ognuno timbra una volta sola, e tende a 1 se timbra sempre uno solo: conta chi c'è spesso, poco chi passa una volta.",
+                "medals.region.math.lemma.caption_v2",
+                "\$n_{i}\$ i timbri dell'\$i\$-esimo socio agli eventi della regione nella stagione. \$e\$ è uguale ai soci presenti se ognuno timbra una volta sola, e tende a 1 se timbra sempre uno solo: conta chi c'è spesso, poco chi passa una volta.",
             ),
         )
         FormulaCard(
             title = tr("medals.region.math.thm1", "Teorema 1 · Sala piena e Zoccolo duro"),
             formula = { MathLine("q ≥ 8,5% · 15% · 25%") },
             caption = tr(
-                "medals.region.math.thm1.caption",
-                "Bronzo, argento, oro. Per Sala piena \$v\$ sono i timbratori dell'evento migliore dell'anno; per Zoccolo duro \$v = e\$, sugli eventi della regione.",
+                "medals.region.math.thm1.caption_v2",
+                "Bronzo, argento, oro. Per Sala piena \$v\$ sono i timbratori dell'evento migliore della stagione; per Zoccolo duro \$v = e\$, sugli eventi della regione.",
             ),
         )
         FormulaCard(
             title = tr("medals.region.math.thm2", "Teorema 2 · Tutti presenti"),
             formula = { MathLine("q ≥ 5% · 10% · 15%") },
             caption = tr(
-                "medals.region.math.thm2.caption",
-                "Bronzo, argento, oro. \$v\$ sono i soci visti ad almeno due eventi diversi nell'anno, in tutta Italia: chi compare una volta sola non entra.",
+                "medals.region.math.thm2.caption_v2",
+                "Bronzo, argento, oro. \$v\$ sono i soci visti ad almeno due eventi diversi nella stagione, in tutta Italia: chi compare una volta sola non entra.",
             ),
         )
         FormulaCard(
@@ -197,16 +200,16 @@ private fun MathExplanation() {
                 MathLine(" ≥ 25% · 40% · 60%")
             },
             caption = tr(
-                "medals.region.math.thm3.caption",
-                "\$n_{i}\$ i soci della regione iscritti all'app nell'anno, \$n_{t}\$ quelli con il primo timbro entro due mesi. Qui la quota è semplice, senza l'esponente.",
+                "medals.region.math.thm3.caption_v2",
+                "\$n_{i}\$ i soci della regione iscritti all'app nella stagione, \$n_{t}\$ quelli con il primo timbro entro due mesi. Qui la quota è semplice, senza l'esponente.",
             ),
         )
         FormulaCard(
             title = tr("medals.region.math.thm4", "Teorema 4 · i conteggi"),
             formula = { MathLine("c ≥ c_{bronzo}, c_{argento}, c_{oro}") },
             caption = tr(
-                "medals.region.math.thm4.caption",
-                "Casa aperta 2 · 4 · 6 regioni. In trasferta 2 · 4 · 6 regioni. Senza pause 6 · 9 · 12 mesi. Padroni di casa 1 · 2 · 3 eventi. Staffetta 2 · 3 · 4 persone. Podio: 3°, 2°, 1° posto al 31 dicembre.",
+                "medals.region.math.thm4.caption_v2",
+                "Casa aperta 2 · 4 · 6 regioni. In trasferta 2 · 4 · 6 regioni. Senza pause 6 · 9 · 12 mesi. Padroni di casa 1 · 2 · 3 eventi. Staffetta 2 · 3 · 4 persone. Podio: 3°, 2°, 1° posto al 30 settembre.",
             ),
         )
     }

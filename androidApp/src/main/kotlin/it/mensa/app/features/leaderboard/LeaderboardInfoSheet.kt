@@ -139,15 +139,18 @@ private fun BasicExplanation(kinds: List<LeaderboardKind>) {
             ),
             Triple(
                 Icons.Outlined.HourglassBottom,
-                tr("leaderboard.info.time.title_v2", "Scadenza"),
-                tr("leaderboard.info.time.detail_v3", "I punti durano un anno e calano piano piano; due anni per gli eventi nazionali."),
+                tr("leaderboard.info.time.title_v3", "Stagione"),
+                tr(
+                    "leaderboard.info.time.detail_v4",
+                    "La classifica conta una stagione, dal 1° ottobre al 30 settembre, e riparte da zero ogni 1° ottobre. Dentro la stagione i punti non calano: ogni timbro e ogni evento vale per intero fino alla chiusura. Le stagioni chiuse restano nell'albo d'oro.",
+                ),
             ),
             Triple(
                 Icons.Outlined.MilitaryTech,
                 tr("leaderboard.info.medals.title", "Medaglie"),
                 tr(
-                    "leaderboard.info.medals.detail_v5",
-                    "Ogni medaglia del Tableport aggiunge punti: più il metallo è prezioso, più punti. Contano solo i timbri che in classifica valgono almeno un punto.",
+                    "leaderboard.info.medals.detail_v6",
+                    "Ogni medaglia di stagione del Tableport aggiunge punti: più il metallo è prezioso, più punti. Le medaglie per sempre (tessera, app, calendario) non ne danno. Contano solo i timbri che in classifica valgono almeno un punto.",
                 ),
             ),
             Triple(
@@ -161,7 +164,7 @@ private fun BasicExplanation(kinds: List<LeaderboardKind>) {
             Triple(
                 Icons.Outlined.FormatListNumbered,
                 tr("leaderboard.info.top.title", "I primi 10"),
-                tr("leaderboard.info.top.detail_v3", "Si vedono i primi dieci. A pari punti, pari posizione."),
+                tr("leaderboard.info.top.detail_v4", "Si vedono i primi dieci. A pari punti, pari posizione. Compare solo chi ha almeno un timbro valido nella stagione."),
             ),
         ),
         tr("leaderboard.tab.regions", "Regioni") to listOf(
@@ -169,8 +172,8 @@ private fun BasicExplanation(kinds: List<LeaderboardKind>) {
                 Icons.Outlined.Map,
                 tr("leaderboard.info.regions.score.title", "Punteggio"),
                 tr(
-                    "leaderboard.info.regions.score.detail_v2",
-                    "Si sommano gli eventi fatti in regione nell'ultimo anno, da chiunque organizzati, fino a 10 punti l'uno. Il totale è poi pesato per quanto è ampia, rispetto ai soci della regione, la comunità che timbra ai suoi eventi. I nazionali ospitati si aggiungono a parte.",
+                    "leaderboard.info.regions.score.detail_v3",
+                    "Si sommano gli eventi fatti in regione nella stagione, da chiunque organizzati, fino a 10 punti l'uno. Il totale è poi pesato per quanto è ampia, rispetto ai soci della regione, la comunità che timbra ai suoi eventi. I nazionali ospitati si aggiungono a parte.",
                 ),
             ),
             Triple(
@@ -233,8 +236,8 @@ private fun MathExplanation(kinds: List<LeaderboardKind>) {
                 Fraction("p", "N_{r}^{0,7} · N̄^{0,3}")
             },
             caption = tr(
-                "leaderboard.math.definitions.caption",
-                "Sia \$p\$ il numero di soci che hanno preso il timbro di un evento, organizzatore escluso; \$N_{r}\$ i soci attivi della regione dell'evento, \$N̄\$ quelli di una regione media; \$Δt\$ i giorni trascorsi. \$s\$ è la quota di timbratori: l'esponente 0,7 perché l'affluenza cresce meno che linearmente con i soci. Le sedi che coprono due regioni contano come una; per gli eventi nazionali o senza regione \$N_{r} = N̄\$.",
+                "leaderboard.math.definitions.caption_v2",
+                "Sia \$p\$ il numero di soci che hanno preso il timbro di un evento, organizzatore escluso; \$N_{r}\$ i soci attivi della regione dell'evento, \$N̄\$ quelli di una regione media. \$s\$ è la quota di timbratori: l'esponente 0,7 perché l'affluenza cresce meno che linearmente con i soci. Le sedi che coprono due regioni contano come una; per gli eventi nazionali o senza regione \$N_{r} = N̄\$.",
             ),
         )
         FormulaCard(
@@ -266,18 +269,17 @@ private fun MathExplanation(kinds: List<LeaderboardKind>) {
                 MathLine(")")
             },
             caption = tr(
-                "leaderboard.math.lemma2.caption",
-                "\$n_{i}\$ i timbri dell'\$i\$-esimo socio agli eventi regionali degli ultimi 12 mesi. \$e\$ è il numero di soci equivalenti: uguale ai timbratori se ognuno timbra una volta sola, tende a 1 se timbra sempre uno solo. La sua quota sulla regione passa nella stessa \$σ\$, quindi \$c = 1\$ dal 15% in su. Per i nazionali \$c = 1\$.",
+                "leaderboard.math.lemma2.caption_v2",
+                "\$n_{i}\$ i timbri dell'\$i\$-esimo socio agli eventi regionali della stagione. \$e\$ è il numero di soci equivalenti: uguale ai timbratori se ognuno timbra una volta sola, tende a 1 se timbra sempre uno solo. La sua quota sulla regione passa nella stessa \$σ\$, quindi \$c = 1\$ dal 15% in su. Per i nazionali \$c = 1\$.",
             ),
         )
         FormulaCard(
-            title = tr("leaderboard.math.lemma3", "Lemma 3 · la scadenza"),
-            formula = {
-                MathLine("d = max(0, 1 − ")
-                Fraction("Δt", "365")
-                MathLine(")")
-            },
-            caption = tr("leaderboard.math.lemma3.caption", "Lineare; 730 al posto di 365 per gli eventi nazionali."),
+            title = tr("leaderboard.math.lemma3_v2", "Lemma 3 · la stagione"),
+            formula = { MathLine("d = 1_{stagione}(data)") },
+            caption = tr(
+                "leaderboard.math.lemma3.caption_v2",
+                "Vale 1 per un evento tra il 1° ottobre e il 30 settembre, 0 fuori dalla stagione: nessun decadimento. Vale anche per i nazionali.",
+            ),
         )
         if (members) {
             FormulaCard(
@@ -299,14 +301,14 @@ private fun MathExplanation(kinds: List<LeaderboardKind>) {
                 title = tr("leaderboard.math.thm3", "Teorema 3 · le medaglie"),
                 formula = { MathLine("M = Σ m,  m ∈ {3, 5, 8, 10, 20}") },
                 caption = tr(
-                    "leaderboard.math.thm3.caption_v2",
-                    "Bronzo 3, argento 5, oro 10, platino 20; 8 per le medaglie a livello unico. Contano solo i timbri con \$20 · σ(s) ≥ 1\$, cioè \$s\$ oltre il 3,8%, a prescindere da \$d\$ e \$c\$.",
+                    "leaderboard.math.thm3.caption_v3",
+                    "Bronzo 3, argento 5, oro 10, platino 20; 8 per le medaglie a livello unico. Sommano solo le medaglie di stagione, coi contatori della stagione: quelle per sempre non danno punti. Contano solo i timbri con \$20 · σ(s) ≥ 1\$, cioè \$s\$ oltre il 3,8%, a prescindere da \$d\$ e \$c\$.",
                 ),
             )
             FormulaCard(
                 title = tr("leaderboard.math.cor1", "Corollario 1 · il socio"),
                 formula = { MathLine("S = ΣT + ΣE + M") },
-                caption = tr("leaderboard.math.cor1.caption", "Sui timbri e sugli eventi degli ultimi 12 mesi (24 i nazionali); ordinamento per \$S\$ arrotondato."),
+                caption = tr("leaderboard.math.cor1.caption_v2", "Sui timbri e sugli eventi della stagione, dal 1° ottobre al 30 settembre; compare solo chi ha almeno un timbro valido nella stagione. Ordinamento per \$S\$ arrotondato."),
             )
         }
         if (regions) {
@@ -314,8 +316,8 @@ private fun MathExplanation(kinds: List<LeaderboardKind>) {
                 title = tr("leaderboard.math.thm4", "Teorema 4 · la regione"),
                 formula = { MathLine("R = c · ΣE_{r} + ΣE_{n}") },
                 caption = tr(
-                    "leaderboard.math.thm4.caption",
-                    "\$E_{r}\$ come nel Teorema 2 ma con \$c = 1\$, sugli eventi non nazionali degli ultimi 12 mesi nella regione, da chiunque organizzati; il fattore si applica una volta sola alla somma, ed è lo stesso: \$Σ c·E = c·ΣE\$. \$E_{n}\$ sui nazionali ospitati, \$d\$ a 24 mesi, senza \$c\$.",
+                    "leaderboard.math.thm4.caption_v2",
+                    "\$E_{r}\$ come nel Teorema 2 ma con \$c = 1\$, sugli eventi non nazionali della stagione nella regione, da chiunque organizzati; il fattore si applica una volta sola alla somma, ed è lo stesso: \$Σ c·E = c·ΣE\$. \$E_{n}\$ sui nazionali ospitati della stagione, senza \$c\$.",
                 ),
             )
         }

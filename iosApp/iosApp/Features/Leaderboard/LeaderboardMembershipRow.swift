@@ -8,8 +8,14 @@ struct LeaderboardMembershipRow: View {
     /// Nil when the members' ranking is switched off and only regions or
     /// secretaries are on: the row then just opens the page.
     let board: LeaderboardBoard?
+    /// The season just closed, when the new one has no ranking yet: its
+    /// members' podium stands in for the board, under the season's name.
+    var lastSeason: HallSeason?
 
     private var detail: String? {
+        if let lastSeason {
+            return tr("leaderboard.home.last_season", fallback: "Stagione {season}", ["season": lastSeason.label])
+        }
         guard let board else { return tr("leaderboard.home.regions", fallback: "Regioni e segretari") }
         if board.me != nil, let gap = board.pointsToNext?.int32Value, let next = board.nextPosition?.int32Value {
             return tr("leaderboard.home.to_next", fallback: "{points} punti al {position}° posto",
@@ -35,7 +41,18 @@ struct LeaderboardMembershipRow: View {
                 Text(tr("leaderboard.home.section", fallback: "Classifica"))
                     .font(.body)
                     .foregroundStyle(.primary)
-                if let detail {
+                if let lastSeason {
+                    // The closed season's name and its first three places, one line each.
+                    Text(detail ?? lastSeason.label)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tint)
+                    ForEach(Array(lastSeason.members.podium.prefix(3)), id: \.id) { entry in
+                        Text("\(entry.position)° \(entry.displayName)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                } else if let detail {
                     Text(detail)
                         .font(.footnote)
                         .foregroundStyle(.secondary)

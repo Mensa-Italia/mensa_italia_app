@@ -6,8 +6,9 @@ import kotlinx.serialization.Serializable
 /**
  * One row of `view_leaderboard`: a member's place in the ranking and the
  * points behind it. The view computes everything (stamps weighted by how
- * many members took them and fading over 12 months, medals, events
- * organised); the app only shows it.
+ * many members took them, medals, events organised, all inside the season
+ * from 1 October to 30 September); the app only shows it. Only members with
+ * at least one valid stamp in the season have a row.
  *
  * Numbers are declared as numbers in PocketBase's schema, so they may come
  * as `12` or `12.0`: read as Double, shown as whole numbers.
@@ -16,6 +17,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LeaderboardEntryModel(
     val id: String = "",
+    /** The season the row is for, by the year it starts in; 0 from an older view. */
+    val season: Double = 0.0,
     val name: String = "",
     val position: Double = 0.0,
     val score: Double = 0.0,

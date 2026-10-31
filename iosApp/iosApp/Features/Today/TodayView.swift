@@ -231,16 +231,21 @@ struct TodayView: View {
                 let boards = koin.featureFlags.enabledLeaderboards()
                 let membersOn = boards.contains(.members)
                 let membersBoard = leaderboardStore.board.flatMap { $0.rows.isEmpty ? nil : $0 }
+                // Season just started, nobody ranked yet: the podium of the
+                // season before stands in for the empty ranking.
+                let lastSeason = membersOn && leaderboardStore.board != nil && membersBoard == nil
+                    ? leaderboardStore.hall?.latest.flatMap { $0.members.podium.isEmpty ? nil : $0 }
+                    : nil
                 // Arriva dalla rete dopo il resto della card: entra sfumando
                 // (the store sets `board` inside withAnimation).
-                if !boards.isEmpty, !membersOn || membersBoard != nil {
+                if !boards.isEmpty, !membersOn || membersBoard != nil || lastSeason != nil {
                     Group {
                         Divider().padding(.leading, 60)
 
                         NavigationLink {
                             LeaderboardView()
                         } label: {
-                            LeaderboardMembershipRow(board: membersOn ? membersBoard : nil)
+                            LeaderboardMembershipRow(board: membersOn ? membersBoard : nil, lastSeason: lastSeason)
                         }
                         .buttonStyle(.plain)
                     }

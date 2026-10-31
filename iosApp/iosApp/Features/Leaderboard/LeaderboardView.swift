@@ -16,6 +16,7 @@ struct LeaderboardView: View {
     @State private var store = LeaderboardStore.shared
     @State private var showInfo = false
     @State private var showSettings = false
+    @State private var showHall = false
     @State private var openMember: String?
     @State private var board = Board.members
     /// A region's or secretary's row, tapped: its calculation in a sheet.
@@ -79,6 +80,12 @@ struct LeaderboardView: View {
         }
         .darkStage()
         .toolbar {
+            // The closed seasons: next to the ⓘ, same style.
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showHall = true } label: {
+                    Label(tr("leaderboard.hall.title", fallback: "Albo d'oro"), systemImage: "trophy")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showInfo = true } label: {
                     Label(tr("leaderboard.how_it_works", fallback: "Come funziona"), systemImage: "info.circle")
@@ -95,6 +102,7 @@ struct LeaderboardView: View {
         }
         .sheet(isPresented: $showInfo) { LeaderboardInfoSheet(kinds: kinds) }
         .sheet(isPresented: $showSettings) { LeaderboardSettingsSheet() }
+        .sheet(isPresented: $showHall) { LeaderboardHallSheet(kinds: kinds) }
         .sheet(item: $detail) { item in
             RegionScoreSheet(detail: item) { id in
                 detail = nil
@@ -192,7 +200,7 @@ struct LeaderboardView: View {
                     }
                 }
             } header: {
-                Text(tr("leaderboard.last_year", fallback: "Ultimi 12 mesi"))
+                Text(seasonTitle)
             } footer: {
                 Text(regionsFooter)
             }
@@ -218,11 +226,16 @@ struct LeaderboardView: View {
                     }
                 }
             } header: {
-                Text(tr("leaderboard.last_year", fallback: "Ultimi 12 mesi"))
+                Text(seasonTitle)
             } footer: {
                 Text(regionsFooter)
             }
         }
+    }
+
+    /// "Stagione 2026/27": the window the rankings count.
+    private var seasonTitle: String {
+        tr("leaderboard.season", fallback: "Stagione {season}", ["season": store.seasonLabel])
     }
 
     private var regionsFooter: String {
@@ -259,8 +272,8 @@ struct LeaderboardView: View {
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
                 } header: {
-                    Text(tr("leaderboard.top_label", fallback: "I primi {count}",
-                            ["count": "\(LeaderboardBoard.companion.TOP_SIZE)"]))
+                    Text(tr("leaderboard.subtitle_top_v2", fallback: "Stagione {season} · i primi {count}",
+                            ["season": store.seasonLabel, "count": "\(LeaderboardBoard.companion.TOP_SIZE)"]))
                 }
             }
     }
@@ -318,7 +331,7 @@ struct LeaderboardView: View {
                         RankRow(row: me) { openMember = $0 }
                     }
                 } footer: {
-                    Text(tr("leaderboard.footer", fallback: "Ultimi 12 mesi. A pari punti, pari posizione."))
+                    Text(tr("leaderboard.footer_v2", fallback: "Dal 1° ottobre al 30 settembre. A pari punti, pari posizione."))
                 }
             }
     }
@@ -525,9 +538,8 @@ private func scoreSteps(_ score: RegionScore) -> [(title: String, value: String,
         (tr("leaderboard.calc.step1.title", fallback: "1 · Gli eventi in regione"),
          pts(score.participation),
          score.eventsTotal == 0
-            ? tr("leaderboard.calc.step1.none", fallback: "Nessun evento in regione negli ultimi 12 mesi, quindi nessun punto da questa voce.")
-            : tr("leaderboard.calc.step1.detail",
-                 fallback: "Negli ultimi 12 mesi in regione si sono fatti {events} eventi, {attendance} timbri in tutto. Ogni evento vale fino a 10 punti secondo quanti soci della regione hanno timbrato: niente se erano meno del 2%, il massimo dal 15% in su. Ne hanno superato la soglia {scoring}; i punti calano col passare dei mesi e spariscono dopo un anno. Sommati fanno {points} punti.",
+            ? tr("leaderboard.calc.step1.none_v2", fallback: "Nessun evento in regione in questa stagione, quindi nessun punto da questa voce.")
+            : tr("leaderboard.calc.step1.detail_v2", fallback: "In questa stagione in regione si sono fatti {events} eventi, {attendance} timbri in tutto. Ogni evento vale fino a 10 punti secondo quanti soci della regione hanno timbrato: niente se erano meno del 2%, il massimo dal 15% in su. Ne hanno superato la soglia {scoring}; i punti non calano, valgono per intero fino alla chiusura della stagione. Sommati fanno {points} punti.",
                  ["events": "\(score.eventsTotal)", "attendance": "\(score.attendanceTotal)",
                   "scoring": "\(score.eventsScoring)", "points": "\(score.participation)"])),
         (tr("leaderboard.calc.step2.title", fallback: "2 · Chi timbra"),
@@ -541,9 +553,8 @@ private func scoreSteps(_ score: RegionScore) -> [(title: String, value: String,
         (tr("leaderboard.calc.step3.title", fallback: "3 · I nazionali ospitati"),
          "+ " + pts(score.nationalPoints),
          score.nationalEvents == 0
-            ? tr("leaderboard.calc.step3.none", fallback: "Nessun evento nazionale ospitato negli ultimi 24 mesi: niente da aggiungere.")
-            : tr("leaderboard.calc.step3.detail",
-                 fallback: "La regione ha ospitato {events} eventi nazionali negli ultimi 24 mesi, che valgono {points} punti con la stessa curva sui timbri. Si sommano a parte, senza il fattore del passo 2: un convegno porta gente da tutta Italia, non misura la comunità locale.",
+            ? tr("leaderboard.calc.step3.none_v2", fallback: "Nessun evento nazionale ospitato in questa stagione: niente da aggiungere.")
+            : tr("leaderboard.calc.step3.detail_v2", fallback: "La regione ha ospitato {events} eventi nazionali in questa stagione, che valgono {points} punti con la stessa curva sui timbri. Si sommano a parte, senza il fattore del passo 2: un convegno porta gente da tutta Italia, non misura la comunità locale.",
                  ["events": "\(score.nationalEvents)", "points": "\(score.nationalPoints)"])),
     ]
 }

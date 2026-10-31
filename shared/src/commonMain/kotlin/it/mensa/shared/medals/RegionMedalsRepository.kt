@@ -6,12 +6,10 @@ import it.mensa.shared.api.endpoints.RegSociApi
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.db.MensaDatabase
+import it.mensa.shared.time.Season
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
@@ -33,7 +31,7 @@ class RegionMedalsRepository(
     private val db: MensaDatabase,
     private val json: Json,
     private val flags: FeatureFlags,
-    private val currentYear: () -> Int = ::thisYear,
+    private val currentSeason: () -> Int = { Season.current() },
 ) {
     /** What was read for [userId]: their region's key (null when they have none) and its rows (null until read). */
     private data class Held(val userId: String, val key: String?, val rows: List<RegionMedalModel>?)
@@ -59,14 +57,14 @@ class RegionMedalsRepository(
         combine(held, auth.currentUser) { held, user ->
             val meId = meId(user?.id)
             val rows = held?.takeIf { it.userId == meId && it.key != null }?.rows ?: return@combine null
-            RegionMedalsState.build(rows, currentYear(), json, meId)
+            RegionMedalsState.build(rows, currentSeason(), json, meId)
         }
 
     /** Rereads the region and its medals. Throws on network errors; the last read stays. */
     @Throws(Exception::class)
     suspend fun refresh() {
         if (RegionMedalFixtures.enabled) {
-            held.value = Held(MedalFixtures.ME_ID, RegionMedalFixtures.KEY, RegionMedalFixtures.rows(currentYear()))
+            held.value = Held(MedalFixtures.ME_ID, RegionMedalFixtures.KEY, RegionMedalFixtures.rows(currentSeason()))
             return
         }
         if (!flags.regionMedalsEnabled) return
@@ -77,7 +75,7 @@ class RegionMedalsRepository(
             held.value = Held(userId, null, null)
             return
         }
-        val rows: List<RegionMedalModel> = pb.fullList(COLLECTION, filter = "region_key = \"${key.replace("\"", "")}\"", sort = "-year,medal")
+        val rows: List<RegionMedalModel> = pb.fullList(COLLECTION, filter = "region_key = \"${key.replace("\"", "")}\"", sort = "-season,medal")
         held.value = Held(userId, key, rows)
         runCatching {
             db.keyValueQueries.insertOrReplace(
@@ -128,5 +126,3 @@ class RegionMedalsRepository(
         const val CACHE_KEY_PREFIX = "region_medals"
     }
 }
-
-private fun thisYear(): Int = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year

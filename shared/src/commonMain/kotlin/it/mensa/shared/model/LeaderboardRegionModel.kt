@@ -6,13 +6,15 @@ import kotlinx.serialization.Serializable
 /**
  * One row of `view_leaderboard_regioni`: a local office's place in the
  * regions' ranking. The view computes everything (the region's events over
- * the last 12 months weighted by the share of members present, times how
+ * the season weighted by the share of members present, times how
  * wide the community that attends is, plus the national events it hosted);
  * the app only shows it. Numbers come as `12` or `12.0`: read as Double.
  */
 @Serializable
 data class LeaderboardRegionModel(
     val id: String = "",
+    /** The season the row is for, by the year it starts in; 0 from an older view. */
+    val season: Double = 0.0,
     val name: String = "",
     val region: String = "",
     @SerialName("region_key") val regionKey: String = "",
@@ -44,6 +46,8 @@ data class LeaderboardRegionModel(
 @Serializable
 data class LeaderboardSecretaryModel(
     val id: String = "",
+    /** The season the row is for, by the year it starts in; 0 from an older view. */
+    val season: Double = 0.0,
     val name: String = "",
     @SerialName("local_office") val localOffice: String = "",
     val region: String = "",

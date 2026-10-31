@@ -40,7 +40,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import it.mensa.app.support.tr
 import it.mensa.shared.koinAccess
+import it.mensa.shared.medals.MedalHistory
+import it.mensa.shared.medals.MedalRules
+import it.mensa.shared.medals.MedalSeasonResult
 import it.mensa.shared.medals.MedalStatus
+import it.mensa.shared.time.Season
 import it.mensa.shared.medals.MedalTier as SharedTier
 
 /**
@@ -72,24 +76,37 @@ data class Medal(
     val countsStamps: Boolean,
     /** Set for a medal of the member's region, which has more to say than a personal one. */
     val region: RegionMedalDetail? = null,
+    /** Won again every season (see `MedalFamily`); false for the lifetime ones and the region's. */
+    val seasonal: Boolean = false,
+    /** Set for the result of a closed season (an "annata"): the season it is, by the year it starts in. */
+    val pastSeason: Int? = null,
 )
 
+/** One closed season's result for a seasonal medal, as the detail's strip shows it. */
+data class PastResult(val season: Int, val tier: MedalTier?, val value: Int)
+
+/** A closed season in the "Annate": its seasonal medals with the metal each ended in. */
+data class PastSeasonUi(val season: Int, val medals: List<Medal>) {
+    val earnedCount: Int get() = medals.count { it.isEarned }
+}
+
 /**
- * What a region medal adds to [Medal]: its year, how it's earned, the figure
+ * What a region medal adds to [Medal]: its season, how it's earned, the figure
  * in its unit and the ladder with thresholds written in that unit (a
  * threshold can be 8,5%, so [Medal.levels]' whole numbers won't do).
  * Mirrors iOS `Medal.Region`.
  */
 data class RegionMedalDetail(
-    val year: Int,
+    /** The season, by the year it starts in: 2026 is "2026/27". */
+    val season: Int,
     /** "Come si ottiene". */
     val rule: String,
     /** The figure in its unit: "11,2%", "6", "3°". */
     val valueLabel: String,
-    /** An earlier year: the figure is final, with no next goal. */
+    /** An earlier season: the figure is final, with no next goal. */
     val isPast: Boolean,
     val isPodium: Boolean,
-    /** Every metal with the figure that earns it, and whether the year reached it. */
+    /** Every metal with the figure that earns it, and whether the season reached it. */
     val ladder: List<RegionLadderStep>,
     /** The next metal's threshold, in the unit. */
     val nextLabel: String?,
@@ -153,12 +170,15 @@ object MedalCatalog {
         "night_owl", "early_bird", "halloween", "new_year", "valentine", "pi_day", "birthday", "front_row", "better_late",
     )
 
+    /** Key suffix of the descriptions whose text changed meaning, so an older translation doesn't win. */
+    val detailSuffix: Map<String, String> = mapOf("four_seasons" to "_v2")
+
     val info: Map<String, MedalInfo> = mapOf(
         "collector" to MedalInfo("Collezionista", "Francobolli raccolti nel passaporto, tra quelli che in classifica valgono almeno un punto. Quelli dei tuoi eventi contano nella medaglia Organizzatore.", Icons.Filled.Verified),
         "steady" to MedalInfo("Costante", "Mesi diversi con almeno un francobollo.", Icons.Filled.CalendarMonth),
         "unstoppable" to MedalInfo("Inarrestabile", "Mesi consecutivi con almeno un francobollo.", Icons.Filled.LocalFireDepartment),
         "marathon" to MedalInfo("Maratoneta", "Francobolli raccolti in un solo giorno.", Icons.Filled.DirectionsRun),
-        "four_seasons" to MedalInfo("Quattro stagioni", "Un francobollo in ogni stagione dello stesso anno.", Icons.Filled.Eco),
+        "four_seasons" to MedalInfo("Quattro stagioni", "Un francobollo in ciascuna delle quattro stagioni dell'anno: primavera, estate, autunno e inverno.", Icons.Filled.Eco),
         "pioneer" to MedalInfo("Pioniere", "Tra i primi dieci a raccogliere un francobollo.", Icons.Filled.AutoAwesome),
         "globetrotter" to MedalInfo("Giramondo", "Regioni diverse in cui hai raccolto francobolli.", Icons.Filled.Public),
         "traveller" to MedalInfo("Trasfertista", "Francobolli raccolti fuori dalla tua regione.", Icons.Filled.DirectionsCar),
@@ -190,7 +210,7 @@ private fun MedalStatus.toMedal(): Medal {
     return Medal(
         id = id,
         title = if (hidden) tr("medals.secret.title", "Medaglia segreta") else tr("medals.$id.title", info.title),
-        detail = if (hidden) tr("medals.secret.detail", "Si svela quando la ottieni.") else tr("medals.$id.detail", info.detail),
+        detail = if (hidden) tr("medals.secret.detail", "Si svela quando la ottieni.") else tr("medals.$id.detail${MedalCatalog.detailSuffix[id].orEmpty()}", info.detail),
         icon = if (hidden) Icons.Filled.QuestionMark else info.icon,
         tier = MedalTier.of(displayTier),
         isEarned = isEarned,
@@ -201,6 +221,35 @@ private fun MedalStatus.toMedal(): Medal {
         progress = progress.toFloat(),
         levels = levels.map { MedalTier.of(it.tier) to it.threshold },
         countsStamps = id in MedalCatalog.stampBased,
+        seasonal = isSeasonal,
+    )
+}
+
+/**
+ * A seasonal medal as it ended in a closed season: the metal won (or the
+ * first one, dark, when it ended without), with no next goal.
+ */
+@Composable
+private fun MedalSeasonResult.toMedal(): Medal? {
+    val rule = MedalRules.rule(medalId) ?: return null
+    val info = MedalCatalog.info[medalId] ?: MedalInfo(medalId, "", Icons.Filled.WorkspacePremium)
+    val first = MedalTier.of(rule.levels.first().first)
+    return Medal(
+        id = medalId,
+        title = tr("medals.$medalId.title", info.title),
+        detail = tr("medals.$medalId.detail${MedalCatalog.detailSuffix[medalId].orEmpty()}", info.detail),
+        icon = info.icon,
+        tier = tier?.let { MedalTier.of(it) } ?: first,
+        isEarned = tier != null,
+        isHidden = false,
+        value = value,
+        nextTier = null,
+        nextThreshold = null,
+        progress = 1f,
+        levels = rule.levels.map { MedalTier.of(it.first) to it.second },
+        countsStamps = medalId in MedalCatalog.stampBased,
+        seasonal = true,
+        pastSeason = season,
     )
 }
 
@@ -222,8 +271,11 @@ private fun bestFirst(medals: List<Medal>): List<Medal> =
             .thenByDescending { if (!it.isEarned && !it.isHidden) it.progress else 0f },
     )
 
-/** The member's medals and whether the last read failed with nothing read before. */
-data class MedalsState(val medals: List<Medal>, val failed: Boolean) {
+/**
+ * The member's medals, the season the seasonal ones are counted in, and
+ * whether the last read failed with nothing read before.
+ */
+data class MedalsState(val medals: List<Medal>, val failed: Boolean, val season: Int = Season.current()) {
     val earnedCount: Int get() = medals.count { it.isEarned }
 }
 
@@ -235,9 +287,30 @@ data class MedalsState(val medals: List<Medal>, val failed: Boolean) {
 fun rememberMedals(): MedalsState {
     val repository = remember { koinAccess().medals }
     val statuses by repository.observe().collectAsState(initial = emptyList())
+    val season by repository.observeSeason().collectAsState(initial = Season.current())
     var failed by remember { mutableStateOf(false) }
     LaunchedEffect(repository) {
         failed = runCatching { repository.refresh() }.isFailure && statuses.isEmpty()
     }
-    return MedalsState(bestFirst(statuses.map { it.toMedal() }), failed)
+    return MedalsState(bestFirst(statuses.map { it.toMedal() }), failed, season)
 }
+
+/** The member's closed seasons: for the "Annate" and for each seasonal medal's strip of past metals. */
+data class MedalHistoryState(val seasons: List<PastSeasonUi>, private val byMedal: Map<String, List<PastResult>>) {
+    /** [medalId]'s result in every closed season, latest first. */
+    fun results(medalId: String): List<PastResult> = byMedal[medalId].orEmpty()
+}
+
+/** The seasonal medals' past seasons, rereading `medals_history` when the caller appears. */
+@Composable
+fun rememberMedalHistory(): MedalHistoryState {
+    val repository = remember { koinAccess().medalsHistory }
+    val history by repository.observe().collectAsState(initial = MedalHistory.EMPTY)
+    LaunchedEffect(repository) { runCatching { repository.refresh() } }
+    val seasons = history.seasons.map { season -> PastSeasonUi(season.season, season.results.mapNotNull { it.toMedal() }) }
+    val byMedal = history.seasons.flatMap { it.results }.groupBy({ it.medalId }) {
+        PastResult(it.season, it.tier?.let(MedalTier::of), it.value)
+    }
+    return MedalHistoryState(seasons, byMedal)
+}
+

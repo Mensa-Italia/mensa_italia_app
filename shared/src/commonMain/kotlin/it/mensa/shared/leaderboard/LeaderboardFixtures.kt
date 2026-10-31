@@ -3,6 +3,8 @@ package it.mensa.shared.leaderboard
 import it.mensa.shared.model.LeaderboardEntryModel
 import it.mensa.shared.model.LeaderboardRegionModel
 import it.mensa.shared.model.LeaderboardSecretaryModel
+import it.mensa.shared.model.LeaderboardSeasonModel
+import it.mensa.shared.time.Season
 import kotlin.math.round
 
 /**
@@ -39,6 +41,7 @@ object LeaderboardFixtures {
         val medals = (score * 0.38).coerceAtMost(110.0)
         LeaderboardEntryModel(
             id = if (index == mePlace - 1) ME_ID else "fixture-$index",
+            season = Season.current().toDouble(),
             name = name,
             position = (index + 1).toDouble(),
             score = score,
@@ -94,7 +97,7 @@ object LeaderboardFixtures {
 
     val regions: List<LeaderboardRegionModel> get() = ranked.map { (s, position) ->
         LeaderboardRegionModel(
-            id = "fixture-office-${s.region}", name = s.region, region = s.region, regionKey = s.region,
+            id = "fixture-office-${s.region}", season = Season.current().toDouble(), name = s.region, region = s.region, regionKey = s.region,
             position = position.toDouble(), score = scoreOf(s), participation = s.participation.toDouble(),
             communityPct = s.community.toDouble(), nationalPoints = s.national.toDouble(),
             nationalEvents = if (s.national > 0) 1.0 else 0.0,
@@ -110,7 +113,8 @@ object LeaderboardFixtures {
     /** One secretary per region, named from [names]; the signed-in member is the fourth. */
     val secretaries: List<LeaderboardSecretaryModel> get() = ranked.mapIndexed { index, (s, position) ->
         LeaderboardSecretaryModel(
-            id = if (index == 3) ME_ID else "fixture-secretary-$index", name = names[index + 5],
+            id = if (index == 3) ME_ID else "fixture-secretary-$index", season = Season.current().toDouble(),
+            name = names[index + 5],
             localOffice = "fixture-office-${s.region}", region = s.region,
             position = position.toDouble(), score = scoreOf(s), participation = s.participation.toDouble(),
             communityPct = s.community.toDouble(), nationalPoints = s.national.toDouble(),
@@ -123,4 +127,53 @@ object LeaderboardFixtures {
             previousPosition = if (position % 2 == 0) position + 1.0 else (position - 1).coerceAtLeast(1).toDouble(),
         )
     }
+
+    // The hall of fame: invented winners of the two seasons before the current one.
+    private val hallMembers = listOf(
+        listOf(
+            "Matilde Corsi" to 214, "Ettore Bassi" to 201, "Nadia Pagani" to 196, "Orlando Fiore" to 188,
+            "Teresa Gallo" to 172, "Valerio Dini" to 165, "Lidia Ferraro" to 151, "Sergio Amato" to 149,
+            "Cinzia Rota" to 133, "Fabio Guerra" to 128,
+        ),
+        listOf(
+            "Ornella Piras" to 187, "Dario Stella" to 181, "Marta Cosentino" to 170, "Ivan Basile" to 163,
+            "Luisa Marini" to 158, "Raffaele Pace" to 150, "Elisa Zanetti" to 144, "Guido Carbone" to 139,
+            "Paola Sanna" to 131, "Cesare Poli" to 122,
+        ),
+    )
+    private val hallRegions = listOf(
+        listOf("Valle Chiara" to 18, "Terre Alte" to 15, "Laguna" to 11, "Pianura Grande" to 9, "Colline" to 7),
+        listOf("Laguna" to 16, "Valle Chiara" to 14, "Altopiano" to 12, "Terre Alte" to 8, "Costa Verde" to 5),
+    )
+    private val hallSecretaries = listOf(
+        listOf("Bruno Sartori", "Cecilia Monaco", "Domenico Vitale", "Emma Palumbo", "Flavio Rossetti"),
+        listOf("Gaia Santoro", "Livio Benedetti", "Monica Pellegrino", "Nello Cattani", "Olga Fumagalli"),
+    )
+
+    /**
+     * `leaderboard_seasons` as the server sends it: for each closed season the
+     * top 10 of the members' board, the regions' and the secretaries', and the
+     * signed-in member's own row in the first one (a place below the podium).
+     */
+    fun seasons(current: Int = Season.current()): List<LeaderboardSeasonModel> =
+        hallMembers.indices.flatMap { index ->
+            val season = current - 1 - index
+            fun row(board: String, subject: String, name: String, position: Int, score: Int, key: String = "", office: String = "") =
+                LeaderboardSeasonModel(
+                    id = "fixture-$season-$board-$position", board = board, season = season.toDouble(), subject = subject,
+                    name = name, position = position.toDouble(), score = score.toDouble(), regionKey = key, localOffice = office,
+                )
+            val members = hallMembers[index].mapIndexed { place, (name, score) ->
+                row("members", "fixture-hall-$season-$place", name, place + 1, score)
+            }
+            val ownRow = if (index == 0) listOf(row("members", ME_ID, names[mePlace - 1], 23, 74)) else emptyList()
+            val regions = hallRegions[index].mapIndexed { place, (region, score) ->
+                row("regions", "fixture-office-$region", region, place + 1, score, key = region, office = "fixture-office-$region")
+            }
+            val secretaries = hallSecretaries[index].mapIndexed { place, name ->
+                val (region, score) = hallRegions[index][place]
+                row("secretaries", "fixture-hall-secretary-$season-$place", name, place + 1, score, key = region, office = "fixture-office-$region")
+            }
+            members + ownRow + regions + secretaries
+        }
 }

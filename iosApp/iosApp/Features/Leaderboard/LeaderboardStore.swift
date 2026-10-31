@@ -13,6 +13,8 @@ final class LeaderboardStore {
     /// The regions' and secretaries' rankings, best first; nil until read.
     private(set) var regions: [RegionRow]?
     private(set) var secretaries: [SecretaryRow]?
+    /// The hall of fame (closed seasons); nil until read.
+    private(set) var hall: HallOfFame?
     /// Set when the last read failed and nothing was read before.
     private(set) var failed = false
     private(set) var regionsFailed = false
@@ -31,6 +33,9 @@ final class LeaderboardStore {
             },
             subscribeOptionalFlow(koin.leaderboard.observeSecretaries() as Kotlinx_coroutines_coreFlow) { [weak self] (rows: NSArray?) in
                 Task { @MainActor [weak self] in self?.secretaries = rows as? [SecretaryRow] }
+            },
+            subscribeOptionalFlow(koin.leaderboard.observeHall() as Kotlinx_coroutines_coreFlow) { [weak self] (hall: HallOfFame?) in
+                Task { @MainActor [weak self] in self?.hall = hall }
             },
             subscribeFlow(koin.leaderboard.observeHidden() as Kotlinx_coroutines_coreFlow) { [weak self] (value: KotlinBoolean) in
                 Task { @MainActor [weak self] in self?.hidden = value.boolValue }
@@ -66,7 +71,19 @@ final class LeaderboardStore {
         } catch {
             regionsFailed = regions == nil
         }
+        // The hall of fame is a bonus: a failed read leaves what was saved.
+        try? await koin.leaderboard.refreshHall()
     }
+
+    /// The season the rankings are for (its starting year): the rows' own, else the current one.
+    var season: Int {
+        if let board, board.season > 0 { return Int(board.season) }
+        if let row = regions?.first(where: { $0.season > 0 }) { return Int(row.season) }
+        return currentSeason()
+    }
+
+    /// "2026/27".
+    var seasonLabel: String { Season.shared.label(season: Int32(season)) }
 }
 
 /// The podium's metal for a position: gold, silver, bronze; nil past third.
@@ -108,4 +125,10 @@ struct RankAvatar: View {
                 .background(AppTheme.brandGradient, in: Circle())
         }
     }
+}
+
+/// The season running now (its starting year), by the shared rule.
+func currentSeason() -> Int {
+    let now = Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000))
+    return Int(Season.shared.current(now: now))
 }

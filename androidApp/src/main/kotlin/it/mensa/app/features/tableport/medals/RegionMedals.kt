@@ -66,6 +66,7 @@ import it.mensa.shared.medals.RegionMedalStatus
 import it.mensa.shared.medals.RegionMedalTier
 import it.mensa.shared.medals.RegionMedalsState
 import it.mensa.shared.medals.formatFigure
+import it.mensa.shared.time.Season
 import kotlin.math.roundToInt
 
 /** Which of the cabinet's two pages is showing. */
@@ -79,6 +80,8 @@ internal data class RegionMedalInfo(
     val icon: ImageVector,
     /** One label per secondary figure, in the order the server sends them. */
     val figures: List<String>,
+    /** Appended to the detail's and rule's keys, bumped when their text changes meaning. */
+    val keySuffix: String = "",
 )
 
 /**
@@ -92,44 +95,50 @@ internal object RegionMedalCatalog {
         RegionMedalKind.PRESENT to RegionMedalInfo(
             "Tutti presenti",
             "I soci che tornano agli eventi, in rapporto a quanti sono.",
-            "Soci della regione che nell'anno si sono visti ad almeno due eventi diversi, in rapporto a quanti sono. Chi compare una volta sola non conta.",
+            "Soci della regione che nella stagione si sono visti ad almeno due eventi diversi, in rapporto a quanti sono. Chi compare una volta sola non conta.",
             Icons.Filled.Groups,
             listOf("Soci tornati", "Di passaggio"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.HOST to RegionMedalInfo(
             "Casa aperta",
             "Le regioni da cui arrivano ospiti agli eventi di casa.",
-            "Da quante regioni diverse arrivano, agli eventi della regione, soci che nell'anno si sono visti almeno due volte.",
+            "Da quante regioni diverse arrivano, agli eventi della regione, soci che nella stagione si sono visti almeno due volte.",
             Icons.Filled.Home,
             listOf("Ospiti da fuori"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.AWAY to RegionMedalInfo(
             "In trasferta",
             "Le regioni in cui i soci vanno a timbrare fuori casa.",
-            "In quante altre regioni i soci della regione, visti almeno due volte nell'anno, sono andati a timbrare.",
+            "In quante altre regioni i soci della regione, visti almeno due volte nella stagione, sono andati a timbrare.",
             Icons.Filled.Luggage,
             listOf("Soci in trasferta"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.MONTHS to RegionMedalInfo(
             "Senza pause",
-            "I mesi dell'anno con un evento timbrato in regione.",
-            "Mesi dell'anno con almeno un evento nella regione a cui qualcuno ha timbrato.",
+            "I mesi della stagione con un evento timbrato in regione.",
+            "Mesi della stagione con almeno un evento nella regione a cui qualcuno ha timbrato.",
             Icons.Filled.EventRepeat,
             listOf("Eventi in regione"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.WELCOME to RegionMedalInfo(
             "Benvenuto",
-            "Chi si è iscritto quest'anno e ha timbrato presto.",
-            "Tra chi si è iscritto all'app quest'anno, quanti hanno preso il primo timbro entro due mesi.",
+            "Chi si è iscritto in questa stagione e ha timbrato presto.",
+            "Tra chi si è iscritto all'app nella stagione, quanti hanno preso il primo timbro entro due mesi.",
             Icons.Filled.WavingHand,
             listOf("Nuovi con un timbro", "Nuovi iscritti"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.FULLHOUSE to RegionMedalInfo(
             "Sala piena",
-            "L'evento più partecipato dell'anno.",
-            "L'evento dell'anno con più timbratori, in rapporto ai soci della regione.",
+            "L'evento più partecipato della stagione.",
+            "L'evento della stagione con più timbratori, in rapporto ai soci della regione.",
             Icons.Filled.EventSeat,
             listOf("Timbratori"),
+            keySuffix = "_v2",
         ),
         RegionMedalKind.CORE to RegionMedalInfo(
             "Zoccolo duro",
@@ -154,10 +163,11 @@ internal object RegionMedalCatalog {
         ),
         RegionMedalKind.PODIUM to RegionMedalInfo(
             "Podio",
-            "Il posto della regione in classifica a fine anno.",
-            "Posizione della regione nella classifica regioni a fine anno. Si assegna il 31 dicembre.",
+            "Il posto della regione in classifica a fine stagione.",
+            "Posizione della regione nella classifica regioni a fine stagione. Si assegna il 30 settembre.",
             Icons.Filled.EmojiEvents,
             listOf("Punteggio della regione"),
+            keySuffix = "_v2",
         ),
     )
 }
@@ -171,10 +181,11 @@ internal data class RegionMedalsUi(
     /** The last read failed with nothing read before. */
     val failed: Boolean,
     val regionName: String,
-    val year: Int,
-    /** This year's medals, best first. */
+    /** The current season, by the year it starts in. */
+    val season: Int,
+    /** This season's medals, best first. */
     val current: List<Medal>,
-    /** Earlier years, latest first, each in the kinds' order. */
+    /** Earlier seasons, latest first, each in the kinds' order. */
     val past: List<Pair<Int, List<Medal>>>,
 ) {
     val earnedCount: Int get() = current.count { it.isEarned }
@@ -199,10 +210,10 @@ internal fun rememberRegionMedals(): RegionMedalsUi {
         loaded = loaded != null,
         failed = failed,
         regionName = loaded?.regionName.orEmpty(),
-        year = loaded?.year ?: 0,
-        current = if (loaded == null) emptyList() else loaded.currentYear.map { it.toMedal(loaded, past = false) },
-        past = if (loaded == null) emptyList() else loaded.pastYearList.map { year ->
-            year to loaded.past(year).map { it.toMedal(loaded, past = true) }
+        season = loaded?.season ?: Season.current(),
+        current = if (loaded == null) emptyList() else loaded.currentSeason.map { it.toMedal(loaded, past = false) },
+        past = if (loaded == null) emptyList() else loaded.pastSeasonList.map { season ->
+            season to loaded.past(season).map { it.toMedal(loaded, past = true) }
         },
     )
 }
@@ -217,9 +228,9 @@ private fun RegionMedalStatus.toMedal(state: RegionMedalsState, past: Boolean): 
         extra.getOrNull(index)?.let { tr("medals.region.$key.fig$index", label) to formatFigure(it) }
     }
     return Medal(
-        id = "region-$key-$year",
+        id = "region-$key-$season",
         title = tr("medals.region.$key.title", info.title),
-        detail = tr("medals.region.$key.detail", info.detail),
+        detail = tr("medals.region.$key.detail${info.keySuffix}", info.detail),
         icon = info.icon,
         // The metal reached, or bronze: what an unearned one is shown in.
         tier = if (isEarned) tier.toMedalTier() else MedalTier.Bronze,
@@ -232,8 +243,8 @@ private fun RegionMedalStatus.toMedal(state: RegionMedalsState, past: Boolean): 
         levels = levels.map { it.tier.toMedalTier() to it.threshold.roundToInt() },
         countsStamps = false,
         region = RegionMedalDetail(
-            year = year,
-            rule = tr("medals.region.$key.rule", info.rule),
+            season = season,
+            rule = tr("medals.region.$key.rule${info.keySuffix}", info.rule),
             valueLabel = valueLabel,
             isPast = past,
             isPodium = kind == RegionMedalKind.PODIUM,
@@ -278,7 +289,7 @@ internal fun CabinetSwitch(page: CabinetPage, onChange: (CabinetPage) -> Unit, m
 
 /**
  * What the region's medals are, said once at the top of their page: of the
- * team, by year, counting people. Mirrors iOS `RegionRules`.
+ * team, by season, counting people. Mirrors iOS `RegionRules`.
  */
 @Composable
 internal fun RegionRules(modifier: Modifier = Modifier) {
@@ -302,13 +313,16 @@ internal fun RegionRules(modifier: Modifier = Modifier) {
         )
         StampRule(
             Icons.Filled.CalendarMonth,
-            tr("medals.region.rules.yearly", "Ogni anno si ricomincia; le annate passate restano in bacheca."),
+            tr(
+                "medals.region.rules.yearly_v2",
+                "Ogni stagione, dal 1° ottobre al 30 settembre, si ricomincia; le annate passate restano in bacheca.",
+            ),
         )
         StampRule(
             Icons.Filled.Person,
             tr(
-                "medals.region.rules.people",
-                "Contano le persone, non i timbri: chi si vede una volta sola nell'anno non fa numero.",
+                "medals.region.rules.people_v2",
+                "Contano le persone, non i timbri: chi si vede una volta sola nella stagione non fa numero.",
             ),
         )
         Text(
@@ -323,21 +337,20 @@ internal fun RegionRules(modifier: Modifier = Modifier) {
     }
 }
 
-/** An earlier year's header: tap to open or close its medals. */
+/** An earlier season's header ("2025/26"): tap to open or close its medals. */
 @Composable
-internal fun YearHeader(year: Int, earned: Int, total: Int, expanded: Boolean, onClick: () -> Unit) {
-    val summary = tr("medals.region.count_of", "{earned} su {total}", "earned" to earned, "total" to total)
+internal fun SeasonHeader(label: String, summary: String, expanded: Boolean, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(18.dp))
             .clickable(onClickLabel = null, role = Role.Button, onClick = onClick)
-            .semantics(mergeDescendants = true) { contentDescription = "$year, $summary" }
+            .semantics(mergeDescendants = true) { contentDescription = "$label, $summary" }
             .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "$year",
+            text = label,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
@@ -374,7 +387,7 @@ internal fun WitnessBadge(modifier: Modifier = Modifier) {
     }
 }
 
-/** The ladder of a region medal: each metal with the figure that earns it, the ones the year reached lit. */
+/** The ladder of a region medal: each metal with the figure that earns it, the ones the season reached lit. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun RegionTierLadder(medal: Medal, region: RegionMedalDetail, modifier: Modifier = Modifier) {
@@ -434,7 +447,7 @@ internal fun RegionStatus(medal: Medal, region: RegionMedalDetail, modifier: Mod
     Column(modifier.widthIn(max = 320.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = when {
-                region.isPast -> tr("medals.region.value_year", "Nell'anno")
+                region.isPast -> tr("medals.region.value_season", "Nella stagione")
                 region.isPodium -> tr("medals.region.value_podium", "Posizione attuale")
                 else -> tr("medals.region.value_now", "Adesso")
             }.uppercase(),
@@ -472,7 +485,7 @@ internal fun RegionStatus(medal: Medal, region: RegionMedalDetail, modifier: Mod
         if (region.isPodium && !medal.isEarned && !region.isPast) {
             Spacer(Modifier.height(10.dp))
             Text(
-                text = tr("medals.region.podium_pending", "Si assegna il 31 dicembre"),
+                text = tr("medals.region.podium_pending_v2", "Si assegna il 30 settembre"),
                 style = MaterialTheme.typography.titleSmall,
                 color = Color.White.copy(alpha = 0.75f),
             )

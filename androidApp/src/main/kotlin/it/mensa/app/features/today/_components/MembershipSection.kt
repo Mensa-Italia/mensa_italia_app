@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.foundation.layout.size
 import it.mensa.app.features.tableport.medals.rememberMedals
 import it.mensa.app.features.leaderboard.LeaderboardMembershipRow
+import it.mensa.app.features.leaderboard.rememberHall
 import it.mensa.app.features.leaderboard.rememberLeaderboard
 import it.mensa.app.ui.components.mensaImageLoader
 import it.mensa.app.features.tableport.util.StampImagePrefetcher
@@ -86,9 +87,15 @@ fun MembershipSection(
     // Quella dei soci solo quando e' stata letta: senza, non ha niente da dire.
     val flags by koinAccess().featureFlags.flags.collectAsState()
     val boards = remember(flags) { koinAccess().featureFlags.enabledLeaderboards() }
-    val membersBoard = rememberLeaderboard().board?.takeIf { it.rows.isNotEmpty() }
+    val readBoard = rememberLeaderboard().board
+    val membersBoard = readBoard?.takeIf { it.rows.isNotEmpty() }
     val board = membersBoard.takeIf { LeaderboardKind.MEMBERS in boards }
-    val showLeaderboard = boards.isNotEmpty() && (LeaderboardKind.MEMBERS !in boards || board != null)
+    // A season that has just started has no ranking yet (only who stamps is listed):
+    // the row then shows the podium of the one that closed, if there is one.
+    val seasonJustStarted = LeaderboardKind.MEMBERS in boards && readBoard != null && readBoard.rows.isEmpty()
+    val lastSeason = rememberHall(enabled = seasonJustStarted).hall?.latest
+        ?.takeIf { seasonJustStarted && !it.members.isEmpty }
+    val showLeaderboard = boards.isNotEmpty() && (LeaderboardKind.MEMBERS !in boards || board != null || lastSeason != null)
     // I timbri del passaporto su disco prima che lo si apra: chi lo sfoglia
     // li trova gia' li'. Dal database; dalla rete solo se e' ancora vuoto.
     LaunchedEffect(user.id) {
@@ -174,7 +181,7 @@ fun MembershipSection(
             AnimatedVisibility(visible = showLeaderboard, enter = fadeIn() + expandVertically()) {
                 Column {
                     HorizontalDivider(modifier = Modifier.padding(start = 20.dp))
-                    LeaderboardMembershipRow(board = board, onClick = onLeaderboardClick)
+                    LeaderboardMembershipRow(board = board, onClick = onLeaderboardClick, lastSeason = lastSeason)
                 }
             }
             // Solo con un ticket ancora valido: una voce che apre una lista
