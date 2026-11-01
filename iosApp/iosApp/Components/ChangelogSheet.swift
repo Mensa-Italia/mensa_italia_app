@@ -74,8 +74,9 @@ struct ChangelogSheet: View {
     }
 }
 
-/// Le schede dell'apertura sopra la Home, una alla volta: prima il messaggio
-/// degli sviluppatori (`DeveloperMessage.pending`), poi il changelog
+/// Le schede dell'apertura sopra la Home, una alla volta: il giorno del
+/// compleanno gli auguri (`BirthdayGreeting.pending`), poi il messaggio degli
+/// sviluppatori (`DeveloperMessage.pending`), poi il changelog
 /// (`Changelog.shouldShow`). Ognuna si segna come vista alla chiusura.
 private struct LaunchNoticesModifier: ViewModifier {
     /// Con `sheet(item:)` il testo viaggia con la presentazione: con
@@ -85,10 +86,18 @@ private struct LaunchNoticesModifier: ViewModifier {
         var id: String { text }
     }
 
+    /// Come il messaggio: gli auguri viaggiano con la presentazione.
+    private struct PendingWish: Identifiable {
+        let wish: BirthdayWish
+        var id: String { wish.firstName }
+    }
+
+    @State private var birthdayWish: PendingWish?
     @State private var developerMessage: PendingMessage?
     @State private var showChangelog = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var showRequestSub: Closeable?
+    @State private var birthdayRequestSub: Closeable?
 
     func body(content: Content) -> some View {
         content
@@ -96,10 +105,10 @@ private struct LaunchNoticesModifier: ViewModifier {
                 // Un attimo dopo la Home, così la scheda sale sopra
                 // qualcosa di già disegnato invece che durante la transizione.
                 try? await Task.sleep(nanoseconds: 600_000_000)
-                if let message = try? await koin.developerMessage.pending() {
-                    developerMessage = PendingMessage(text: message)
+                if let wish = try? await koin.birthdayGreeting.pending() {
+                    birthdayWish = PendingWish(wish: wish)
                 } else {
-                    await presentChangelogIfNeeded()
+                    await presentDeveloperMessageOrChangelog()
                 }
             }
             // Toccata una notifica `developer_message`: si rimostra il
@@ -120,15 +129,45 @@ private struct LaunchNoticesModifier: ViewModifier {
                     }
                 }
             }
-            .onDisappear { showRequestSub?.close() }
+            // Toccata una notifica `birthday`: gli auguri risalgono anche se
+            // gia' visti oggi, con la stessa attesa del messaggio.
+            .onAppear {
+                birthdayRequestSub?.close()
+                let flow = koin.birthdayGreeting.showRequested as Kotlinx_coroutines_coreFlow
+                birthdayRequestSub = subscribeFlow(flow) { (requested: KotlinBoolean) in
+                    guard requested.boolValue else { return }
+                    Task { @MainActor in
+                        koin.birthdayGreeting.consumeShowRequest()
+                        guard developerMessage == nil else { return }
+                        showChangelog = false
+                        if let wish = try? await koin.birthdayGreeting.current() {
+                            birthdayWish = PendingWish(wish: wish)
+                        }
+                    }
+                }
+            }
+            .onDisappear {
+                showRequestSub?.close()
+                birthdayRequestSub?.close()
+            }
             // Anche al ritorno in primo piano: un messaggio cambiato mentre
             // l'app era aperta si vede subito, senza chiuderla del tutto.
             .onChange(of: scenePhase) { _, phase in
-                guard phase == .active, developerMessage == nil, !showChangelog else { return }
+                guard phase == .active, developerMessage == nil, birthdayWish == nil, !showChangelog else { return }
                 Task {
                     if let message = try? await koin.developerMessage.pending() {
                         developerMessage = PendingMessage(text: message)
                     }
+                }
+            }
+            .sheet(item: $birthdayWish, onDismiss: {
+                Task {
+                    try? await koin.birthdayGreeting.markSeen()
+                    await presentDeveloperMessageOrChangelog()
+                }
+            }) { pending in
+                BirthdayGreetingSheet(wish: pending.wish) {
+                    birthdayWish = nil
                 }
             }
             .sheet(item: $developerMessage, onDismiss: {
@@ -145,6 +184,14 @@ private struct LaunchNoticesModifier: ViewModifier {
                     showChangelog = false
                 }
             }
+    }
+
+    private func presentDeveloperMessageOrChangelog() async {
+        if let message = try? await koin.developerMessage.pending() {
+            developerMessage = PendingMessage(text: message)
+        } else {
+            await presentChangelogIfNeeded()
+        }
     }
 
     private func presentChangelogIfNeeded() async {

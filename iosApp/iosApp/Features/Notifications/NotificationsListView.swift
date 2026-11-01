@@ -24,6 +24,8 @@ enum NotificationTarget: Hashable {
     case localOffice(String)
     /// Il messaggio degli sviluppatori: nessuna pagina, rimostra la scheda.
     case developerMessage
+    /// Gli auguri di compleanno: nessuna pagina, rimostra la scheda.
+    case birthday
     case accountConfirmation(exAppId: String, callbackUrl: String, notificationId: String?)
     /// Esportazione una tantum di timbri o medaglie verso un'app esterna.
     /// `scope` e' il valore `wire` di `DataExportScope` (`stamps` / `medals`).
@@ -47,6 +49,7 @@ enum NotificationTarget: Hashable {
         case let t as NotificationTargetQuidPdf:         self = .quidPdf(t.recordId)
         case let t as NotificationTargetLocalOffice:     self = .localOffice(t.slug)
         case is NotificationTargetDeveloperMessage:      self = .developerMessage
+        case is NotificationTargetBirthday:              self = .birthday
         case let t as NotificationTargetAccountConfirmation:
             self = .accountConfirmation(
                 exAppId: t.exAppId,
@@ -105,16 +108,21 @@ func notificationSystemIcon(for notification: NotificationModel) -> String {
 
 extension NotificationTarget {
     /// Le destinazioni che non sono una pagina: le apre qui e torna true,
-    /// cosi' chi naviga non deve conoscerle. Oggi solo il messaggio degli
-    /// sviluppatori, che rimostra la scheda anche se gia' letto (vedi
-    /// `launchNotices()`).
+    /// cosi' chi naviga non deve conoscerle: il messaggio degli sviluppatori
+    /// e gli auguri di compleanno, che rimostrano la scheda anche se gia'
+    /// vista (vedi `launchNotices()`).
     @MainActor
     func openInPlace() -> Bool {
-        if case .developerMessage = self {
+        switch self {
+        case .developerMessage:
             koin.developerMessage.requestShow()
             return true
+        case .birthday:
+            koin.birthdayGreeting.requestShow()
+            return true
+        default:
+            return false
         }
-        return false
     }
 }
 
@@ -320,7 +328,7 @@ struct NotificationsListView: View {
         case .accountConfirmation, .dataExportConfirmation:
             ExAppConfirmationSheet(target: target, onDismiss: { route = nil })
         case .member(let id):         MemberDetailView(memberId: id)
-        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
+        case .developerMessage, .birthday:EmptyView() // aperto da `openInPlace()`
         }
     }
 

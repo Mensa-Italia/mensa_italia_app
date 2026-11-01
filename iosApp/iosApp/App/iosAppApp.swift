@@ -157,6 +157,7 @@ struct DebugLaunchSelector: View {
                     case "medals_preview": MedalCabinetView()
                     case "leaderboard_preview_card": DebugLeaderboardCardPreview()
                     case "changelog_preview": ChangelogSheet(items: koin.changelog.items) {}
+                    case "birthday_preview": DebugBirthdayGreetingPreview()
                     default: Text("Unknown screen: \(target)")
                     }
                 }
@@ -259,5 +260,18 @@ private struct DebugLeaderboardCardPreview: View {
         }
         .background(Color(.systemBackground))
         .task { await store.refresh() }
+    }
+}
+
+/// La scheda degli auguri sopra uno sfondo qualsiasi, per gli screenshot:
+/// `MENSA_LAUNCH_SCREEN=birthday_preview`. Nome ed eta' di prova.
+private struct DebugBirthdayGreetingPreview: View {
+    @State private var shown = true
+    var body: some View {
+        Color(.systemGroupedBackground)
+            .ignoresSafeArea()
+            .sheet(isPresented: $shown) {
+                BirthdayGreetingSheet(wish: BirthdayWish(firstName: "Matteo", age: 36)) { shown = false }
+            }
     }
 }

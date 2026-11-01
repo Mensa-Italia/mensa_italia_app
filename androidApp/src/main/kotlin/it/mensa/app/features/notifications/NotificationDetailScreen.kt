@@ -178,4 +178,5 @@ private fun ctaLabel(target: NotificationTarget): String = when (target) {
     is NotificationTarget.AccountConfirmation -> tr("notifications.go_account_confirmation", fallback = "Conferma identità")
     is NotificationTarget.DataExportConfirmation -> tr("notifications.go_data_export_confirmation", fallback = "Rispondi alla richiesta")
     is NotificationTarget.DeveloperMessage -> tr("notifications.go_developer_message", fallback = "Leggi il messaggio")
+    is NotificationTarget.Birthday -> tr("notifications.go_birthday", fallback = "Apri gli auguri")
 }

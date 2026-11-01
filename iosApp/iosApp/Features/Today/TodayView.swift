@@ -115,7 +115,7 @@ struct TodayView: View {
             case .accountConfirmation, .dataExportConfirmation:
                 ExAppConfirmationSheet(target: target, onDismiss: { notificationRoute = nil })
             case .member(let id):         MemberDetailView(memberId: id)
-            case .developerMessage:       EmptyView() // aperto da `openInPlace()`
+            case .developerMessage, .birthday: EmptyView() // aperto da `openInPlace()`
             }
         }
     }

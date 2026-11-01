@@ -258,7 +258,7 @@ struct MainTabView: View {
         case .accountConfirmation, .dataExportConfirmation:
             EmptyView() // handled directly in .sheet
         case .member(let id):         MemberDetailView(memberId: id)
-        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
+        case .developerMessage, .birthday:EmptyView() // aperto da `openInPlace()`
         }
     }
 }
@@ -309,6 +309,7 @@ extension NotificationTarget: Identifiable {
         case .dataExportConfirmation(let requestId, _, _, _, _): return "dataExportConfirmation:\(requestId)"
         case .member(let id):         return "member:\(id)"
         case .developerMessage:       return "developerMessage"
+        case .birthday:               return "birthday"
         }
     }
 }

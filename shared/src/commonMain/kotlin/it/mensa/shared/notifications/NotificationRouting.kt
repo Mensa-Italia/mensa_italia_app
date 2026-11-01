@@ -33,6 +33,9 @@ data class NotificationTargetLocalOffice(val slug: String) : NotificationTarget(
 /** Il messaggio degli sviluppatori: non apre una pagina, rimostra la scheda. */
 object NotificationTargetDeveloperMessage : NotificationTarget()
 
+/** Gli auguri di compleanno: come il messaggio degli sviluppatori, rimostra la scheda. */
+object NotificationTargetBirthday : NotificationTarget()
+
 /**
  * Third-party data-access approval prompt. Payload carries the `ex_apps`
  * record id and the callback URL the host expects a `{"accepted": bool}`
@@ -110,6 +113,7 @@ object NotificationRouter {
             "quid_pdf" -> str("record_id")?.let { NotificationTargetQuidPdf(it) }
             "local_office" -> str("slug")?.let { NotificationTargetLocalOffice(it) }
             "developer_message" -> NotificationTargetDeveloperMessage
+            "birthday" -> NotificationTargetBirthday
             "account_confirmation" -> {
                 val appId = str("keyAppId")
                 val url = str("url")
@@ -157,6 +161,7 @@ object NotificationRouter {
         "quid_article" -> "doc.richtext"
         "local_office" -> "building.2"
         "developer_message" -> "megaphone"
+        "birthday" -> "birthday.cake"
         else -> "bell"
     }
 }

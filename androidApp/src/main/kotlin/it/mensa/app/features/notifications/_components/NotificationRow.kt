@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.Description
@@ -59,6 +60,7 @@ fun notificationIcon(n: NotificationModel): ImageVector {
         "quid_article" -> Icons.AutoMirrored.Outlined.Article
         "local_office" -> Icons.Outlined.LocationCity
         "developer_message" -> Icons.Outlined.Campaign
+        "birthday" -> Icons.Outlined.Cake
         else -> Icons.Outlined.Notifications
     }
 }
