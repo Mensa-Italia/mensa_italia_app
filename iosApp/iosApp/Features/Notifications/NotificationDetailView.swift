@@ -40,6 +40,7 @@ struct NotificationDetailView: View {
         case .dataExportConfirmation: return tr("notifications.go_data_export_confirmation", fallback: "Rispondi alla richiesta")
         case .member:              return tr("notifications.go_member", fallback: "Apri socio")
         case .developerMessage:    return tr("notifications.go_developer_message", fallback: "Leggi il messaggio")
+        case .birthday:            return tr("notifications.go_birthday", fallback: "Apri gli auguri")
         }
     }
 
@@ -59,7 +60,7 @@ struct NotificationDetailView: View {
         case .accountConfirmation, .dataExportConfirmation:
             ExAppConfirmationSheet(target: t, onDismiss: { target = nil })
         case .member(let id):         MemberDetailView(memberId: id)
-        case .developerMessage:       EmptyView() // aperto da `openInPlace()`
+        case .developerMessage, .birthday:EmptyView() // aperto da `openInPlace()`
         }
     }
 

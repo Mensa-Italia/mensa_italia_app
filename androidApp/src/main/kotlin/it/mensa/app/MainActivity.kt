@@ -189,6 +189,13 @@ class MainActivity : ComponentActivity() {
                 .toMap()
             if (data.isEmpty()) return@runCatching
 
+            // Gli auguri di compleanno non sono una pagina: la richiesta
+            // aspetta in :shared che `LaunchNotices` mostri la scheda.
+            if (data["type"] == "birthday") {
+                koinAccess().birthdayGreeting.requestShow()
+                return@runCatching
+            }
+
             val target = PushDeepLinkRouter.parse(data)
             if (target !is PushDeepLinkRouter.NotificationTarget.Unknown) {
                 PendingPushTarget.set(target)

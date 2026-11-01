@@ -21,7 +21,9 @@ import it.mensa.app.features.card._components.MembershipCardHero
 import it.mensa.app.features.tableport.medals.MedalCabinetScreen
 import it.mensa.app.features.today._components.SectionLabel
 import it.mensa.app.support.koinAccess
+import it.mensa.app.ui.components.BirthdayGreetingSheet
 import it.mensa.app.ui.components.ChangelogSheet
+import it.mensa.shared.members.BirthdayWish
 
 /**
  * Debug harness: the leaderboard on its made-up ranking, mounted without the
@@ -68,6 +70,9 @@ fun LeaderboardPreviewHarness(screen: String) {
     } else if (screen == "changelog_preview") {
         // The release's "Novita'" sheet, to proof its texts before tagging.
         ChangelogSheet(items = koinAccess().changelog.items, onDone = {})
+    } else if (screen == "birthday_preview") {
+        // Gli auguri di compleanno, con nome ed eta' di prova.
+        BirthdayGreetingSheet(wish = BirthdayWish(firstName = "Matteo", age = 36), onDone = {})
     } else {
         // `leaderboard_preview_hall` opens the hall of fame ("Albo d'oro") over the page.
         LeaderboardScreen(onNavigateBack = {}, startWithHall = screen == "leaderboard_preview_hall")

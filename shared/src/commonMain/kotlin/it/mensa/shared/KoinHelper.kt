@@ -6,6 +6,7 @@ import it.mensa.shared.auth.passkey.PasskeyRepository
 import it.mensa.shared.config.FeatureFlags
 import it.mensa.shared.changelog.Changelog
 import it.mensa.shared.config.DeveloperMessage
+import it.mensa.shared.members.BirthdayGreeting
 import it.mensa.shared.i18n.I18n
 import it.mensa.shared.net.Connectivity
 import it.mensa.shared.onboarding.OnboardingState
@@ -80,6 +81,7 @@ class KoinAccess(
     val connectivity: Connectivity,
     val changelog: Changelog,
     val developerMessage: DeveloperMessage,
+    val birthdayGreeting: BirthdayGreeting,
 )
 
 fun koinAccess(): KoinAccess = KoinAccess(
@@ -120,6 +122,7 @@ fun koinAccess(): KoinAccess = KoinAccess(
     connectivity = KoinPlatform.getKoin().get(),
     changelog = KoinPlatform.getKoin().get(),
     developerMessage = KoinPlatform.getKoin().get(),
+    birthdayGreeting = KoinPlatform.getKoin().get(),
 )
 
 fun appScope(): CoroutineScope =

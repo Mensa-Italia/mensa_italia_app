@@ -2,6 +2,7 @@ package it.mensa.shared.di
 
 import it.mensa.shared.changelog.Changelog
 import it.mensa.shared.config.DeveloperMessage
+import it.mensa.shared.members.BirthdayGreeting
 import it.mensa.shared.api.endpoints.AddonsApi
 import it.mensa.shared.api.endpoints.LocalOfficesApi
 import it.mensa.shared.api.endpoints.CalendarLinksApi
@@ -111,6 +112,7 @@ val extrasModule = module {
     single { OnboardingState(get()) }
     single { Changelog(get(), get()) }
     single { DeveloperMessage(get(), get()) }
+    single { BirthdayGreeting(get(), get(), get()) }
 
     // Public IQ test scraper (dedicated Ktor client with cookie storage)
     single { MensaTestClient() }

@@ -47,33 +47,41 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.shared.changelog.ChangelogItem
+import it.mensa.shared.members.BirthdayWish
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Le schede dell'apertura sopra la Home, una alla volta: prima il messaggio
- * degli sviluppatori (`DeveloperMessage.pending`), poi "Novità" una volta per
+ * Le schede dell'apertura sopra la Home, una alla volta: il giorno del
+ * compleanno gli auguri (`BirthdayGreeting.pending`), poi il messaggio degli
+ * sviluppatori (`DeveloperMessage.pending`), poi "Novità" una volta per
  * versione (`Changelog.shouldShow`). Mirrors iOS `launchNotices()`.
  */
 @Composable
 fun LaunchNotices() {
     val koin = remember { koinAccess() }
+    var birthdayWish by remember { mutableStateOf<BirthdayWish?>(null) }
     var developerMessage by remember { mutableStateOf<String?>(null) }
     var changelogTurn by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    suspend fun developerMessageOrChangelog() {
+        developerMessage = runCatching { koin.developerMessage.pending() }.getOrNull()
+        if (developerMessage == null) changelogTurn = true
+    }
 
     LaunchedEffect(Unit) {
         // Un attimo dopo la Home, cosi' la scheda sale sopra qualcosa di gia'
         // disegnato invece che durante la transizione.
         delay(600)
-        developerMessage = runCatching { koin.developerMessage.pending() }.getOrNull()
-        if (developerMessage == null) changelogTurn = true
+        birthdayWish = runCatching { koin.birthdayGreeting.pending() }.getOrNull()
+        if (birthdayWish == null) developerMessageOrChangelog()
     }
 
     // Anche al ritorno in primo piano: un messaggio cambiato mentre l'app
     // era aperta si vede subito, senza chiuderla del tutto.
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        if (developerMessage == null) {
+        if (developerMessage == null && birthdayWish == null) {
             scope.launch {
                 runCatching { koin.developerMessage.pending() }.getOrNull()?.let { developerMessage = it }
             }
@@ -90,8 +98,30 @@ fun LaunchNotices() {
         runCatching { koin.developerMessage.current() }.getOrNull()?.let { developerMessage = it }
     }
 
+    // Toccata una notifica `birthday`: gli auguri risalgono anche se gia'
+    // visti oggi, se non c'e' gia' il messaggio davanti.
+    val birthdayRequested by koin.birthdayGreeting.showRequested.collectAsStateWithLifecycle()
+    LaunchedEffect(birthdayRequested) {
+        if (!birthdayRequested) return@LaunchedEffect
+        koin.birthdayGreeting.consumeShowRequest()
+        if (developerMessage != null) return@LaunchedEffect
+        runCatching { koin.birthdayGreeting.current() }.getOrNull()?.let {
+            changelogTurn = false
+            birthdayWish = it
+        }
+    }
+
+    val wish = birthdayWish
     val message = developerMessage
-    if (message != null) {
+    if (wish != null) {
+        BirthdayGreetingSheet(wish = wish) {
+            birthdayWish = null
+            scope.launch {
+                runCatching { koin.birthdayGreeting.markSeen() }
+                developerMessageOrChangelog()
+            }
+        }
+    } else if (message != null) {
         DeveloperMessageSheet(message = message) {
             scope.launch { runCatching { koin.developerMessage.markSeen(message) } }
             developerMessage = null

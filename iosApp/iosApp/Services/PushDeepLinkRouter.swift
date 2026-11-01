@@ -42,13 +42,17 @@ enum PushDeepLinkRouter {
     /// `PendingDeepLink` so a cold-launch tap isn't lost when `MainTabView`
     /// hasn't subscribed yet (mirrors Flutter's `getInitialMessage()` path).
     static func post(target: NotificationTarget) {
-        // Il messaggio degli sviluppatori non e' una pagina: si ferma qui,
-        // prima di `PendingDeepLink` e della notifica a `MainTabView`, che
-        // aprirebbe un suo foglio vuoto sopra la scheda. La richiesta aspetta
-        // in :shared che la scheda sia pronta, anche ad app chiusa.
-        if case .developerMessage = target {
+        // Il messaggio degli sviluppatori e gli auguri di compleanno non sono
+        // una pagina: si fermano qui, prima di `PendingDeepLink` e della
+        // notifica a `MainTabView`, che aprirebbe un suo foglio vuoto sopra
+        // la scheda. La richiesta aspetta in :shared che la scheda sia
+        // pronta, anche ad app chiusa.
+        switch target {
+        case .developerMessage, .birthday:
             Task { @MainActor in _ = target.openInPlace() }
             return
+        default:
+            break
         }
         Task { @MainActor in
             PendingDeepLink.shared.set(target)

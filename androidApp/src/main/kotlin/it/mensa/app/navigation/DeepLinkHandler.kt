@@ -100,6 +100,10 @@ object DeepLinkHandler {
                 // che c'e' (vedi `LaunchNotices`), anche se gia' letto.
                 runCatching { koinAccess().developerMessage.requestShow() }
             }
+            is NotificationTarget.Birthday -> {
+                // Come sopra: gli auguri salgono sopra a quello che c'e'.
+                runCatching { koinAccess().birthdayGreeting.requestShow() }
+            }
             is NotificationTarget.AccountConfirmation,
             is NotificationTarget.DataExportConfirmation -> {
                 // No navigation — surface the modal approval sheet instead.
