@@ -150,7 +150,8 @@ fun PublicTestSessionDetailScreen(
                                 title = tr("public.test_session.info.seats", fallback = "Posti"),
                                 value = tr(
                                     "public.test_session.info.seats_value",
-                                    fallback = "max ${testDate.maxParticipants}",
+                                    fallback = "max {n}",
+                                    "n" to testDate.maxParticipants,
                                 ),
                             )
                         }

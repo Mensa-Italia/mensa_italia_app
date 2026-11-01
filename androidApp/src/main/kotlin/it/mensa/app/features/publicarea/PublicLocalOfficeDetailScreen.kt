@@ -370,7 +370,8 @@ internal fun TestDateCard(
                     Pill(
                         text = tr(
                             "public.local_office.test_date.max_short",
-                            fallback = "max ${td.maxParticipants}",
+                            fallback = "max {n}",
+                            "n" to td.maxParticipants,
                         ),
                     )
                 }
@@ -381,7 +382,8 @@ internal fun TestDateCard(
                         else
                             tr(
                                 "public.local_office.test_date.assistants_other",
-                                fallback = "${td.assistants.size} assistenti",
+                                fallback = "{n} assistenti",
+                                "n" to td.assistants.size,
                             ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

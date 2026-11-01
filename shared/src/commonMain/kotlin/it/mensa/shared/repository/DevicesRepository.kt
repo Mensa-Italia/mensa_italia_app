@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 
 class DevicesRepository(
     private val api: DevicesApi,
@@ -25,7 +24,6 @@ class DevicesRepository(
     @Throws(Exception::class)
     suspend fun refresh() {
         val items = api.list()
-        val now = Clock.System.now().toEpochMilliseconds()
         db.transaction {
             db.deviceQueries.deleteAll()
             items.forEach { d ->
@@ -36,7 +34,9 @@ class DevicesRepository(
                     deviceName = d.deviceName,
                     language = "",
                     createdAt = d.created.toEpochMilliseconds(),
-                    updatedAt = now,
+                    // The server's date, which "Dispositivi" shows: the time
+                    // of this fetch made every device look updated today.
+                    updatedAt = d.updated.toEpochMilliseconds(),
                 )
             }
         }
@@ -198,7 +198,7 @@ class DevicesRepository(
             deviceName = device.deviceName,
             language = language,
             createdAt = device.created.toEpochMilliseconds(),
-            updatedAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = device.updated.toEpochMilliseconds(),
         )
     }
 

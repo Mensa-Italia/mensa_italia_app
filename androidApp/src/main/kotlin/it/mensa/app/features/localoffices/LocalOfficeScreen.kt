@@ -676,10 +676,10 @@ private fun EventsGroup(
                     if (showPastEvents)
                         tr("local_office.events.hide_past", fallback = "Nascondi eventi passati")
                     else
-                        tr(
-                            "local_office.events.show_past",
-                            fallback = "Mostra eventi passati (${past.size})",
-                        ),
+                        // The count outside the text: the key is shared with iOS,
+                        // whose label has none.
+                        tr("local_office.events.show_past", fallback = "Mostra eventi passati") +
+                            " (${past.size})",
                 )
             }
         }

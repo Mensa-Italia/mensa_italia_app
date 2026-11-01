@@ -318,7 +318,8 @@ fun ProfileScreen(
                             Text(
                                 text = tr(
                                     "app.profile.signed_in_as",
-                                    fallback = "Hai effettuato l'accesso come $email",
+                                    fallback = "Hai effettuato l'accesso come {email}",
+                                    "email" to email,
                                 ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

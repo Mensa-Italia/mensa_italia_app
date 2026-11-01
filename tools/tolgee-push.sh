@@ -13,6 +13,12 @@ python3 - <<'PY'
 import re, json, pathlib
 
 found = {}
+# A string template the language would fill in at run time, so the source
+# literal is not the text shown: `\(x)` in Swift, `$x` / `${x}` in Kotlin.
+# Each language is checked against its own syntax: `$` is plain text in
+# Swift, and Kotlin writes a literal one as `\$` (the math captions, `$c$`,
+# are written that way in Kotlin and as-is in Swift).
+templates = []
 
 def add(k, fb):
     if fb is None: return
@@ -26,6 +32,8 @@ swift_root = pathlib.Path('iosApp/iosApp')
 swift_pat = re.compile(r'tr\(\s*"([^"]+)"(?:\s*,\s*fallback:\s*"((?:[^"\\]|\\.)*)")?')
 for f in swift_root.rglob('*.swift'):
     for m in swift_pat.finditer(f.read_text()):
+        if m.group(2) and re.search(r'\\\(', m.group(2)):
+            templates.append((m.group(1), m.group(2)))
         add(m.group(1), m.group(2))
 
 # Android Kotlin:  tr("key", fallback = "value")  or  tr("key", "value")
@@ -34,7 +42,9 @@ kotlin_root = pathlib.Path('androidApp/src/main/kotlin')
 kotlin_pat = re.compile(r'(?<![A-Za-z0-9_])tr\(\s*"([a-zA-Z0-9_.]+)"\s*,\s*(?:fallback\s*=\s*)?"((?:[^"\\]|\\.)*)"')
 for f in kotlin_root.rglob('*.kt'):
     for m in kotlin_pat.finditer(f.read_text()):
-        add(m.group(1), m.group(2))
+        if re.search(r'(?<!\\)\$(\{|[A-Za-z_])', m.group(2)):
+            templates.append((m.group(1), m.group(2)))
+        add(m.group(1), m.group(2).replace('\\$', '$'))
 
 # Qui c'erano anche gli estrattori della web app (t("key","fallback") nei
 # .ts/.tsx e data-i18n nei .astro). Il modulo webApp/ non esiste piu': le
@@ -43,13 +53,9 @@ for f in kotlin_root.rglob('*.kt'):
 # ── Pre-flight: reject anything ICU cannot parse ─────────────────────────────
 # Both failures below are silent corruption if they reach Tolgee: the bad string
 # is stored, auto-translated into every language, and only shows up on screen.
-problems = []
+# The extractor ships the fallback verbatim, so a template lands as literal text.
+problems = [(k, v, 'string template — use a {handle} and pass it via args') for k, v in templates]
 for k, v in sorted(found.items()):
-    # A Kotlin/Swift template that was never interpolated — `${x}`, `\(x)`.
-    # The extractor ships the fallback verbatim, so it lands as literal text.
-    if re.search(r'\$\{|\$[A-Za-z_]|\\\(', v):
-        problems.append((k, v, 'string template — use a {handle} and pass it via args'))
-        continue
     # An apostrophe glued to a brace: ICU reads `'` as quoting and swallows the
     # placeholder. `l'accesso {email}` is fine; `l'{email}` is not.
     if re.search(r"'\s*[{}]|[{}]\s*'", v):
