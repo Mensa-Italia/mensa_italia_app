@@ -18,6 +18,11 @@ struct MensaApp: App {
         CrashLogger_appleKt.installCrashLogger()
         MensaSdk.shared.doInitKoinIos()
         Log.app.info("Koin initialized")
+        // Il database SQLDelight parte subito, da qui: questo `init` gira in
+        // ogni avvio, anche in quelli senza interfaccia (BGTask, push
+        // silente, token FCM) dove `BootstrapGate` non monta mai. Vedi
+        // `AppBootstrap`.
+        AppBootstrap.shared.start()
         // Cattura screenshot per gli store (`tools/storekit`): sostituisce
         // nome, foto e numero tessera del socio loggato con un segnaposto,
         // così le immagini pubblicate non espongono i dati di chi ha fatto il
@@ -95,9 +100,9 @@ struct MensaApp: App {
 }
 
 /// Gates the root UI on the async bootstrap chain:
-///   1. `initializeMensaDatabase(DriverFactory())` — fills the SQLDelight
-///      lazy holder that every repository depends on. Must complete BEFORE
-///      any koin accessor is touched.
+///   1. `AppBootstrap.shared.waitUntilReady()` — the SQLDelight lazy holder
+///      that every repository depends on, already started by `MensaApp.init`;
+///      here we wait for it. Must complete BEFORE any koin accessor is touched.
 ///   2. `StripeService.bootstrap()` — fetches the Stripe publishable key,
 ///      in the background (not awaited).
 /// Until step 1 is done we show a `LoadingDots` splash; on error we surface
@@ -124,7 +129,7 @@ struct BootstrapGate<Content: View>: View {
         }
         .task {
             do {
-                try await DatabaseModuleKt.initializeMensaDatabase(factory: DriverFactory())
+                try await AppBootstrap.shared.waitUntilReady()
                 // In sottofondo: la chiave Stripe arriva da `configs`, cioe'
                 // dalla rete, e l'avvio la aspettava per pagamenti che si
                 // aprono molto piu' tardi. Ogni flusso di `StripeService` la

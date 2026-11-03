@@ -168,10 +168,10 @@ final class SpotlightRefreshCoordinator {
     }
 
     private func handleBGTask(_ task: BGAppRefreshTask) async {
-        // Cold-launch da iOS solo per BGTask: SwiftUI BootstrapGate non gira,
-        // il DB SQLDelight non è inizializzato. Lo facciamo qui (idempotente).
+        // Cold-launch da iOS solo per BGTask: SwiftUI BootstrapGate non gira.
+        // `MensaApp.init` ha già avviato il database; qui lo si aspetta.
         do {
-            try await DatabaseModuleKt.initializeMensaDatabase(factory: DriverFactory())
+            try await AppBootstrap.shared.waitUntilReady()
             isBootstrapped = true
         } catch {
             task.setTaskCompleted(success: false)

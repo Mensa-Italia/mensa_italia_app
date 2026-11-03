@@ -31,7 +31,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         // di didFinishLaunchingWithOptions), altrimenti iOS rifiuta i task.
         // Il primo refresh + schedule sono triggerati da `BootstrapGate` via
         // `markBootstrapped()` quando il DB SQLDelight è pronto — toccare koin
-        // qui esplode perché `initializeMensaDatabase` non è ancora girato.
+        // qui esplode perché il database non è ancora pronto. Chi deve
+        // toccarlo da un punto d'ingresso che può precedere la finestra
+        // aspetta `AppBootstrap.shared.waitUntilReady()`.
         SpotlightRefreshCoordinator.shared.registerBGTask()
 
         // Cold-launch tap: the system stashes the remote notification payload
@@ -72,6 +74,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let token = fcmToken, !token.isEmpty else { return }
+        // Arriva a ogni avvio, anche senza interfaccia: e' `PushTokenStore`
+        // ad aspettare `AppBootstrap` prima di toccare `koin`.
         Task { @MainActor in
             PushTokenStore.shared.handle(token: token)
         }
