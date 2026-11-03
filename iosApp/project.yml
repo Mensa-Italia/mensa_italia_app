@@ -151,3 +151,43 @@ targets:
         product: FirebaseMessaging
       - package: MarkdownUI
         product: MarkdownUI
+
+  # Test unitari ospitati dall'app: girano nel processo di `iosApp`, quindi
+  # con il framework Shared e Koin gia' avviati.
+  #   xcodebuild test -project iosApp.xcodeproj -scheme iosApp \
+  #     -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+  iosAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: iosAppTests
+    dependencies:
+      - target: iosApp
+    settings:
+      base:
+        SWIFT_VERSION: "5.10"
+        PRODUCT_BUNDLE_IDENTIFIER: it.mensa.app.tests
+        DEVELOPMENT_TEAM: 6WA5D3RJBU
+        FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../shared/build/XCFrameworks/debug
+
+# Uno scheme esplicito spegne l'autogenerazione degli altri, quindi `iosApp`
+# va dichiarato qui, uguale a quello che Xcode creava da se' (la CI lo usa per
+# build e archive) piu' i test.
+schemes:
+  iosApp:
+    build:
+      targets:
+        iosApp: all
+        iosAppTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - iosAppTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

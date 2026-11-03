@@ -49,7 +49,13 @@ enum PushDeepLinkRouter {
         // pronta, anche ad app chiusa.
         switch target {
         case .developerMessage, .birthday:
-            Task { @MainActor in _ = target.openInPlace() }
+            Task { @MainActor in
+                // Al tocco su una push ad app chiusa si arriva qui da
+                // `didFinishLaunching`, prima che il database sia pronto, e
+                // `openInPlace` tocca `koin`. Vedi `AppBootstrap`.
+                do { try await AppBootstrap.shared.waitUntilReady() } catch { return }
+                _ = target.openInPlace()
+            }
             return
         default:
             break

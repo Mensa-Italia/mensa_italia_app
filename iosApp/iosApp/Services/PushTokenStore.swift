@@ -20,7 +20,14 @@ import Shared
 @MainActor
 final class PushTokenStore {
     static let shared = PushTokenStore()
-    private init() {}
+
+    private let bootstrap: AppBootstrap
+
+    /// `bootstrap` e' iniettabile per i test; l'app usa `AppBootstrap.shared`
+    /// (risolto qui dentro, sul main actor, e non come valore di default).
+    init(bootstrap: AppBootstrap? = nil) {
+        self.bootstrap = bootstrap ?? .shared
+    }
 
     /// Ultimo `(userId, token)` verificato **in questo processo**. Non
     /// persistito: è esattamente ciò che rendeva il bug permanente.
@@ -46,6 +53,13 @@ final class PushTokenStore {
     /// ritorno in primo piano. Idempotente.
     func ensureRegistered() async {
         guard let token = currentToken, !token.isEmpty else { return }
+        // Il token FCM arriva a ogni avvio, anche a quelli senza interfaccia
+        // (BGTask, push silente) dove `BootstrapGate` non gira: senza questa
+        // attesa il primo tocco a `koin` qui sotto cadeva in `MensaDatabase
+        // not initialized` e l'app abortiva (crash 22.5.1 del 3 nov). Se
+        // l'avvio fallisce il token resta in `currentToken`: lo riprendono le
+        // chiamate da `RootView` e `MainTabView`.
+        do { try await bootstrap.waitUntilReady() } catch { return }
         guard let user = koin.auth.currentUser.value as? UserModel, !user.id.isEmpty else {
             return
         }
