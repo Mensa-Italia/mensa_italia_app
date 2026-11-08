@@ -12,7 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.EmojiEvents
@@ -21,16 +24,24 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Leaderboard
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.LocalOffer
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PersonAdd
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -68,7 +79,9 @@ import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.localgroup.LocalGroupSnapshot
 import it.mensa.shared.localgroup.LocalGroupState
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /**
@@ -97,6 +110,18 @@ fun LocalGroupScreen(onNavigate: (String) -> Unit) {
             }
         }
     }
+    // Il ritorno alla propria sede va fino in fondo anche se si lascia la tab:
+    // il risultato e' lo stato del repository, non di questa schermata.
+    val backToMine: () -> Unit = {
+        scope.launch {
+            refreshing = true
+            try {
+                withContext(NonCancellable) { runCatching { repository.selectOffice(null) } }
+            } finally {
+                refreshing = false
+            }
+        }
+    }
     // Il NavHost smonta la tab quando si cambia tab: rileggere tutto a ogni
     // ritorno sarebbe uno spreco. Si carica solo se non c'e' niente da
     // mostrare (come `needsInitialLoad` su iOS); il resto e' pull-to-refresh.
@@ -109,6 +134,11 @@ fun LocalGroupScreen(onNavigate: (String) -> Unit) {
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(tr("local_group.title", "Gruppo locale")) },
+                actions = {
+                    shownSnapshot(state)?.takeIf { it.isBoard }?.let { snapshot ->
+                        BoardMenu(isOverride = snapshot.isOverride, onNavigate = onNavigate, onBackToMine = backToMine)
+                    }
+                },
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -124,14 +154,59 @@ fun LocalGroupScreen(onNavigate: (String) -> Unit) {
                     CenteredMessage(tr("local_group.state.no_region", "Il registro soci non indica la tua regione."))
                 LocalGroupState.NoOffice ->
                     CenteredMessage(tr("local_group.state.no_office", "Nessun gruppo locale per la tua regione."))
-                is LocalGroupState.Ready -> LocalGroupContent(current.snapshot, failed = false, onRetry = refresh, onNavigate = onNavigate)
+                is LocalGroupState.Ready ->
+                    LocalGroupContent(current.snapshot, failed = false, onRetry = refresh, onBackToMine = backToMine, onNavigate = onNavigate)
                 is LocalGroupState.Failed -> current.cached?.let {
-                    LocalGroupContent(it, failed = true, onRetry = refresh, onNavigate = onNavigate)
+                    LocalGroupContent(it, failed = true, onRetry = refresh, onBackToMine = backToMine, onNavigate = onNavigate)
                 } ?: CenteredMessage(
                     text = tr("local_group.state.failed", "Non siamo riusciti a caricare il gruppo locale."),
                     action = tr("local_group.retry", "Riprova") to refresh,
                 )
             }
+        }
+    }
+}
+
+/** The snapshot on screen: the ready one, or the cached one under a failed refresh. */
+private fun shownSnapshot(state: LocalGroupState): LocalGroupSnapshot? = when (state) {
+    is LocalGroupState.Ready -> state.snapshot
+    is LocalGroupState.Failed -> state.cached
+    else -> null
+}
+
+/**
+ * The board's menu: another office for this session, the association's
+ * figures and, while another office is shown, the way back to one's own.
+ */
+@Composable
+private fun BoardMenu(isOverride: Boolean, onNavigate: (String) -> Unit, onBackToMine: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    val choose: (() -> Unit) -> () -> Unit = { action ->
+        {
+            open = false
+            action()
+        }
+    }
+    IconButton(onClick = { open = true }) {
+        Icon(Icons.Outlined.MoreVert, contentDescription = tr("local_group.board.menu", "Altre azioni"))
+    }
+    DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+        DropdownMenuItem(
+            text = { Text(tr("local_group.board.switch", "Cambia gruppo locale")) },
+            leadingIcon = { Icon(Icons.Outlined.Business, contentDescription = null) },
+            onClick = choose { onNavigate(LocalGroupRoutes.OFFICES) },
+        )
+        DropdownMenuItem(
+            text = { Text(tr("local_group.board.association", "Statistiche dell'associazione")) },
+            leadingIcon = { Icon(Icons.Outlined.BarChart, contentDescription = null) },
+            onClick = choose { onNavigate(LocalGroupRoutes.ASSOCIATION) },
+        )
+        if (isOverride) {
+            DropdownMenuItem(
+                text = { Text(tr("local_group.board.back_to_mine", "Torna al mio gruppo locale")) },
+                leadingIcon = { Icon(Icons.AutoMirrored.Outlined.Undo, contentDescription = null) },
+                onClick = choose(onBackToMine),
+            )
         }
     }
 }
@@ -145,11 +220,13 @@ private fun LocalGroupContent(
     snapshot: LocalGroupSnapshot,
     failed: Boolean,
     onRetry: () -> Unit,
+    onBackToMine: () -> Unit,
     onNavigate: (String) -> Unit,
 ) {
     // Composta come TodayScreen: ogni sezione e' un'etichetta (SectionLabel)
     // sopra il suo blocco, a 20dp dai bordi e 20dp dalla sezione prima.
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 40.dp)) {
+        if (snapshot.isOverride) item(key = "override") { OverrideBanner(snapshot.office.name, onBackToMine) }
         if (failed) item(key = "failed") { FailedBanner(onRetry) }
         item(key = "header") { LocalOfficeHero(office = snapshot.office, showRegion = true) }
         if (snapshot.admins.isNotEmpty()) item(key = "secretariat") { SecretariatSection(snapshot, onNavigate) }
@@ -214,16 +291,36 @@ private fun RowsDivider() {
 private val SECTION_GAP = 20.dp
 private val SIDE_PADDING = 20.dp
 
+/** A one-row notice over the page: a [RowsCard] between the side margins. */
+@Composable
+private fun Banner(content: @Composable () -> Unit) {
+    Column(Modifier.padding(horizontal = SIDE_PADDING, vertical = 8.dp)) { RowsCard(content) }
+}
+
 @Composable
 private fun FailedBanner(onRetry: () -> Unit) {
-    Column(Modifier.padding(horizontal = SIDE_PADDING, vertical = 8.dp)) {
-        RowsCard {
-            SectionRow(
-                title = tr("local_group.state.failed", "Non siamo riusciti a caricare il gruppo locale."),
-                icon = Icons.Outlined.CloudOff,
-                onClick = onRetry,
-            )
-        }
+    Banner {
+        SectionRow(
+            title = tr("local_group.state.failed", "Non siamo riusciti a caricare il gruppo locale."),
+            icon = Icons.Outlined.CloudOff,
+            onClick = onRetry,
+        )
+    }
+}
+
+/** The board is looking at [officeName], not at its own office: say so, with the way back. */
+@Composable
+private fun OverrideBanner(officeName: String, onBackToMine: () -> Unit) {
+    Banner {
+        // Come una SectionRow, ma con un bottone al posto del valore.
+        ListItem(
+            headlineContent = { Text(tr("local_group.board.viewing", "Stai guardando {office}", "office" to officeName)) },
+            leadingContent = { Icon(Icons.Outlined.Visibility, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            trailingContent = {
+                TextButton(onClick = onBackToMine) { Text(tr("local_group.board.back_short", "Torna al tuo")) }
+            },
+            colors = cardItemColors(),
+        )
     }
 }
 

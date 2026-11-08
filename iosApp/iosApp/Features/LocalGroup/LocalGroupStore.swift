@@ -14,6 +14,12 @@ final class LocalGroupStore {
     private(set) var available = false
     /// True once `available` holds the repository's answer, not just the initial false.
     private(set) var availabilityKnown = false
+    /// The office chosen by a board member with `selectOffice`, nil while the
+    /// tab shows the member's own. In memory only, as in the repository.
+    private(set) var selectedOfficeId: String?
+    /// The member's own office, from the last snapshot that was not an
+    /// override: `listOffices()` leaves it out, the association page names it.
+    private(set) var ownOffice: LocalOfficeModel?
     private var subscriptions: [Closeable] = []
 
     private init() {
@@ -22,13 +28,21 @@ final class LocalGroupStore {
             // interface), so the flow is read as NSObject and cast.
             subscribeFlow(koin.localGroup.observe() as Kotlinx_coroutines_coreFlow) { [weak self] (value: NSObject) in
                 guard let state = value as? LocalGroupState else { return }
-                Task { @MainActor [weak self] in self?.state = state }
+                Task { @MainActor [weak self] in
+                    self?.state = state
+                    if let ready = state as? LocalGroupStateReady, !ready.snapshot.isOverride {
+                        self?.ownOffice = ready.snapshot.office
+                    }
+                }
             },
             subscribeFlow(koin.localGroup.observeAvailable() as Kotlinx_coroutines_coreFlow) { [weak self] (value: KotlinBoolean) in
                 Task { @MainActor [weak self] in
                     self?.available = value.boolValue
                     self?.availabilityKnown = true
                 }
+            },
+            subscribeOptionalFlow(koin.localGroup.observeSelectedOffice() as Kotlinx_coroutines_coreFlow) { [weak self] (value: NSString?) in
+                Task { @MainActor [weak self] in self?.selectedOfficeId = value as String? }
             },
         ]
     }
@@ -50,6 +64,12 @@ final class LocalGroupStore {
     /// Rereads everything. Network errors end up in `state`, never here.
     func refresh() async {
         try? await koin.localGroup.refresh()
+    }
+
+    /// Board only: shows `id`'s office in the tab for this session (nil goes
+    /// back to the member's own). Errors end up in `state`, as for `refresh`.
+    func selectOffice(_ id: String?) async {
+        try? await koin.localGroup.selectOffice(officeId: id)
     }
 }
 

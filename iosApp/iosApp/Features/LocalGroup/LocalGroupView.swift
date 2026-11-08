@@ -9,6 +9,9 @@ import SwiftUI
 struct LocalGroupView: View {
     @State private var store = LocalGroupStore.shared
     @State private var appeared = false
+    /// Board only: the office picker sheet and the association's page.
+    @State private var showsOfficePicker = false
+    @State private var showsAssociation = false
 
     var body: some View {
         content
@@ -23,6 +26,43 @@ struct LocalGroupView: View {
             .navigationDestination(for: LocalOfficeLinktreeRoute.self) { route in
                 LocalOfficeLinktreeView(officeId: route.officeId)
             }
+            .toolbar {
+                if store.snapshot?.isBoard == true {
+                    ToolbarItem(placement: .topBarTrailing) { boardMenu }
+                }
+            }
+            .sheet(isPresented: $showsOfficePicker) {
+                LocalGroupOfficePickerView()
+            }
+            .navigationDestination(isPresented: $showsAssociation) {
+                LocalGroupAssociationView()
+            }
+    }
+
+    /// Board only: look at another office for this session, or at the whole association.
+    private var boardMenu: some View {
+        Menu {
+            Button {
+                showsOfficePicker = true
+            } label: {
+                Label(tr("local_group.board.switch", fallback: "Cambia gruppo locale"), systemImage: "building.2")
+            }
+            Button {
+                showsAssociation = true
+            } label: {
+                Label(tr("local_group.board.association", fallback: "Statistiche dell'associazione"), systemImage: "chart.bar.xaxis")
+            }
+            if store.snapshot?.isOverride == true {
+                Button {
+                    Task { await store.selectOffice(nil) }
+                } label: {
+                    Label(tr("local_group.board.back_to_mine", fallback: "Torna al mio gruppo locale"), systemImage: "arrow.uturn.backward")
+                }
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .accessibilityLabel(Text(tr("local_group.board.menu", fallback: "Altre opzioni")))
+        }
     }
 
     @ViewBuilder
@@ -65,6 +105,9 @@ struct LocalGroupView: View {
     private func page(_ snapshot: LocalGroupSnapshot, failed: Bool) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                if snapshot.isOverride {
+                    overrideBanner(snapshot.office)
+                }
                 LocalOfficeHero(office: snapshot.office, inset: true)
                 LocalOfficeIntro(
                     office: snapshot.office,
@@ -127,6 +170,28 @@ struct LocalGroupView: View {
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) { appeared = true }
         }
+    }
+
+    /// Board only, while the tab shows another office: which one, and the way back.
+    /// A row of Today's membership card, in its glass card, the hero's width.
+    private func overrideBanner(_ office: LocalOfficeModel) -> some View {
+        HStack(spacing: 0) {
+            TodayMembershipRow(
+                icon: "eye.fill",
+                color: .blue,
+                title: tr("local_group.board.viewing", fallback: "Stai guardando {office}", ["office": office.name]),
+                showsChevron: false
+            )
+            Button(tr("local_group.board.back_short", fallback: "Torna al tuo")) {
+                Task { await store.selectOffice(nil) }
+            }
+            .font(.subheadline.weight(.semibold))
+            .fixedSize()
+            .padding(.trailing, 16)
+        }
+        .compatGlass(cornerRadius: 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
     }
 
     private func block<Content: View>(_ index: Int, @ViewBuilder content: @escaping () -> Content) -> some View {

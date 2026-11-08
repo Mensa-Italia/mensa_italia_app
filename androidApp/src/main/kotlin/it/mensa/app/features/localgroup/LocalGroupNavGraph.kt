@@ -23,11 +23,16 @@ object LocalGroupRoutes {
     const val MEMBERS = "local_group/admin/members"
     const val STATS = "local_group/admin/stats"
     const val EVENTS = "local_group/admin/events"
+    /** Board only: the picker of the office the tab shows. */
+    const val OFFICES = "local_group/offices"
+    /** Board only: the association's figures and every office's. */
+    const val ASSOCIATION = "local_group/association"
 }
 
 /**
  * The pages of the "Gruppo locale" tab: the week's new members, open to
- * everyone, and the admin area ("Area segreteria" and its three pages). The tab root ([LocalGroupRoutes.ROOT]) is a tab destination of the
+ * everyone, the admin area ("Area segreteria" and its three pages) and the
+ * board's office picker and association page. The tab root ([LocalGroupRoutes.ROOT]) is a tab destination of the
  * shell, so it is not registered here: two destinations with the same route
  * in one NavHost would replace each other.
  */
@@ -39,6 +44,13 @@ fun NavGraphBuilder.localGroupNavGraph(navController: NavController) {
     slide(LocalGroupRoutes.MEMBERS) { LocalGroupMembersScreen(onBack = back, onNavigate = open) }
     slide(LocalGroupRoutes.STATS) { LocalGroupStatsScreen(onBack = back) }
     slide(LocalGroupRoutes.EVENTS) { LocalGroupEventsScreen(onBack = back, onNavigate = open) }
+    // Scelta una sede si torna alla tab, che ora la mostra. Nel banco di prova
+    // la radice non e' sotto queste pagine: allora la si apre.
+    val toRoot: () -> Unit = {
+        if (!navController.popBackStack(LocalGroupRoutes.ROOT, inclusive = false)) navController.navigate(LocalGroupRoutes.ROOT)
+    }
+    slide(LocalGroupRoutes.OFFICES) { LocalGroupOfficePickerScreen(onBack = back, onPicked = toRoot) }
+    slide(LocalGroupRoutes.ASSOCIATION) { LocalGroupAssociationScreen(onBack = back, onOfficePicked = toRoot) }
 }
 
 /** The same horizontal spring slide as the leaderboard's graph. */

@@ -36,11 +36,14 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /**
@@ -73,6 +76,28 @@ class LocalGroupRepository(
     private data class Held(val userId: String, val state: LocalGroupState)
 
     private val held = MutableStateFlow<Held?>(null)
+
+    /** A board member's choice of office, for one user: the next member to sign in must not inherit it. */
+    private data class Choice(val userId: String, val officeId: String)
+
+    /** The office a board member chose to look at instead of their own; in memory only, so it resets when the app closes. */
+    private val override = MutableStateFlow<Choice?>(null)
+
+    /** [override] as the signed-in member sees it: null for their own office. */
+    private val selected: StateFlow<String?> by lazy {
+        combine(override, auth.currentUser) { choice, user -> choice?.takeIf { user != null && it.userId == user.id }?.officeId }
+            .stateIn(scope, SharingStarted.Eagerly, null)
+    }
+
+    /** Whether the signed-in member sits on the board, read once per process (null = not read yet). */
+    private var boardCache: Pair<String, Boolean>? = null
+
+    /** The member's own office id (user id to office id), from the disk or the network: [listOffices] leaves it out and [selectOffice] of it means "back to mine". */
+    private var ownOffice: Pair<String, String>? = null
+
+    private fun chosenFor(userId: String): String? = override.value?.takeIf { it.userId == userId }?.officeId
+
+    private fun ownOfficeIdFor(userId: String): String? = ownOffice?.takeIf { it.first == userId }?.second
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /** All 18 offices, read once per process. */
@@ -83,8 +108,11 @@ class LocalGroupRepository(
             if (user == null || held == null || held.userId != user.id) LocalGroupState.Loading else held.state
         }.stateIn(scope, SharingStarted.Eagerly, LocalGroupState.Loading)
 
-    private val fixtureState by lazy {
-        MutableStateFlow<LocalGroupState>(LocalGroupState.Ready(LocalGroupFixtures.snapshot())).asStateFlow()
+    private val fixtureOverride = MutableStateFlow<String?>(null)
+
+    private val fixtureState: StateFlow<LocalGroupState> by lazy {
+        fixtureOverride.map { chosen -> LocalGroupState.Ready(LocalGroupFixtures.snapshot(officeId = chosen)) }
+            .stateIn(scope, SharingStarted.Eagerly, LocalGroupState.Ready(LocalGroupFixtures.snapshot()))
     }
 
     /**
@@ -112,25 +140,31 @@ class LocalGroupRepository(
         if (LocalGroupFixtures.enabled) return
         if (!flags.localGroupEnabled) return
         val user = auth.currentUser.value ?: return
+        chosenFor(user.id)?.let { chosen ->
+            refreshOverride(chosen, user)
+            return
+        }
         primeFromDisk(user.id)
         val resolved = try {
             resolveKey(user.id)?.let { key -> key to findOffice(key) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            publish(user.id, LocalGroupState.Failed(e.message, lastSnapshot(user.id)))
+            publishOwn(user.id, LocalGroupState.Failed(e.message, lastOwnSnapshot(user.id)))
             return
         }
         val (key, office) = resolved ?: run {
-            publish(user.id, LocalGroupState.NoRegion)
+            publishOwn(user.id, LocalGroupState.NoRegion)
             return
         }
         if (office == null) {
-            publish(user.id, LocalGroupState.NoOffice)
+            publishOwn(user.id, LocalGroupState.NoOffice)
             return
         }
+        ownOffice = user.id to office.id
         val snapshot = load(office, key, user)
-        publish(user.id, LocalGroupState.Ready(snapshot))
+        // Still the member's own office on screen? A switch made meanwhile wins.
+        publishOwn(user.id, LocalGroupState.Ready(snapshot))
         save(user.id, snapshot)
     }
 
@@ -215,6 +249,140 @@ class LocalGroupRepository(
         return pb.getBytes("/api/cs/local-office/$officeId/members-export", query)
     }
 
+    // ---- Board: other offices and the association ----
+
+    /** The id of the office chosen with [selectOffice], null while the tab shows the member's own. */
+    fun observeSelectedOffice(): StateFlow<String?> = if (LocalGroupFixtures.enabled) fixtureOverride.asStateFlow() else selected
+
+    /**
+     * Shows [officeId] in the tab instead of the member's own office (null
+     * goes back to it). For board members and super only: the caller checks
+     * [LocalGroupSnapshot.isBoard]. In memory only: closing the app comes
+     * back to the member's office. The chosen office is never saved to disk.
+     */
+    @Throws(Exception::class)
+    suspend fun selectOffice(officeId: String?) {
+        if (LocalGroupFixtures.enabled) {
+            fixtureOverride.value = officeId?.takeIf { it.isNotBlank() && it != LocalGroupFixtures.OFFICE_ID }
+            return
+        }
+        val user = auth.currentUser.value ?: return
+        val chosen = officeId?.takeIf { it.isNotBlank() && it != ownOfficeIdFor(user.id) }
+        override.value = chosen?.let { Choice(user.id, it) }
+        // The page shows its loader until the chosen office is in: the old one must not linger.
+        publish(user.id, LocalGroupState.Loading)
+        refresh()
+    }
+
+    /** The other offices, by name: the picker of [selectOffice]. The member's own is not in it, it has its own row. */
+    @Throws(Exception::class)
+    suspend fun listOffices(): List<LocalOfficeModel> {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.offices()
+        val own = auth.currentUser.value?.let { ownOfficeIdFor(it.id) }
+        return allOffices().filter { it.id != own }.sortedBy { it.name.lowercase() }
+    }
+
+    /** Every office's name by id, the member's own included: to label rows that carry only an office id. */
+    @Throws(Exception::class)
+    suspend fun officeNames(): Map<String, String> {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.officeNames()
+        return allOffices().associate { it.id to it.name }
+    }
+
+    /**
+     * The association's figures now (one row, id "association"): the same
+     * numbers as an office's, over every member, event and deal. Board and
+     * super only: anyone else gets an error. Null when the server has none yet.
+     */
+    @Throws(Exception::class)
+    suspend fun loadAssociationStats(): LocalOfficeStatsModel? {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.associationStats()
+        return pb.getOne<LocalOfficeStatsModel>(ASSOCIATION_STATS, ASSOCIATION_ID)
+    }
+
+    /** The association's months, oldest first, from the previous season's October. Board and super only. */
+    @Throws(Exception::class)
+    suspend fun loadAssociationMonthly(): List<LocalOfficeMonthlyStatsModel> {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.associationMonthly(LocalGroupDates.today())
+        return pb.fullList<LocalOfficeMonthlyStatsModel>(ASSOCIATION_MONTHLY, sort = "month").sortedBy { it.month }
+    }
+
+    /** Every office's figures now, most members first: the comparison table of the association page. */
+    @Throws(Exception::class)
+    suspend fun loadAllOfficeStats(): List<LocalOfficeStatsModel> {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.allOfficeStats()
+        return pb.fullList<LocalOfficeStatsModel>(STATS, sort = "-members_active").sortedByDescending { it.membersActive }
+    }
+
+    /** Loads the chosen office like [refresh] does the member's own, without touching the disk cache. */
+    private suspend fun refreshOverride(officeId: String, user: UserModel) {
+        val office = try {
+            allOffices().firstOrNull { it.id == officeId }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            publishOverride(user.id, officeId, LocalGroupState.Failed(e.message, lastOverrideSnapshot(user.id, officeId)))
+            return
+        }
+        if (office == null) {
+            override.value = null
+            refresh()
+            return
+        }
+        val snapshot = load(office, officeRegionKey(office).orEmpty(), user).copy(isOverride = true)
+        // Still the chosen office? A later choice (or "back to mine") wins.
+        publishOverride(user.id, officeId, LocalGroupState.Ready(snapshot))
+    }
+
+    /** Publishes a state of the member's own office, unless another office was chosen meanwhile. */
+    private fun publishOwn(userId: String, value: LocalGroupState) {
+        if (chosenFor(userId) == null) publish(userId, value)
+    }
+
+    /** Publishes a state of the chosen [officeId], unless the choice changed meanwhile. */
+    private fun publishOverride(userId: String, officeId: String, value: LocalGroupState) {
+        if (chosenFor(userId) == officeId) publish(userId, value)
+    }
+
+    /** The last snapshot of the member's own office: the one in memory if it is theirs, else the saved one. */
+    private suspend fun lastOwnSnapshot(userId: String): LocalGroupSnapshot? =
+        heldSnapshot(userId)?.takeUnless { it.isOverride } ?: readSnapshot(userId)
+
+    /** The last snapshot of the chosen [officeId], if that is what memory holds; never another office's. */
+    private fun lastOverrideSnapshot(userId: String, officeId: String): LocalGroupSnapshot? =
+        heldSnapshot(userId)?.takeIf { it.isOverride && it.office.id == officeId }
+
+    private fun heldSnapshot(userId: String): LocalGroupSnapshot? =
+        when (val current = held.value?.takeIf { it.userId == userId }?.state) {
+            is LocalGroupState.Ready -> current.snapshot
+            is LocalGroupState.Failed -> current.cached
+            else -> null
+        }
+
+    /** Whether [user] sits on the board (an active row of the org chart's "consiglio" group) or is super. Read once. */
+    private suspend fun isBoard(user: UserModel): Boolean {
+        if (Powers.has(user.powers, Powers.SUPER)) return true
+        boardCache?.takeIf { it.first == user.id }?.let { return it.second }
+        val rows = pb.fullList<BoardRow>(
+            ORG_CHART_MEMBERS,
+            filter = "user = ${quote(user.id)} && inactive = false",
+            expand = "group",
+        )
+        val sits = rows.any { it.expand?.group?.title.equals(BOARD_GROUP, ignoreCase = true) }
+        boardCache = user.id to sits
+        return sits
+    }
+
+    /** One row of `org_chart_members` with its group expanded, enough to tell the board apart. */
+    @Serializable
+    private data class BoardRow(val id: String = "", val expand: BoardRowExpand? = null)
+
+    @Serializable
+    private data class BoardRowExpand(val group: BoardGroup? = null)
+
+    @Serializable
+    private data class BoardGroup(val title: String = "")
+
     // ---- Loading ----
 
     private suspend fun load(office: LocalOfficeModel, key: String, user: UserModel): LocalGroupSnapshot = coroutineScope {
@@ -224,6 +392,7 @@ class LocalGroupRepository(
         val ranking = async { optional(null) { pb.getOne<LeaderboardRegionModel>(RANKING, office.id) } }
         val next = async { optional(emptyList()) { nextEvents(office.id, key) } }
         val localDeals = async { optional(emptyList()) { regionDeals(key) } }
+        val board = async { optional(false) { isBoard(user) } }
         val people = admins.await()
         LocalGroupSnapshot(
             office = office,
@@ -235,6 +404,7 @@ class LocalGroupRepository(
             deals = localDeals.await(),
             isAdmin = isAdmin(user, people),
             regionKey = key,
+            isBoard = board.await(),
         )
     }
 
@@ -297,24 +467,18 @@ class LocalGroupRepository(
 
     /** Publishes what was saved for [userId], while nothing for them is in memory. */
     private suspend fun primeFromDisk(userId: String) {
-        if (held.value?.userId == userId) return
+        if (held.value?.userId == userId && ownOfficeIdFor(userId) != null) return
         val saved = readSnapshot(userId)
+        // The own office is known from the disk before the network answers:
+        // the picker leaves it out and choosing it means "back to mine" from the first second.
+        if (saved != null && ownOfficeIdFor(userId) == null) ownOffice = userId to saved.office.id
+        if (held.value?.userId == userId) return
         val primed = when {
             saved != null -> LocalGroupState.Ready(saved)
             readValue(keyKey(userId)) == "" -> LocalGroupState.NoRegion
             else -> return
         }
         if (held.value?.userId != userId) publish(userId, primed)
-    }
-
-    /** The snapshot in memory for [userId], or the saved one. */
-    private suspend fun lastSnapshot(userId: String): LocalGroupSnapshot? {
-        val current = held.value?.takeIf { it.userId == userId }?.state
-        return when (current) {
-            is LocalGroupState.Ready -> current.snapshot
-            is LocalGroupState.Failed -> current.cached
-            else -> readSnapshot(userId)
-        }
     }
 
     private suspend fun readSnapshot(userId: String): LocalGroupSnapshot? =
@@ -340,6 +504,13 @@ class LocalGroupRepository(
     internal companion object {
         const val STATS = "local_office_stats"
         const val MONTHLY = "local_office_stats_monthly"
+        const val ASSOCIATION_STATS = "association_stats"
+        const val ASSOCIATION_MONTHLY = "association_stats_monthly"
+        const val ASSOCIATION_ID = "association"
+        const val ORG_CHART_MEMBERS = "org_chart_members"
+
+        /** The org chart group of the board (`org_chart_groups.title`). */
+        const val BOARD_GROUP = "consiglio"
         const val CHANGES = "members_registry_changes"
         const val RANKING = "view_leaderboard_regioni"
         const val CACHE_KEY_PREFIX = "local_group"

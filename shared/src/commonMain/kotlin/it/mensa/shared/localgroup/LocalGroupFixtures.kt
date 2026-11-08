@@ -85,8 +85,42 @@ object LocalGroupFixtures {
         "Riccardo Conti", "Elena Barbieri", "Francesco Testa", "Alice Serra", "Pietro Longo", "Giorgia Bianchi",
     )
 
-    /** The tab's snapshot, with events from next weekend on. */
-    internal fun snapshot(now: Instant = Clock.System.now()): LocalGroupSnapshot = LocalGroupSnapshot(
+    /** The other offices of the picker, with the fixture one. */
+    private val otherOffices = listOf(
+        LocalOfficeModel(id = "fixture-lazio", name = "Mensa Lazio", region = "Lazio", slug = "lazio", regionKey = "Lazio"),
+        LocalOfficeModel(id = "fixture-piemonte", name = "Mensa Piemonte", region = "Piemonte", slug = "piemonte", regionKey = "Piemonte"),
+        LocalOfficeModel(id = "fixture-puglia", name = "Mensa Puglia", region = "Puglia", slug = "puglia", regionKey = "Puglia"),
+    )
+
+    /** The other offices, by name (the fixture's own has its own row in the picker). */
+    internal fun offices(): List<LocalOfficeModel> = otherOffices.sortedBy { it.name }
+
+    /** Every office's name by id, the fixture's own included. */
+    internal fun officeNames(): Map<String, String> = (otherOffices + office).associate { it.id to it.name }
+
+    /**
+     * The tab's snapshot, with events from next weekend on. With [officeId]
+     * (one of [offices]) the snapshot is of that office, as after
+     * [LocalGroupRepository.selectOffice]. The admin fixture also sits on the board.
+     */
+    internal fun snapshot(now: Instant = Clock.System.now(), officeId: String? = null): LocalGroupSnapshot {
+        val chosen = officeId?.let { id -> otherOffices.firstOrNull { it.id == id } }
+        val base = ownSnapshot(now)
+        return if (chosen == null) {
+            base
+        } else {
+            base.copy(
+                office = chosen,
+                regionKey = chosen.regionKey.orEmpty(),
+                stats = base.stats?.copy(id = chosen.id, localOffice = chosen.id, regionKey = chosen.regionKey.orEmpty(), membersActive = 188),
+                ranking = null,
+                isAdmin = false,
+                isOverride = true,
+            )
+        }
+    }
+
+    private fun ownSnapshot(now: Instant): LocalGroupSnapshot = LocalGroupSnapshot(
         office = office,
         admins = admins,
         links = links,
@@ -105,7 +139,37 @@ object LocalGroupFixtures {
         deals = deals,
         isAdmin = admin,
         regionKey = REGION,
+        isBoard = admin,
     )
+
+    /** The association's figures: every office together. */
+    internal fun associationStats(now: Instant = Clock.System.now()): LocalOfficeStatsModel = LocalOfficeStatsModel(
+        id = "association", membersActive = 2714, membersNew7d = 19, membersNew30d = 74, membersLeft30d = 31,
+        eventsSeason = 61, eventsUpcoming = 14, attendanceSeason = 1203, dealsActive = 38,
+        season = Season.label(Season.current(now)), computedAt = now.toString(),
+    )
+
+    /** The association's months: the office's, about seven times. */
+    internal fun associationMonthly(today: LocalDate): List<LocalOfficeMonthlyStatsModel> = monthly(today).map {
+        it.copy(
+            id = "association_${it.month}", localOffice = "", regionKey = "",
+            events = it.events * 7, attendance = it.attendance * 6, distinctAttendees = it.distinctAttendees * 5,
+            membersNew = it.membersNew * 7, membersLeft = it.membersLeft * 7, membersActive = it.membersActive * 7 - 170,
+        )
+    }
+
+    /** Every office's figures, most members first. */
+    internal fun allOfficeStats(now: Instant = Clock.System.now()): List<LocalOfficeStatsModel> {
+        val season = Season.label(Season.current(now))
+        return (offices() + office).mapIndexed { i, o ->
+            LocalOfficeStatsModel(
+                id = o.id, localOffice = o.id, regionKey = o.regionKey.orEmpty(),
+                membersActive = listOf(412, 188, 301, 97)[i % 4], membersNew7d = i, membersNew30d = 3 + i * 2,
+                membersLeft30d = 1 + i, eventsSeason = listOf(9, 4, 6, 2)[i % 4], eventsUpcoming = 1 + i % 2,
+                attendanceSeason = listOf(187, 61, 140, 23)[i % 4], dealsActive = 2 + i, season = season, computedAt = now.toString(),
+            )
+        }.sortedByDescending { it.membersActive }
+    }
 
     /** Twelve movements spread over [from]..[to], newest first. */
     internal fun changes(from: LocalDate, to: LocalDate): List<MemberChangeModel> {

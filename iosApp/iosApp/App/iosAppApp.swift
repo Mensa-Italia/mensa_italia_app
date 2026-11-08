@@ -171,6 +171,8 @@ struct DebugLaunchSelector: View {
                     case "local_group_stats_preview": DebugLocalGroupSnapshot { LocalGroupStatsView(snapshot: $0) }
                     case "local_group_events_preview": DebugLocalGroupSnapshot { LocalGroupEventsView(snapshot: $0) }
                     case "local_group_new_members_preview": DebugLocalGroupSnapshot { LocalGroupNewMembersView(officeId: $0.office.id) }
+                    case "local_group_association_preview": LocalGroupAssociationView()
+                    case "local_group_offices_preview": DebugLocalGroupOfficesPreview()
                     default: Text("Unknown screen: \(target)")
                     }
                 }
@@ -187,6 +189,20 @@ struct DebugLaunchSelector: View {
         } else {
             RootView()
         }
+    }
+}
+
+/// The tab with the office picker already presented, as the board menu does:
+/// the picker owns its NavigationStack, so it opens as a sheet, not inline.
+private struct DebugLocalGroupOfficesPreview: View {
+    @State private var presented = false
+    var body: some View {
+        LocalGroupView()
+            .sheet(isPresented: $presented) { LocalGroupOfficePickerView() }
+            .task {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                presented = true
+            }
     }
 }
 

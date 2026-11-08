@@ -10,12 +10,15 @@ import it.mensa.shared.localgroup.LocalGroupRepository
 import it.mensa.shared.localgroup.LocalGroupSnapshot
 import it.mensa.shared.localgroup.LocalGroupState
 import it.mensa.shared.model.EventModel
+import it.mensa.shared.model.LocalOfficeModel
 import it.mensa.shared.model.LocalOfficeMonthlyStatsModel
+import it.mensa.shared.model.LocalOfficeStatsModel
 import it.mensa.shared.model.MemberChangeModel
 import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,6 +65,26 @@ class LocalGroupViewModel(
     private val _events = MutableStateFlow<Loadable<List<EventModel>>>(Loadable.Loading)
     val events: StateFlow<Loadable<List<EventModel>>> = _events.asStateFlow()
 
+    /** The office the tab shows instead of the member's own (board only), null for the own one. */
+    val selectedOffice: StateFlow<String?> = repository.observeSelectedOffice()
+
+    private val _offices = MutableStateFlow<Loadable<List<LocalOfficeModel>>>(Loadable.Loading)
+    val offices: StateFlow<Loadable<List<LocalOfficeModel>>> = _offices.asStateFlow()
+
+    private val _officeNames = MutableStateFlow<Loadable<Map<String, String>>>(Loadable.Loading)
+
+    /** Every office's name by id, the member's own included: the labels of the association's table. */
+    val officeNames: StateFlow<Loadable<Map<String, String>>> = _officeNames.asStateFlow()
+
+    private val _associationStats = MutableStateFlow<Loadable<LocalOfficeStatsModel?>>(Loadable.Loading)
+    val associationStats: StateFlow<Loadable<LocalOfficeStatsModel?>> = _associationStats.asStateFlow()
+
+    private val _associationMonthly = MutableStateFlow<Loadable<List<LocalOfficeMonthlyStatsModel>>>(Loadable.Loading)
+    val associationMonthly: StateFlow<Loadable<List<LocalOfficeMonthlyStatsModel>>> = _associationMonthly.asStateFlow()
+
+    private val _officeStats = MutableStateFlow<Loadable<List<LocalOfficeStatsModel>>>(Loadable.Loading)
+    val officeStats: StateFlow<Loadable<List<LocalOfficeStatsModel>>> = _officeStats.asStateFlow()
+
     /** The running read of each target: a new one (another period) cancels the old. */
     private val jobs = mutableMapOf<MutableStateFlow<*>, Job>()
 
@@ -85,6 +108,27 @@ class LocalGroupViewModel(
     fun loadNewMembers(officeId: String) = load(_newMembers) { repository.loadNewMembers(officeId) }
 
     fun loadEvents(officeId: String) = load(_events) { repository.loadOfficeEvents(officeId) }
+
+    fun loadOffices() = load(_offices) { repository.listOffices() }
+
+    fun loadOfficeNames() = load(_officeNames) { repository.officeNames() }
+
+    fun loadAssociationStats() = load(_associationStats) { repository.loadAssociationStats() }
+
+    fun loadAssociationMonthly() = load(_associationMonthly) { repository.loadAssociationMonthly() }
+
+    fun loadAllOfficeStats() = load(_officeStats) { repository.loadAllOfficeStats() }
+
+    /**
+     * Shows [officeId] in the tab (null: the member's own office). The page
+     * that asks pops right after, which clears this ViewModel: the switch and
+     * its refresh run to the end anyway, their result is the tab's state.
+     */
+    fun selectOffice(officeId: String?) {
+        viewModelScope.launch {
+            withContext(NonCancellable) { runCatching { repository.selectOffice(officeId) } }
+        }
+    }
 
     /**
      * Downloads the .xlsx of [kind] and writes it in [directory] (the cache,

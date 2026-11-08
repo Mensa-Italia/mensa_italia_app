@@ -41,6 +41,15 @@ data class LocalGroupSnapshot(
     val isAdmin: Boolean,
     /** The merged region key the office was found by, e.g. "Puglia" (also for Basilicata). */
     val regionKey: String = "",
+    /**
+     * The signed-in member sits on the board (org chart group "consiglio")
+     * or has the `super` power: they can look at any office and at the
+     * association's figures ([LocalGroupRepository.selectOffice],
+     * [LocalGroupRepository.loadAssociationStats]).
+     */
+    val isBoard: Boolean = false,
+    /** True while the snapshot is of an office chosen with [LocalGroupRepository.selectOffice], not the member's own. */
+    val isOverride: Boolean = false,
 ) {
     /** The secretary, if the office has one. */
     val secretary: LocalOfficeAdminModel? get() = admins.firstOrNull { it.isTheOfficer }
