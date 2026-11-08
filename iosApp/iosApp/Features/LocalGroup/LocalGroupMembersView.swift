@@ -97,10 +97,12 @@ struct LocalGroupMembersView: View {
                 } else {
                     ForEach(shown, id: \.id) { change in
                         // A row without a registry id (an old snapshot) has no page to open.
+                        // Pushed by view like every other screen of this tab: a value
+                        // push from a view-pushed screen makes the stack pop it.
                         if change.member.isEmpty {
                             changeRow(change)
                         } else {
-                            NavigationLink(value: RegSociRoute(id: change.member)) { changeRow(change) }
+                            NavigationLink { MemberDetailView(memberId: change.member) } label: { changeRow(change) }
                         }
                     }
                 }

@@ -27,7 +27,9 @@ struct LocalGroupNewMembersView: View {
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(members, id: \.id) { member in
-                        NavigationLink(value: RegSociRoute(id: member.id)) {
+                        // By view, like the screen that opened this one: a value push from
+                        // a view-pushed screen makes the stack pop it (see LocalGroupMembersView).
+                        NavigationLink { MemberDetailView(memberId: member.id) } label: {
                             MemberCellCompact(member: member)
                         }
                     }
