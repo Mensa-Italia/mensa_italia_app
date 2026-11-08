@@ -208,7 +208,7 @@ struct MainTabView: View {
                     DiscoverView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
                 if localGroup.available {
-                    Tab(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "person.3", value: AppTab.localGroup) { // i18n
+                    Tab(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "mappin.and.ellipse", value: AppTab.localGroup) { // i18n
                         localGroupContent
                     }
                 }
@@ -231,7 +231,7 @@ struct MainTabView: View {
                 .tag(AppTab.discover)
                 if localGroup.available {
                     localGroupContent
-                        .tabItem { Label(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "person.3") } // i18n
+                        .tabItem { Label(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "mappin.and.ellipse") } // i18n
                         .tag(AppTab.localGroup)
                 }
                 SearchView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView

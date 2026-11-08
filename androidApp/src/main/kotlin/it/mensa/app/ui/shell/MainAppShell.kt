@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.setValue
@@ -112,7 +112,7 @@ enum class MainTab(
     Discover("discover", "app.tab.discover", "Scopri", Icons.Outlined.GridView),
 
     /** Shown only while [it.mensa.shared.localgroup.LocalGroupRepository.observeAvailable] is true. */
-    LocalGroup(LocalGroupRoutes.ROOT, "app.tab.local_group", "Gruppo locale", Icons.Outlined.Groups),
+    LocalGroup(LocalGroupRoutes.ROOT, "app.tab.local_group", "Gruppo locale", Icons.Outlined.LocationOn),
     Profile("profile", "app.tab.profile", "Profilo", Icons.Outlined.AccountCircle),
 }
 
