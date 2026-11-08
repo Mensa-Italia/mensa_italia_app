@@ -42,6 +42,8 @@ class FeatureFlags(
         val leaderboardSecretaries: Boolean = false,
         /** The region's medals page in the medal cabinet. */
         val regionMedals: Boolean = false,
+        /** The "Gruppo locale" tab (the member's local office), `local_group_enabled`. */
+        val localGroup: Boolean = false,
     ) {
         val leaderboard: Boolean get() = leaderboardMembers || leaderboardRegions || leaderboardSecretaries
 
@@ -92,6 +94,8 @@ class FeatureFlags(
     val leaderboardRegionsEnabled: Boolean get() = _flags.value.leaderboardRegions
     val leaderboardSecretariesEnabled: Boolean get() = _flags.value.leaderboardSecretaries
     val regionMedalsEnabled: Boolean get() = _flags.value.regionMedals
+    /** The "Gruppo locale" tab exists: see [Flags.localGroup]. */
+    val localGroupEnabled: Boolean get() = _flags.value.localGroup
     /** Any of the three rankings on: the Home row and the page exist. */
     val leaderboardEnabled: Boolean get() = _flags.value.leaderboard
 
@@ -147,6 +151,7 @@ class FeatureFlags(
                 leaderboardRegions = configs[KEY_LEADERBOARD_REGIONS].toFlag(),
                 leaderboardSecretaries = configs[KEY_LEADERBOARD_SECRETARIES].toFlag(),
                 regionMedals = configs[KEY_REGION_MEDALS].toFlag(),
+                localGroup = configs[KEY_LOCAL_GROUP].toFlag(),
             )
             _flags.value = fresh
             writeCached(fresh)
@@ -160,7 +165,7 @@ class FeatureFlags(
         val parts = raw.split(',')
         // Length check doubles as a version guard: a cache written by an older
         // build with fewer flags is discarded rather than read short.
-        if (parts.size != 11) return null
+        if (parts.size != 12) return null
         return Flags(
             publicArea = parts[0] == "1",
             orgChart = parts[1] == "1",
@@ -173,6 +178,7 @@ class FeatureFlags(
             leaderboardRegions = parts[8] == "1",
             leaderboardSecretaries = parts[9] == "1",
             regionMedals = parts[10] == "1",
+            localGroup = parts[11] == "1",
             donationStripeLink = db.keyValueQueries
                 .selectById(CACHE_KEY_DONATION_LINK).awaitAsOneOrNull()?.value_.orEmpty(),
         )
@@ -191,6 +197,7 @@ class FeatureFlags(
             flags.leaderboardRegions,
             flags.leaderboardSecretaries,
             flags.regionMedals,
+            flags.localGroup,
         ).joinToString(",") { if (it) "1" else "0" }
         try {
             db.keyValueQueries.insertOrReplace(key = CACHE_KEY, value_ = encoded)
@@ -223,6 +230,7 @@ class FeatureFlags(
         const val KEY_LEADERBOARD_REGIONS = "leaderboard_regions_enabled"
         const val KEY_LEADERBOARD_SECRETARIES = "leaderboard_secretaries_enabled"
         const val KEY_REGION_MEDALS = "region_medals_enabled"
+        const val KEY_LOCAL_GROUP = "local_group_enabled"
         const val CACHE_KEY = "config.feature_flags"
         // Il link sta per conto suo e non nella lista separata da virgole:
         // un URL puo' contenerne una, e la spezzerebbe in due campi.

@@ -36,6 +36,13 @@ struct MensaApp: App {
             ProcessInfo.processInfo.environment["MENSA_REGION_MEDALS_FIXTURE"] == "1"
         MedalFixtures.shared.enabled =
             ProcessInfo.processInfo.environment["MENSA_MEDALS_FIXTURE"] == "1" || RegionMedalFixtures.shared.enabled
+        // Gruppo locale inventato (sede, persone, movimenti, statistiche):
+        // vedi `LocalGroupFixtures` e i case `local_group_*` qui sotto. Va
+        // impostato prima del primo `observe()`, cioe' prima di `LocalGroupStore`.
+        LocalGroupFixtures.shared.enabled =
+            ProcessInfo.processInfo.environment["MENSA_LOCAL_GROUP_FIXTURE"] == "1"
+        LocalGroupFixtures.shared.admin =
+            ProcessInfo.processInfo.environment["MENSA_LOCAL_GROUP_ADMIN"] == "1"
         if let place = ProcessInfo.processInfo.environment["MENSA_LEADERBOARD_ME"].flatMap(Int32.init) {
             LeaderboardFixtures.shared.mePlace = place
         }
@@ -158,6 +165,11 @@ struct DebugLaunchSelector: View {
                     case "leaderboard_preview_card": DebugLeaderboardCardPreview()
                     case "changelog_preview": ChangelogSheet(items: koin.changelog.items) {}
                     case "birthday_preview": DebugBirthdayGreetingPreview()
+                    case "local_group_preview": LocalGroupView()
+                    case "local_group_admin_preview": DebugLocalGroupSnapshot { LocalGroupAdminView(snapshot: $0) }
+                    case "local_group_members_preview": DebugLocalGroupSnapshot { LocalGroupMembersView(snapshot: $0) }
+                    case "local_group_stats_preview": DebugLocalGroupSnapshot { LocalGroupStatsView(snapshot: $0) }
+                    case "local_group_events_preview": DebugLocalGroupSnapshot { LocalGroupEventsView(snapshot: $0) }
                     default: Text("Unknown screen: \(target)")
                     }
                 }
@@ -273,5 +285,21 @@ private struct DebugBirthdayGreetingPreview: View {
             .sheet(isPresented: $shown) {
                 BirthdayGreetingSheet(wish: BirthdayWish(firstName: "Matteo", age: 36)) { shown = false }
             }
+    }
+}
+
+/// The admin area's pages need the snapshot the tab hands them: this waits
+/// for it in `LocalGroupStore` (the fixture one with
+/// `MENSA_LOCAL_GROUP_FIXTURE=1`) and then shows `content`.
+struct DebugLocalGroupSnapshot<Content: View>: View {
+    @ViewBuilder let content: (LocalGroupSnapshot) -> Content
+    @State private var store = LocalGroupStore.shared
+
+    var body: some View {
+        if let snapshot = store.snapshot {
+            content(snapshot)
+        } else {
+            ProgressView().task { await store.refresh() }
+        }
     }
 }

@@ -11,6 +11,7 @@ import it.mensa.app.features.events.eventsNavGraph
 import it.mensa.app.features.external.ExternalRoutes
 import it.mensa.app.features.external.externalNavGraph
 import it.mensa.app.features.leaderboard.leaderboardNavGraph
+import it.mensa.app.features.localgroup.localGroupNavGraph
 import it.mensa.app.features.localoffices.localOfficesNavGraph
 import it.mensa.app.features.locations.locationsNavGraph
 import it.mensa.app.features.members.membersNavGraph
@@ -54,6 +55,7 @@ fun NavGraphBuilder.drillNavGraphs(navController: NavController) {
     externalNavGraph(navController)
     tableportNavGraph(navController)
     leaderboardNavGraph(navController)
+    localGroupNavGraph(navController)
     testAssistantNavGraph(navController)
     addonsHubNavGraph(
         navController = navController,

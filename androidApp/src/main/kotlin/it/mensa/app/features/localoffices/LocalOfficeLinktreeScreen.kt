@@ -362,23 +362,3 @@ private fun LinktreeSectionHeader(
     }
     HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
 }
-
-private fun resolveIcon(raw: String): String {
-    val trimmed = raw.trim()
-    val lower = trimmed.lowercase()
-    return when {
-        trimmed.isEmpty() -> "🔗"
-        trimmed.codePointCount(0, trimmed.length) == 1 &&
-            trimmed.codePoints().findFirst().asInt > 127 -> trimmed
-        lower == "instagram" -> "📷"
-        lower == "facebook" -> "👤"
-        lower == "telegram" -> "✈️"
-        lower == "whatsapp" -> "💬"
-        lower == "youtube" -> "▶️"
-        lower == "email" -> "📧"
-        lower == "linkedin" -> "💼"
-        lower == "github" -> "💻"
-        lower == "twitter" -> "🐦"
-        else -> "🔗"
-    }
-}

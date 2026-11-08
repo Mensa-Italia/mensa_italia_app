@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.setValue
@@ -47,6 +48,8 @@ import it.mensa.app.features.deals.DealsRoute
 import it.mensa.app.features.discover.DiscoverTab
 import it.mensa.app.features.documents.DocumentsRoutes
 import it.mensa.app.features.events.EventRoutes
+import it.mensa.app.features.localgroup.LocalGroupRoutes
+import it.mensa.app.features.localgroup.LocalGroupScreen
 import it.mensa.app.features.localoffices.LocalOfficesRoutes
 import it.mensa.app.features.leaderboard.LeaderboardRoutes
 import it.mensa.app.features.members.MembersRoutes
@@ -72,6 +75,7 @@ import it.mensa.app.services.push.PendingPushTarget
 import it.mensa.app.services.push.PushPermissionRequester
 import it.mensa.app.support.ExternalLinks
 import it.mensa.app.support.LaunchHarness
+import it.mensa.app.support.koinAccess
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaNavItem
 import it.mensa.app.ui.components.MensaNavigationBar
@@ -79,6 +83,7 @@ import it.mensa.app.ui.components.MensaNavigationRail
 import it.mensa.app.ui.components.TwoColumnMinWidth
 import it.mensa.app.ui.components.MiniAudioPlayer
 import it.mensa.app.ui.components.NowPlayingFullScreenView
+import it.mensa.shared.localgroup.LocalGroupFixtures
 import org.koin.compose.koinInject
 
 /**
@@ -105,6 +110,9 @@ enum class MainTab(
 ) {
     Today("today", "app.tab.today", "Oggi", Icons.Outlined.AutoAwesome),
     Discover("discover", "app.tab.discover", "Scopri", Icons.Outlined.GridView),
+
+    /** Shown only while [it.mensa.shared.localgroup.LocalGroupRepository.observeAvailable] is true. */
+    LocalGroup(LocalGroupRoutes.ROOT, "app.tab.local_group", "Gruppo locale", Icons.Outlined.Groups),
     Profile("profile", "app.tab.profile", "Profilo", Icons.Outlined.AccountCircle),
 }
 
@@ -128,6 +136,8 @@ private val tabRoutes = MainTab.values().map { it.route }.toSet()
 private fun harnessRoute(alias: String): String? = when (alias.lowercase()) {
     "today" -> MainTab.Today.route
     "discover" -> MainTab.Discover.route
+    // `local_group_preview` arriva da LocalGroupPreviewHarness, che monta la shell intera.
+    "local_group", "local_group_preview" -> MainTab.LocalGroup.route
     // The card lives on Today now.
     "card" -> MainTab.Today.route
     "profile" -> MainTab.Profile.route
@@ -172,7 +182,13 @@ fun MainAppShell() {
     // NavHost start destination so the shell opens directly on it; a drill
     // alias starts on Today and pushes the destination once.
     val harnessTarget = remember { LaunchHarness.screen?.let(::harnessRoute) }
-    val startDestination = harnessTarget?.takeIf { it in tabRoutes } ?: MainTab.Today.route
+    // La tab "Gruppo locale" puo' non esserci (flag spento, nessun login): se
+    // l'alias punta li', si parte da Today, altrimenti la pila diventerebbe
+    // [LocalGroup, Today] e Indietro girerebbe in tondo.
+    val startDestination = harnessTarget
+        ?.takeIf { it in tabRoutes }
+        ?.takeIf { it != MainTab.LocalGroup.route || localGroupInitiallyAvailable() }
+        ?: MainTab.Today.route
     LaunchedEffect(harnessTarget) {
         if (harnessTarget != null && harnessTarget !in tabRoutes) {
             navController.navigate(harnessTarget) { launchSingleTop = true }
@@ -230,7 +246,20 @@ fun MainAppShell() {
     var lastTabRoute by remember { mutableStateOf(MainTab.Today.route) }
     LaunchedEffect(activeTabRoute) { activeTabRoute?.let { lastTabRoute = it } }
 
-    val navItems = MainTab.values().map { tab ->
+    // La tab "Gruppo locale" esiste solo col flag acceso e un socio loggato
+    // (o le fixture). Il valore iniziale e' letto subito, cosi' la tab non
+    // lampeggia e un avvio aperto su di lei non viene rimandato a Today.
+    val localGroup = remember { koinAccess().localGroup }
+    val localGroupAvailable by remember { localGroup.observeAvailable() }
+        .collectAsStateWithLifecycle(initialValue = localGroupInitiallyAvailable())
+    val visibleTabs = MainTab.values().filter { it != MainTab.LocalGroup || localGroupAvailable }
+    LaunchedEffect(localGroupAvailable, currentDestination?.route) {
+        if (!localGroupAvailable && currentDestination?.route == MainTab.LocalGroup.route) {
+            navController.navigateToTab(MainTab.Today)
+        }
+    }
+
+    val navItems = visibleTabs.map { tab ->
         MensaNavItem(
             route = tab.route,
             icon = tab.icon,
@@ -349,6 +378,10 @@ fun MainAppShell() {
                             )
                         }
 
+                        composable(MainTab.LocalGroup.route) {
+                            LocalGroupScreen(onNavigate = { navController.navigate(it) })
+                        }
+
                         composable(SearchRoute.ROUTE) {
                             SearchTab(
                                 onItemClick = { hit ->
@@ -402,6 +435,13 @@ fun MainAppShell() {
 }
 
 // ─── Navigation helpers ───────────────────────────────────────────────────────
+
+/** Whether the local group tab shows before its flow emits: fixtures, or flag on and signed in. */
+private fun localGroupInitiallyAvailable(): Boolean {
+    val access = koinAccess()
+    return LocalGroupFixtures.enabled ||
+        (access.featureFlags.localGroupEnabled && access.auth.currentUser.value != null)
+}
 
 private fun NavController.navigateToTab(tab: MainTab) {
     navigate(tab.route) {

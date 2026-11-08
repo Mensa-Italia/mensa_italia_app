@@ -52,6 +52,7 @@ import it.mensa.app.features.leaderboard.rememberLeaderboard
 import it.mensa.app.support.koinAccess
 import it.mensa.shared.leaderboard.LeaderboardFixtures
 import it.mensa.app.features.today._components.BirthdaysCard
+import it.mensa.app.features.today._components.EmptyEventHero
 import it.mensa.app.features.today._components.MembershipSection
 import it.mensa.app.features.today._components.NotificationsPreview
 import it.mensa.app.features.today._components.OfflineBanner
@@ -457,54 +458,6 @@ private fun UserAvatar(
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.size(20.dp),
             )
-        }
-    }
-}
-
-// ── Empty state for next event ───────────────────────────────────────────────
-
-@Composable
-private fun EmptyEventHero(onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.size(44.dp),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Outlined.CalendarMonth,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = tr("today.no_events_title", fallback = "Nessun evento in agenda"),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = tr("today.no_events_subtitle", fallback = "Esplora gli eventi pubblici"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }

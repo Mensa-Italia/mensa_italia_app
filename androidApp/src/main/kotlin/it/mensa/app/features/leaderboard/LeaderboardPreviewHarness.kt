@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import it.mensa.app.features.card._components.MembershipCardHero
+import it.mensa.app.features.localgroup.LocalGroupPreviewHarness
 import it.mensa.app.features.tableport.medals.MedalCabinetScreen
 import it.mensa.app.features.today._components.SectionLabel
 import it.mensa.app.support.koinAccess
@@ -39,7 +40,10 @@ import it.mensa.shared.members.BirthdayWish
  */
 @Composable
 fun LeaderboardPreviewHarness(screen: String) {
-    if (screen == "leaderboard_preview_card") {
+    if (screen.startsWith("local_group")) {
+        // Le pagine del gruppo locale sulle loro fixture: vedi LocalGroupPreviewHarness.
+        LocalGroupPreviewHarness(screen)
+    } else if (screen == "leaderboard_preview_card") {
         val board = rememberLeaderboard().board
         Column(
             Modifier

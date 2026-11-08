@@ -108,14 +108,15 @@ import kotlin.math.sin
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MedalCabinetScreen(onNavigateBack: () -> Unit) = DarkStage {
+fun MedalCabinetScreen(onNavigateBack: () -> Unit, initialRegion: Boolean = false) = DarkStage {
     val state = rememberMedals()
     val medals = state.medals
     val history = rememberMedalHistory()
     val seasonLabel = Season.label(state.season)
     val region = rememberRegionMedals()
     // "Le mie" / "La mia regione": the switch exists only with the flag on and the region known.
-    var page by rememberSaveable { mutableStateOf(CabinetPage.Mine) }
+    // initialRegion: aperto dal gruppo locale ("Medaglie della regione").
+    var page by rememberSaveable { mutableStateOf(if (initialRegion) CabinetPage.Region else CabinetPage.Mine) }
     val onRegion = region.available && page == CabinetPage.Region
     var showInfo by remember { mutableStateOf(false) }
     // Seasons unfolded under "Annate", on each of the two pages (they may share a season).

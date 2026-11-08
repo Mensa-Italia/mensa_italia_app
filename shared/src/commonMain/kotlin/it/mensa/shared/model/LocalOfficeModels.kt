@@ -15,6 +15,12 @@ data class LocalOfficeModel(
     val slug: String = "",
     val bio: String = "",
     val image: String = "",
+    /**
+     * The merged region key (`RegionKey.of(members_registry.area)`): "Puglia"
+     * also for Basilicata, "Piemonte" also for Valle d'Aosta. Empty on an older
+     * server, null from the public view that doesn't expose it.
+     */
+    @SerialName("region_key") val regionKey: String? = null,
 )
 
 @Serializable
@@ -78,6 +84,8 @@ data class LocalOfficeLinktreeRowModel(
     val kind: String = "",           // "section" | "link"
     val parent: String = "",         // "" = root
     @SerialName("sort_order") val sortOrder: Int = 0,
+    /// True when the view doesn't expose the field (it may list active links only).
+    val active: Boolean = true,
 )
 
 /// Raw `local_offices_test_dates` collection record — what we POST/PATCH.

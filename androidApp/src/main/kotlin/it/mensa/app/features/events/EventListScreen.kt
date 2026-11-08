@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.mensa.app.features.events._components.EventFiltersSheet
 import it.mensa.app.features.events._components.EventRowCard
+import it.mensa.app.features.events._components.EventSectionHeader
 import it.mensa.app.features.events.util.EventFilterState
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
@@ -179,12 +180,7 @@ fun EventListScreen(
                         ) {
                             if (upcoming.isNotEmpty()) {
                                 item {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(tr("events.section.upcoming", fallback = "Imminenti"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                                    }
+                                    EventSectionHeader(tr("events.section.upcoming", fallback = "Imminenti"))
                                 }
                                 itemsIndexed(upcoming, key = { _, e -> e.id }) { index, event ->
                                     EventRowCard(
@@ -198,12 +194,7 @@ fun EventListScreen(
                             }
                             if (past.isNotEmpty()) {
                                 item {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 24.dp, bottom = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(tr("events.section.past", fallback = "Passati"), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                                    }
+                                    EventSectionHeader(tr("events.section.past", fallback = "Passati"))
                                 }
                                 itemsIndexed(past, key = { _, e -> e.id }) { index, event ->
                                     EventRowCard(

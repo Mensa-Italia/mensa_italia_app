@@ -198,10 +198,23 @@ fun MembershipSection(
     }
 }
 
+/**
+ * A row of the membership card. Also used by the "Gruppo locale" tab: there
+ * [value] is a figure beside the title, [supporting] a line under it, and without [onClick] the row opens
+ * nothing (no chevron).
+ */
 @Composable
-private fun SectionRow(title: String, icon: ImageVector, onClick: () -> Unit, medalCount: Int? = null) {
+internal fun SectionRow(
+    title: String,
+    icon: ImageVector,
+    onClick: (() -> Unit)?,
+    medalCount: Int? = null,
+    value: String? = null,
+    supporting: String? = null,
+) {
     ListItem(
         headlineContent = { Text(title) },
+        supportingContent = supporting?.let { { Text(it) } },
         leadingContent = {
             Icon(
                 imageVector = icon,
@@ -231,15 +244,24 @@ private fun SectionRow(title: String, icon: ImageVector, onClick: () -> Unit, me
                         },
                     )
                 }
-                Icon(
-                    imageVector = Icons.Outlined.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                if (value != null) {
+                    Text(
+                        text = value,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                if (onClick != null) {
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        modifier = Modifier.clickable(onClick = onClick, role = Role.Button),
+        modifier = if (onClick != null) Modifier.clickable(onClick = onClick, role = Role.Button) else Modifier,
     )
 }
 

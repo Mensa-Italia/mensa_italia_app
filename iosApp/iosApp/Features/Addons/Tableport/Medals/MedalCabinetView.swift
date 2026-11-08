@@ -31,6 +31,12 @@ struct MedalCabinetView: View {
     @State private var showInfo = false
     @State private var openSeasons = Set<Int>()
 
+    /// `showRegion`: opens on "La mia regione" (the "Gruppo locale" tab's
+    /// "Medaglie della regione"); without the region page it stays on "Le mie".
+    init(showRegion: Bool = false) {
+        _page = State(initialValue: showRegion ? .region : .mine)
+    }
+
     private var medals: [Medal] { store.medals }
     /// The season's medals first, then the permanent ones, as the grid lists them.
     private var shown: [Medal] {

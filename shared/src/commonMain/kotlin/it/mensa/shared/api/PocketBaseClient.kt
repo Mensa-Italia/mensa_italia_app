@@ -75,6 +75,18 @@ class PocketBaseClient(@PublishedApi internal val client: HttpClient) {
             setBody(body)
         }.body()
 
+    /**
+     * Raw authenticated GET of any backend [path] (e.g. `/api/cs/...`), for
+     * files: the body as bytes. The Bearer token is attached by [AuthPlugin]
+     * like for every other request; a non 2xx answer throws a
+     * `ResponseException` with the status.
+     */
+    @Throws(Exception::class)
+    suspend fun getBytes(path: String, query: Map<String, String> = emptyMap()): ByteArray =
+        client.get(path) {
+            query.forEach { (k, v) -> parameter(k, v) }
+        }.body()
+
     @Throws(Exception::class)
     suspend fun delete(collection: String, id: String) {
         client.delete("/api/collections/$collection/records/$id")

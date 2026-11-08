@@ -117,8 +117,9 @@ fun NotificationsPreview(
     }
 }
 
+/** The "see all" row closing a card; [label] defaults to the notifications' "Vedi tutte". */
 @Composable
-private fun SeeAllRow(onClick: () -> Unit) {
+internal fun SeeAllRow(onClick: () -> Unit, label: String = tr("app.today.notifications.see_all", fallback = "Vedi tutte")) {
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -131,7 +132,7 @@ private fun SeeAllRow(onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = tr("app.today.notifications.see_all", fallback = "Vedi tutte"),
+                text = label,
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f),

@@ -58,11 +58,18 @@ class Changelog internal constructor(
 
     companion object {
         /** Cambialo, con [ITEMS], per far ricomparire il changelog in un rilascio. */
-        const val ID = "2026-11-stagione"
+        const val ID = "2026-11-gruppo-locale"
 
         private const val KEY_SEEN = "changelog.seen"
 
         private val ITEMS = listOf(
+            ChangelogItem(
+                icon = "trophy",
+                titleKey = "changelog.2026_11.local_group.title",
+                titleFallback = "Il tuo gruppo locale",
+                bodyKey = "changelog.2026_11.local_group.body",
+                bodyFallback = "Nella nuova scheda Gruppo locale trovi la sede della tua regione: segretario e co-segretari con i contatti, la posizione in classifica, le medaglie, il prossimo evento e le convenzioni attive. Chi la gestisce ha anche un'area riservata con i soci nuovi, le statistiche e l'esportazione in Excel.",
+            ),
             ChangelogItem(
                 icon = "trophy",
                 titleKey = "changelog.2026_11.season.title",

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import it.mensa.shared.demo.DemoIdentity
 import it.mensa.shared.leaderboard.LeaderboardFixtures
+import it.mensa.shared.localgroup.LocalGroupFixtures
 import it.mensa.shared.medals.MedalFixtures
 import it.mensa.shared.medals.RegionMedalFixtures
 
@@ -40,6 +41,8 @@ object LaunchHarness {
     const val EXTRA_LEADERBOARD_ME = "mensa_leaderboard_me"
     const val EXTRA_MEDALS_FIXTURE = "mensa_medals_fixture"
     const val EXTRA_REGION_MEDALS_FIXTURE = "mensa_region_medals_fixture"
+    const val EXTRA_LOCAL_GROUP_FIXTURE = "mensa_local_group_fixture"
+    const val EXTRA_LOCAL_GROUP_ADMIN = "mensa_local_group_admin"
 
     /** Requested destination alias (e.g. `today`, `events`, `card`), or null. */
     var screen: String? = null
@@ -50,11 +53,11 @@ object LaunchHarness {
 
     /**
      * A screen to mount on its own, before and without the login: only the
-     * leaderboard and medal previews, which run on [LeaderboardFixtures],
-     * [MedalFixtures] and [RegionMedalFixtures].
+     * leaderboard, medal and local group previews, which run on [LeaderboardFixtures],
+     * [MedalFixtures], [RegionMedalFixtures] and [LocalGroupFixtures].
      */
     val standalonePreview: String?
-        get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" || it == "changelog_preview" || it == "birthday_preview" }
+        get() = screen?.takeIf { it.startsWith("leaderboard_preview") || it == "medals_preview" || it.startsWith("local_group_") || it == "changelog_preview" || it == "birthday_preview" }
 
     /** True when this process was launched by the screenshot/automation harness. */
     val isActive: Boolean
@@ -90,6 +93,11 @@ object LaunchHarness {
         // Il medagliere ha anche la pagina personale, quindi le porta con se'.
         RegionMedalFixtures.enabled = extras.getString(EXTRA_REGION_MEDALS_FIXTURE) == "1"
         MedalFixtures.enabled = extras.getString(EXTRA_MEDALS_FIXTURE) == "1" || RegionMedalFixtures.enabled
+        // Gruppo locale inventato (tab visibile anche senza flag e login), e con
+        // l'area segreteria se richiesta: vedi [LocalGroupFixtures]. Va impostato
+        // qui, prima che qualcuno osservi il repository.
+        LocalGroupFixtures.enabled = extras.getString(EXTRA_LOCAL_GROUP_FIXTURE) == "1"
+        LocalGroupFixtures.admin = extras.getString(EXTRA_LOCAL_GROUP_ADMIN) == "1"
         if (isActive) {
             Logger.i("LaunchHarness", "configure", "active: screen=$screen autologin=${email != null}")
         }

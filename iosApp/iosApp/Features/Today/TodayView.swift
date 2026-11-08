@@ -274,39 +274,7 @@ struct TodayView: View {
     }
 
     private func membershipRow(icon: String, color: Color, title: String, medalCount: Int? = nil) -> some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(color)
-                    .frame(width: 30, height: 30)
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-            Text(title)
-                .font(.body)
-                .foregroundStyle(.primary)
-            Spacer()
-            if let medalCount {
-                HStack(spacing: 4) {
-                    Image(systemName: "medal.fill")
-                        .font(.footnote.weight(.semibold))
-                    Text("\(medalCount)")
-                        .font(.subheadline.weight(.semibold).monospacedDigit())
-                }
-                .foregroundStyle(.secondary)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(
-                    tr("medals.count_a11y", fallback: "%d medaglie").replacingOccurrences(of: "%d", with: "\(medalCount)")
-                ))
-            }
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .contentShape(Rectangle())
+        TodayMembershipRow(icon: icon, color: color, title: title, medalCount: medalCount)
     }
 
     @ViewBuilder
@@ -437,17 +405,7 @@ struct TodayView: View {
                     Button {
                         showAllNotifications = true
                     } label: {
-                        HStack(spacing: 6) {
-                            Text(tr("app.today.notifications.see_all", fallback: "Vedi tutte")) // i18n
-                                .font(.subheadline.weight(.medium))
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                            Spacer()
-                        }
-                        .foregroundStyle(Color.accentColor)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .contentShape(Rectangle())
+                        TodaySeeAllRow(title: tr("app.today.notifications.see_all", fallback: "Vedi tutte")) // i18n
                     }
                     .buttonStyle(.plain)
                 }
@@ -523,29 +481,11 @@ struct TodayView: View {
     // MARK: - Helpers
 
     private func sectionLabel(title: String, icon: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Text(title.uppercased())
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .tracking(0.5)
-        }
+        TodaySectionLabel(title: title, icon: icon)
     }
 
     private func emptyState(icon: String, message: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.secondary)
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .compatGlass(cornerRadius: 14)
+        TodayEmptyState(icon: icon, message: message)
     }
 }
 

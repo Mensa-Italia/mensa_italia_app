@@ -200,35 +200,15 @@ struct LocalOfficeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 // 1. Hero
-                heroSection(office)
+                LocalOfficeHero(office: office)
 
                 // 2. Kicker + title + bio
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(tr("local_office.kicker", fallback: "GRUPPO LOCALE").uppercased())
-                        .font(.caption2.weight(.semibold))
-                        .tracking(1.8)
-                        .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-
-                    Text(office.name)
-                        .font(.system(.largeTitle, design: .serif).weight(.bold))
-                        .foregroundStyle(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    if !office.bio.isEmpty {
-                        Text(office.bio)
-                            .font(.body)
-                            .foregroundStyle(.primary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 8)
+                LocalOfficeIntro(office: office)
 
                 // 3. Linktree
                 if !linktree.isEmpty || canEdit {
                     sectionBlock(index: 0) {
-                        linktreeSection
+                        LocalOfficeLinktreeSection(officeId: officeId, rows: linktree, canEdit: canEdit)
                     }
                 }
 
@@ -256,7 +236,7 @@ struct LocalOfficeView: View {
                 // 7. Admins (referenti)
                 if !admins.isEmpty {
                     sectionBlock(index: 4) {
-                        adminsSection
+                        LocalOfficeAdminsSection(admins: admins)
                     }
                 }
 
@@ -272,164 +252,6 @@ struct LocalOfficeView: View {
         }
         .ignoresSafeArea(.container, edges: .top)
         .refreshableOnReconnect { await refresh() }
-    }
-
-    // MARK: - Hero
-
-    @ViewBuilder
-    private func heroSection(_ office: LocalOfficeModel) -> some View {
-        let coverURL: URL? = {
-            guard !office.image.isEmpty else { return nil }
-            return Files.url(
-                collection: "local_offices",
-                recordId: office.id,
-                filename: office.image,
-                thumb: "0x500"
-            )
-        }()
-
-        GeometryReader { geo in
-            let minY = geo.frame(in: .global).minY
-            let stretch = max(0, minY)
-            ZStack(alignment: .bottom) {
-                Group {
-                    if let url = coverURL {
-                        CachedAsyncImage(url: url) { img in
-                            img.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            AppTheme.brandGradient
-                        }
-                    } else {
-                        AppTheme.brandGradient
-                            .overlay(
-                                Image(systemName: "building.2.fill")
-                                    .font(.system(size: 48, weight: .semibold))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            )
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-                .clipped()
-
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.45)],
-                    startPoint: .top, endPoint: .bottom
-                )
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-            }
-            .frame(width: geo.size.width, height: geo.size.height + stretch)
-            .clipped()
-            .offset(y: -stretch)
-        }
-        .frame(height: 250)
-    }
-
-    // MARK: - Linktree section (preview — top-2 root links + "Vedi tutti")
-
-    @ViewBuilder
-    private var linktreeSection: some View {
-        let sorted = linktree.sorted { $0.sortOrder < $1.sortOrder }
-        let rootLinks = sorted.filter { $0.parent == "" && $0.kind == "link" }
-        let hasSections = sorted.contains { $0.parent == "" && $0.kind == "section" }
-        let previewLinks = Array(rootLinks.prefix(2))
-        let showSeeAll = rootLinks.count > 2 || hasSections
-
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center) {
-                sectionHeader(tr("local_office.linktree.title", fallback: "Link utili"))
-                Spacer(minLength: 8)
-                HStack(spacing: 12) {
-                    if canEdit {
-                        NavigationLink(value: LocalOfficeLinktreeRoute(officeId: officeId)) {
-                            Text(tr("local_office.linktree.edit", fallback: "Modifica"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    if showSeeAll {
-                        NavigationLink(value: LocalOfficeLinktreeRoute(officeId: officeId)) {
-                            Text(tr("local_office.linktree.see_all", fallback: "Vedi tutti"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-
-            VStack(spacing: 8) {
-                ForEach(previewLinks, id: \.id) { link in
-                    linktreeRow(link)
-                }
-                if linktree.isEmpty {
-                    Text(tr("local_office.linktree.empty", fallback: "Nessun link"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 8)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func linktreeRow(_ row: LocalOfficeLinktreeRowModel) -> some View {
-        Button {
-            ExternalLink.open(row.url)
-        } label: {
-            HStack(spacing: 12) {
-                iconView(row.icon)
-                    .frame(width: 24, height: 24)
-                    .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-
-                Text(row.title)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.up.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-            }
-            .frame(height: 52)
-            .padding(.horizontal, 16)
-            .compatGlass(cornerRadius: 14)
-        }
-        .buttonStyle(.plain)
-    }
-
-    /// Resolves the icon field: emoji → Text, brand name → SF symbol, SF symbol, fallback link.
-    @ViewBuilder
-    private func iconView(_ raw: String) -> some View {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.unicodeScalars.count == 1 && trimmed.unicodeScalars.first.map({ $0.value > 127 }) == true {
-            // Single non-ASCII scalar → treat as emoji
-            Text(trimmed).font(.system(size: 18))
-        } else if let sfForBrand = brandSFSymbol(trimmed.lowercased()) {
-            Image(systemName: sfForBrand)
-        } else if !trimmed.isEmpty && UIImage(systemName: trimmed) != nil {
-            Image(systemName: trimmed)
-        } else {
-            Image(systemName: "link")
-        }
-    }
-
-    private func brandSFSymbol(_ name: String) -> String? {
-        switch name {
-        case "instagram":  return "camera.filters"
-        case "facebook":   return "f.cursive.circle.fill"
-        case "twitter":    return "bird.fill"
-        case "tiktok":     return "music.note"
-        case "youtube":    return "play.rectangle.fill"
-        case "telegram":   return "paperplane.fill"
-        case "whatsapp":   return "message.fill"
-        case "linkedin":   return "person.crop.rectangle.stack.fill"
-        case "github":     return "chevron.left.forwardslash.chevron.right"
-        case "email":      return "envelope.fill"
-        default:           return nil
-        }
     }
 
     // MARK: - Test dates section
@@ -658,69 +480,6 @@ struct LocalOfficeView: View {
         .compatGlass(cornerRadius: 14)
     }
 
-    // MARK: - Admins (referenti) section
-
-    @ViewBuilder
-    private var adminsSection: some View {
-        let sorted = admins.sorted { a, b in
-            if a.isTheOfficer != b.isTheOfficer { return a.isTheOfficer }
-            return a.name < b.name
-        }
-
-        VStack(alignment: .leading, spacing: 10) {
-            sectionHeader(tr("local_office.admins.title", fallback: "Referenti"))
-
-            ForEach(sorted, id: \.id) { admin in
-                NavigationLink(value: RegSociRoute(id: admin.user)) {
-                    adminRow(admin)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func adminRow(_ admin: LocalOfficeAdminModel) -> some View {
-        let imageURL: URL? = {
-            guard !admin.image.isEmpty else { return nil }
-            return Files.url(
-                collection: "view_local_office_admins",
-                recordId: admin.id,
-                filename: admin.image,
-                thumb: "200x200"
-            )
-        }()
-
-        HStack(spacing: 12) {
-            avatarView(url: imageURL, name: admin.name, size: 40)
-
-            Text(titleCase(admin.name))
-                .font(.subheadline)
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-
-            Spacer(minLength: 0)
-
-            if admin.isTheOfficer {
-                Text(tr("local_office.admin.officer", fallback: "Segretario"))
-                    .font(.caption2.weight(.semibold))
-                    .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(AppTheme.Colors.brandPrimary.opacity(0.15), in: Capsule())
-                    .foregroundStyle(AppTheme.Colors.brandTintAdaptive)
-            } else {
-                Text(tr("local_office.admin.co_officer", fallback: "Cosegretario"))
-                    .font(.caption2.weight(.semibold))
-                    .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(Color.secondary.opacity(0.15), in: Capsule())
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .compatGlass(cornerRadius: 14)
-        .contentShape(.rect(cornerRadius: 14))
-    }
-
     // MARK: - Assistants section
 
     @ViewBuilder
@@ -767,62 +526,17 @@ struct LocalOfficeView: View {
 
     // MARK: - Shared subviews
 
-    @ViewBuilder
     private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.title3.weight(.bold))
-            .foregroundStyle(.primary)
+        LocalOfficeSectionHeader(title: title)
     }
 
     /// Wraps a section in standard padding + stagger-appear animation.
-    @ViewBuilder
-    private func sectionBlock<Content: View>(index: Int, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            content()
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 24)
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 14)
-        .animation(
-            .spring(response: 0.5, dampingFraction: 0.86)
-                .delay(Double(index) * 0.07),
-            value: appeared
-        )
+    private func sectionBlock<Content: View>(index: Int, @ViewBuilder content: @escaping () -> Content) -> some View {
+        LocalOfficeSectionBlock(index: index, appeared: appeared, content: content)
     }
 
-    @ViewBuilder
     private func avatarView(url: URL?, name: String, size: CGFloat) -> some View {
-        Group {
-            if let url = url {
-                CachedAsyncImage(url: url) { img in
-                    img.resizable().scaledToFill()
-                } placeholder: {
-                    initialBubble(name: name, size: size)
-                }
-            } else {
-                initialBubble(name: name, size: size)
-            }
-        }
-        .frame(width: size, height: size)
-        .clipShape(Circle())
-        .overlay(Circle().stroke(.white.opacity(0.6), lineWidth: 1))
-    }
-
-    private func initialBubble(name: String, size: CGFloat) -> some View {
-        ZStack {
-            AppTheme.brandGradient
-            Text(initials(from: name))
-                .font(.system(size: size * 0.4, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-        }
-    }
-
-    private func initials(from name: String) -> String {
-        let parts = name.split(separator: " ").prefix(2)
-        let chars = parts.compactMap { $0.first }
-        let result = String(chars).uppercased()
-        return result.isEmpty ? "?" : result
+        LocalOfficeAvatar(url: url, name: name, size: size)
     }
 
     private func titleCase(_ s: String) -> String {

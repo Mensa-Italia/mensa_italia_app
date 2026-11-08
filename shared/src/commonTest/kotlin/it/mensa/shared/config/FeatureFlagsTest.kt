@@ -54,4 +54,19 @@ class FeatureFlagsTest {
         assertTrue(soloOrg.allowsSearchType(SearchType.ORG))
         assertFalse(soloOrg.allowsSearchType(SearchType.LINKTREE_LINK))
     }
+
+    @Test
+    fun gruppoLocaleSpentoDiDefault() {
+        // Flag mancante o non ancora letto: la tab non c'e'.
+        assertFalse(FeatureFlags.Flags().localGroup)
+    }
+
+    @Test
+    fun gruppoLocaleNonDipendeDaiGruppiLocali() {
+        // `local_group_enabled` (la tab) e `local_groups_enabled` (le pagine delle sedi) sono due flag diversi.
+        val soloTab = FeatureFlags.Flags(localGroup = true, localGroups = false)
+        assertTrue(soloTab.localGroup)
+        assertFalse(soloTab.allowsSearchType(SearchType.LINKTREE_LINK))
+        assertFalse(FeatureFlags.Flags(localGroups = true).localGroup)
+    }
 }

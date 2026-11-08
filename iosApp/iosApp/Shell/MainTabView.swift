@@ -4,7 +4,7 @@ import Combine
 // toccava solo tipi Swift e non ne aveva bisogno.
 import Shared
 
-/// 4-tab shell with iOS 26 Liquid Glass tab bar.
+/// 4-tab shell (5 with "Gruppo locale") with iOS 26 Liquid Glass tab bar.
 /// iOS 26 automatically applies the Liquid Glass style to TabView.
 struct MainTabView: View {
     @State private var selectedTab: AppTab = {
@@ -13,6 +13,7 @@ struct MainTabView: View {
             switch args[i + 1] {
             case "today": return .today
             case "discover": return .discover
+            case "local_group": return .localGroup
             case "search": return .search
             // The card lives in the Home tab now.
             case "card": return .today
@@ -28,6 +29,9 @@ struct MainTabView: View {
     /// tapped notification opens the referenced object regardless of which tab
     /// the user is on.
     @State private var pushDestination: NotificationTarget?
+
+    /// Whether the "Gruppo locale" tab exists (flag on and signed in).
+    @State private var localGroup = LocalGroupStore.shared
 
     /// Francobollo da confermare, arrivato da un link universale.
     @State private var stampClaim: PendingStamp?
@@ -96,6 +100,13 @@ struct MainTabView: View {
             }
             if let stamp = pendingDeepLink.consumeStamp() {
                 stampClaim = stamp
+            }
+        }
+        .onChange(of: localGroup.available || !localGroup.availabilityKnown, initial: true) { _, mayShow in
+            // The tab is gone (flag off, signed out, or never there for
+            // `--initial-tab local_group`) while it was the one selected.
+            if !mayShow, selectedTab == .localGroup {
+                selectedTab = .today
             }
         }
         .onChange(of: pendingDeepLink.stamp) { _, newValue in
@@ -196,6 +207,11 @@ struct MainTabView: View {
                 Tab(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2", value: AppTab.discover) { // i18n
                     DiscoverView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
+                if localGroup.available {
+                    Tab(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "person.3", value: AppTab.localGroup) { // i18n
+                        localGroupContent
+                    }
+                }
                 Tab(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass", value: AppTab.search, role: .search) { // i18n
                     SearchView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 }
@@ -213,6 +229,11 @@ struct MainTabView: View {
                 DiscoverView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 .tabItem { Label(tr("app.tab.discover", fallback: "Scopri"), systemImage: "square.grid.2x2") } // i18n
                 .tag(AppTab.discover)
+                if localGroup.available {
+                    localGroupContent
+                        .tabItem { Label(tr("app.tab.local_group", fallback: "Gruppo locale"), systemImage: "person.3") } // i18n
+                        .tag(AppTab.localGroup)
+                }
                 SearchView().collapsesSidebarWhenNarrow() // owns its NavigationSplitView
                 .tabItem { Label(tr("app.tab.search", fallback: "Cerca"), systemImage: "magnifyingglass") } // i18n
                 .tag(AppTab.search)
@@ -220,6 +241,12 @@ struct MainTabView: View {
                 .tabItem { Label(tr("app.tab.profile", fallback: "Profilo"), systemImage: "person.crop.circle") } // i18n
                 .tag(AppTab.profile)
             }
+        }
+    }
+
+    private var localGroupContent: some View {
+        NavigationStack {
+            LocalGroupView()
         }
     }
 

@@ -258,17 +258,7 @@ struct EventListView: View {
     }
 
     private func sectionHeader(_ title: String, count: Int) -> some View {
-        HStack {
-            Text(title).font(.title3.bold())
-            Text("\(count)")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8).padding(.vertical, 2)
-                .background(.thinMaterial, in: Capsule())
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.top, 6)
+        EventListSectionHeader(title: title, count: count)
     }
 }
 
