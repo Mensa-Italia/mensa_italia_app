@@ -169,7 +169,7 @@ private fun LocalGroupContent(
                         SectionRow(
                             title = tr("local_group.members.new_week", "Nuovi nell'ultima settimana"),
                             icon = Icons.Outlined.PersonAdd,
-                            onClick = null,
+                            onClick = { onNavigate(LocalGroupRoutes.NEW_MEMBERS) },
                             value = stats.membersNew7d.toString(),
                         )
                     }

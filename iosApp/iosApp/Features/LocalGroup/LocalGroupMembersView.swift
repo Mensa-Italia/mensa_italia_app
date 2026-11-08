@@ -96,11 +96,11 @@ struct LocalGroupMembersView: View {
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(shown, id: \.id) { change in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(TextFormatters.shared.titleCase(s: change.name))
-                            Text("\(LocalGroupFormat.changeLabel(change)) · \(LocalGroupFormat.day(change.dayIso))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                        // A row without a registry id (an old snapshot) has no page to open.
+                        if change.member.isEmpty {
+                            changeRow(change)
+                        } else {
+                            NavigationLink(value: RegSociRoute(id: change.member)) { changeRow(change) }
                         }
                     }
                 }
@@ -162,6 +162,15 @@ struct LocalGroupMembersView: View {
         }
         loading = false
         exportURL = nil
+    }
+
+    private func changeRow(_ change: MemberChangeModel) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(TextFormatters.shared.titleCase(s: change.name))
+            Text("\(LocalGroupFormat.changeLabel(change)) · \(LocalGroupFormat.day(change.dayIso))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func export(kind: ExportKind, from: Kotlinx_datetimeLocalDate?, to: Kotlinx_datetimeLocalDate?) {

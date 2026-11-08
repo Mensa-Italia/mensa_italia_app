@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 object LocalGroupRoutes {
     /** The tab root: registered by the shell as a tab, not in [localGroupNavGraph]. */
     const val ROOT = "local_group"
+    const val NEW_MEMBERS = "local_group/new_members"
     const val ADMIN = "local_group/admin"
     const val MEMBERS = "local_group/admin/members"
     const val STATS = "local_group/admin/stats"
@@ -25,16 +26,17 @@ object LocalGroupRoutes {
 }
 
 /**
- * The admin area of the "Gruppo locale" tab ("Area segreteria" and its three
- * pages). The tab root ([LocalGroupRoutes.ROOT]) is a tab destination of the
+ * The pages of the "Gruppo locale" tab: the week's new members, open to
+ * everyone, and the admin area ("Area segreteria" and its three pages). The tab root ([LocalGroupRoutes.ROOT]) is a tab destination of the
  * shell, so it is not registered here: two destinations with the same route
  * in one NavHost would replace each other.
  */
 fun NavGraphBuilder.localGroupNavGraph(navController: NavController) {
     val back: () -> Unit = { navController.popBackStack() }
     val open: (String) -> Unit = { navController.navigate(it) }
+    slide(LocalGroupRoutes.NEW_MEMBERS) { LocalGroupNewMembersScreen(onBack = back, onNavigate = open) }
     slide(LocalGroupRoutes.ADMIN) { LocalGroupAdminScreen(onBack = back, onNavigate = open) }
-    slide(LocalGroupRoutes.MEMBERS) { LocalGroupMembersScreen(onBack = back) }
+    slide(LocalGroupRoutes.MEMBERS) { LocalGroupMembersScreen(onBack = back, onNavigate = open) }
     slide(LocalGroupRoutes.STATS) { LocalGroupStatsScreen(onBack = back) }
     slide(LocalGroupRoutes.EVENTS) { LocalGroupEventsScreen(onBack = back, onNavigate = open) }
 }

@@ -12,6 +12,7 @@ import it.mensa.shared.localgroup.LocalGroupState
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.LocalOfficeMonthlyStatsModel
 import it.mensa.shared.model.MemberChangeModel
+import it.mensa.shared.model.RegSociModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,6 +56,9 @@ class LocalGroupViewModel(
     private val _monthly = MutableStateFlow<Loadable<List<LocalOfficeMonthlyStatsModel>>>(Loadable.Loading)
     val monthly: StateFlow<Loadable<List<LocalOfficeMonthlyStatsModel>>> = _monthly.asStateFlow()
 
+    private val _newMembers = MutableStateFlow<Loadable<List<RegSociModel>>>(Loadable.Loading)
+    val newMembers: StateFlow<Loadable<List<RegSociModel>>> = _newMembers.asStateFlow()
+
     private val _events = MutableStateFlow<Loadable<List<EventModel>>>(Loadable.Loading)
     val events: StateFlow<Loadable<List<EventModel>>> = _events.asStateFlow()
 
@@ -77,6 +81,8 @@ class LocalGroupViewModel(
     }
 
     fun loadMonthly(officeId: String) = load(_monthly) { repository.loadMonthly(officeId) }
+
+    fun loadNewMembers(officeId: String) = load(_newMembers) { repository.loadNewMembers(officeId) }
 
     fun loadEvents(officeId: String) = load(_events) { repository.loadOfficeEvents(officeId) }
 

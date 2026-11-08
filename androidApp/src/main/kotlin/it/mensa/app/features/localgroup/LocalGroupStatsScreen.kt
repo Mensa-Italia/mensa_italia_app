@@ -25,7 +25,8 @@ import it.mensa.shared.model.LocalOfficeStatsModel
 
 /**
  * "Statistiche" of the admin area: the office's figures now, then month by
- * month for the season (events, attendance, active members, joined and left).
+ * month from October of the previous season (events, attendance, active
+ * members, joined and left).
  */
 @Composable
 fun LocalGroupStatsScreen(
@@ -79,6 +80,7 @@ private fun FiguresCard(stats: LocalOfficeStatsModel) {
         tr("local_group.stats.attendance_season", "Presenze in stagione") to stats.attendanceSeason,
         tr("local_group.stats.deals", "Convenzioni attive") to stats.dealsActive,
     )
+    // I totali sono della stagione in corso: il titolo e' la stagione.
     LocalGroupSection(title = stats.season.takeIf { it.isNotBlank() }) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             figures.chunked(2).forEach { pair ->
@@ -101,9 +103,12 @@ private fun Figure(label: String, value: Int, modifier: Modifier) {
 @Composable
 private fun MonthlyCharts(months: List<LocalOfficeMonthlyStatsModel>) {
     val locale = rememberAppLocale()
-    val labels = months.map { shortMonth(it.monthNumber, locale) }
+    val labels = monthLabels(months, locale)
     val primary = MaterialTheme.colorScheme.primary
+    // I grafici partono dall'ottobre della stagione prima: il titolo dice da quando.
+    val start = months.first().takeIf { it.year > 0 && it.monthNumber > 0 }?.let { monthAndYear(it, locale) }
     Column {
+        if (start != null) SectionTitle(tr("local_group.stats.since", "Da {month}", "month" to start))
         ChartCard(tr("local_group.stats.events", "Eventi per mese")) {
             MonthlyBars(months.map { it.events }, labels, primary)
         }

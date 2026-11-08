@@ -13,7 +13,6 @@ struct LocalGroupView: View {
     var body: some View {
         content
             .navigationTitle(tr("local_group.title", fallback: "Gruppo locale"))
-            .navigationBarTitleDisplayMode(.inline)
             .cleanNavBar()
             // Only when there is nothing to show: `.task` reruns on every
             // return from a pushed screen. Pull to refresh does the rest.
@@ -66,8 +65,11 @@ struct LocalGroupView: View {
     private func page(_ snapshot: LocalGroupSnapshot, failed: Bool) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                LocalOfficeHero(office: snapshot.office)
-                LocalOfficeIntro(office: snapshot.office)
+                LocalOfficeHero(office: snapshot.office, inset: true)
+                LocalOfficeIntro(
+                    office: snapshot.office,
+                    kicker: snapshot.office.region.isEmpty ? nil : snapshot.office.region
+                )
 
                 if failed {
                     block(0) {
@@ -107,7 +109,7 @@ struct LocalGroupView: View {
                 block(3) { rankingSection(snapshot.ranking) }
 
                 if let stats = snapshot.stats {
-                    block(4) { membersSection(stats) }
+                    block(4) { membersSection(stats, officeId: snapshot.office.id) }
                 }
 
                 block(5) { nextEventSection(snapshot.nextEvent) }
@@ -121,7 +123,6 @@ struct LocalGroupView: View {
                 Color.clear.frame(height: 40)
             }
         }
-        .ignoresSafeArea(.container, edges: .top)
         .refreshableOnReconnect { await store.refresh() }
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) { appeared = true }
@@ -180,7 +181,7 @@ struct LocalGroupView: View {
 
     // MARK: Members
 
-    private func membersSection(_ stats: LocalOfficeStatsModel) -> some View {
+    private func membersSection(_ stats: LocalOfficeStatsModel, officeId: String) -> some View {
         section(tr("local_group.section.members", fallback: "Soci")) {
             VStack(spacing: 0) {
                 TodayMembershipRow(
@@ -191,13 +192,17 @@ struct LocalGroupView: View {
                     showsChevron: false
                 )
                 Divider().padding(.leading, 60)
-                TodayMembershipRow(
-                    icon: "person.badge.plus",
-                    color: .green,
-                    title: tr("local_group.members.new_week", fallback: "Nuovi nell'ultima settimana"),
-                    value: "\(stats.membersNew7d)",
-                    showsChevron: false
-                )
+                NavigationLink {
+                    LocalGroupNewMembersView(officeId: officeId)
+                } label: {
+                    TodayMembershipRow(
+                        icon: "person.badge.plus",
+                        color: .green,
+                        title: tr("local_group.members.new_week", fallback: "Nuovi nell'ultima settimana"),
+                        value: "\(stats.membersNew7d)"
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .compatGlass(cornerRadius: 18)
         }

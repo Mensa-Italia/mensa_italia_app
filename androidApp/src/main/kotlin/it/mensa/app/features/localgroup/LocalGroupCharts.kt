@@ -23,12 +23,17 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 // I grafici delle statistiche della sede. Nel progetto non c'e' una libreria
 // di grafici: barre e linee sono disegnate su un Canvas, come la curva della
 // classifica. Sul Canvas niente testo: valori ed etichette dei mesi sono Text
 // in righe a pesi uguali, una colonna per mese, allineate alle barre.
+// Con due stagioni (fino a 24 mesi) le etichette dei mesi non stanno tutte:
+// se ne mostra una ogni due o tre, centrata sotto la sua barra.
 
 /** One bar per month, [values] in [color]; the values over the chart. */
 @Composable
@@ -72,7 +77,7 @@ private fun ChartFrame(values: List<Int>?, labels: List<String>, chart: @Composa
             ColumnsRow(values.map(Int::toString), MaterialTheme.colorScheme.onSurface)
         }
         chart()
-        ColumnsRow(labels, MaterialTheme.colorScheme.onSurfaceVariant)
+        MonthLabelsRow(labels)
     }
 }
 
@@ -92,6 +97,47 @@ private fun ColumnsRow(texts: List<String>, color: Color) {
     }
 }
 
+/**
+ * The months under the chart: every label when they fit (up to a season),
+ * else one every [labelStep], each centred on its month's column and free to
+ * be wider than it.
+ */
+@Composable
+private fun MonthLabelsRow(labels: List<String>) {
+    val step = labelStep(labels.size)
+    Layout(
+        modifier = Modifier.fillMaxWidth(),
+        content = {
+            labels.forEachIndexed { index, label ->
+                if (index % step == 0) {
+                    Text(
+                        label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
+            }
+        },
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val slot = width.toFloat() / labels.size.coerceAtLeast(1)
+        val placeables = measurables.map { it.measure(Constraints(maxWidth = width)) }
+        val height = placeables.maxOfOrNull { it.height } ?: 0
+        layout(width, height) {
+            placeables.forEachIndexed { shown, placeable ->
+                val centre = slot * (shown * step) + slot / 2
+                val x = (centre - placeable.width / 2f).roundToInt().coerceIn(0, (width - placeable.width).coerceAtLeast(0))
+                placeable.place(x, 0)
+            }
+        }
+    }
+}
+
+/** 1 up to a season of months, else the step that leaves at most [MAX_MONTH_LABELS] labels. */
+private fun labelStep(months: Int): Int =
+    if (months <= MAX_READABLE_VALUES) 1 else (months + MAX_MONTH_LABELS - 1) / MAX_MONTH_LABELS
+
 @Composable
 private fun LegendEntry(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -107,9 +153,12 @@ private fun DrawScope.drawBars(series: List<List<Int>>, colors: List<Color>) {
     val max = series.flatten().maxOrNull()?.coerceAtLeast(1) ?: 1
     val slot = size.width / months
     // Con pochi mesi le barre resterebbero larghissime: si fermano a BAR_MAX_WIDTH.
-    val group = minOf(slot * GROUP_FILL, BAR_MAX_WIDTH.toPx() * series.size)
+    // Con due stagioni la colonna e' stretta: le barre ne occupano di piu'.
+    val fill = if (months > MAX_READABLE_VALUES) GROUP_FILL_DENSE else GROUP_FILL
+    val group = minOf(slot * fill, BAR_MAX_WIDTH.toPx() * series.size)
     val bar = group / series.size
-    val radius = CornerRadius(BAR_RADIUS.toPx())
+    val gap = minOf(BAR_GAP.toPx(), bar * GAP_SHARE)
+    val radius = CornerRadius(minOf(BAR_RADIUS.toPx(), (bar - gap) / 2))
     for (month in 0 until months) {
         val start = slot * month + (slot - group) / 2
         series.forEachIndexed { index, values ->
@@ -118,8 +167,8 @@ private fun DrawScope.drawBars(series: List<List<Int>>, colors: List<Color>) {
             if (height > 0f) {
                 drawRoundRect(
                     color = colors[index],
-                    topLeft = Offset(start + bar * index + BAR_GAP.toPx() / 2, size.height - height),
-                    size = Size(bar - BAR_GAP.toPx(), height),
+                    topLeft = Offset(start + bar * index + gap / 2, size.height - height),
+                    size = Size(bar - gap, height),
                     cornerRadius = radius,
                 )
             }
@@ -132,7 +181,8 @@ private fun DrawScope.drawLine(values: List<Int>, color: Color, baseline: Color)
     if (values.isEmpty()) return
     val min = values.min()
     val span = (values.max() - min).takeIf { it > 0 }
-    val inset = POINT_RADIUS.toPx() * 2
+    val point = (if (values.size > MAX_READABLE_VALUES) POINT_RADIUS_DENSE else POINT_RADIUS).toPx()
+    val inset = point * 2
     val slot = size.width / values.size
     val points = values.mapIndexed { index, value ->
         val share = span?.let { (value - min).toFloat() / it } ?: HALF
@@ -143,7 +193,7 @@ private fun DrawScope.drawLine(values: List<Int>, color: Color, baseline: Color)
         points.forEachIndexed { index, point -> if (index == 0) moveTo(point.x, point.y) else lineTo(point.x, point.y) }
     }
     drawPath(path, color, style = Stroke(width = LINE_WIDTH.toPx()))
-    points.forEach { drawCircle(color, POINT_RADIUS.toPx(), it) }
+    points.forEach { drawCircle(color, point, it) }
 }
 
 private val CHART_HEIGHT = 160.dp
@@ -152,6 +202,10 @@ private val BAR_MAX_WIDTH = 28.dp
 private val BAR_GAP = 2.dp
 private val LINE_WIDTH = 2.5.dp
 private val POINT_RADIUS = 4.dp
+private val POINT_RADIUS_DENSE = 2.5.dp
 private const val GROUP_FILL = 0.6f
+private const val GROUP_FILL_DENSE = 0.8f
+private const val GAP_SHARE = 0.2f
+private const val MAX_MONTH_LABELS = 8
 private const val HALF = 0.5f
 private const val MAX_READABLE_VALUES = 12

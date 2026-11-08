@@ -3,6 +3,7 @@ package it.mensa.app.features.localgroup
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import it.mensa.app.features.members.MembersRoutes
 import it.mensa.app.support.tr
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.localgroup.ExportKind
@@ -59,6 +61,7 @@ import java.io.File
 @Composable
 fun LocalGroupMembersScreen(
     onBack: () -> Unit,
+    onNavigate: (String) -> Unit,
     viewModel: LocalGroupViewModel = viewModel { LocalGroupViewModel() },
 ) {
     val snapshot by viewModel.snapshot.collectAsStateWithLifecycle()
@@ -109,7 +112,10 @@ fun LocalGroupMembersScreen(
                     text = tr("local_group.state.failed", "Non siamo riusciti a caricare il gruppo locale."),
                     action = tr("local_group.retry", "Riprova") to { viewModel.loadChanges(officeId) },
                 )
-                is Loadable.Loaded -> ChangesList(current.value.filter { it.isArrival == arrivals })
+                is Loadable.Loaded -> ChangesList(
+                    changes = current.value.filter { it.isArrival == arrivals },
+                    onMemberClick = { onNavigate(MembersRoutes.detail(it)) },
+                )
             }
         }
     }
@@ -177,7 +183,7 @@ private fun PeriodRow(period: LocalGroupPeriod, onChange: (LocalGroupPeriod) -> 
 }
 
 @Composable
-private fun ChangesList(changes: List<MemberChangeModel>) {
+private fun ChangesList(changes: List<MemberChangeModel>, onMemberClick: (String) -> Unit) {
     if (changes.isEmpty()) {
         CenteredMessage(tr("local_group.members.empty", "Nessun movimento nel periodo"))
         return
@@ -202,6 +208,7 @@ private fun ChangesList(changes: List<MemberChangeModel>) {
                 headlineContent = { Text(personName(change.name)) },
                 supportingContent = { Text(listOfNotNull(label, shortDate(change.dayIso)).joinToString(" · ")) },
                 colors = cardItemColors(),
+                modifier = Modifier.clickable(enabled = change.member.isNotBlank()) { onMemberClick(change.member) },
             )
         }
     }

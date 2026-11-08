@@ -11,6 +11,10 @@ import SwiftUI
 /// screen's edge.
 struct LocalOfficeHero: View {
     let office: LocalOfficeModel
+    /// `false` (the office page): full-bleed at the very top, under an inline
+    /// bar, stretching on overscroll. `true` (a root tab under a large title):
+    /// a rounded card in the content, no stretch, as `EventRowCard`.
+    var inset: Bool = false
 
     private var coverURL: URL? {
         guard !office.image.isEmpty else { return nil }
@@ -23,40 +27,54 @@ struct LocalOfficeHero: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-            let minY = geo.frame(in: .global).minY
-            let stretch = max(0, minY)
-            ZStack(alignment: .bottom) {
-                Group {
-                    if let url = coverURL {
-                        CachedAsyncImage(url: url) { img in
-                            img.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            AppTheme.brandGradient
-                        }
-                    } else {
-                        AppTheme.brandGradient
-                            .overlay(
-                                Image(systemName: "building.2.fill")
-                                    .font(.system(size: 48, weight: .semibold))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            )
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
-                .clipped()
-
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.45)],
-                    startPoint: .top, endPoint: .bottom
-                )
-                .frame(width: geo.size.width, height: geo.size.height + stretch)
+        if inset {
+            GeometryReader { geo in
+                cover(width: geo.size.width, height: geo.size.height)
             }
-            .frame(width: geo.size.width, height: geo.size.height + stretch)
-            .clipped()
-            .offset(y: -stretch)
+            .frame(height: 200)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+        } else {
+            GeometryReader { geo in
+                let minY = geo.frame(in: .global).minY
+                let stretch = max(0, minY)
+                cover(width: geo.size.width, height: geo.size.height + stretch)
+                    .offset(y: -stretch)
+            }
+            .frame(height: 250)
         }
-        .frame(height: 250)
+    }
+
+    private func cover(width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .bottom) {
+            Group {
+                if let url = coverURL {
+                    CachedAsyncImage(url: url) { img in
+                        img.resizable().aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        AppTheme.brandGradient
+                    }
+                } else {
+                    AppTheme.brandGradient
+                        .overlay(
+                            Image(systemName: "building.2.fill")
+                                .font(.system(size: 48, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.85))
+                        )
+                }
+            }
+            .frame(width: width, height: height)
+            .clipped()
+
+            LinearGradient(
+                colors: [.black.opacity(0), .black.opacity(0.45)],
+                startPoint: .top, endPoint: .bottom
+            )
+            .frame(width: width, height: height)
+        }
+        .frame(width: width, height: height)
+        .clipped()
     }
 }
 
@@ -65,10 +83,14 @@ struct LocalOfficeHero: View {
 /// "GRUPPO LOCALE", the office's name in the serif title and its bio, under the hero.
 struct LocalOfficeIntro: View {
     let office: LocalOfficeModel
+    /// The eyebrow above the name; nil keeps "GRUPPO LOCALE" (the office
+    /// page). The local group tab passes the region, its title already says
+    /// "Gruppo locale".
+    var kicker: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(tr("local_office.kicker", fallback: "GRUPPO LOCALE").uppercased())
+            Text((kicker ?? tr("local_office.kicker", fallback: "GRUPPO LOCALE")).uppercased())
                 .font(.caption2.weight(.semibold))
                 .tracking(1.8)
                 .foregroundStyle(AppTheme.Colors.brandTintAdaptive)

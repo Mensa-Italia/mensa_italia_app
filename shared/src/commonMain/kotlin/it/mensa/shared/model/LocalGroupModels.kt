@@ -1,5 +1,8 @@
 package it.mensa.shared.model
 
+import it.mensa.shared.time.Season
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -106,10 +109,18 @@ data class MemberChangeModel(
     /** True for a member who joined or moved in. */
     val isArrival: Boolean get() = changeKind?.isArrival == true
 
-    /** "YYYY-MM-DD", the date part of [day]. */
-    val dayIso: String get() = day.take(DATE_LENGTH)
+    /**
+     * "YYYY-MM-DD": the day in Europe/Rome. The server writes Rome midnight
+     * in UTC, so "2026-11-01 23:00:00.000Z" is 2 November, not the 1st.
+     */
+    val dayIso: String get() = romeDate(day) ?: day.take(DATE_LENGTH)
 
     private companion object {
         const val DATE_LENGTH = 10
     }
 }
+
+/** The Rome date of a PocketBase datetime ("2026-11-01 23:00:00.000Z"), null when unreadable. */
+private fun romeDate(dateTime: String): String? = runCatching {
+    Instant.parse(dateTime.trim().replace(' ', 'T')).toLocalDateTime(Season.ZONE).date.toString()
+}.getOrNull()

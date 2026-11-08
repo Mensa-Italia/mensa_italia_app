@@ -13,6 +13,7 @@ import it.mensa.shared.model.LocalOfficeStatsModel
 import it.mensa.shared.model.LocationModel
 import it.mensa.shared.model.MemberChangeKind
 import it.mensa.shared.model.MemberChangeModel
+import it.mensa.shared.model.RegSociModel
 import it.mensa.shared.time.Season
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -122,12 +123,17 @@ object LocalGroupFixtures {
         }.sortedWith(compareByDescending<MemberChangeModel> { it.dayIso }.thenBy { it.name })
     }
 
-    /** One row per month from October of the current season to [today]'s month. */
+    /** Three members who joined this week, by name. */
+    internal fun newMembers(): List<RegSociModel> =
+        listOf("Aurora Costa", "Edoardo Fontana", "Matteo Bellini").mapIndexed { i, name ->
+            RegSociModel(id = "fixture-member-$i", name = name, city = listOf("Milano", "Bergamo", "Como")[i])
+        }
+
+    /** One row per month from October of the previous season to [today]'s month, like the server. */
     internal fun monthly(today: LocalDate): List<LocalOfficeMonthlyStatsModel> {
         val season = Season.of(today.atNoon())
-        val label = Season.label(season)
-        var month = LocalDate(season, 10, 1)
-        var active = 398
+        var month = LocalDate(season - 1, 10, 1)
+        var active = 360
         val out = mutableListOf<LocalOfficeMonthlyStatsModel>()
         var i = 0
         while (month <= today) {
@@ -137,7 +143,8 @@ object LocalGroupFixtures {
             val events = 2 + i % 3
             val key = "${month.year}-${month.monthNumber.toString().padStart(2, '0')}"
             out += LocalOfficeMonthlyStatsModel(
-                id = "${OFFICE_ID}_$key", localOffice = OFFICE_ID, regionKey = REGION, month = key, season = label,
+                id = "${OFFICE_ID}_$key", localOffice = OFFICE_ID, regionKey = REGION, month = key,
+                season = Season.label(if (month.monthNumber >= 10) month.year else month.year - 1),
                 events = events, attendance = events * (18 + i % 5), distinctAttendees = events * 14 + i,
                 membersNew = joined, membersLeft = left, membersActive = active,
             )

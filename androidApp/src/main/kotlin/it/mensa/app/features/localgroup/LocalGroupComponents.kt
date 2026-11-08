@@ -35,23 +35,30 @@ import androidx.compose.ui.unit.dp
 import it.mensa.app.support.AppFormat
 import it.mensa.app.support.tr
 import it.mensa.shared.localgroup.LocalGroupDates
+import it.mensa.shared.model.LocalOfficeMonthlyStatsModel
 import java.text.DateFormatSymbols
 import java.util.Locale
 
 // Pezzi comuni alle pagine del gruppo locale: solo componenti Material 3
 // (Card, ListItem, TopAppBar, LoadingIndicator) messi insieme.
 
+/** The title over a [LocalGroupSection], also used alone over a group of sections. */
+@Composable
+internal fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 24.dp, bottom = 8.dp),
+    )
+}
+
 /** A section: its title in primary, then its rows in a [Card]. */
 @Composable
 internal fun LocalGroupSection(title: String?, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxWidth()) {
         if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 24.dp, bottom = 8.dp),
-            )
+            SectionTitle(title)
         } else {
             Spacer(Modifier.height(16.dp))
         }
@@ -138,3 +145,24 @@ internal fun shortDate(iso: String): String {
 /** The short name of month [number] (1 to 12) in [locale]: "ott", "nov". */
 internal fun shortMonth(number: Int, locale: Locale): String =
     DateFormatSymbols.getInstance(locale).shortMonths.getOrNull(number - 1)?.trimEnd('.').orEmpty()
+
+/**
+ * The chart label of each of [months]: the short month ("ott"), plus the
+ * two-digit year ("ott 25") when the rows span more than one year, since
+ * October of two seasons would read the same.
+ */
+internal fun monthLabels(months: List<LocalOfficeMonthlyStatsModel>, locale: Locale): List<String> {
+    val withYear = months.map { it.year }.distinct().size > 1
+    return months.map {
+        val name = shortMonth(it.monthNumber, locale)
+        if (withYear) "$name %02d".format(it.year % CENTURY) else name
+    }
+}
+
+/** "ottobre 2025": the full name of [month]'s month and its year, in [locale]. */
+internal fun monthAndYear(month: LocalOfficeMonthlyStatsModel, locale: Locale): String {
+    val name = DateFormatSymbols.getInstance(locale).months.getOrNull(month.monthNumber - 1).orEmpty()
+    return "$name ${month.year}".trim()
+}
+
+private const val CENTURY = 100

@@ -5,6 +5,7 @@ import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.LocalOfficeAdminModel
 import it.mensa.shared.model.LocalOfficeModel
 import it.mensa.shared.model.LocationModel
+import it.mensa.shared.model.MemberChangeModel
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -71,14 +72,27 @@ class LocalGroupTest {
     }
 
     @Test
-    fun leFixtureHannoUnMesePerMeseDellaStagione() {
+    fun leFixtureHannoUnMesePerMeseDaDueStagioni() {
         val rows = LocalGroupFixtures.monthly(LocalDate(2026, 12, 3))
-        assertEquals(listOf("2026-10", "2026-11", "2026-12"), rows.map { it.month })
+        assertEquals(15, rows.size)
+        assertEquals("2025-10", rows.first().month)
+        assertEquals("2026-12", rows.last().month)
+        assertEquals(listOf("2025/26", "2026/27"), rows.map { it.season }.distinct())
+        assertEquals(3, LocalGroupFixtures.newMembers().size)
         val changes = LocalGroupFixtures.changes(LocalDate(2026, 10, 1), LocalDate(2026, 11, 8))
         assertEquals(12, changes.size)
         assertEquals("2026-11-08", changes.first().dayIso)
         assertEquals(3, LocalGroupFixtures.snapshot().nextEvents.size)
         assertEquals(8, LocalGroupFixtures.officeEvents().size)
+    }
+
+    @Test
+    fun ilGiornoDelServerELaMezzanotteDiRoma() {
+        assertEquals("2026-11-01 23:00:00.000Z", LocalGroupDates.romeMidnight(LocalDate(2026, 11, 2)))
+        assertEquals("2026-07-14 22:00:00.000Z", LocalGroupDates.romeMidnight(LocalDate(2026, 7, 15)))
+        assertEquals("2026-11-02", MemberChangeModel(day = "2026-11-01 23:00:00.000Z").dayIso)
+        assertEquals("2026-11-02", MemberChangeModel(day = "2026-11-02 00:00:00.000Z").dayIso)
+        assertEquals("2026-11-0", MemberChangeModel(day = "2026-11-0").dayIso)
     }
 
     @Test

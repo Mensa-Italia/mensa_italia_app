@@ -11,6 +11,7 @@ import it.mensa.shared.time.Season
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
@@ -34,7 +35,7 @@ data class LocalGroupSnapshot(
     val ranking: LeaderboardRegionModel?,
     /** Events of the region not over yet, soonest first, at most 5. */
     val nextEvents: List<EventModel>,
-    /** Active local deals of the region, at most 10. */
+    /** Active deals: the region's local ones first, then the national ones, at most 10 in all. */
     val deals: List<DealModel>,
     /** The signed-in member is one of [admins] or has the `super` power: the admin area exists. */
     val isAdmin: Boolean,
@@ -111,6 +112,19 @@ object LocalGroupDates {
 
     /** A date from its parts, for Swift callers. */
     fun of(year: Int, month: Int, day: Int): LocalDate = LocalDate(year, month, day)
+
+    /**
+     * Rome midnight of [date] as PocketBase writes it, in UTC: "2026-11-01
+     * 23:00:00.000Z" for 2 November. The server stores `day` this way, so
+     * filters on it must compare against this value, not against the bare
+     * "2026-11-02" (that would be 01:00 of the 2nd in Rome, and skip the row).
+     */
+    fun romeMidnight(date: LocalDate): String {
+        val utc = date.atStartOfDayIn(Season.ZONE).toLocalDateTime(TimeZone.UTC)
+        return "${utc.date} ${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}.000Z"
+    }
+
+    private fun two(n: Int): String = n.toString().padStart(2, '0')
 
     internal const val ISO_DATE_LENGTH = 10
 }

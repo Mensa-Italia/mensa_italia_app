@@ -170,6 +170,7 @@ struct DebugLaunchSelector: View {
                     case "local_group_members_preview": DebugLocalGroupSnapshot { LocalGroupMembersView(snapshot: $0) }
                     case "local_group_stats_preview": DebugLocalGroupSnapshot { LocalGroupStatsView(snapshot: $0) }
                     case "local_group_events_preview": DebugLocalGroupSnapshot { LocalGroupEventsView(snapshot: $0) }
+                    case "local_group_new_members_preview": DebugLocalGroupSnapshot { LocalGroupNewMembersView(officeId: $0.office.id) }
                     default: Text("Unknown screen: \(target)")
                     }
                 }

@@ -14,6 +14,7 @@ import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.geo.TextNormalizer
 import it.mensa.shared.medals.RegionKey
 import it.mensa.shared.model.DealModel
+import it.mensa.shared.model.RegSociModel
 import it.mensa.shared.model.EventModel
 import it.mensa.shared.model.LeaderboardRegionModel
 import it.mensa.shared.model.LocalOfficeAdminModel
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.serialization.json.Json
 
@@ -142,12 +144,35 @@ class LocalGroupRepository(
     @Throws(Exception::class)
     suspend fun loadChanges(officeId: String, from: LocalDate, to: LocalDate): List<MemberChangeModel> {
         if (LocalGroupFixtures.enabled) return LocalGroupFixtures.changes(from, to)
-        val until = to.plus(1, DateTimeUnit.DAY)
+        val start = LocalGroupDates.romeMidnight(from)
+        val until = LocalGroupDates.romeMidnight(to.plus(1, DateTimeUnit.DAY))
         return pb.fullList<MemberChangeModel>(
             CHANGES,
-            filter = "local_office = ${quote(officeId)} && day >= ${quote(from.toString())} && day < ${quote(until.toString())}",
+            filter = "local_office = ${quote(officeId)} && day >= ${quote(start)} && day < ${quote(until)}",
             sort = "-day,name",
         ).sortedWith(compareByDescending<MemberChangeModel> { it.dayIso }.thenBy { it.name })
+    }
+
+    /**
+     * The members who joined the office's region in the last
+     * [NEW_MEMBERS_DAYS] days (new or arrived from another region), by
+     * name: the people behind [LocalOfficeStatsModel.membersNew7d]. Every
+     * signed-in member can read them, like the members' directory.
+     */
+    @Throws(Exception::class)
+    suspend fun loadNewMembers(officeId: String): List<RegSociModel> {
+        if (LocalGroupFixtures.enabled) return LocalGroupFixtures.newMembers()
+        // the server's window: day > today - 7 (Rome midnights)
+        val after = LocalGroupDates.romeMidnight(LocalGroupDates.today().minus(NEW_MEMBERS_DAYS, DateTimeUnit.DAY))
+        val ids = pb.fullList<MemberChangeModel>(
+            CHANGES,
+            filter = "local_office = ${quote(officeId)} && (kind = \"joined\" || kind = \"moved_in\") && day > ${quote(after)}",
+            sort = "-day",
+        ).map { it.member }.filter { it.isNotBlank() }.distinct()
+        if (ids.isEmpty()) return emptyList()
+        return ids.chunked(IDS_PER_QUERY)
+            .flatMap { chunk -> regSoci.list(filter = chunk.joinToString(" || ") { "id = ${quote(it)}" }) }
+            .sortedBy { it.name.lowercase() }
     }
 
     /** The office's months, oldest first. Only the office's admins and super can read them. */
@@ -219,13 +244,27 @@ class LocalGroupRepository(
             .sortedBy { it.whenStart }
             .take(MAX_EVENTS)
 
-    private suspend fun regionDeals(key: String): List<DealModel> {
+    /**
+     * The deals a member of the region can use: the region's local ones
+     * first, then the national ones (not tied to a place: hotels, shops
+     * online), at most [MAX_DEALS] in all. A region with no local deal
+     * still has the national ones to show.
+     */
+    private suspend fun regionDeals(key: String): List<DealModel> = coroutineScope {
+        val local = async { localDeals(key) }
+        val national = async { nationalDeals() }
+        (local.await() + national.await()).distinctBy { it.id }.take(MAX_DEALS)
+    }
+
+    private suspend fun localDeals(key: String): List<DealModel> {
         val states = statesOf(key).joinToString(" || ") { "position.state = ${quote(it)}" }
         val filter = "is_local = true && is_active = true && (ending = \"\" || ending > @now) && ($states)"
         return deals.list(filter = filter, sort = "-created")
             .filter { RegionKey.of(it.position?.state) == key }
-            .take(MAX_DEALS)
     }
+
+    private suspend fun nationalDeals(): List<DealModel> =
+        deals.list(filter = "is_local = false && is_active = true && (ending = \"\" || ending > @now)", sort = "-created")
 
     private suspend fun findOffice(key: String): LocalOfficeModel? =
         allOffices().firstOrNull { officeRegionKey(it) == key }
@@ -306,6 +345,12 @@ class LocalGroupRepository(
         const val CACHE_KEY_PREFIX = "local_group"
         const val MAX_EVENTS = 5
         const val MAX_DEALS = 10
+
+        /** The window of [loadNewMembers]: the server's `members_new_7d`. */
+        const val NEW_MEMBERS_DAYS = 7
+
+        /** Registry ids per query: a filter with hundreds of `id =` would be too long a URL. */
+        const val IDS_PER_QUERY = 50
 
         /**
          * `local_offices.region` -> region key, for a server without
