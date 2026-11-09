@@ -38,6 +38,12 @@ import kotlinx.serialization.json.JsonObject
 private const val KEY_CURRENT_USER = "auth.current_user"
 /** Quando il record in [KEY_CURRENT_USER] e' arrivato dal server (epoch ms). */
 private const val KEY_CURRENT_USER_SYNCED_AT = "auth.current_user.synced_at"
+/**
+ * Presente quando l'ultima risposta del server ha detto `account_blocked`.
+ * Tiene la sospensione anche negli avvii offline: [AccountStatus] vive solo in
+ * memoria, e senza questo un riavvio in modalita' aereo riapriva l'app.
+ */
+private const val KEY_ACCOUNT_SUSPENDED = "auth.account_suspended"
 private const val MEMBERSHIP_CHECK_MAX_WAIT_MS = 8_000L
 private const val EXPIRES_SAFETY_MARGIN_SECONDS = 30L
 /** Quanto il logout aspetta la cancellazione del device prima di uscire comunque. */
@@ -57,6 +63,12 @@ class AuthRepository(
      * come repository perche' i device stanno in un altro modulo Koin.
      */
     private val unregisterDevice: suspend (userId: String) -> Unit = {},
+    /**
+     * Cancella tutti i dati del socio dal telefono ([wipeAllUserData]: tabelle,
+     * file del database, Spotlight). Iniettabile solo per i test, che non
+     * passano dal database globale.
+     */
+    private val wipeUserData: suspend () -> Unit = { wipeAllUserData() },
 ) {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unknown)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -199,6 +211,65 @@ class AuthRepository(
 
     init {
         tokenRefresher.onSessionLost = { recoverLostSession() }
+        // Solo i cambi di stato, non il valore iniziale: altrimenti il `false`
+        // di partenza cancellerebbe il segno di sospensione prima che [initImpl]
+        // lo legga.
+        backgroundScope.launch {
+            var previous = AccountStatus.suspended.value
+            AccountStatus.suspended.collect { suspended ->
+                if (suspended == previous) return@collect
+                previous = suspended
+                if (suspended) onAccountSuspended() else onAccountRestored()
+            }
+        }
+    }
+
+    /**
+     * Il server ha appena detto `account_blocked`: via i dati dal telefono, e
+     * resta scritto che l'account e' sospeso.
+     *
+     * Sessione e credenziali restano: servono al tasto "Riprova" e al login
+     * dell'avvio successivo, che e' cio' che toglie la sospensione quando il
+     * server riattiva l'account. Non resta invece niente da leggere offline:
+     * prima la schermata di sospensione copriva l'app solo finche' il processo
+     * era vivo, e il registro soci restava nel database.
+     */
+    private suspend fun onAccountSuspended() {
+        // Gia' segnato vuol dire gia' cancellato: succede a ogni avvio di un
+        // account sospeso, quando [initImpl] ripristina lo stato dal segno.
+        if (!readSuspendedFlag()) runCatching { wipeUserData() }
+        writeSuspendedFlag()
+        _verified.value = false
+        _syncedAt.value = null
+    }
+
+    private suspend fun onAccountRestored() {
+        runCatching { db.keyValueQueries.deleteById(KEY_ACCOUNT_SUSPENDED) }
+    }
+
+    private suspend fun writeSuspendedFlag() {
+        runCatching { db.keyValueQueries.insertOrReplace(key = KEY_ACCOUNT_SUSPENDED, value_ = "1") }
+    }
+
+    private suspend fun readSuspendedFlag(): Boolean = runCatching {
+        db.keyValueQueries.selectById(KEY_ACCOUNT_SUSPENDED).awaitAsOneOrNull() != null
+    }.getOrDefault(false)
+
+    /**
+     * Applica [OfflineCache] mentre l'app e' gia' aperta: chiamata quando una
+     * rilettura del socio non raggiunge il server. Se l'ultima conferma e'
+     * troppo vecchia si esce cancellando i dati, tenendo le credenziali, che
+     * al primo avvio con la rete rifanno il login da sole.
+     *
+     * Un account sospeso non passa di qui: i suoi dati sono gia' stati
+     * cancellati, e mandarlo al login farebbe alternare le due schermate.
+     */
+    private suspend fun expireStaleCache() {
+        if (AccountStatus.suspended.value) return
+        if (_authState.value !is AuthState.Authenticated) return
+        if (!OfflineCache.isStale(readSyncedAt(), Clock.System.now())) return
+        revalidation?.cancel()
+        wipeAndGoAnonymous(keepCredentials = true)
     }
 
     /**
@@ -270,8 +341,29 @@ class AuthRepository(
         // dopo, in sottofondo, e aggiorna lo stato quando risponde. Se il
         // server dice che la sessione non vale piu', si esce come prima.
         // Senza cache (primo avvio dopo il login) si aspetta come sempre.
+        //
+        // La cache pero' vale solo [OfflineCache.MAX_AGE] dall'ultima conferma
+        // del server: oltre, i dati si cancellano prima di mostrare qualunque
+        // cosa e si aspetta il server. Se il server non risponde si va al login
+        // (le credenziali restano, e il primo avvio con la rete rientra da solo).
+        //
+        // Un account sospeso l'ultima volta che il server ha risposto resta
+        // sospeso anche offline, finche' il server non dice il contrario.
+        val wasSuspended = readSuspendedFlag()
+        if (wasSuspended) AccountStatus.markSuspended()
+
         val stored = readStoredSession()
         val cached = readCachedUser()
+        if (cached != null && OfflineCache.isStale(readSyncedAt(), Clock.System.now())) {
+            runCatching { wipeUserData() }
+            // La cancellazione porta via anche il segno di sospensione.
+            if (wasSuspended) writeSuspendedFlag()
+            revalidate()
+            if (_authState.value is AuthState.Authenticated && !_verified.value && !AccountStatus.suspended.value) {
+                wipeAndGoAnonymous(keepCredentials = true)
+            }
+            return
+        }
         if (stored != null && cached != null) {
             AuthHolder.session = stored
             _syncedAt.value = readSyncedAt()
@@ -464,7 +556,12 @@ class AuthRepository(
                 storeServerUser(user)
                 DemoIdentity.redact(user).also { _currentUser.value = it }
             }
-            MeOutcome.Offline -> null
+            MeOutcome.Offline -> {
+                // Gira a ogni ritorno in primo piano: e' qui che la scadenza
+                // della cache arriva anche a un'app rimasta aperta per giorni.
+                expireStaleCache()
+                null
+            }
             MeOutcome.Wiped -> null
         }
     }
@@ -561,7 +658,7 @@ class AuthRepository(
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
         if (!keepCredentials) runCatching { credentials.clear() }
-        runCatching { wipeAllUserData() }
+        runCatching { wipeUserData() }
         AccountStatus.clear()
         _authState.value = AuthState.Anonymous
         _currentUser.value = null
@@ -687,7 +784,7 @@ class AuthRepository(
         AuthHolder.session = null
         runCatching { tokenStore.clear() }
         runCatching { credentials.clear() }
-        runCatching { wipeAllUserData() }
+        runCatching { wipeUserData() }
         AccountStatus.clear()
         _authState.value = AuthState.Anonymous
         _currentUser.value = null

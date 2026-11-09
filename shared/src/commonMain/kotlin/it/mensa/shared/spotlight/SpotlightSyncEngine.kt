@@ -223,13 +223,13 @@ class SpotlightSyncEngine(
         if (ignoreCache) return if (isValidImage) Action.DownloadImage else Action.NoImage
         if (!isValidImage) return Action.NoImage
         val p = prev ?: return Action.DownloadImage  // brand new member
-        val imageChanged = p.imageHash != m.imageHash
-        val dataChanged = p.dataHash != m.dataHash
-        return when {
-            imageChanged -> Action.DownloadImage
-            dataChanged -> Action.ReuseImage
-            else -> Action.Skip
-        }
+        // Immagine invariata: si reindicizza comunque, con la miniatura in
+        // cache e senza scaricare niente. Non per i dati ma per la scadenza:
+        // Spotlight non ha un modo di prolungarla se non riscrivere l'elemento,
+        // e con la scadenza a un giorno (OfflineCache) un socio mai cambiato
+        // sparirebbe dalla ricerca il giorno dopo anche per chi e' online.
+        // Prima qui c'era Action.Skip, e succedeva lo stesso dopo una settimana.
+        return if (p.imageHash != m.imageHash) Action.DownloadImage else Action.ReuseImage
     }
 
     private fun buildBlock(
