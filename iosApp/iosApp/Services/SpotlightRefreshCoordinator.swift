@@ -43,7 +43,12 @@ final class SpotlightRefreshCoordinator {
 
     static let bgTaskIdentifier = "it.mensa.app.spotlight-refresh"
 
-    private let rollingExpiration: TimeInterval = 7 * 24 * 60 * 60
+    /// Quanto restano in Spotlight i soci (con telefoni ed email) dopo
+    /// l'ultima sincronizzazione. Un giorno, come `OfflineCache.MAX_AGE` in
+    /// KMP: la ricerca di sistema si consulta senza aprire l'app, quindi la
+    /// scadenza della cache all'avvio non la raggiunge. Era una settimana, e
+    /// un telefono tenuto offline continuava a mostrare il registro da lì.
+    private let rollingExpiration: TimeInterval = 24 * 60 * 60
 
     // Throttle/timestamp persistence è in KMP (SpotlightSyncEngine →
     // SQLDelight KeyValue) così wipeAllUserData() lo azzera automaticamente
