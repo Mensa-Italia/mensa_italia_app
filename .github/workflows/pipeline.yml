@@ -752,18 +752,24 @@ jobs:
               # "A review submission is already in progress". La versione nuova
               # sostituisce quella in coda (v22.2.21 sulla 22.2.20): l'invio si
               # annulla qui, prima di deliver, e si aspetta che Apple lo chiuda.
+              # L'attesa rilegge l'invio annullato per id: dopo l'annullamento Apple
+              # lo tiene in CANCELING, che get_in_progress_review_submission non conta,
+              # quindi smetteva subito di aspettare e deliver falliva (v22.6.1).
               asc_platform = Spaceship::ConnectAPI::Platform::IOS
               app = Spaceship::ConnectAPI::App.find(FastlaneCore::IpaFileAnalyser.fetch_app_identifier(ENV['IPA_PATH']))
               submission = app.get_in_progress_review_submission(platform: asc_platform)
               if submission
                 UI.important("Invio in revisione aperto (#{submission.state}): lo annullo, la #{ENV['VERSION']} lo sostituisce")
                 submission.cancel_submission
+                complete = Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::COMPLETE
+                state = nil
                 40.times do
-                  break if app.get_in_progress_review_submission(platform: asc_platform).nil?
-                  UI.message("Aspetto che Apple chiuda l'invio annullato...")
+                  state = Spaceship::ConnectAPI::ReviewSubmission.get(review_submission_id: submission.id).state
+                  break if state == complete
+                  UI.message("Aspetto che Apple chiuda l'invio annullato (#{state})...")
                   sleep(15)
                 end
-                if app.get_in_progress_review_submission(platform: asc_platform)
+                if state != complete
                   UI.user_error!("L'invio precedente e' ancora aperto dopo 10 minuti")
                 end
               end
