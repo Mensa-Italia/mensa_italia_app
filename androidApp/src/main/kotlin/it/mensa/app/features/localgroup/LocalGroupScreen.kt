@@ -434,7 +434,7 @@ private fun LazyListScope.dealsSection(snapshot: LocalGroupSnapshot, onNavigate:
                     )
                 }
             }
-            SeeAllRow(onClick = { onNavigate(DealsRoute.LIST) }, label = tr("local_group.deals.all", "Tutte le convenzioni"))
+            SeeAllRow(onClick = { onNavigate(if (snapshot.regionKey.isBlank()) DealsRoute.LIST else DealsRoute.listInRegion(snapshot.regionKey)) }, label = tr("local_group.deals.all", "Tutte le convenzioni"))
         }
     }
 }

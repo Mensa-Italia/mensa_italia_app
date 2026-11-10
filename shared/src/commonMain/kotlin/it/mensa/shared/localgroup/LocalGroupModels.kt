@@ -35,7 +35,7 @@ data class LocalGroupSnapshot(
     val ranking: LeaderboardRegionModel?,
     /** Events of the region not over yet, soonest first, at most 5. */
     val nextEvents: List<EventModel>,
-    /** Active deals: the region's local ones first, then the national ones, at most 10 in all. */
+    /** Active deals: the region's ones first, then the ones valid everywhere, at most 10 in all. */
     val deals: List<DealModel>,
     /** The signed-in member is one of [admins] or has the `super` power: the admin area exists. */
     val isAdmin: Boolean,
@@ -50,6 +50,8 @@ data class LocalGroupSnapshot(
     val isBoard: Boolean = false,
     /** True while the snapshot is of an office chosen with [LocalGroupRepository.selectOffice], not the member's own. */
     val isOverride: Boolean = false,
+    /** True for super admins: they see every member who left. The office's secretaries see only the last [LocalGroupRules.EXITS_WINDOW_DAYS] days, so the page gives them no choice of period for the exits. */
+    val canSeeOldExits: Boolean = false,
 ) {
     /** The secretary, if the office has one. */
     val secretary: LocalOfficeAdminModel? get() = admins.firstOrNull { it.isTheOfficer }
@@ -109,6 +111,12 @@ enum class LocalGroupPeriod(val days: Int) {
         SEASON -> LocalGroupRange(Season.bounds(Season.of(today.atStartOfDayIn(Season.ZONE))).first, today)
         else -> LocalGroupRange(today.minus(days, DateTimeUnit.DAY), today)
     }
+}
+
+/** The rules of the "Gruppo locale" pages that the apps need as numbers. */
+object LocalGroupRules {
+    /** How many days back the office's secretaries see the members who left (super admins see them all). The server enforces it; the apps use it to word the page. */
+    const val EXITS_WINDOW_DAYS: Int = 7
 }
 
 /** Dates for the admin area, in Europe/Rome like the server's. */

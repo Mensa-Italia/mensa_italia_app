@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -46,6 +47,7 @@ import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.shared.localgroup.ExportKind
 import it.mensa.shared.localgroup.LocalGroupExportFile
 import it.mensa.shared.localgroup.LocalGroupPeriod
+import it.mensa.shared.localgroup.LocalGroupRules
 import it.mensa.shared.model.MemberChangeKind
 import it.mensa.shared.model.MemberChangeModel
 import kotlinx.coroutines.CancellationException
@@ -73,6 +75,9 @@ fun LocalGroupMembersScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val officeId = snapshot?.office?.id
+    // Le segreterie vedono solo le uscite degli ultimi giorni: niente scelta del periodo.
+    val exitsLocked = !arrivals && snapshot?.canSeeOldExits != true
+    LaunchedEffect(exitsLocked) { viewModel.setExitsLocked(exitsLocked) }
     LaunchedEffect(officeId) { officeId?.let(viewModel::loadChanges) }
     val failedText = tr("local_group.export.failed", "Esportazione non riuscita")
     val export: (ExportKind) -> Unit = { kind ->
@@ -105,7 +110,20 @@ fun LocalGroupMembersScreen(
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (exporting) LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(horizontal = 16.dp))
             DirectionRow(arrivals = arrivals, onChange = { arrivals = it })
-            PeriodRow(period = period, onChange = viewModel::selectPeriod)
+            if (exitsLocked) {
+                Text(
+                    tr(
+                        "local_group.members.exits_window",
+                        "Le uscite sono visibili solo per gli ultimi {days} giorni.",
+                        "days" to LocalGroupRules.EXITS_WINDOW_DAYS,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            } else {
+                PeriodRow(period = period, onChange = viewModel::selectPeriod)
+            }
             when (val current = changes) {
                 Loadable.Loading -> CenteredLoading()
                 Loadable.Failed -> CenteredMessage(

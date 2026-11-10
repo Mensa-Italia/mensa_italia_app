@@ -14,6 +14,8 @@ final class DealListViewModel {
 
     /// Active sector chip (`nil` = "all").
     var selectedSector: String?
+    /// Active region (`nil` = every region). See `DealRegions`.
+    var selectedRegion: String?
     var searchText: String = ""
 
     /// Current authenticated user — letto sincrono dall'auth (session-stable,
@@ -23,6 +25,10 @@ final class DealListViewModel {
     }
 
     private var dealsSub: Closeable?
+
+    init(selectedRegion: String? = nil) {
+        self.selectedRegion = selectedRegion
+    }
 
     // MARK: - Lifecycle
 
@@ -64,12 +70,21 @@ final class DealListViewModel {
         return set.sorted()
     }
 
-    /// Filtered by sector + search.
+    /// The regions that have at least one deal, plus the selected one (the
+    /// list may open filtered before the deals arrive, or on a region with no
+    /// deal of its own: the picker needs a row to check), alphabetically.
+    var regions: [String] {
+        let withDeals = DealRegions.shared.regions(deals: allDeals)
+        guard let selectedRegion, !withDeals.contains(selectedRegion) else { return withDeals }
+        return (withDeals + [selectedRegion]).sorted()
+    }
+
+    /// Filtered by region (its deals first, then those valid everywhere) + sector + search.
     var filteredDeals: [DealModel] {
         let trimmedQuery = searchText
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
-        return allDeals.filter { d in
+        return DealRegions.shared.filter(deals: allDeals, regionKey: selectedRegion).filter { d in
             if let sector = selectedSector, d.commercialSector != sector { return false }
             guard !trimmedQuery.isEmpty else { return true }
             if d.name.lowercased().contains(trimmedQuery) { return true }
@@ -82,7 +97,7 @@ final class DealListViewModel {
     /// Empty-state copy depends on whether we filtered ourselves into a corner
     /// or really have no data.
     var isFilterActive: Bool {
-        selectedSector != nil ||
+        selectedSector != nil || selectedRegion != nil ||
             !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 

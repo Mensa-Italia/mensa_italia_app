@@ -2,7 +2,6 @@ package it.mensa.app.features.members
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,10 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.People
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -38,10 +34,11 @@ import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
+import it.mensa.app.ui.components.PlaceChoice
+import it.mensa.app.ui.components.PlaceFilterChip
 import it.mensa.app.ui.theme.EasingEmphasizedDecelerate
 import it.mensa.app.ui.theme.MensaMotion
 import it.mensa.shared.members.MemberDirectory
-import it.mensa.shared.members.MemberPlace
 import org.koin.androidx.compose.koinViewModel
 import it.mensa.app.support.RefreshOnReconnect
 
@@ -57,6 +54,8 @@ fun MembersDirectoryScreen(
     val sectioned = remember(filtered) { vm.sectioned(filtered) }
     val regions = remember(state.members) { MemberDirectory.regions(state.members) }
     val provinces = remember(state.members, state.region) { MemberDirectory.provinces(state.members, state.region) }
+    val regionChoices = remember(regions) { regions.map { PlaceChoice(it.name, it.count) } }
+    val provinceChoices = remember(provinces) { provinces.map { PlaceChoice(it.name, it.count) } }
     val filtering = state.query.isNotBlank() || state.region != null
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -87,7 +86,7 @@ fun MembersDirectoryScreen(
                 PlaceFilterChip(
                     label = tr("members.filter.region", fallback = "Regione"),
                     allLabel = tr("members.filter.region.all", fallback = "Tutte le regioni"),
-                    places = regions,
+                    places = regionChoices,
                     selected = state.region,
                     onSelect = vm::onRegionChange,
                     showCounts = state.members.isNotEmpty(),
@@ -109,7 +108,7 @@ fun MembersDirectoryScreen(
                     PlaceFilterChip(
                         label = tr("members.filter.province", fallback = "Provincia"),
                         allLabel = tr("members.filter.province.all", fallback = "Tutte le province"),
-                        places = provinces,
+                        places = provinceChoices,
                         selected = state.province,
                         onSelect = vm::onProvinceChange,
                         showCounts = state.members.isNotEmpty(),
@@ -252,86 +251,5 @@ fun MembersDirectoryScreen(
             text = { Text(err) },
             confirmButton = { TextButton(onClick = vm::clearError) { Text("OK") } },
         )
-    }
-}
-
-/**
- * Il filtro per regione o provincia: una chip che apre il menu dei [places],
- * ognuno col suo numero di soci quando il registro e' caricato ([showCounts]).
- * Selezionata mostra il luogo scelto; [allLabel] lo toglie.
- */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun PlaceFilterChip(
-    label: String,
-    allLabel: String,
-    places: List<MemberPlace>,
-    selected: String?,
-    onSelect: (String?) -> Unit,
-    showCounts: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val choose: (String?) -> Unit = { place ->
-        expanded = false
-        onSelect(place)
-    }
-    Box(modifier) {
-        FilterChip(
-            // "Regione" -> "Friuli-Venezia Giulia": la larghezza segue il testo.
-            modifier = Modifier.animateContentSize(MaterialTheme.motionScheme.fastSpatialSpec()),
-            selected = selected != null,
-            onClick = { expanded = true },
-            label = { Text(selected ?: label) },
-            leadingIcon = {
-                Icon(
-                    Icons.Outlined.Place,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-                )
-            },
-            trailingIcon = {
-                Icon(
-                    Icons.Filled.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-                )
-            },
-        )
-        DropdownMenuPopup(expanded = expanded, onDismissRequest = { expanded = false }) {
-            val check: @Composable () -> Unit = { Icon(Icons.Filled.Check, contentDescription = null) }
-            DropdownMenuGroup(shapes = MenuDefaults.groupShape(0, 2)) {
-                DropdownMenuItem(
-                    selected = selected == null,
-                    onClick = { choose(null) },
-                    text = { Text(allLabel) },
-                    shapes = MenuDefaults.itemShape(0, 1),
-                    selectedLeadingIcon = check,
-                )
-            }
-            Spacer(Modifier.height(2.dp))
-            DropdownMenuGroup(shapes = MenuDefaults.groupShape(1, 2)) {
-                places.forEachIndexed { index, place ->
-                    DropdownMenuItem(
-                        selected = selected == place.name,
-                        onClick = { choose(place.name) },
-                        text = { Text(place.name) },
-                        shapes = MenuDefaults.itemShape(index, places.size),
-                        selectedLeadingIcon = check,
-                        trailingIcon = if (showCounts) {
-                            {
-                                Text(
-                                    place.count.toString(),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        } else {
-                            null
-                        },
-                    )
-                }
-            }
-        }
     }
 }

@@ -44,14 +44,6 @@ class LocalGroupTest {
     }
 
     @Test
-    fun ilFiltroComprendeLeRegioniAccorpate() {
-        assertEquals(
-            "(local_office = \"x\" || position.state = \"Basilicata\" || position.state = \"Puglia\")",
-            repo.regionFilter("x", "Puglia"),
-        )
-    }
-
-    @Test
     fun ilSegretarioPrimaPoiIcoSegretariPerNome() {
         val sorted = repo.sortAdmins(
             listOf(

@@ -44,7 +44,15 @@ struct LocalGroupMembersView: View {
     @State private var exportURL: URL?
     @State private var exportFailed = false
 
-    private var range: LocalGroupRange { period.shared.range(today: LocalGroupDates.shared.today()) }
+    /// A secretary sees only the last days of exits (the server's window):
+    /// no choice of period for them. Super admins see every exit.
+    private var exitsLocked: Bool { direction == .left && !snapshot.canSeeOldExits }
+
+    /// The period loaded and exported: the chosen one, or the exits' window
+    /// while `exitsLocked` (the choice is kept for "Entrati").
+    private var effectivePeriod: Period { exitsLocked ? .days7 : period }
+
+    private var range: LocalGroupRange { effectivePeriod.shared.range(today: LocalGroupDates.shared.today()) }
 
     private var shown: [MemberChangeModel] {
         changes.filter { direction == .arrived ? $0.isArrival : !$0.isArrival }
@@ -58,12 +66,20 @@ struct LocalGroupMembersView: View {
                         Text(tr("local_group.members.arrived", fallback: "Entrati")).tag(Direction.arrived)
                         Text(tr("local_group.members.left", fallback: "Usciti")).tag(Direction.left)
                     }
-                    Picker(tr("local_group.period.season", fallback: "Stagione"), selection: $period) {
-                        ForEach(Period.allCases, id: \.self) { Text($0.label).tag($0) }
+                    if !exitsLocked {
+                        Picker(tr("local_group.period.season", fallback: "Stagione"), selection: $period) {
+                            ForEach(Period.allCases, id: \.self) { Text($0.label).tag($0) }
+                        }
                     }
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical, 4)
+            } footer: {
+                if exitsLocked {
+                    Text(tr("local_group.members.exits_window",
+                            fallback: "Le uscite sono visibili solo per gli ultimi {days} giorni.",
+                            ["days": "\(LocalGroupRules.shared.EXITS_WINDOW_DAYS)"]))
+                }
             }
 
             if let exportURL {
@@ -97,12 +113,10 @@ struct LocalGroupMembersView: View {
                 } else {
                     ForEach(shown, id: \.id) { change in
                         // A row without a registry id (an old snapshot) has no page to open.
-                        // Pushed by view like every other screen of this tab: a value
-                        // push from a view-pushed screen makes the stack pop it.
                         if change.member.isEmpty {
                             changeRow(change)
                         } else {
-                            NavigationLink { MemberDetailView(memberId: change.member) } label: { changeRow(change) }
+                            NavigationLink(value: RegSociRoute(id: change.member)) { changeRow(change) }
                         }
                     }
                 }
@@ -139,7 +153,8 @@ struct LocalGroupMembersView: View {
         .alert(tr("local_group.export.failed", fallback: "Esportazione non riuscita"), isPresented: $exportFailed) {
             Button("OK", role: .cancel) {}
         }
-        .task(id: period) { await load() }
+        // Reloads when the effective range changes: a new period, or "Usciti" locked to its window.
+        .task(id: effectivePeriod) { await load() }
         .refreshable { await load() }
         .onChange(of: direction) { exportURL = nil }
     }

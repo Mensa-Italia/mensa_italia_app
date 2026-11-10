@@ -9,9 +9,8 @@ import SwiftUI
 struct LocalGroupView: View {
     @State private var store = LocalGroupStore.shared
     @State private var appeared = false
-    /// Board only: the office picker sheet and the association's page.
+    /// Board only: the office picker sheet.
     @State private var showsOfficePicker = false
-    @State private var showsAssociation = false
 
     var body: some View {
         content
@@ -20,12 +19,7 @@ struct LocalGroupView: View {
             // Only when there is nothing to show: `.task` reruns on every
             // return from a pushed screen. Pull to refresh does the rest.
             .task { if store.needsInitialLoad { await store.refresh() } }
-            .navigationDestination(for: RegSociRoute.self) { route in
-                MemberDetailView(memberId: route.id)
-            }
-            .navigationDestination(for: LocalOfficeLinktreeRoute.self) { route in
-                LocalOfficeLinktreeView(officeId: route.officeId)
-            }
+            .localGroupDestinations()
             .toolbar {
                 if store.snapshot?.isBoard == true {
                     ToolbarItem(placement: .topBarTrailing) { boardMenu }
@@ -33,9 +27,6 @@ struct LocalGroupView: View {
             }
             .sheet(isPresented: $showsOfficePicker) {
                 LocalGroupOfficePickerView()
-            }
-            .navigationDestination(isPresented: $showsAssociation) {
-                LocalGroupAssociationView()
             }
     }
 
@@ -47,9 +38,7 @@ struct LocalGroupView: View {
             } label: {
                 Label(tr("local_group.board.switch", fallback: "Cambia gruppo locale"), systemImage: "building.2")
             }
-            Button {
-                showsAssociation = true
-            } label: {
+            NavigationLink(value: LocalGroupRoute.association) {
                 Label(tr("local_group.board.association", fallback: "Statistiche dell'associazione"), systemImage: "chart.bar.xaxis")
             }
             if store.snapshot?.isOverride == true {
@@ -157,7 +146,7 @@ struct LocalGroupView: View {
 
                 block(5) { nextEventSection(snapshot.nextEvent) }
 
-                block(6) { dealsSection(snapshot.deals) }
+                block(6) { dealsSection(snapshot.deals, regionKey: snapshot.regionKey) }
 
                 if snapshot.isAdmin {
                     block(7) { adminSection(snapshot) }
@@ -212,9 +201,7 @@ struct LocalGroupView: View {
         section(tr("local_group.section.ranking", fallback: "Classifica e medaglie")) {
             VStack(spacing: 0) {
                 if let ranking {
-                    NavigationLink {
-                        LeaderboardView()
-                    } label: {
+                    NavigationLink(value: LocalGroupRoute.leaderboard) {
                         TodayMembershipRow(
                             icon: "trophy.fill",
                             color: .orange,
@@ -229,9 +216,7 @@ struct LocalGroupView: View {
                     Divider().padding(.leading, 60)
                 }
 
-                NavigationLink {
-                    MedalCabinetView(showRegion: true)
-                } label: {
+                NavigationLink(value: LocalGroupRoute.medals) {
                     TodayMembershipRow(
                         icon: "medal.fill",
                         color: .yellow,
@@ -257,9 +242,7 @@ struct LocalGroupView: View {
                     showsChevron: false
                 )
                 Divider().padding(.leading, 60)
-                NavigationLink {
-                    LocalGroupNewMembersView(officeId: officeId)
-                } label: {
+                NavigationLink(value: LocalGroupRoute.newMembers(officeId: officeId)) {
                     TodayMembershipRow(
                         icon: "person.badge.plus",
                         color: .green,
@@ -278,7 +261,7 @@ struct LocalGroupView: View {
     private func nextEventSection(_ event: EventModel?) -> some View {
         section(tr("local_group.events.next", fallback: "Prossimo evento")) {
             if let event {
-                NavigationLink(destination: EventDetailView(eventId: event.id)) {
+                NavigationLink(value: LocalGroupRoute.event(id: event.id)) {
                     EventRowCard(event: event)
                 }
                 .buttonStyle(.plain)
@@ -286,13 +269,13 @@ struct LocalGroupView: View {
                 TodayEmptyState(icon: "calendar.badge.exclamationmark",
                                 message: tr("local_group.events.none", fallback: "Nessun evento in programma"))
             }
-            seeAll(tr("local_group.events.all", fallback: "Tutti gli eventi")) { EventListView() }
+            seeAll(tr("local_group.events.all", fallback: "Tutti gli eventi"), route: .allEvents)
         }
     }
 
     // MARK: Deals (as the deals list)
 
-    private func dealsSection(_ deals: [DealModel]) -> some View {
+    private func dealsSection(_ deals: [DealModel], regionKey: String) -> some View {
         section(tr("local_group.section.deals", fallback: "Convenzioni")) {
             if deals.isEmpty {
                 TodayEmptyState(icon: "tag.slash",
@@ -300,14 +283,14 @@ struct LocalGroupView: View {
             } else {
                 LazyVStack(spacing: 10) {
                     ForEach(Array(deals.prefix(3)), id: \.id) { deal in
-                        NavigationLink(destination: DealDetailView(dealId: deal.id)) {
+                        NavigationLink(value: LocalGroupRoute.deal(id: deal.id)) {
                             DealCardView(deal: deal)
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
-            seeAll(tr("local_group.deals.all", fallback: "Tutte le convenzioni")) { DealListView() }
+            seeAll(tr("local_group.deals.all", fallback: "Tutte le convenzioni"), route: .allDeals(regionKey: regionKey))
         }
     }
 
@@ -315,9 +298,7 @@ struct LocalGroupView: View {
 
     /// One card, no title above it: the row already says "Area segreteria".
     private func adminSection(_ snapshot: LocalGroupSnapshot) -> some View {
-        NavigationLink {
-            LocalGroupAdminView(snapshot: snapshot)
-        } label: {
+        NavigationLink(value: LocalGroupRoute.admin) {
             TodayMembershipRow(
                 icon: "person.badge.key.fill",
                 color: .purple,
@@ -330,10 +311,8 @@ struct LocalGroupView: View {
     }
 
     /// Today's "Vedi tutte" line, in its own glass card under the section's content.
-    private func seeAll<Destination: View>(_ title: String, @ViewBuilder destination: @escaping () -> Destination) -> some View {
-        NavigationLink {
-            destination()
-        } label: {
+    private func seeAll(_ title: String, route: LocalGroupRoute) -> some View {
+        NavigationLink(value: route) {
             TodaySeeAllRow(title: title)
         }
         .buttonStyle(.plain)

@@ -69,7 +69,7 @@ struct LocalGroupEventsView: View {
                                                count: upcoming.count)
                         LazyVStack(spacing: 12) {
                             ForEach(Array(upcoming.enumerated()), id: \.element.id) { idx, ev in
-                                NavigationLink(destination: EventDetailView(eventId: ev.id)) {
+                                NavigationLink(value: LocalGroupRoute.event(id: ev.id)) {
                                     EventRowCard(event: ev)
                                 }
                                 .buttonStyle(.plain)
@@ -83,7 +83,7 @@ struct LocalGroupEventsView: View {
                                                count: past.count)
                         LazyVStack(spacing: 12) {
                             ForEach(Array(past.enumerated()), id: \.element.id) { idx, ev in
-                                NavigationLink(destination: EventDetailView(eventId: ev.id)) {
+                                NavigationLink(value: LocalGroupRoute.event(id: ev.id)) {
                                     EventRowCard(event: ev)
                                         .opacity(0.7)
                                 }

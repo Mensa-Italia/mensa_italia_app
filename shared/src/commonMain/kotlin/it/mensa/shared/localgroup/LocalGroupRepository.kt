@@ -9,8 +9,8 @@ import it.mensa.shared.api.endpoints.RegSociApi
 import it.mensa.shared.auth.AuthRepository
 import it.mensa.shared.auth.Powers
 import it.mensa.shared.config.FeatureFlags
+import it.mensa.shared.deals.DealRegions
 import it.mensa.shared.db.MensaDatabase
-import it.mensa.shared.geo.ItalianRegions
 import it.mensa.shared.geo.TextNormalizer
 import it.mensa.shared.medals.RegionKey
 import it.mensa.shared.model.DealModel
@@ -24,6 +24,7 @@ import it.mensa.shared.model.LocalOfficeMonthlyStatsModel
 import it.mensa.shared.model.LocalOfficeStatsModel
 import it.mensa.shared.model.MemberChangeModel
 import it.mensa.shared.model.UserModel
+import it.mensa.shared.time.Season
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -218,16 +219,19 @@ class LocalGroupRepository(
     }
 
     /**
-     * Every event of the office, past and future: the ones with
-     * `local_office` = the office and the ones placed in its region. Latest
-     * first.
+     * Every event of the office from the previous season on (events that
+     * start on or after 1 October of the previous season), past and future:
+     * the ones with `local_office` = the office and the ones placed in its
+     * region. Latest first. The region is matched here, not in the server
+     * filter: members cannot read `positions`, so a `position.state` filter
+     * would never match.
      */
     @Throws(Exception::class)
     suspend fun loadOfficeEvents(officeId: String): List<EventModel> {
         if (LocalGroupFixtures.enabled) return LocalGroupFixtures.officeEvents()
         val key = allOffices().firstOrNull { it.id == officeId }?.let(::officeRegionKey)
-        val filter = regionFilter(officeId, key)
-        return events.list(filter = filter, sort = "-when_start")
+        val since = LocalGroupDates.romeMidnight(Season.bounds(Season.current() - 1).first)
+        return events.list(filter = "when_start >= ${quote(since)}", sort = "-when_start")
             .filter { belongsTo(it, officeId, key) }
             .sortedByDescending { it.whenStart }
     }
@@ -405,36 +409,28 @@ class LocalGroupRepository(
             isAdmin = isAdmin(user, people),
             regionKey = key,
             isBoard = board.await(),
+            canSeeOldExits = Powers.has(user.powers, Powers.SUPER),
         )
     }
 
+    /** The office's events not over yet; the region is matched here (members cannot read `positions` in a server filter). */
     private suspend fun nextEvents(officeId: String, key: String): List<EventModel> =
-        events.list(filter = "when_end >= @now && ${regionFilter(officeId, key)}", sort = "when_start")
+        events.list(filter = "when_end >= @now", sort = "when_start")
             .filter { belongsTo(it, officeId, key) }
             .sortedBy { it.whenStart }
             .take(MAX_EVENTS)
 
     /**
-     * The deals a member of the region can use: the region's local ones
-     * first, then the national ones (not tied to a place: hotels, shops
-     * online), at most [MAX_DEALS] in all. A region with no local deal
-     * still has the national ones to show.
+     * The deals a member of the region can use: the region's ones first,
+     * then the ones valid everywhere (no place in Italy), at most
+     * [MAX_DEALS] in all ([DealRegions.filter]). All active deals are read
+     * once and the region is chosen here: members cannot read `positions`
+     * in a server filter, and `is_local` is unreliable in the real data.
      */
-    private suspend fun regionDeals(key: String): List<DealModel> = coroutineScope {
-        val local = async { localDeals(key) }
-        val national = async { nationalDeals() }
-        (local.await() + national.await()).distinctBy { it.id }.take(MAX_DEALS)
+    private suspend fun regionDeals(key: String): List<DealModel> {
+        val all = deals.list(filter = "is_active = true && (ending = \"\" || ending > @now)", sort = "-created")
+        return DealRegions.filter(all, key).take(MAX_DEALS)
     }
-
-    private suspend fun localDeals(key: String): List<DealModel> {
-        val states = statesOf(key).joinToString(" || ") { "position.state = ${quote(it)}" }
-        val filter = "is_local = true && is_active = true && (ending = \"\" || ending > @now) && ($states)"
-        return deals.list(filter = filter, sort = "-created")
-            .filter { RegionKey.of(it.position?.state) == key }
-    }
-
-    private suspend fun nationalDeals(): List<DealModel> =
-        deals.list(filter = "is_local = false && is_active = true && (ending = \"\" || ending > @now)", sort = "-created")
 
     private suspend fun findOffice(key: String): LocalOfficeModel? =
         allOffices().firstOrNull { officeRegionKey(it) == key }
@@ -543,9 +539,6 @@ class LocalGroupRepository(
             return RegionKey.of(mapped)
         }
 
-        /** The canonical regions that fold into [key]: "Piemonte" -> Piemonte and Valle d'Aosta. */
-        fun statesOf(key: String): List<String> = ItalianRegions.all.filter { RegionKey.of(it) == key }
-
         /** True when [event] is the office's: its `local_office`, or placed in its region. */
         fun belongsTo(event: EventModel, officeId: String, key: String?): Boolean =
             event.localOfficeId == officeId || (key != null && RegionKey.of(event.position?.state) == key)
@@ -560,12 +553,6 @@ class LocalGroupRepository(
 
         fun isAdmin(user: UserModel, admins: List<LocalOfficeAdminModel>): Boolean =
             Powers.has(user.powers, Powers.SUPER) || admins.any { it.user == user.id }
-
-        /** `local_office = id || position.state = ...`, in parentheses. */
-        fun regionFilter(officeId: String, key: String?): String {
-            val states = key?.let(::statesOf).orEmpty().map { "position.state = ${quote(it)}" }
-            return (listOf("local_office = ${quote(officeId)}") + states).joinToString(" || ", "(", ")")
-        }
 
         /** A PocketBase filter string literal; quotes and backslashes are dropped. */
         fun quote(value: String): String = "\"" + value.replace("\\", "").replace("\"", "") + "\""

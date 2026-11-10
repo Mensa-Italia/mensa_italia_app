@@ -171,12 +171,12 @@ struct DebugLaunchSelector: View {
                     case "changelog_preview": ChangelogSheet(items: koin.changelog.items) {}
                     case "birthday_preview": DebugBirthdayGreetingPreview()
                     case "local_group_preview": LocalGroupView()
-                    case "local_group_admin_preview": DebugLocalGroupSnapshot { LocalGroupAdminView(snapshot: $0) }
-                    case "local_group_members_preview": DebugLocalGroupSnapshot { LocalGroupMembersView(snapshot: $0) }
-                    case "local_group_stats_preview": DebugLocalGroupSnapshot { LocalGroupStatsView(snapshot: $0) }
-                    case "local_group_events_preview": DebugLocalGroupSnapshot { LocalGroupEventsView(snapshot: $0) }
-                    case "local_group_new_members_preview": DebugLocalGroupSnapshot { LocalGroupNewMembersView(officeId: $0.office.id) }
-                    case "local_group_association_preview": LocalGroupAssociationView()
+                    case "local_group_admin_preview": DebugLocalGroupSnapshot { LocalGroupAdminView(snapshot: $0) }.localGroupDestinations()
+                    case "local_group_members_preview": DebugLocalGroupSnapshot { LocalGroupMembersView(snapshot: $0) }.localGroupDestinations()
+                    case "local_group_stats_preview": DebugLocalGroupSnapshot { LocalGroupStatsView(snapshot: $0) }.localGroupDestinations()
+                    case "local_group_events_preview": DebugLocalGroupSnapshot { LocalGroupEventsView(snapshot: $0) }.localGroupDestinations()
+                    case "local_group_new_members_preview": DebugLocalGroupSnapshot { LocalGroupNewMembersView(officeId: $0.office.id) }.localGroupDestinations()
+                    case "local_group_association_preview": LocalGroupAssociationView().localGroupDestinations()
                     case "local_group_offices_preview": DebugLocalGroupOfficesPreview()
                     default: Text("Unknown screen: \(target)")
                     }

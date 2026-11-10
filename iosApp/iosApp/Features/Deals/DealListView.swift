@@ -5,9 +5,14 @@ import Shared
 /// pull-to-refresh.
 /// Cache-first: never blocks on a spinner if we already have cached data.
 struct DealListView: View {
-    @State private var vm = DealListViewModel()
+    @State private var vm: DealListViewModel
     @State private var appeared = false
     @State private var showAdd = false
+
+    /// `initialRegion`: the list opens already filtered on that region (from "Gruppo locale").
+    init(initialRegion: String? = nil) {
+        _vm = State(initialValue: DealListViewModel(selectedRegion: initialRegion))
+    }
 
     var body: some View {
         content
@@ -34,7 +39,9 @@ struct DealListView: View {
                     )
                 }
             }
-            .navigationTitle(tr("addons.deals.title", fallback: "Deal & convenzioni"))
+            // With a region chosen the title names it, so a list opened already
+            // filtered says what it shows.
+            .navigationTitle(vm.selectedRegion ?? tr("addons.deals.title", fallback: "Deal & convenzioni"))
             .cleanNavBar()
             .searchable(
                 text: $vm.searchText,
@@ -46,7 +53,7 @@ struct DealListView: View {
                 prompt: Text(tr("app.deals.search_placeholder", fallback: "Cerca convenzioni"))
             )
             .toolbar {
-                sectorFilterToolbarItem
+                filterToolbarItem
                 if vm.canAddDeal {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -121,23 +128,34 @@ struct DealListView: View {
         .refreshableOnReconnect { await vm.refresh() }
     }
 
-    /// Il filtro è SEMPRE in toolbar — i settori specifici si popolano dal
+    /// Il filtro è SEMPRE in toolbar — regioni e settori si popolano dal
     /// flow ma sappiamo a prescindere che esisteranno. Mostrare il bottone
     /// subito evita lo snap quando arrivano i dati.
-    @ToolbarContentBuilder private var sectorFilterToolbarItem: some ToolbarContent {
+    @ToolbarContentBuilder private var filterToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
-                Picker(selection: $vm.selectedSector, label: EmptyView()) {
-                    Text(tr("app.deals.filter.all", fallback: "Tutti"))
-                        .tag(String?.none)
-                    ForEach(vm.sectors, id: \.self) { sector in
-                        Text(sector).tag(String?.some(sector))
+                Section(tr("app.deals.filter.region", fallback: "Regione")) {
+                    Picker(selection: $vm.selectedRegion, label: EmptyView()) {
+                        Text(tr("app.deals.filter.all_regions", fallback: "Tutte le regioni"))
+                            .tag(String?.none)
+                        ForEach(vm.regions, id: \.self) { region in
+                            Text(region).tag(String?.some(region))
+                        }
+                    }
+                }
+                Section(tr("app.deals.filter.sector", fallback: "Settore")) {
+                    Picker(selection: $vm.selectedSector, label: EmptyView()) {
+                        Text(tr("app.deals.filter.all", fallback: "Tutti"))
+                            .tag(String?.none)
+                        ForEach(vm.sectors, id: \.self) { sector in
+                            Text(sector).tag(String?.some(sector))
+                        }
                     }
                 }
             } label: {
                 Label(
-                    tr("app.deals.filter.label", fallback: "Filtra per settore"),
-                    systemImage: vm.selectedSector == nil
+                    tr("app.deals.filter.title", fallback: "Filtra"),
+                    systemImage: vm.selectedSector == nil && vm.selectedRegion == nil
                         ? "line.3.horizontal.decrease.circle"
                         : "line.3.horizontal.decrease.circle.fill"
                 )

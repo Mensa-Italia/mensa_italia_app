@@ -53,6 +53,13 @@ class LocalGroupViewModel(
     private val _period = MutableStateFlow(LocalGroupPeriod.DAYS_30)
     val period: StateFlow<LocalGroupPeriod> = _period.asStateFlow()
 
+    /**
+     * True when the page shows the exits to someone who sees only the last
+     * [LocalGroupRules.EXITS_WINDOW_DAYS] days of them: the list and the
+     * export then take 7 days, while [period] keeps the choice for "Entrati".
+     */
+    private val exitsLocked = MutableStateFlow(false)
+
     private val _changes = MutableStateFlow<Loadable<List<MemberChangeModel>>>(Loadable.Loading)
     val changes: StateFlow<Loadable<List<MemberChangeModel>>> = _changes.asStateFlow()
 
@@ -94,12 +101,16 @@ class LocalGroupViewModel(
 
     fun selectPeriod(value: LocalGroupPeriod) {
         if (value == _period.value) return
-        _period.value = value
-        snapshot.value?.let { loadChanges(it.office.id) }
+        reloadIfPeriodChanges { _period.value = value }
+    }
+
+    fun setExitsLocked(locked: Boolean) {
+        if (locked == exitsLocked.value) return
+        reloadIfPeriodChanges { exitsLocked.value = locked }
     }
 
     fun loadChanges(officeId: String) {
-        val range = _period.value.range()
+        val range = usedPeriod().range()
         load(_changes) { repository.loadChanges(officeId, range.from, range.to) }
     }
 
@@ -137,10 +148,19 @@ class LocalGroupViewModel(
      */
     suspend fun export(kind: ExportKind, directory: File): File {
         val office = checkNotNull(snapshot.value).office
-        val range = _period.value.range().takeIf { kind != ExportKind.ACTIVE }
+        val range = usedPeriod().range().takeIf { kind != ExportKind.ACTIVE }
         val bytes = repository.exportMembers(office.id, kind, range?.from, range?.to)
         val name = LocalGroupExportFile.fileName(office, kind, range?.from, range?.to)
         return withContext(Dispatchers.IO) { File(directory, name).apply { writeBytes(bytes) } }
+    }
+
+    /** The period the list and the export actually use. */
+    private fun usedPeriod(): LocalGroupPeriod = if (exitsLocked.value) LocalGroupPeriod.DAYS_7 else _period.value
+
+    private fun reloadIfPeriodChanges(change: () -> Unit) {
+        val before = usedPeriod()
+        change()
+        if (usedPeriod() != before) snapshot.value?.let { loadChanges(it.office.id) }
     }
 
     private fun <T> load(target: MutableStateFlow<Loadable<T>>, read: suspend () -> T) {

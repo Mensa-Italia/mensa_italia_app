@@ -36,9 +36,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +52,9 @@ import it.mensa.app.support.tr
 import it.mensa.app.ui.components.LoadingDots
 import it.mensa.app.ui.components.MensaScaffold
 import it.mensa.app.ui.components.MensaSearchableTopAppBar
+import it.mensa.app.ui.components.PlaceChoice
+import it.mensa.app.ui.components.PlaceFilterChip
+import it.mensa.shared.deals.DealRegions
 import org.koin.androidx.compose.koinViewModel
 import it.mensa.app.support.RefreshOnReconnect
 
@@ -63,12 +68,26 @@ fun DealListScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToAdd: () -> Unit,
     onBack: () -> Unit = {},
+    initialRegion: String? = null,
     modifier: Modifier = Modifier,
     viewModel: DealListViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // Il filtro di partenza (dal Gruppo locale) vale una volta sola: tornando
+    // dal dettaglio non torna, se nel frattempo l'utente l'ha tolto.
+    var initialRegionApplied by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!initialRegionApplied) {
+            initialRegionApplied = true
+            if (initialRegion != null) viewModel.setSelectedRegion(initialRegion)
+        }
+    }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showSectorMenu by remember { mutableStateOf(false) }
+    val regionChoices = remember(state.allDeals) {
+        val counts = state.allDeals.groupingBy(DealRegions::keyOf).eachCount()
+        state.regions.map { PlaceChoice(it, counts[it] ?: 0) }
+    }
 
     if (state.error != null) {
         AlertDialog(
@@ -163,13 +182,24 @@ fun DealListScreen(
                 .padding(innerPadding),
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Sector chips row
-                if (state.sectors.size > 1) {
+                // Region chip + sector chips row. Also with a region chosen and
+                // no deals at all, so the filter can still be seen and removed.
+                if (state.sectors.size > 1 || state.regions.isNotEmpty() || state.selectedRegion != null) {
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(bottom = 8.dp),
                     ) {
+                        item {
+                            PlaceFilterChip(
+                                label = tr("app.deals.filter.region", "Regione"),
+                                allLabel = tr("app.deals.filter.all_regions", "Tutte le regioni"),
+                                places = regionChoices,
+                                selected = state.selectedRegion,
+                                onSelect = viewModel::setSelectedRegion,
+                                showCounts = true,
+                            )
+                        }
                         item {
                             FilterChip(
                                 selected = state.selectedSector == null,

@@ -4,6 +4,7 @@ import it.mensa.app.support.refreshMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.mensa.app.support.koinAccess
+import it.mensa.shared.deals.DealRegions
 import it.mensa.shared.model.DealModel
 import it.mensa.shared.model.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,12 @@ data class DealListUiState(
     val error: String? = null,
     val currentUser: UserModel? = null,
     val selectedSector: String? = null,
+    val selectedRegion: String? = null,
     val searchText: String = "",
 ) {
+    val regions: List<String>
+        get() = DealRegions.regions(allDeals)
+
     val sectors: List<String>
         get() = allDeals
             .map { it.commercialSector }
@@ -36,7 +41,7 @@ data class DealListUiState(
     val filteredDeals: List<DealModel>
         get() {
             val query = searchText.trim().lowercase()
-            return allDeals.filter { d ->
+            return DealRegions.filter(allDeals, selectedRegion).filter { d ->
                 if (selectedSector != null && d.commercialSector != selectedSector) return@filter false
                 if (query.isEmpty()) return@filter true
                 if (d.name.lowercase().contains(query)) return@filter true
@@ -47,7 +52,7 @@ data class DealListUiState(
         }
 
     val isFilterActive: Boolean
-        get() = selectedSector != null || searchText.isNotBlank()
+        get() = selectedSector != null || selectedRegion != null || searchText.isNotBlank()
 
     val canAddDeal: Boolean
         get() {
@@ -101,6 +106,10 @@ class DealListViewModel : ViewModel() {
 
     fun setSelectedSector(sector: String?) {
         _state.update { it.copy(selectedSector = sector) }
+    }
+
+    fun setSelectedRegion(region: String?) {
+        _state.update { it.copy(selectedRegion = region) }
     }
 
     fun clearError() {
